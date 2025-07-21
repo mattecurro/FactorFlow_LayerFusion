@@ -17,6 +17,8 @@ gemm_coupling = Coupling(['M', 'K', 'N'], ['K', 'N'], ['M', 'K'], ['M', 'N'])
 # => P+R-1: Input height
 # => Q+S-1: Input width
 # ==> MAC: Out[m][p][q] += W[m][c][r][s] * In[c][p+r][q+s]
+# VGG16-L0 -> C: 3, M: 64, P: 224, Q: 224, R: 3, S: 3
+# Output shape: [64, 222, 222], Weight shape: [64, 3, 3, 3], Input shape: [3, 224, 224]
 conv_coupling = Coupling(['M', 'P', 'Q', 'C', 'R', 'S'], ['C', ['P', 'R'], ['Q', 'S']], ['M', 'C', 'R', 'S'], ['M', 'P', 'Q'])
 # WITH STRIDE the indexing becomes:
 # => Pstride*P+Rdilation*R-1: Input height
@@ -229,3 +231,98 @@ benchmark_convs_batched = {
     'XIX': Shape(N = 128, C = 72, M = 72, P = 28, Q = 28, R = 3, S = 3, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1),
     'XX': Shape(N = 32, C = 256, M = 256, P = 56, Q = 56, R = 5, S = 5, Pstride = 2, Qstride = 2, Rdilation = 3, Sdilation = 3)
 }
+
+def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with_batches: bool = False) -> Coupling:
+    """
+    Creates a coupling for an N-layer convolution.
+    
+    Args:
+        num_layers: Number of convolution layers
+        with_stride: Whether to include stride parameters
+        with_batches: Whether to include batch dimension
+    
+    Returns:
+        A Coupling object representing an N-layer convolution
+    """
+    # Build dimensions list
+    dims = ['P', 'Q']
+    
+    # Add batch dimension if needed
+    if with_batches:
+        dims.insert(0, 'N')
+    
+    # Add output channel dimension (K for the last layer)
+    dims.append('K')
+    
+    # Add dimensions for each layer
+    for i in range(num_layers-1, -1, -1):
+        # Add filter dimensions for this layer
+        dims.extend([f'R{i}', f'S{i}'])
+        
+        # Add channel dimensions (except for the last layer which uses K)
+        if i > 0:
+            dims.append(f'C{i}')
+        else:
+            dims.append('M')  # Input channels for first layer
+    
+    # Build input coupling
+    p_dims = ['P'] + [f'R{i}' for i in range(num_layers-1, -1, -1)]
+    
+    
+    q_dims = ['Q'] + [f'S{i}' for i in range(num_layers-1, -1, -1)]
+    
+    in_coupling = [[p_dims], [q_dims], ['M']]
+    if with_batches:
+        in_coupling.insert(0, ['N'])
+    
+    # Build weight couplings for each layer
+    weight_couplings = []
+    
+    # First layer: M -> C1
+    weight_couplings.append(['M', 'C1', 'R0', 'S0'])
+    
+    # Middle layers
+    for i in range(1, num_layers-1):
+        weight_couplings.append([f'C{i}', f'C{i+1}', f'R{i}', f'S{i}'])
+    
+    # Last layer: CN-1 -> K
+    if num_layers > 1:
+        weight_couplings.append([f'C{num_layers-1}', 'K', f'R{num_layers-1}', f'S{num_layers-1}'])
+    
+    # Output coupling
+    out_coupling = []
+    if with_batches:
+        out_coupling.append('N')
+    out_coupling.extend(['P', 'Q', 'K'])
+    
+    # Create strides if needed
+    in_strides = None
+    weight_strides = None
+    out_strides = None
+    
+    if with_stride:
+        in_strides = {}
+        for i in range(num_layers):
+            in_strides[f'P{i}'] = f'Pstride{i}'
+            in_strides[f'R{i}'] = f'Rdilation{i}'
+            in_strides[f'Q{i}'] = f'Qstride{i}'
+            in_strides[f'S{i}'] = f'Sdilation{i}'
+    
+    return Coupling(
+        dims=dims,
+        in_coupling=in_coupling,
+        weight_couplings=weight_couplings,
+        out_coupling=out_coupling,
+        in_strides=in_strides,
+        weight_strides=weight_strides,
+        out_strides=out_strides
+    )
+
+# 3-layer convolution example
+conv_3layer = create_nlayer_conv_coupling(num_layers=3)
+
+# 4-layer convolution example
+conv_4layer = create_nlayer_conv_coupling(num_layers=4)
+
+# 3-layer convolution with stride and batches
+conv_3layer_with_stride_and_batches = create_nlayer_conv_coupling(num_layers=3, with_stride=True, with_batches=True)

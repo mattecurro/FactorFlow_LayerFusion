@@ -395,8 +395,11 @@ class Arch(list[Level]):
     """
     Returns the current stride for a dimension indexing the weights tensor.
     """
-    def getWStride(self, dim : str) -> int:
-        return self.stride_values[self.coupling.w_strides[dim]] if dim in self.coupling.w_strides else 1
+    def getWStride(self, dim: str, layer_idx: int = 0) -> int:
+        """Returns the stride value for a given dimension in the weight tensor at the specified layer."""
+        if dim in self.coupling.w_strides[layer_idx]:
+            return self.stride_values[self.coupling.w_strides[layer_idx][dim]]
+        return 1
 
     """
     Returns the current stride for a dimension indexing the output tensor.
