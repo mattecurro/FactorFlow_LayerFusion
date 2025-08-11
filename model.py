@@ -11,6 +11,8 @@ from arch import *
 Entry point for the analytical model.
 Updates the MOPs and Latency data of each level w.r.t. the current mapping.
 """
+## in_reads non è più un intero ma una lista
+## w_reads non è più un intero ma una lista
 def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     assert arch.initialized, f"Arch {arch.name}: architecture not initialized, ensure to call 'initFactors' first."
     
@@ -20,14 +22,24 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     spatial_iterations = 1
     last_in_reads, last_w_reads, last_out_reads, last_out_writes = 0, 0, 0, 0
     acc_out_reads_factors = 1
+
     # NOTE: here we compute total MOPs, not per-instance
     for i in range(len(arch)):
         level = arch[i]
         if isinstance(level, MemLevel):
             # multiply by spatial_iterations too because memory is replicated spatially
             level_mops = level.MOPs()
-            in_reads, w_reads, out_reads, out_writes = map(lambda m : m*temporal_iterations*spatial_iterations, level_mops[:4])
+            ## Get base MOPs for this level
+            per_layer_in_reads, per_layer_w_reads, out_reads, out_writes, out_reads_factors = level_mops
+            scale = temporal_iterations*spatial_iterations
+            per_layer_in_reads = [m*scale for m in per_layer_in_reads]
+            per_layer_w_reads = [m*scale for m in per_layer_w_reads]
+            in_reads = sum(per_layer_in_reads) # sum all input reads
+            w_reads = sum(per_layer_w_reads) # sum all weight reads
+            out_reads = out_reads * scale # output reads are not per-layer, so scale them directly
+            out_writes = out_writes * scale # output writes are not per-layer, so scale them directly
             out_reads_factors = level_mops[4]*acc_out_reads_factors
+
             if not bias_read and out_reads_factors != 0:
                 out_reads = (out_reads*(out_reads_factors - 1))//out_reads_factors
             if 'in' not in level.bypasses:
@@ -49,7 +61,15 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     last_out_writes = out_writes
             else:
                 level.setAboveMOPs(0, 0)
-            level.setMOPs(in_reads = in_reads, w_reads = w_reads, out_reads = out_reads, in_writes = in_writes, w_writes = w_writes, out_writes = out_writes)
+            level.setMOPs(per_layer_in_reads = per_layer_in_reads,
+                          per_layer_w_reads = per_layer_w_reads,
+                          out_reads = out_reads,
+                          in_writes = in_writes,
+                          w_writes = w_writes,
+                          out_writes = out_writes)
+            level.in_reads = in_reads
+            level.w_reads = w_reads
+            level.out_reads = out_reads
             level.temporal_iterations = temporal_iterations
             reads = in_reads + w_reads + out_reads
             writes = in_writes + w_writes + out_writes

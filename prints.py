@@ -131,6 +131,7 @@ in the architecture, broken down per-operand. A few notes:
   since otherwise drain and updates are 0, while fill and read can be inferred
   from Tot_W and Tot_R respectively.
 """
+## modificare: reads per ogni layer sia per pesi che per in
 
 def printMOPs(arch : Arch, per_instance : bool = False) -> None:
     tot_reads = 0

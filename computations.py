@@ -232,8 +232,7 @@ benchmark_convs_batched = {
     'XX': Shape(N = 32, C = 256, M = 256, P = 56, Q = 56, R = 5, S = 5, Pstride = 2, Qstride = 2, Rdilation = 3, Sdilation = 3)
 }
 
-def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with_batches: bool = False) -> Coupling:
-    """
+"""
     Creates a coupling for an N-layer convolution.
     
     Args:
@@ -243,7 +242,8 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
     
     Returns:
         A Coupling object representing an N-layer convolution
-    """
+"""    
+def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with_batches: bool = False) -> Coupling:
     # Build dimensions list
     dims = ['P', 'Q']
     
@@ -309,13 +309,13 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
             in_strides[f'S{i}'] = f'Sdilation{i}'
     
     return Coupling(
-        dims=dims,
-        in_coupling=in_coupling,
-        weight_couplings=weight_couplings,
-        out_coupling=out_coupling,
-        in_strides=in_strides,
-        weight_strides=weight_strides,
-        out_strides=out_strides
+        dims = dims,
+        in_coupling = in_coupling,
+        weight_couplings = weight_couplings,
+        out_coupling = out_coupling,
+        in_strides = in_strides,
+        weight_strides = weight_strides,
+        out_strides = out_strides
     )
 
 # 3-layer convolution example

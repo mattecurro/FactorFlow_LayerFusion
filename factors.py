@@ -62,6 +62,7 @@ Constructor arguments:
 - in/w/out_strides: dictionary binding stride constant names to dimensions
 """
 class Coupling:
+    ## a fine init (dopo gli assert) castare le liste in Tuple
     def __init__(self, dims : list[str],
                  in_coupling : list[Union[str, list[str]]],
                  w_coupling : list[list[Union[str, list[str]]]], 
@@ -85,12 +86,10 @@ class Coupling:
 
         
         # flatten_two_levels_list is used to return a single list of input dims
-        
         self.flat_in_coupling : list[str] = flatten_two_levels_list(in_coupling)
-        ## HOW TO HANDLE THIS? 
         #self.flat_w_coupling : list[str] = flatten_two_levels_list(w_coupling)
 
-## non sono sicuro
+
         self.flat_w_coupling : list[list[str]] = []
         for w in w_coupling:
             self.flat_w_coupling.append(flatten_two_levels_list(w))
@@ -151,8 +150,7 @@ class Coupling:
         for i, w_strides in enumerate(self.w_strides):
             assert all(any(dim in dim_sum for dim_sum in self.w_coupling[i] if len(dim_sum) > 1) for dim in w_strides.keys()), f"Invalid coupling: all dimensions referenced in w_strides[{i}] {w_strides.keys()} must be part of a sum of at least two indices on the weights (thus pick among {list(reduce(lambda x, y : x+y, filter(lambda dim_sum : len(dim_sum) > 1, self.w_coupling[i]), []))})"
         assert all(any(dim in dim_sum for dim_sum in self.out_coupling if len(dim_sum) > 1) for dim in self.out_strides.keys()), f"Invalid coupling: all dimensions referenced in out_strides {self.out_strides.keys()} must be part of a sum of at least two indices on the output (thus pick among {list(reduce(lambda x, y : x+y, filter(lambda dim_sum : len(dim_sum) > 1, self.out_coupling), []))})"
-        #warnings for strided sums of more than 2 indices 
-        ## DOUBT 
+        #warnings for strided sums of more than 2 indices  
         if any(len(dim_sum) > 2 and any(dim in self.in_strides for dim in dim_sum) for dim_sum in self.in_coupling): print(f"WARNING: coupling {self} has strides applied to a sum of more than 2 indices on its input tensor ({filter(lambda dim_sum: len(dim_sum) > 2 and any(dim in self.in_strides for dim in dim_sum), self.in_coupling)}), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.")
         for i, w_coupling in enumerate(self.w_coupling):
             if any(len(dim_sum) > 2 and any(dim in self.w_strides[i] for dim in dim_sum) for dim_sum in w_coupling): print(f"WARNING: coupling {self} has strides applied to a sum of more than 2 indices on its weights tensor ({filter(lambda dim_sum: len(dim_sum) > 2 and any(dim in self.w_strides[i] for dim in dim_sum), w_coupling)}), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.")
@@ -269,7 +267,7 @@ class Coupling:
     
     def getNumLayers(self) -> int:
         """Returns the number of layers in this coupling."""
-        return len(self.weight_couplings) 
+        return len(self.w_coupling) 
     
     """
     Returns a compact string representing the coupling.
@@ -381,6 +379,9 @@ class Factors(dict[str, dict[int, int]]):
             self[dimension].pop(factor)
         self._dim_products[dimension] //= factor**amount
         return True
+
+    ##aggiungere constraints!!! da poi chiamare in levels in level in checkFactorsConstraints
+    
 
     ## number of iterations along a dimension
     """

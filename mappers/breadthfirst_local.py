@@ -116,6 +116,7 @@ def fanoutMaximization(arch : Arch, comp : Shape, bias_read : bool, verbose : bo
 Removes from 'perms' all but one permutation for each set that is in equi-dataflow match on 'level'.
 Use 'in/w/out_matters' to specify wheather an operand is or not relevant to determine the equi-dataflow.
 """
+## modifica!!! modificare weights con ciclo, no input!!
 def filterEquiDataflowPerms(level : MemLevel, coupling : Coupling, perms : list[list[str]], in_matters : bool = True, w_matters : bool = True, out_matters : bool = True) -> list[list[str]]:
     """
     Returns a dictionary indicating for each dimension if it has only a single iteration on 'level'.
@@ -137,10 +138,29 @@ def filterEquiDataflowPerms(level : MemLevel, coupling : Coupling, perms : list[
             # 3) for bypassed operands, only the level that first dictates a dataflow among those the bypass spans over, needs to have an equi-dataflow match, all others match by default
             # NOTE: (3) is passively handled by in/w/out_matters, that are given also according to whether the present level solves a bypass dataflow or not.
             i, j = next((i for i, dim in enumerate(perm_effective) if dim in coupling.flat_in_coupling), 0), next((j for j, dim in enumerate(unique_perm_effective) if dim in coupling.flat_in_coupling), 0)
+            ## in_matters = TRUE == bypassed
+            ## or
+            ## i == j => the innermost dim is the same
+            ## set(perm_effective[:i]) == set(unique_perm_effective[:j]) => all non-ort dim before innermost must be the same 
+                ## or
+                ## perm_effective[i] == unique_perm_effective[j] => the innermost dim is the same 
+                ## or
+                ## not coupling.getDimSum('in', perm_effective[i], 2) and not coupling.getDimSum('in', unique_perm_effective[j], 2) => the innermost dim is not part of a sum of indices
             input_ok = not in_matters or i == j and set(perm_effective[:i]) == set(unique_perm_effective[:j]) and ((perm_effective[i] == unique_perm_effective[j] or (not coupling.getDimSum('in', perm_effective[i], 2) and not coupling.getDimSum('in', unique_perm_effective[j], 2))) or (not level.multiple_reuses and i != 0))
             if input_ok:
-                i, j = next((i for i, dim in enumerate(perm_effective) if dim in coupling.flat_w_coupling), 0), next((j for j, dim in enumerate(unique_perm_effective) if dim in coupling.flat_w_coupling), 0)
-                weights_ok = not w_matters or i == j and set(perm_effective[:i]) == set(unique_perm_effective[:j]) and ((perm_effective[i] == unique_perm_effective[j] or (not coupling.getDimSum('w', perm_effective[i], 2) and not coupling.getDimSum('w', unique_perm_effective[j], 2))) or (not level.multiple_reuses and i != 0))
+                i, j = next((i for i, dim in enumerate(perm_effective) if dim in coupling.flat_w_coupling), 0), next((j for j, dim in enumerate(unique_perm_effective) if dim in coupling.flat_w_coupling), 0)                
+                ## Check weights_ok for each layer
+                weights_ok = True
+                if w_matters:
+                    ## Check each layer
+                    for layer_idx in range(coupling.getNumLayers()):
+                        flat_w_coupling_layer = coupling.flat_w_coupling[layer_idx]
+                        i, j = next((i for i, dim in enumerate(perm_effective) if dim in flat_w_coupling_layer), 0), next((j for j, dim in enumerate(unique_perm_effective) if dim in flat_w_coupling_layer), 0)
+                        layer_weights_ok = i == j and set(perm_effective[:i]) == set(unique_perm_effective[:j]) and ((perm_effective[i] == unique_perm_effective[j] or (not coupling.getDimSum('w', perm_effective[i], 2, layer_idx) and not coupling.getDimSum('w', unique_perm_effective[j], 2, layer_idx))) or (not level.multiple_reuses and i != 0))
+                
+                        if not layer_weights_ok:
+                            weights_ok = False
+                            break
                 if weights_ok:
                     i, j = next((i for i, dim in enumerate(perm_effective) if dim in coupling.flat_out_coupling), 0), next((j for j, dim in enumerate(unique_perm_effective) if dim in coupling.flat_out_coupling), 0)
                     output_ok = not out_matters or i == j and set(perm_effective[:i]) == set(unique_perm_effective[:j]) and ((perm_effective[i] == unique_perm_effective[j] or (not coupling.getDimSum('out', perm_effective[i], 2) and not coupling.getDimSum('out', unique_perm_effective[j], 2))) or (not level.multiple_reuses and i != 0))
@@ -181,7 +201,9 @@ def pickBestPermsIteratively(arch : Arch) -> None:
         if len(dims_not_at_one) == 2: # two dimension iterated, pick the best order between them
             dims_at_one = [dim for dim in arch.coupling.dims if level.factors.dimProduct(dim) == 1]
             candidate_perms = [dims_at_one + dims_not_at_one, dims_at_one + dims_not_at_one[::-1]]
-        elif len(dims_not_at_one) < 6: # some dimensions not iterated, check equi-dataflow matches
+        ## change that with the num_layers
+        # for example for 3 layer: 12        
+        elif len(dims_not_at_one) < len(arch.coupling.dims): # some dimensions not iterated, check equi-dataflow matches
             candidate_perms = candidate_perms_per_mem_level[i]
             candidate_perms = filterEquiDataflowPerms(level, arch.coupling, candidate_perms, in_matters, w_matters, out_matters)
         else: # six dimensions iterated, all candidates must be tried
@@ -191,7 +213,9 @@ def pickBestPermsIteratively(arch : Arch) -> None:
         for perm in candidate_perms:
             level.dataflow = perm
             # TODO: unfair, because the cost of reads and write is not identical...and we are ignoring other mops types...this is not a great proxy for reuse!
-            in_reads, w_reads, out_reads, out_writes, _ = level.MOPs(in_matters, w_matters, out_matters, True)
+            per_layer_in_reads, per_layer_w_reads, out_reads, out_writes, _ = level.MOPs(in_matters, w_matters, out_matters, True)
+            in_reads = sum(per_layer_in_reads)
+            w_reads = sum(per_layer_w_reads)
             mops = in_reads + w_reads + out_reads + out_writes
             if mops < best_mops:
                 best_perm, best_mops = perm, mops
@@ -503,11 +527,23 @@ def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : 
             else:
                 candidate_perms = [perm for perm in interleave(level.dataflow_constraints, [dim for dim in level.dataflow if dim not in level.dataflow_constraints])]
             # NOTE: can't remove here some couplings w.r.t stored/not-stored operands because they still have an effect when there is a bypass...
-            coupling_sets = [frozenset(arch.coupling.flat_in_coupling), frozenset(arch.coupling.flat_w_coupling), frozenset(arch.coupling.flat_out_coupling)]
+            #coupling_sets = [frozenset(arch.coupling.flat_in_coupling), frozenset(arch.coupling.flat_w_coupling), frozenset(arch.coupling.flat_out_coupling)]
+            
+            # Flatten all weight couplings
+            all_w_dims = set()
+            for layer_w_coupling in arch.coupling.flat_w_coupling:
+                all_w_dims.update(layer_w_coupling)
+            coupling_sets = [frozenset(arch.coupling.flat_in_coupling),
+                             frozenset(all_w_dims), # use all weight dimensions, not just the first layer
+                             frozenset(arch.coupling.flat_out_coupling)]
             if False and level.multiple_reuses:
+                w_has_dimsum = any(
+                    any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in layer_w_coupling) 
+                    for layer_w_coupling in arch.coupling.w_coupling
+                )
                 # considering skipped dimensions and halo reuse, for each operand changing order of loops before and after the innermost iterated dimension coupled to the operand doesn't impact reuse, while such innermost dimension dictates the halo reuse (if a dimsum is present)
                 # => remove permutations with a different order of loops inside those determining the dataflow or outside them for each operand
-                dimsums_flags = [int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.in_coupling)), int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.w_coupling)), int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.out_coupling))]
+                dimsums_flags = [int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.in_coupling)), int(w_has_dimsum), int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.out_coupling))]
                 candidate_perms = filter_equivalent_perms(candidate_perms, coupling_sets, dimsums_flags)
             else:
                 # same as above, but we don't have halo reuse
