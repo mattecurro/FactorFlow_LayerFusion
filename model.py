@@ -31,6 +31,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             level_mops = level.MOPs()
             ## Get base MOPs for this level
             per_layer_in_reads, per_layer_w_reads, out_reads, out_writes, out_reads_factors = level_mops
+#            print(f"DEBUG updateStats {level.name}: per_layer_w_reads = {per_layer_w_reads}")            
             scale = temporal_iterations*spatial_iterations
             per_layer_in_reads = [m*scale for m in per_layer_in_reads]
             per_layer_w_reads = [m*scale for m in per_layer_w_reads]

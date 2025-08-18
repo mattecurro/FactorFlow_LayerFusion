@@ -105,7 +105,7 @@ class Coupling:
         # no dimension can be used more than once in the same coupling,
         # even if it is in a different sublist, e.g. ['X', ['Y', 'X']] is not allowed
         assert all(self.flat_in_coupling.count(dim) == 1 for dim in self.flat_in_coupling), f"Invalid coupling: in_coupling ({in_coupling}) must not use a dimension more than once, not even between sublists."
-        for i, flat_w_coupling in enumerate(self.flat_weight_couplings):
+        for i, flat_w_coupling in enumerate(self.flat_w_coupling):
             assert all(flat_w_coupling.count(dim) == 1 for dim in flat_w_coupling), f"Invalid coupling: weight_coupling[{i}] must not use a dimension more than once."
         assert all(self.flat_out_coupling.count(dim) == 1 for dim in self.flat_out_coupling), f"Invalid coupling: out_coupling ({out_coupling}) must not use a dimension more than once, not even between sublists."
         # convert all coupling lists to lists of lists, 
@@ -116,6 +116,7 @@ class Coupling:
         # e.g. ['X', ['Y', 'Z']] becomes [['X'], ['Y', 'Z']]
         self.in_coupling : list[list[str]] = list(map(lambda x : x if isinstance(x, list) else [x], in_coupling))
         
+        self.w_coupling : list[list[list[str]]] = []
         for w in w_coupling:
             self.w_coupling.append(list(map(lambda x: x if isinstance(x, list) else [x], w)))
 
@@ -132,7 +133,6 @@ class Coupling:
         self.out_strides : dict[str, str] = out_strides if out_strides else {}
         #validate strides keys
         assert all(dim in self.dims for dim in self.in_strides.keys()), f"Invalid coupling: all keys assigned in in_strides {self.in_strides.keys()} must be dimensions of the coupling ({self.dims})."        
-        assert all(dim in self.dims for dim in self.w_strides.keys()), f"Invalid coupling: all keys assigned for w_strides {self.w_strides.keys()} must be dimensions of the coupling ({self.dims})."
         for i, w_strides in enumerate(self.w_strides):
             assert all(dim in self.dims for dim in w_strides.keys()), f"Invalid coupling: all keys assigned for w_strides[{i}] {w_strides.keys()} must be dimensions of the coupling ({self.dims})."
         assert all(dim in self.dims for dim in self.out_strides.keys()), f"Invalid coupling: all keys assigned for out_strides {self.out_strides.keys()} must be dimensions of the coupling ({self.dims})."
@@ -190,7 +190,7 @@ class Coupling:
     can model a subset of the kernels modeled by the current coupling.
     """
     def isSubcoupling(self, coupling : Coupling) -> bool:
-        if not self.isCompatileCoupling(coupling):
+        if not self.isCompatibleCoupling(coupling):
             return False
         
         if not any(all(set(dim_sum) <= set(self_dim_sum) for dim_sum, self_dim_sum in zip(coupling.in_coupling, perm)) for perm in permutations(self.in_coupling, len(coupling.in_coupling))):

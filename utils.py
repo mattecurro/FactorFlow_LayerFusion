@@ -64,6 +64,19 @@ elements of 'array'. The array elements retain their order, while those of
 'elements' may not.
 """
 def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
+    ## DEBUG
+    if len(elements) > 10 :
+        if not elements:
+            return [array]
+        results = []
+        results.append(elements + array)
+        results.append(array + elements)
+        if len(array) > 0:
+            mid_pos = len(array) // 2
+            results.append(array[:mid_pos] + elements + array[mid_pos:])
+        print(f"interleave: too many elements ({len(elements)}), returning {len(results)} results")
+        return results
+    
     def recursive_insert(arr, elems):
         if not elems:
             return [arr]

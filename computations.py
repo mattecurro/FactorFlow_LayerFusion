@@ -271,7 +271,7 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
     
     q_dims = ['Q'] + [f'S{i}' for i in range(num_layers-1, -1, -1)]
     
-    in_coupling = [[p_dims], [q_dims], ['M']]
+    in_coupling = [p_dims, q_dims, ['M']]
     if with_batches:
         in_coupling.insert(0, ['N'])
     
@@ -302,19 +302,19 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
     
     if with_stride:
         in_strides = {}
+        in_strides['P'] = 'Pstride'
+        in_strides['Q'] = 'Qstride'
         for i in range(num_layers):
-            in_strides[f'P{i}'] = f'Pstride{i}'
             in_strides[f'R{i}'] = f'Rdilation{i}'
-            in_strides[f'Q{i}'] = f'Qstride{i}'
             in_strides[f'S{i}'] = f'Sdilation{i}'
     
     return Coupling(
         dims = dims,
         in_coupling = in_coupling,
-        weight_couplings = weight_couplings,
+        w_coupling = weight_couplings,
         out_coupling = out_coupling,
         in_strides = in_strides,
-        weight_strides = weight_strides,
+        w_strides = weight_strides,
         out_strides = out_strides
     )
 
@@ -326,3 +326,18 @@ conv_4layer = create_nlayer_conv_coupling(num_layers=4)
 
 # 3-layer convolution with stride and batches
 conv_3layer_with_stride_and_batches = create_nlayer_conv_coupling(num_layers=3, with_stride=True, with_batches=True)
+
+comp = Shape(
+    P = 256,
+    Q = 256,
+    K = 8,
+    R0 = 3,
+    S0 = 3,
+    C1 = 2,
+    R1 = 3,
+    S1 = 3,
+    R2 = 3,  # You'll need to specify R2 and S2 for the third layer
+    S2 = 3,
+    C2 = 4,  # You'll need to specify C2 for the connection between layers
+    M = 3
+)

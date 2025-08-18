@@ -132,7 +132,6 @@ in the architecture, broken down per-operand. A few notes:
   from Tot_W and Tot_R respectively.
 """
 ## modificare: reads per ogni layer sia per pesi che per in
-
 def printMOPs(arch : Arch, per_instance : bool = False) -> None:
     tot_reads = 0
     tot_writes = 0
@@ -142,6 +141,47 @@ def printMOPs(arch : Arch, per_instance : bool = False) -> None:
             scaling = level.active_instances if per_instance else 1
             if 'out' not in level.bypasses:
                 print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Out_R = {(level.out_reads - level.last_out_writes)/scaling:.0f} (reads) + {level.last_out_writes/scaling:.0f} (drains), Out_W = {(level.out_writes - level.last_out_reads)/scaling:.0f} (updates) + {level.last_out_reads/scaling:.0f} (fills)")
+            reads = level.in_reads + level.w_reads + level.out_reads
+            writes = level.in_writes + level.w_writes + level.out_writes
+            print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.in_reads/scaling:.0f} In_R, {level.w_reads/scaling:.0f} W_R, {level.out_reads/scaling:.0f} Our_R, {reads/scaling:.0f} Tot_R,\n\t\t{level.in_writes/scaling:.0f} In_W, {level.w_writes/scaling:.0f} W_W, {level.out_writes/scaling:.0f} Out_W, {writes/scaling:.0f} Tot_W")
+            tot_reads += reads
+            tot_writes += writes
+            WMOPs += level.WMOPs(reads, writes)
+        elif isinstance(level, FanoutLevel):
+            continue
+        elif isinstance(level, ComputeLevel):
+            WMOPs += level.computeCost(level.temporal_iterations*level.active_instances)
+            break
+    print(f"Totals:\t\t{tot_reads:.0f} R, {tot_writes:.0f} W, {tot_reads+tot_writes:.0f} Tot")
+    print(f"Energy:\t\t{WMOPs*10**-6:.3f} uJ")
+
+
+"""
+Print to stdout the memory operations (MOPs) per level in the architecture.
+If "per_instance" is True, reported MOPs are divided by the number of instances
+of a certain component, otherwise they are aggregate across all such instances.
+Default is False.
+"""
+def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
+    tot_reads = 0
+    tot_writes = 0
+    WMOPs = 0
+    for level in arch:
+        if isinstance(level, MemLevel):
+            scaling = level.active_instances if per_instance else 1
+            if 'out' not in level.bypasses:
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Out_R = {(level.out_reads - level.last_out_writes)/scaling:.0f} (reads) + {level.last_out_writes/scaling:.0f} (drains), Out_W = {(level.out_writes - level.last_out_reads)/scaling:.0f} (updates) + {level.last_out_reads/scaling:.0f} (fills)")
+            
+            # Print per-layer input reads if available
+            if hasattr(level, 'per_layer_in_reads') and level.per_layer_in_reads:
+                layer_in_str = ", ".join([f"L{i}: {reads/scaling:.0f}" for i, reads in enumerate(level.per_layer_in_reads)])
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer In_R: [{layer_in_str}], Total: {level.in_reads/scaling:.0f}")
+            
+            # Print per-layer weight reads if available
+            if hasattr(level, 'per_layer_w_reads') and level.per_layer_w_reads:
+                layer_w_str = ", ".join([f"L{i}: {reads/scaling:.0f}" for i, reads in enumerate(level.per_layer_w_reads)])
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer W_R: [{layer_w_str}], Total: {level.w_reads/scaling:.0f}")
+            
             reads = level.in_reads + level.w_reads + level.out_reads
             writes = level.in_writes + level.w_writes + level.out_writes
             print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.in_reads/scaling:.0f} In_R, {level.w_reads/scaling:.0f} W_R, {level.out_reads/scaling:.0f} Our_R, {reads/scaling:.0f} Tot_R,\n\t\t{level.in_writes/scaling:.0f} In_W, {level.w_writes/scaling:.0f} W_W, {level.out_writes/scaling:.0f} Out_W, {writes/scaling:.0f} Tot_W")

@@ -87,19 +87,80 @@ class Level(LevelCore):
         #        all([((dim + '<=') not in self.factors_constraints or self.factors_constraints[dim + '<='] >= self.factors.dimProduct(dim)) for dim in self.dataflow]) and
         #        all([((dim + '>=') not in self.factors_constraints or self.factors_constraints[dim + '>='] <= self.factors.dimProduct(dim)) for dim in self.dataflow]) and
         #        all([len(self.factors[dim]) == 0 for dim in self.arch.coupling.dims if dim not in self.dataflow]))
-        return (all((constr == self.factors.dimProduct(dim) if len(dim) == 1 else (constr >= self.factors.dimProduct(dim[0]) if dim[1] == '<' else constr <= self.factors.dimProduct(dim[0]))) for dim, constr in self.factors_constraints.items()) and
-                all(len(self.factors[dim]) == 0 for dim in self.arch.coupling.dims if dim not in self.dataflow))
+        # Extract dimension name correctly for multi-character dimensions
+        def extract_dimension_and_constraint_type(constraint_key):
+            if constraint_key.endswith('>='):
+                return constraint_key[:-2], '>='
+            elif constraint_key.endswith('<='):
+                return constraint_key[:-2], '<='
+            else:
+                return constraint_key, '=='
+        
+        # Check factor constraints
+        for constraint_key, constraint_value in self.factors_constraints.items():
+            dim_name, constraint_type = extract_dimension_and_constraint_type(constraint_key)
+            
+            if constraint_type == '==':
+                if constraint_value != self.factors.dimProduct(dim_name):
+                    return False
+            elif constraint_type == '>=':
+                if constraint_value > self.factors.dimProduct(dim_name):
+                    return False
+            elif constraint_type == '<=':
+                if constraint_value < self.factors.dimProduct(dim_name):
+                    return False
+        
+        # Check that dimensions not in dataflow have 0 iterations
+        return all(len(self.factors[dim]) == 0 for dim in self.arch.coupling.dims if dim not in self.dataflow)
 
     """
     Returns a string describing the current violation of constraints, if any.
     """
     def logConstraintsViolation(self) -> str:
         if not self.checkFactorsConstraints():
-            return (f"CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: "
-                + ', '.join(f"constrained {dim} == {self.factors_constraints[dim]} VS obtained {dim}: {self.factors.dimProduct(dim)}, " for dim in self.dataflow if (dim in self.factors_constraints and self.factors_constraints[dim] != self.factors.dimProduct(dim)))
-                + ', '.join(f"constrained {dim} <= {self.factors_constraints[dim + '<=']} VS obtained {dim}: {self.factors.dimProduct(dim)}, " for dim in self.dataflow if (dim + '<=' in self.factors_constraints and self.factors_constraints[dim + '<='] < self.factors.dimProduct(dim)))
-                + ', '.join(f"constrained {dim} >= {self.factors_constraints[dim + '>=']} VS obtained {dim}: {self.factors.dimProduct(dim)}, " for dim in self.dataflow if (dim + '>=' in self.factors_constraints and self.factors_constraints[dim + '>='] > self.factors.dimProduct(dim)))
-                + ', '.join(f"dimension {dim} is not in the dataflow ({self.dataflow}), but still received some iterations ({dim}: {self.factors.dimProduct(dim)}) due to constraints." for dim in self.arch.coupling.dims if dim not in self.dataflow and len(self.factors[dim]) != 0))
+            # Helper function to extract dimension names correctly
+            def extract_dimension_and_constraint_type(constraint_key):
+                if constraint_key.endswith('>='):
+                    return constraint_key[:-2], '>='
+                elif constraint_key.endswith('<='):
+                    return constraint_key[:-2], '<='
+                else:
+                    return constraint_key, '=='
+            
+            violations = []
+            
+            # Check exact constraints (==)
+            for constraint_key, constraint_value in self.factors_constraints.items():
+                dim_name, constraint_type = extract_dimension_and_constraint_type(constraint_key)
+                
+                if constraint_type == '==' and dim_name in self.dataflow:
+                    if constraint_value != self.factors.dimProduct(dim_name):
+                        violations.append(f"constrained {dim_name} == {constraint_value} VS obtained {dim_name}: {self.factors.dimProduct(dim_name)}")
+            
+            # Check upper bound constraints (<=)
+            for constraint_key, constraint_value in self.factors_constraints.items():
+                dim_name, constraint_type = extract_dimension_and_constraint_type(constraint_key)
+                
+                if constraint_type == '<=' and dim_name in self.dataflow:
+                    if constraint_value < self.factors.dimProduct(dim_name):
+                        violations.append(f"constrained {dim_name} <= {constraint_value} VS obtained {dim_name}: {self.factors.dimProduct(dim_name)}")
+            
+            # Check lower bound constraints (>=)
+            for constraint_key, constraint_value in self.factors_constraints.items():
+                dim_name, constraint_type = extract_dimension_and_constraint_type(constraint_key)
+                
+                if constraint_type == '>=' and dim_name in self.dataflow:
+                    if constraint_value > self.factors.dimProduct(dim_name):
+                        violations.append(f"constrained {dim_name} >= {constraint_value} VS obtained {dim_name}: {self.factors.dimProduct(dim_name)}")
+            
+            # Check dimensions not in dataflow but with iterations
+            for dim in self.arch.coupling.dims:
+                if dim not in self.dataflow and len(self.factors[dim]) != 0:
+                    violations.append(f"dimension {dim} is not in the dataflow ({self.dataflow}), but still received some iterations ({dim}: {self.factors.dimProduct(dim)}) due to constraints")
+            
+            if violations:
+                return f"CIao CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: " + ", ".join(violations)
+        
         return ""
 
     def __getitem__(self, key : str) -> Any:
@@ -284,8 +345,14 @@ class MemLevel(Level):
         self.factors = self.factors if self.factors else Factors(arch.coupling.dims)
         self.tile_sizes = self.tile_sizes if self.tile_sizes else Shape({dim: 1 for dim in arch.coupling.dims})
         assert self.read_bandwidth >= 0 and self.write_bandwidth >= 0, f"Arch: {arch.name} -> Level: {self.name}: a negative bandwidth ({self.read_bandwidth} R, {self.write_bandwidth} W) does not mean anything."
-        assert all([constr[0] in self.dataflow and constr[1:] in ['', '>=', '<='] for constr in self.factors_constraints.keys()]), f"Arch: {arch.name} -> Level: {self.name}: all keys within factor constraints ({list(self.factors_constraints.keys())}) must be a dimension of the dataflow ({self.dataflow}) and in the form 'dim', 'dim<=', or 'dim>='."
-        assert all([sum(constr[0] == dim for constr in self.factors_constraints.keys()) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must occur at most once in factor constraints ({list(self.factors_constraints.keys())}), regardless of the use of '>=' or '<='."
+        ## changed due to the 2 char
+        assert all([
+    constr in self.dataflow or 
+    (constr.endswith('<=') and constr[:-2] in self.dataflow) or 
+    (constr.endswith('>=') and constr[:-2] in self.dataflow) 
+    for constr in self.factors_constraints.keys()
+]), f"Arch: {arch.name} -> Level: {self.name}: all keys within factor constraints ({list(self.factors_constraints.keys())}) must be a dimension of the dataflow ({self.dataflow}) and in the form 'dim', 'dim<=', or 'dim>='."
+        assert all([sum((constr == dim) + (constr == dim + '<=') + (constr == dim + '>=') for constr in self.factors_constraints.keys()) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must occur at most once in factor constraints ({list(self.factors_constraints.keys())}), regardless of the use of '>=' or '<='."        
         assert all([value > 0 for value in self.factors_constraints.values()]), f"Arch: {arch.name} -> Level: {self.name}: all factor constraints ({self.factors_constraints}) must have a value strictly > 0."
         assert all([constr == '_' or constr in self.dataflow for constr in self.dataflow_constraints]), f"Arch: {arch.name} -> Level: {self.name}: all dims specified as dataflow constraints ({self.dataflow_constraints}) must be part of the dataflow ({self.dataflow}) or be placeholders ('_')."
         assert all([sum(constr == dim for constr in self.dataflow_constraints) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must appear at most once in dataflow constraints ({self.dataflow_constraints})."
@@ -507,6 +574,8 @@ class MemLevel(Level):
         actual_dataflow = list(filter(lambda dim : self.factors.dimProduct(dim) > 1, self.dataflow))
         # stationarity calculation for inputs
  ##       in_reads = int(in_bp)
+
+        ## this is OK
         if in_bp:
             per_layer_in_reads: list[int] = []
             for layer_idx in range(num_layers):
@@ -610,13 +679,17 @@ class MemLevel(Level):
                 for dim in actual_dataflow[:i+1]:
                     layer_read *= self.factors.dimProduct(dim)
                     
-                per_layer_in_reads.append(layer_read)    
+                per_layer_in_reads.append(layer_read)  
+#                print(f"Layer {layer_idx} In reads: {layer_read}")  
             # Sum up all layer input reads, like you do for weight reads
             in_reads = sum(per_layer_in_reads)
         # stationarity calculation for weights
         else:
+            in_reads = 0
             per_layer_in_reads = [0]*num_layers
 ##        w_reads = int(w_bp)
+        
+        ## this is OK
         if w_bp:
             ## Handle each weight Layer separately      
             per_layer_w_reads : list[int] = []            
@@ -644,36 +717,18 @@ class MemLevel(Level):
                 for dim in actual_dataflow[:i+1]:
                     layer_read *= self.factors.dimProduct(dim)
                 per_layer_w_reads.append(layer_read)
+#                print(f"Layer {layer_idx} W reads: {layer_read}")
             ## tenere la lista
             w_reads = sum(per_layer_w_reads)
+#            print(f"Total W reads: {w_reads}")
             #print(f"Layer {layer_idx} W reads: {layer_read}")
             #print(f"Total W reads: {w_reads}")    
-
-
-
-            i = len(actual_dataflow) - 1
-            innermost_dim_sum = None
-            if not self.next_is_compute:
-                skipped = False
-                while i >= 0 and (actual_dataflow[i] not in self.arch.coupling.flat_w_coupling):
-                    i -= 1
-                    skipped = True
-                innermost_dim_sum = self.arch.coupling.getDimSum('w', actual_dataflow[i], 2) if i >= 0 else None
-                if innermost_dim_sum and (not all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in self.next_spatials) or (skipped and not self.multiple_reuses)):
-                    innermost_dim_sum = None
-                if innermost_dim_sum:
-                    w_reads *= distinct_values([self.factors.dimProduct(actual_dataflow[i])*self.tile_sizes[actual_dataflow[i]]] + [self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow[i]], [self.arch.getWStride(actual_dataflow[i])] + [self.arch.getWStride(dim) for dim in innermost_dim_sum if dim != actual_dataflow[i]])
-                    i -= 1
-            if not self.next_spatials:
-                w_reads *= prod(distinct_values([self.tile_sizes[dim] for dim in dim_sum], [self.arch.getWStride(dim) for dim in dim_sum]) for dim_sum in self.arch.coupling.w_coupling if dim_sum is not innermost_dim_sum)
-            else:
-                next_spatial_unroll = {dim: prod(level.factors.dimProduct(dim) for level in self.next_spatials if not level.selective_multicast_support) for dim in self.arch.coupling.dims}
-                w_reads *= prod(distinct_values([self.tile_sizes[dim]//next_spatial_unroll[dim] for dim in dim_sum], [self.arch.getWStride(dim) for dim in dim_sum])*prod(next_spatial_unroll[dim] for dim in dim_sum) for dim_sum in self.arch.coupling.w_coupling if dim_sum is not innermost_dim_sum)
-            for dim in actual_dataflow[:i+1]:
-                w_reads *= self.factors.dimProduct(dim)
         # stationarity calculation for outputs
         else:
+            w_reads = 0
             per_layer_w_reads = [0]*num_layers        
+        
+        ## this is OK
         out_reads = int(out_bp)
         ## iterations orthogonal to the output
         out_reads_factors = out_reads # this collects the factors along dimensions orthogonal to the output, returned to handle the presence/absence of the bias
@@ -685,7 +740,8 @@ class MemLevel(Level):
                 while i >= 0 and (actual_dataflow[i] not in self.arch.coupling.flat_out_coupling):
                     i -= 1
                     skipped = True
-                innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow[i], 2) if i >= 0 else None
+                ## DOUBT INNERMOST_DIM_SUM
+                innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow[i], num_layers-1) if i >= 0 else None
                 if innermost_dim_sum and (not all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in self.next_spatials) or (skipped and not self.multiple_reuses)):
                     innermost_dim_sum = None
                 if innermost_dim_sum:
@@ -702,7 +758,7 @@ class MemLevel(Level):
                     out_reads_factors *= self.factors.dimProduct(dim)
         out_writes = out_reads
         
-        #print("BEFORE BYPASS:\n", f"{self.name}:{chr(9) * (2 - len(self.name)//8)}{in_reads} In_R, {w_reads} W_R, {out_reads} Our_R, {in_reads + w_reads + out_reads} Tot_R, {out_writes} Out_W, {out_reads_factors} Out_R_Fac")
+#        print("BEFORE BYPASS:\n", f"{self.name}:{chr(9) * (2 - len(self.name)//8)}{in_reads} In_R, {w_reads} W_R, {out_reads} Our_R, {in_reads + w_reads + out_reads} Tot_R, {out_writes} Out_W, {out_reads_factors} Out_R_Fac")
         # handle bypasses
         if not ignore_bypasses:
             for operand, levels in self.next_levels_with_bypass.items():
@@ -726,9 +782,6 @@ class MemLevel(Level):
                     ## parto dal livello più basso
                     for in_btwn in in_between[::-1]:
                         if isinstance(in_btwn, MemLevel):
-                            ## input coupling ??
-
-
                             ## actual_dataflow_bp for the in_btwn level
                             # ignore loops at one
                             actual_dataflow_bp = list(filter(lambda dim : in_btwn.factors.dimProduct(dim) > 1, in_btwn.dataflow))
@@ -801,7 +854,8 @@ class MemLevel(Level):
                                     while i >= 0 and (actual_dataflow_bp[i] not in self.arch.coupling.flat_out_coupling):
                                         i -= 1
                                     stationarity_to_address = i < 0
-                                    innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow_bp[i], 2) if i >= 0 else None
+                                    ## DOUBT
+                                    innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow_bp[i], num_layers-1) if i >= 0 else None
                                     if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in in_btwn.next_spatials) and (i == len(actual_dataflow_bp) - 1 or self.multiple_reuses)):
                                         out_reads_bp, out_writes_bp = out_reads_bp//(dvs := distinct_values([in_btwn.tile_sizes[dim] for dim in innermost_dim_sum], [self.arch.getOutStride(dim) for dim in innermost_dim_sum])), out_writes_bp//dvs
                                         out_reads_bp, out_writes_bp = out_reads_bp*(dvs := distinct_values([in_btwn.factors.dimProduct(actual_dataflow_bp[i])*in_btwn.tile_sizes[actual_dataflow_bp[i]]] + [in_btwn.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_bp[i]], [self.arch.getOutStride(actual_dataflow_bp[i])] + [self.arch.getOutStride(dim) for dim in innermost_dim_sum if dim != actual_dataflow_bp[i]])), out_writes_bp*dvs
@@ -833,17 +887,18 @@ class MemLevel(Level):
                         ## actual_dataflow_db => stationarity_to_address is False  
                         ## SINCE NOW stationarity_to_address is False if there is IN in df
                         if stationarity_to_address:
-                            # all inner loops were 1s or orthogonal, deal with the dataflow now!
-                            i = len(actual_dataflow) - 1
-                            while i >= 0 and (actual_dataflow[i] not in self.arch.coupling.flat_in_coupling):
-                                i -= 1
-                            innermost_dim_sum = self.arch.coupling.getDimSum('in', actual_dataflow[i], 2) if i >= 0 else None
-                            if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in self.next_spatials) and (i == len(actual_dataflow) - 1 or self.multiple_reuses)):
-                                in_reads_bp //= distinct_values([self.tile_sizes[dim] for dim in innermost_dim_sum], [self.arch.getInStride(dim) for dim in innermost_dim_sum])
-                                in_reads_bp *= distinct_values([self.factors.dimProduct(actual_dataflow[i])*self.tile_sizes[actual_dataflow[i]]] + [self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow[i]], [self.arch.getInStride(actual_dataflow[i])] + [self.arch.getInStride(dim) for dim in innermost_dim_sum if dim != actual_dataflow[i]])
-                                i -= 1
-                            for dim in actual_dataflow[:i+1]:
-                                in_reads_bp *= self.factors.dimProduct(dim)
+                            for layer_idx in range(num_layers):
+                                # all inner loops were 1s or orthogonal, deal with the dataflow now!
+                                i = len(actual_dataflow) - 1
+                                while i >= 0 and (actual_dataflow[i] not in self.arch.coupling.flat_in_coupling):
+                                    i -= 1
+                                innermost_dim_sum = self.arch.coupling.getDimSum('in', actual_dataflow[i], 2) if i >= 0 else None
+                                if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in self.next_spatials) and (i == len(actual_dataflow) - 1 or self.multiple_reuses)):
+                                    in_reads_bp //= distinct_values([self.tile_sizes[dim] for dim in innermost_dim_sum], [self.arch.getInStride(dim) for dim in innermost_dim_sum])
+                                    in_reads_bp *= distinct_values([self.factors.dimProduct(actual_dataflow[i])*self.tile_sizes[actual_dataflow[i]]] + [self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow[i]], [self.arch.getInStride(actual_dataflow[i])] + [self.arch.getInStride(dim) for dim in innermost_dim_sum if dim != actual_dataflow[i]])
+                                    i -= 1
+                                for dim in actual_dataflow[:i+1]:
+                                    in_reads_bp *= self.factors.dimProduct(dim)
                         else:
                             # dataflow handled among inner loops
                             in_reads_bp = factors_full*in_reads_bp
@@ -871,7 +926,8 @@ class MemLevel(Level):
                             i = len(actual_dataflow) - 1
                             while i >= 0 and (actual_dataflow[i] not in self.arch.coupling.flat_out_coupling):
                                 i -= 1
-                            innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow[i], 2) if i >= 0 else None
+                            ## DOUBT
+                            innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow[i], num_layers-1) if i >= 0 else None
                             if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in self.next_spatials) and (i == len(actual_dataflow) - 1 or self.multiple_reuses)):
                                 out_reads_bp, out_writes_bp = out_reads_bp//(dvs := distinct_values([self.tile_sizes[dim] for dim in innermost_dim_sum], [self.arch.getOutStride(dim) for dim in innermost_dim_sum])), out_writes_bp//dvs
                                 out_reads_bp, out_writes_bp = out_reads_bp*(dvs := distinct_values([self.factors.dimProduct(actual_dataflow[i])*self.tile_sizes[actual_dataflow[i]]] + [self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow[i]], [self.arch.getOutStride(actual_dataflow[i])] + [self.arch.getOutStride(dim) for dim in innermost_dim_sum if dim != actual_dataflow[i]])), out_writes_bp*dvs
@@ -892,13 +948,14 @@ class MemLevel(Level):
                     out_writes += out_writes_bp
                     if operand == 'out':
                         out_reads_factors = out_reads_bp_factors
-        #print("AFTER BYPASS:\n", f"{self.name}:{chr(9) * (2 - len(self.name)//8)}{in_reads} In_R, {w_reads} W_R, {out_reads} Our_R, {in_reads + w_reads + out_reads} Tot_R, {out_writes} Out_W, {out_reads_factors} Out_R_Fac\n")
+#        print("AFTER BYPASS:\n", f"{self.name}:{chr(9) * (2 - len(self.name)//8)}{in_reads} In_R, {w_reads} W_R, {out_reads} Our_R, {in_reads + w_reads + out_reads} Tot_R, {out_writes} Out_W, {out_reads_factors} Out_R_Fac\n")
         for spatial_level in self.next_spatials:
             for dim in spatial_level.dataflow:
                 # no multicast => copy n_levels times
                 if not spatial_level.spatial_multicast_support and dim not in self.arch.coupling.flat_in_coupling: # the next fanout doesn't have spatial multicast capabilities, increment the reads on the memory before such fanout
                         in_reads *= spatial_level.factors.dimProduct(dim)
-                if not spatial_level.spatial_multicast_support and dim not in self.arch.coupling.flat_w_coupling: # the next fanout doesn't have spatial multicast capabilities, increment the reads on the memory before such fanout
+                w_weight_dims = {d for layer_dims in self.arch.coupling.flat_w_coupling for d in layer_dims}
+                if not spatial_level.spatial_multicast_support and dim not in w_weight_dims: # the next fanout doesn't have spatial multicast capabilities, increment the reads on the memory before such fanout
                         w_reads *= spatial_level.factors.dimProduct(dim)
                 if dim not in self.arch.coupling.flat_out_coupling:
                     # no multicast for reading
@@ -937,14 +994,15 @@ class MemLevel(Level):
     def checkFactorsConstraints(self) -> bool:
         # Existing memory footprint check
         base_check = self.factors.memFootprint(self.tile_sizes, self.arch, not self.bypasses or 'in' not in self.bypasses, not self.bypasses or 'w' not in self.bypasses, not self.bypasses or 'out' not in self.bypasses) <= self.size/self.multiple_buffering and super().checkFactorsConstraints()
-    
+        if not base_check:
+            return False
+            
         # Layer fusion constraint: no iterations on intermediate layer dimensions (except last layer)
         if hasattr(self.arch.coupling, 'w_coupling') and len(self.arch.coupling.w_coupling) > 1:
             # Get the number of layers
             num_layers = self.arch.coupling.getNumLayers()
 
             forbidden_dims = set()
-            ## DOUBT
             for i in range(num_layers -1):
                 forbidden_dims.update([f'C{i+1}', f'R{i}', f'S{i}'])
         
@@ -952,15 +1010,16 @@ class MemLevel(Level):
                 ## # Add C1, cause is an intermediate
                 forbidden_dims.add('C1')  
 
-            ## Check if forbidden have at most 1 iteration
-            
-            ## PROBLEM THIS is not right for compute level!
-            ## But this is not a compute level so maybe is ok
-            for dim in forbidden_dims:
-                if dim in self.dataflow and self.factors.dimProduct(dim) > 1:
-                    return False
-        return base_check
-    
+            compute_index = next(i for i, level in enumerate(self.arch) if isinstance(level, ComputeLevel))
+            level_index = self.arch.index(self)
+            is_register_level = (compute_index - level_index <= 3)
+            if not is_register_level:
+                ## Check if forbidden have at most 1 iteration
+                for dim in forbidden_dims:
+                    if dim in self.dataflow and self.factors.dimProduct(dim) > 1:
+                        return False            
+        return True
+
     """
     Returns True iif this level's dataflow satisfies all of its constraints.
     """
@@ -993,6 +1052,7 @@ class MemLevel(Level):
             if mem_footprint > self.size/self.multiple_buffering:
                 return f"CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: memory footprint: {mem_footprint} VS memory available: {self.size/self.multiple_buffering:.0f}"
             
+           
             ## Check layer fusion constraint violation
             if hasattr(self.arch.coupling, 'w_coupling') and len(self.arch.coupling.w_coupling) > 1:
                 # Get the number of layers
@@ -1002,9 +1062,16 @@ class MemLevel(Level):
                     forbidden_dims.update([f'C{i+1}', f'R{i}', f'S{i}'])
                 if num_layers > 1:
                     forbidden_dims.add('C1')
-                violated_dims = [dim for dim in forbidden_dims if dim in self.dataflow and self.factors.dimProduct(dim) > 1]
-                if violated_dims:
-                    return f"CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: layer fusion constraint violated, dimensions with more than 1 iteration: {', '.join(violated_dims)}"                
+
+                ## CHECK IN ALL LEVEL \ last 
+                level_index = self.arch.index(self)
+                compute_index = next(i for i, level in enumerate(self.arch) if isinstance(level, ComputeLevel))
+                is_register_level = (compute_index - level_index <= 3)  
+  
+                if not is_register_level:
+                    violated_dims = [dim for dim in forbidden_dims if dim in self.dataflow and self.factors.dimProduct(dim) > 1]
+                    if violated_dims:
+                        return f"CIAOCIAO CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: layer fusion constraint violated, dimensions with more than 1 iteration: {', '.join(violated_dims)}"           
         elif not self.checkDataflowConstraints():
             return f"CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: dataflow: {self.dataflow} VS " + (f"dataflow constraints for relative order: {self.dataflow_constraints}" if '_' not in self.dataflow_constraints else f"positional dataflow constraints: {self.dataflow_constraints} ('_' are placeholders)")
         return ""
@@ -1119,8 +1186,13 @@ class FanoutLevel(SpatialLevel):
         assert not self.selective_reduction_support or self.spatial_reduction_support, f"Arch: {arch.name} -> Level: {self.name}: selective reduction ({self.selective_reduction_support}) is a form of spatial reduction ({self.spatial_reduction_support}), which must then be supported to enable it."
         self.factors = self.factors if self.factors else Factors(arch.coupling.dims)
         self.tile_sizes = self.tile_sizes if self.tile_sizes else Shape({dim: 1 for dim in arch.coupling.dims})
-        assert all([constr[0] in self.dataflow and constr[1:] in ['', '>=', '<='] for constr in self.factors_constraints.keys()]), f"Arch: {arch.name} -> Level: {self.name}: all keys within factor constraints ({list(self.factors_constraints.keys())}) must be a dimension of the dataflow ({self.dataflow}) and in the form 'dim', 'dim<=', or 'dim>='."
-        assert all([sum(constr[0] == dim for constr in self.factors_constraints.keys()) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must occur at most once in factor constraints ({list(self.factors_constraints.keys())}), regardless of the use of '>=' or '<='."
+        assert all([
+    constr in self.dataflow or 
+    (constr.endswith('<=') and constr[:-2] in self.dataflow) or 
+    (constr.endswith('>=') and constr[:-2] in self.dataflow) 
+    for constr in self.factors_constraints.keys()
+]), f"Arch: {arch.name} -> Level: {self.name}: all keys within factor constraints ({list(self.factors_constraints.keys())}) must be a dimension of the dataflow ({self.dataflow}) and in the form 'dim', 'dim<=', or 'dim>='."
+        assert all([sum((constr == dim) + (constr == dim + '<=') + (constr == dim + '>=') for constr in self.factors_constraints.keys()) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must occur at most once in factor constraints ({list(self.factors_constraints.keys())}), regardless of the use of '>=' or '<='."        
         assert all([value > 0 for value in self.factors_constraints.values()]), f"Arch: {arch.name} -> Level: {self.name}: all factor constraints ({self.factors_constraints}) must have a value strictly > 0."
 
     """
@@ -1139,13 +1211,15 @@ class FanoutLevel(SpatialLevel):
                     in_reads *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
                 else:
                     in_reads *= self.factors.dimProduct(dim_sum[0])
-            for dim_sum in self.arch.coupling.w_coupling:
-                if len(dim_sum) > 1:
-                    strides = [self.arch.getWStride(dim) for dim in dim_sum]
-                    w_reads //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
-                    w_reads *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
-                else:
-                    w_reads *= self.factors.dimProduct(dim_sum[0])
+            ## fix to handle multi layers
+            for layer_w_coupling in self.arch.coupling.w_coupling:
+                for dim_sum in layer_w_coupling:
+                    if len(dim_sum) > 1:
+                        strides = [self.arch.getWStride(dim) for dim in dim_sum]
+                        w_reads //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
+                        w_reads *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
+                    else:
+                        w_reads *= self.factors.dimProduct(dim_sum[0])
             for dim_sum in self.arch.coupling.out_coupling:
                 if len(dim_sum) > 1:
                     strides = [self.arch.getOutStride(dim) for dim in dim_sum]
@@ -1155,7 +1229,7 @@ class FanoutLevel(SpatialLevel):
                     out_reads *= self.factors.dimProduct(dim_sum[0])
         else:
             in_reads *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.flat_in_coupling)
-            w_reads *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.flat_w_coupling)
+            w_reads *= prod(self.factors.dimProduct(dim) for layer_dims in self.arch.coupling.flat_w_coupling for dim in layer_dims)
             out_reads *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.flat_out_coupling)
         if self.selective_reduction_support:
             for dim_sum in self.arch.coupling.out_coupling:
@@ -1170,7 +1244,9 @@ class FanoutLevel(SpatialLevel):
         
         if not self.spatial_multicast_support:
             in_reads *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_in_coupling)
-            w_reads *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_w_coupling)
+            ## fix to handle multi layers
+            w_weight_dims = {d for layer_dims in self.arch.coupling.flat_w_coupling for d in layer_dims}
+            w_reads *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in w_weight_dims)
             out_reads *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_out_coupling)
         if not self.spatial_reduction_support:
             out_writes *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_out_coupling)
@@ -1308,8 +1384,13 @@ class ComputeLevel(SpatialLevel):
         assert self.cycles >= 0, f"Arch: {arch.name} -> Level: {self.name}: a negative number of clock-cycles per MAC ({self.cycles}) does not mean anything."
         self.factors = self.factors if self.factors else Factors(arch.coupling.dims)
         self.tile_sizes = self.tile_sizes if self.tile_sizes else Shape({dim: 1 for dim in arch.coupling.dims})
-        assert all([constr[0] in self.dataflow and constr[1:] in ['', '>=', '<='] for constr in self.factors_constraints.keys()]), f"Arch: {arch.name} -> Level: {self.name}: all keys within factor constraints ({list(self.factors_constraints.keys())}) must be a dimension of the dataflow ({self.dataflow}) and in the form 'dim', 'dim<=', or 'dim>='."
-        assert all([sum(constr[0] == dim for constr in self.factors_constraints.keys()) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must occur at most once in factor constraints ({list(self.factors_constraints.keys())}), regardless of the use of '>=' or '<='."
+        assert all([
+    constr in self.dataflow or 
+    (constr.endswith('<=') and constr[:-2] in self.dataflow) or 
+    (constr.endswith('>=') and constr[:-2] in self.dataflow) 
+    for constr in self.factors_constraints.keys()
+]), f"Arch: {arch.name} -> Level: {self.name}: all keys within factor constraints ({list(self.factors_constraints.keys())}) must be a dimension of the dataflow ({self.dataflow}) and in the form 'dim', 'dim<=', or 'dim>='."
+        assert all([sum((constr == dim) + (constr == dim + '<=') + (constr == dim + '>=') for constr in self.factors_constraints.keys()) <= 1 for dim in self.dataflow]), f"Arch: {arch.name} -> Level: {self.name}: each dimension must occur at most once in factor constraints ({list(self.factors_constraints.keys())}), regardless of the use of '>=' or '<='."
         assert all([value > 0 for value in self.factors_constraints.values()]), f"Arch: {arch.name} -> Level: {self.name}: all factor constraints ({self.factors_constraints}) must have a value strictly > 0."
 
     """

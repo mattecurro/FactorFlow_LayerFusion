@@ -69,6 +69,7 @@ def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool,
         end_time = time.time() - start_time
         
         edp = EDP(arch, bias_read, True)
+        ## potential error
         mops = MOPs(arch)
         energy = Energy(arch, True)
         latency = Latency(arch)
@@ -85,7 +86,7 @@ def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool,
         printFactors(arch)
         
         print("\nFinal MOPs per memory level:")
-        printMOPs(arch)
+        printMOPsFusion(arch)
         print("\nFinal Latency per level:")
         printLatency(arch)
         

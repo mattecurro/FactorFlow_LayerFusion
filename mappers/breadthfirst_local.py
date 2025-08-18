@@ -116,7 +116,7 @@ def fanoutMaximization(arch : Arch, comp : Shape, bias_read : bool, verbose : bo
 Removes from 'perms' all but one permutation for each set that is in equi-dataflow match on 'level'.
 Use 'in/w/out_matters' to specify wheather an operand is or not relevant to determine the equi-dataflow.
 """
-## modifica!!! modificare weights con ciclo, no input!!
+## modified
 def filterEquiDataflowPerms(level : MemLevel, coupling : Coupling, perms : list[list[str]], in_matters : bool = True, w_matters : bool = True, out_matters : bool = True) -> list[list[str]]:
     """
     Returns a dictionary indicating for each dimension if it has only a single iteration on 'level'.
@@ -274,6 +274,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
     if verbose: print("-------- factorFlow --------")
     already_initialized = arch.initialized
     if not already_initialized:
+        ## THIS IS A PROBLEM FOR THE CONSTRAINT
         arch.initFactors(comp)
         arch.enforceFactorsConstraints(Settings.PADDED_MAPPINGS, verbose)
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
@@ -313,6 +314,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
                 except Empty:
                     #print(f"Thread {thread_idx} idle...")
                     continue
+                ## Local Search
                 try:
                     if update_local_arch[thread_idx]:
                         local_arch.transferMapping(arch, True, False)
@@ -511,6 +513,9 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
 
 """
 Pre-compute the meaningful permutations to explore for each memory level.
+Using the 'interleave' and 'slot_in' functions, we generate all permutations
+that respect the dataflow constraints of each memory level, while
+considering the coupling constraints of the architecture.
 Delegate all optimization to 'factorFlow'.
 """
 def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : int = -1, threads_count : int = 1, past_perms : dict[tuple[int, ...], ThreadSafeHeap[float, list[LevelCore], int, int]] = None, lock : threading.Lock = None, barrier : threading.Barrier = None, verbose : bool = False) -> Optional[tuple[Arch, float]]:
@@ -529,7 +534,7 @@ def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : 
             # NOTE: can't remove here some couplings w.r.t stored/not-stored operands because they still have an effect when there is a bypass...
             #coupling_sets = [frozenset(arch.coupling.flat_in_coupling), frozenset(arch.coupling.flat_w_coupling), frozenset(arch.coupling.flat_out_coupling)]
             
-            # Flatten all weight couplings
+            ## Flatten all weight couplings
             all_w_dims = set()
             for layer_w_coupling in arch.coupling.flat_w_coupling:
                 all_w_dims.update(layer_w_coupling)
@@ -549,6 +554,7 @@ def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : 
                 # same as above, but we don't have halo reuse
                 candidate_perms = filter_equivalent_perms(candidate_perms, coupling_sets)
             candidate_perms_per_mem_level.append(candidate_perms)
+            print(f"Level {level.name} ({len(candidate_perms)} candidate permutations)")
     
     arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
     if verbose: print("\nPerformed moves:", moves)

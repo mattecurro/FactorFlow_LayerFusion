@@ -1,10 +1,15 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from copy import deepcopy
 
 from settings import *
 from factors import *
-from levels import *
 from utils import *
+
+if TYPE_CHECKING:
+    from levels import *
+else:
+    from levels import *
 
 """
 Class wrapping a list of levels into an architecture.
@@ -161,7 +166,18 @@ class Arch(list[Level]):
     def initFactors(self, comp : Shape) -> None:
         # initialize with all factors on first level, all tile sizes of 1!
         self[0].factors = Factors({dim: prime_factors(comp[dim]) for dim in self.coupling.dims})
-        self.stride_values = {dim: (comp[dim] if dim in comp else 1) for dim in list(self.coupling.in_strides.values()) + list(self.coupling.w_strides.values()) + list(self.coupling.out_strides.values())}
+        # Handle both single-layer and multi-layer w_strides
+        if isinstance(self.coupling.w_strides, list):
+            # Multi-layer case: flatten all layer stride dictionaries
+            all_w_strides = {}
+            for layer_strides in self.coupling.w_strides:
+                all_w_strides.update(layer_strides)
+            w_stride_values = list(all_w_strides.values())
+        else:
+            # Single-layer case: use directly
+            w_stride_values = list(self.coupling.w_strides.values())
+        
+        self.stride_values = {dim: (comp[dim] if dim in comp else 1) for dim in list(self.coupling.in_strides.values()) + w_stride_values + list(self.coupling.out_strides.values())}
         self.initialized = True
 
     """
@@ -201,7 +217,15 @@ class Arch(list[Level]):
         for i in range(1, len(self)):
             level = self[i]
             for k in level.factors_constraints.keys():
-                assert k[0] in level.dataflow, f"Arch: {self.name} -> Level: {level.name}: cannot enforce constraint on dimension {k[0]} that is not in dataflow {level.dataflow}."
+                ## changed in order to have more than one char
+                if k.endswith('>='):
+                    dim = k[:-2]
+                elif k.endswith('<='):
+                    dim = k[:-2]  
+                else:
+                    dim = k
+                assert dim in level.dataflow, f"Arch: {self.name} -> Level: {level.name}: cannot enforce constraint on dimension {dim} that is not in dataflow {level.dataflow}."
+                    
             # initialize only == and >= constraints, leave <= set to 1
             constr_factors = Factors({dim: (prime_factors(level.factors_constraints[dim]) if dim in level.factors_constraints else (prime_factors(level.factors_constraints[f'{dim}>=']) if f'{dim}>=' in level.factors_constraints else {})) for dim in self.coupling.dims})
             if self[0].factors.isSubset(constr_factors) or allow_padding:
@@ -393,12 +417,17 @@ class Arch(list[Level]):
         return self.stride_values[self.coupling.in_strides[dim]] if dim in self.coupling.in_strides else 1
 
     """
-    Returns the current stride for a dimension indexing the weights tensor.
+        Returns the stride value for a given dimension in the weight tensor at the specified layer.
     """
     def getWStride(self, dim: str, layer_idx: int = 0) -> int:
-        """Returns the stride value for a given dimension in the weight tensor at the specified layer."""
-        if dim in self.coupling.w_strides[layer_idx]:
-            return self.stride_values[self.coupling.w_strides[layer_idx][dim]]
+        if isinstance(self.coupling.w_strides, list):
+            # Multi-layer case
+            if layer_idx < len(self.coupling.w_strides) and dim in self.coupling.w_strides[layer_idx]:
+                return self.stride_values[self.coupling.w_strides[layer_idx][dim]]
+        else:
+            # Single-layer case
+            if dim in self.coupling.w_strides:
+                return self.stride_values[self.coupling.w_strides[dim]]
         return 1
 
     """
