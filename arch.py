@@ -360,6 +360,19 @@ class Arch(list[Level]):
     an assertion enforces constraints to comply.
     """
     def fitConstraintsToComp(self, comp : Shape, comp_name : Optional[str] = None, enforce : bool = False) -> bool:
+        ## intermediate dims
+        num_layers = self.coupling.getNumLayers()
+        if num_layers > 1:
+            final_layer_dims = {'P', 'Q', 'M', 'K',f'R{num_layers-1}', f'S{num_layers-1}'}
+            intermediate_dims = set(self.coupling.dims) - final_layer_dims
+            for level in self:
+                if isinstance(level, MemLevel) and any(name in level.name.lower() for name in ['register', 'reg']):
+                    for dim in intermediate_dims:
+                        if dim in level.dataflow:
+                            #level.factors_constraints[dim] = 2**32
+                            print(f"INFO: Added high constraint for intermediate dimension {dim} in level {level.name}")
+
+
         failed = False
         for dim in self.coupling.dims:
             total_constraint = 1

@@ -32,14 +32,14 @@ def prettyPrint(obj : object, omit_fields : Optional[list[str]] = None) -> None:
     seen = set()
     res = ""
     
-    def pp(obj, indent=0, keep_first_indend = True):
+    def pp(obj, indent=0, keep_first_indend = True, parent_attr_name = None):
         nonlocal res
         
         if isinstance(obj, dict):
             for key, value in obj.items():
                 if key not in omit_fields:
                     res += f"{' ' * (indent + 4)}{key}:\n"
-                    pp(value, indent + 4)
+                    pp(value, indent + 4, parent_attr_name=key)
             if len(obj) == 0:
                 res += f"{' ' * (indent + 4)}<empty>\n"
             return
@@ -49,8 +49,11 @@ def prettyPrint(obj : object, omit_fields : Optional[list[str]] = None) -> None:
                 return
             res += f"{' ' * indent * keep_first_indend}[\n"
             for i, item in enumerate(obj):
-                res += f"{' ' * (indent + 4)}Item {i}:\n"
-                pp(item, indent + 8)
+                if parent_attr_name in ['per_layer_in_reads', 'per_layer_w_reads']:
+                    res += f"{' ' * (indent + 4)}Layer {i}:\n"
+                else:
+                    res += f"{' ' * (indent + 4)}Item {i}:\n"
+                pp(item, indent + 8, parent_attr_name=parent_attr_name)
             res += f"{' ' * indent}]\n"
             return
         if hasattr(obj, "__dict__"):
@@ -65,13 +68,13 @@ def prettyPrint(obj : object, omit_fields : Optional[list[str]] = None) -> None:
                     continue
                 if hasattr(value, "__dict__"):
                     res += f"{' ' * (indent + 4)}{attr}:\n"
-                    pp(value, indent + 4)
+                    pp(value, indent + 4, parent_attr_name=attr)
                 elif isinstance(value, dict):
                     res += f"{' ' * (indent + 4)}{attr}:\n"
-                    pp(value, indent + 4)
+                    pp(value, indent + 4, parent_attr_name=attr)
                 elif isinstance(value, collections.abc.Iterable) and not isinstance(value, str):
                     res += f"{' ' * (indent + 4)}{attr}: "
-                    pp(value, indent + 4, False)
+                    pp(value, indent + 4, False, parent_attr_name=attr)
                 else:
                     res += f"{' ' * (indent + 4)}{attr}: {value}\n"
         else:

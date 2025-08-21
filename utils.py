@@ -65,6 +65,7 @@ elements of 'array'. The array elements retain their order, while those of
 """
 def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
     ## DEBUG
+    """
     if len(elements) > 10 :
         if not elements:
             return [array]
@@ -76,7 +77,7 @@ def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
             results.append(array[:mid_pos] + elements + array[mid_pos:])
         print(f"interleave: too many elements ({len(elements)}), returning {len(results)} results")
         return results
-    
+    """
     def recursive_insert(arr, elems):
         if not elems:
             return [arr]

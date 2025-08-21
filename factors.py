@@ -156,7 +156,6 @@ class Coupling:
             if any(len(dim_sum) > 2 and any(dim in self.w_strides[i] for dim in dim_sum) for dim_sum in w_coupling): print(f"WARNING: coupling {self} has strides applied to a sum of more than 2 indices on its weights tensor ({filter(lambda dim_sum: len(dim_sum) > 2 and any(dim in self.w_strides[i] for dim in dim_sum), w_coupling)}), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.")
         if any(len(dim_sum) > 2 and any(dim in self.out_strides for dim in dim_sum) for dim_sum in self.out_coupling): print(f"WARNING: coupling {self} has strides applied to a sum of more than 2 indices on its output tensor ({filter(lambda dim_sum: len(dim_sum) > 2 and any(dim in self.out_strides for dim in dim_sum), self.out_coupling)}), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.")
 
-    ## check with Shape
     """
     If True, the provided comp's is valid for the present coupling.
     This means that all required dimensions are specified.
@@ -267,8 +266,8 @@ class Coupling:
     
     def getNumLayers(self) -> int:
         """Returns the number of layers in this coupling."""
-        return len(self.w_coupling) 
-    
+        return len(self.w_coupling)
+
     """
     Returns a compact string representing the coupling.
     """
@@ -285,9 +284,6 @@ class Coupling:
     def __str__(self) -> str:
         return "{" + f"dims: {self.dims}, in_coupling: {self.in_coupling}, w_coupling: {self.w_coupling}, out_coupling: {self.out_coupling}, in_strides: {self.in_strides}, w_strides: {self.w_strides}, out_strides: {self.out_strides}" + "}"
 
-## Where do we use Shape?
-## Computation?
-## Gives the sizes of each dimension
 """
 Shape of a kernel in the form Out = W x In.
 Where 'x' is a MAC-based linear algebra operation.

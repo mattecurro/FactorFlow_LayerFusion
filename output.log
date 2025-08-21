@@ -1,0 +1,972 @@
+WARNING: coupling {dims: ['N', 'P', 'Q', 'K', 'R2', 'S2', 'C2', 'R1', 'S1', 'C1', 'R0', 'S0', 'M'], in_coupling: [['N'], ['P', 'R2', 'R1', 'R0'], ['Q', 'S2', 'S1', 'S0'], ['M']], w_coupling: [[['M'], ['C1'], ['R0'], ['S0']], [['C1'], ['C2'], ['R1'], ['S1']], [['C2'], ['K'], ['R2'], ['S2']]], out_coupling: [['N'], ['P'], ['Q'], ['K']], in_strides: {'P': 'Pstride', 'Q': 'Qstride', 'R0': 'Rdilation0', 'S0': 'Sdilation0', 'R1': 'Rdilation1', 'S1': 'Sdilation1', 'R2': 'Rdilation2', 'S2': 'Sdilation2'}, w_strides: [{}, {}, {}], out_strides: {}} has strides applied to a sum of more than 2 indices on its input tensor (<filter object at 0x7ed5a40a8b20>), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.
+-------- architecture --------
+WARNING: coupling {dims: ['N', 'P', 'Q', 'K', 'R1', 'S1', 'C1', 'R0', 'S0', 'M'], in_coupling: [['N'], ['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']], w_coupling: [[['M'], ['C1'], ['R0'], ['S0']], [['C1'], ['K'], ['R1'], ['S1']]], out_coupling: [['N'], ['P'], ['Q'], ['K']], in_strides: {'P': 'Pstride', 'Q': 'Qstride', 'R0': 'Rdilation0', 'S0': 'Sdilation0', 'R1': 'Rdilation1', 'S1': 'Sdilation1'}, w_strides: [{}, {}], out_strides: {}} has strides applied to a sum of more than 2 indices on its input tensor (<filter object at 0x7ed5a3ebed70>), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.
+Architecture: architectures/multi_layer_arch.py -> arch
+-------- computation  --------
+Computation: architectures/3layer_comp.py -> comp: {P: 256, Q: 256, K: 8, R0: 3, S0: 3, C1: 2, R1: 3, S1: 3, R2: 3, S2: 3, C2: 4, M: 3}
+Coupling: architectures/3layer_comp.py -> coupling: dims: PQKR2S2C2R1S1C1R0S0M, in_coupling: [P+R2+R1+R0][Q+S2+S1+S0][M], w_coupling: W0: [M][C1][R0][S0]W1: [C1][C2][R1][S1]W2: [C2][K][R2][S2], out_coupling: [P][Q][K]
+Bias present: False
+------------------------------
+----- running FactorFlow -----
+------------------------------
+
+Threads: 8
+INFO: Added high constraint for intermediate dimension N in level InRegister
+INFO: Added high constraint for intermediate dimension C2 in level InRegister
+INFO: Added high constraint for intermediate dimension C1 in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension S1 in level InRegister
+INFO: Added high constraint for intermediate dimension S0 in level InRegister
+INFO: Added high constraint for intermediate dimension R0 in level InRegister
+INFO: Added high constraint for intermediate dimension N in level WRegister
+INFO: Added high constraint for intermediate dimension C2 in level WRegister
+INFO: Added high constraint for intermediate dimension C1 in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension S1 in level WRegister
+INFO: Added high constraint for intermediate dimension S0 in level WRegister
+INFO: Added high constraint for intermediate dimension R0 in level WRegister
+INFO: Added high constraint for intermediate dimension N in level OutRegister
+INFO: Added high constraint for intermediate dimension C2 in level OutRegister
+INFO: Added high constraint for intermediate dimension C1 in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+INFO: Added high constraint for intermediate dimension S1 in level OutRegister
+INFO: Added high constraint for intermediate dimension S0 in level OutRegister
+INFO: Added high constraint for intermediate dimension R0 in level OutRegister
+INFO: forcefully updating setting ITERATE_AMOUNTS to True
+INFO: forcefully updating setting STEPS_TO_EXPLORE to 4
+INFO: forcefully updating setting CO_OPT_STEPS_TO_EXPLORE to 4
+INFO: forcefully updating setting INITIAL_STEPS_TO_EXPLORE to 2
+INFO: forcefully updating setting LOCAL_SEARCH_SPATIAL_LEVELS to True
+INFO: forcefully updating setting CO_OPT_LIMIT_NEXT_STEP_DST_TO_CURRENT_SRC to True
+INFO: forcefully updating setting NO_CONSTRAINTS_CHECK_DURING_MULTISTEP to True
+INFO: --> the cause of this is the presence of Fanout levels (SACols) with multiple mapped dimensions (['Q', 'K']). Runtime might increase slightly...
+INFO: forcefully updating setting SPATIAL_STEPS_TO_EXPLORE to 4
+INFO: forcefully updating setting SPATIAL_ITERATE_AMOUNTS to True
+WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.
+INFO: running multithreaded with THREADS_COUNT = 8
+
+Level DRAM (1 candidate permutations)
+Level GlobalBuffer (1 candidate permutations)
+Level InRegister (1 candidate permutations)
+Level WRegister (1 candidate permutations)
+Level OutRegister (1 candidate permutations)
+-------- factorFlow --------
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
+Level: DRAM: Here I am
+BEFORE BYPASS: Per Layer In reads: [276672, 166400, 297216], Per Layer W Reads: [54, 72, 4608]  In reads: 740288, W reads: 4734, Out reads: 524288
+Level: DRAM: operand = in, levels = None
+Level: DRAM: operand = w, levels = None
+Level: DRAM: operand = out, levels = None
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+End MOPs with Bypasses for Level: DRAM
+
+
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [153600, 49152, 24576], Per Layer W Reads: [0, 0, 0]  In reads: 227328, W reads: 0, Out reads: 0
+Level: GlobalBuffer: operand = in, levels = None
+Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>]
+Chiamo non recursive MOPs su Level: InRegister. Operand: w
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	0 In_R, 140 W_R, 0 Our_R, 140 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [36, 72, 32] Per Layer W_R, 140 W_R, 0 Our_R, 140 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [36, 72, 32], w_reads = 140, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[36, 72, 32] w_bp=140, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 140, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [36, 72, 32], out_reads: 0, out_writes: 0
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [108, 72, 32]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 212, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [108, 72, 32], out_reads: 0, out_writes: 0
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [108, 72, 32]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[108, 72, 32], w_bp=212, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 384, Level: GlobalBuffer: per_layer_w_reads_bp = [41472, 27648, 12288] w_reads_bp = 212
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=454656, per_layer_w_reads = [41472, 27648, 12288] w_bp=81408, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>, <levels.MemLevel object at 0x7ed5a3ebea40>]
+Chiamo non recursive MOPs su Level: WRegister. Operand: out
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 32, out_writes = 32, out_reads_factors = 1
+After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=32, ignore_bypasses=True (bypass operand out)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=256, stationarity_to_address=True (bypass operand out)
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=681984, per_layer_w_reads = [41472, 27648, 12288] w_bp=162816, out_bp=32768, ignore_bypasses=False (bypass operand out)
+AFTER BYPASS of all operands:
+ GlobalBuffer:	681984 In_R, 162816 W_R, 32768 Our_R, 877568 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 681984 In_R, [41472, 27648, 12288] Per Layer W_R, 162816 W_R, 32768 Our_R, 877568 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 681984, per_layer_w_reads = [41472, 27648, 12288], w_reads = 162816, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+End MOPs with Bypasses for Level: GlobalBuffer
+
+
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7ed5a3ebea40>, <levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: in
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	864 In_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[288, 288, 288] Per Layer Input Reads, 864 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [288, 288, 288], in_reads = 864, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[288, 288, 288] in_bp=864, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
+Start inbtwn: Level: InRegister
+Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+Level: InRegister: in_btwn_factors_full = 18, in_reads_bp = 15552
+Level: InRegister: per_layer_in_reads_bp = [13436928, 13436928, 13436928]
+End inbtwn
+Level: InRegister: MOPs for per_layer_in_reads_bp=[13436928, 13436928, 13436928], in_bp=15552, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
+Level: InRegister: MOPs after bypasses for per_layer_in_reads = [53747712, 53747712, 53747712] in_bp=161243136, per_layer_w_reads = [0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
+Level: InRegister: operand = w, levels = None
+Level: InRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ InRegister:	161243136 In_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[53747712, 53747712, 53747712] Per Layer Input Reads, 161243136 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [53747712, 53747712, 53747712], in_reads = 161243136, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: InRegister
+
+
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: WRegister: operand = in, levels = None
+Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: w
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[288, 288, 288] w_bp=864, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: WRegister
+End inbtwn
+Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[288, 288, 288], w_bp=864, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 18, Level: WRegister: per_layer_w_reads_bp = [5184, 5184, 5184] w_reads_bp = 864
+Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0, 0] in_bp=0, per_layer_w_reads = [5184, 5184, 5184] w_bp=15552, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: WRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [5184, 5184, 5184] Per Layer W_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [5184, 5184, 5184], w_reads = 15552, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: WRegister
+
+
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 288
+Level: OutRegister: operand = in, levels = None
+Level: OutRegister: operand = w, levels = None
+Level: OutRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 288, out_writes = 288, out_reads_factors = 9
+End MOPs with Bypasses for Level: OutRegister
+
+
+Initial condition (Wart: 3.578e-17):
+DRAM ----------> Q: 16, S2: 3
+GlobalBuffer --> P: 64, Q: 2, R2: 3
+SACols --------> Q: 8
+SARows --------> M: 3
+InRegister ----> C2: 2, C1: 2
+WRegister -----> R0: 3, R1: 3, C2: 2
+OutRegister ---> P: 4, K: 8, S1: 3, S0: 3
+Compute -------
+
+Starting FactorFlow tiling optimization:
+
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
+Level: DRAM: Here I am
+BEFORE BYPASS: Per Layer In reads: [276672, 166400, 297216], Per Layer W Reads: [54, 72, 4608]  In reads: 740288, W reads: 4734, Out reads: 524288
+Level: DRAM: operand = in, levels = None
+Level: DRAM: operand = w, levels = None
+Level: DRAM: operand = out, levels = None
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+End MOPs with Bypasses for Level: DRAM
+
+
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [153600, 49152, 24576], Per Layer W Reads: [0, 0, 0]  In reads: 227328, W reads: 0, Out reads: 0
+Level: GlobalBuffer: operand = in, levels = None
+Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>]
+Chiamo non recursive MOPs su Level: InRegister. Operand: w
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	0 In_R, 140 W_R, 0 Our_R, 140 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [36, 72, 32] Per Layer W_R, 140 W_R, 0 Our_R, 140 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [36, 72, 32], w_reads = 140, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[36, 72, 32] w_bp=140, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 140, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [36, 72, 32], out_reads: 0, out_writes: 0
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [108, 72, 32]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 212, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [108, 72, 32], out_reads: 0, out_writes: 0
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [108, 72, 32]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[108, 72, 32], w_bp=212, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 384, Level: GlobalBuffer: per_layer_w_reads_bp = [41472, 27648, 12288] w_reads_bp = 212
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=454656, per_layer_w_reads = [41472, 27648, 12288] w_bp=81408, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>, <levels.MemLevel object at 0x7ed5a3ebea40>]
+Chiamo non recursive MOPs su Level: WRegister. Operand: out
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 32, out_writes = 32, out_reads_factors = 1
+After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=32, ignore_bypasses=True (bypass operand out)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=256, stationarity_to_address=True (bypass operand out)
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=681984, per_layer_w_reads = [41472, 27648, 12288] w_bp=162816, out_bp=32768, ignore_bypasses=False (bypass operand out)
+AFTER BYPASS of all operands:
+ GlobalBuffer:	681984 In_R, 162816 W_R, 32768 Our_R, 877568 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 681984 In_R, [41472, 27648, 12288] Per Layer W_R, 162816 W_R, 32768 Our_R, 877568 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 681984, per_layer_w_reads = [41472, 27648, 12288], w_reads = 162816, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+End MOPs with Bypasses for Level: GlobalBuffer
+
+
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7ed5a3ebea40>, <levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: in
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	864 In_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[288, 288, 288] Per Layer Input Reads, 864 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [288, 288, 288], in_reads = 864, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[288, 288, 288] in_bp=864, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
+Start inbtwn: Level: InRegister
+Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+Level: InRegister: in_btwn_factors_full = 18, in_reads_bp = 15552
+Level: InRegister: per_layer_in_reads_bp = [13436928, 13436928, 13436928]
+End inbtwn
+Level: InRegister: MOPs for per_layer_in_reads_bp=[13436928, 13436928, 13436928], in_bp=15552, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
+Level: InRegister: MOPs after bypasses for per_layer_in_reads = [53747712, 53747712, 53747712] in_bp=161243136, per_layer_w_reads = [0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
+Level: InRegister: operand = w, levels = None
+Level: InRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ InRegister:	161243136 In_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[53747712, 53747712, 53747712] Per Layer Input Reads, 161243136 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [53747712, 53747712, 53747712], in_reads = 161243136, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: InRegister
+
+
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: WRegister: operand = in, levels = None
+Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: w
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[288, 288, 288] w_bp=864, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: WRegister
+End inbtwn
+Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[288, 288, 288], w_bp=864, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 18, Level: WRegister: per_layer_w_reads_bp = [5184, 5184, 5184] w_reads_bp = 864
+Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0, 0] in_bp=0, per_layer_w_reads = [5184, 5184, 5184] w_bp=15552, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: WRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [5184, 5184, 5184] Per Layer W_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [5184, 5184, 5184], w_reads = 15552, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: WRegister
+
+
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 288
+Level: OutRegister: operand = in, levels = None
+Level: OutRegister: operand = w, levels = None
+Level: OutRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 288, out_writes = 288, out_reads_factors = 9
+End MOPs with Bypasses for Level: OutRegister
+
+
+-- local search of spatial levels --
+No valid follow-up configuration, stopping, current Wart: 3.578e-17
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+Level: DRAM: Here I am
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+Level: DRAM: Here I am
+AFTER BYPASS of all operands:
+ DRAM:		1808136 In_R, 414 W_R, 1572864 Our_R, 3381414 Tot_R, 1572864 Out_W, 3 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[613080, 402480, 792576] Per Layer Input Reads, 1808136 In_R, [54, 72, 288] Per Layer W_R, 414 W_R, 1572864 Our_R, 3381414 Tot_R, 1572864 Out_W, 3 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [613080, 402480, 792576], in_reads = 1808136, per_layer_w_reads = [54, 72, 288], w_reads = 414, out_reads = 1572864, out_writes = 1572864, out_reads_factors = 3
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ GlobalBuffer:	227328 In_R, 12414 W_R, 32768 Our_R, 272510 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 227328 In_R, [54, 72, 12288] Per Layer W_R, 12414 W_R, 32768 Our_R, 272510 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 227328, per_layer_w_reads = [54, 72, 12288], w_reads = 12414, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	128 In_R, 140 W_R, 0 Our_R, 268 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[40, 72, 16] Per Layer Input Reads, 128 In_R, [36, 72, 32] Per Layer W_R, 140 W_R, 0 Our_R, 268 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [40, 72, 16], in_reads = 128, per_layer_w_reads = [36, 72, 32], w_reads = 140, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	108 In_R, 154 W_R, 0 Our_R, 262 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[40, 36, 32] Per Layer Input Reads, 108 In_R, [18, 72, 64] Per Layer W_R, 154 W_R, 0 Our_R, 262 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [40, 36, 32], in_reads = 108, per_layer_w_reads = [18, 72, 64], w_reads = 154, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	216 In_R, 207 W_R, 0 Our_R, 423 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[90, 54, 72] Per Layer Input Reads, 216 In_R, [9, 54, 144] Per Layer W_R, 207 W_R, 0 Our_R, 423 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [90, 54, 72], in_reads = 216, per_layer_w_reads = [9, 54, 144], w_reads = 207, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 288 Our_R, 1152 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 288 Our_R, 1152 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 288, out_writes = 288, out_reads_factors = 9
+-- local search of memory levels --
+No valid follow-up configuration, stopping, current Wart: 3.578e-17
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+Level: DRAM: Here I am
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+Level: DRAM: Here I am
+AFTER BYPASS of all operands:
+ DRAM:		1808136 In_R, 414 W_R, 1572864 Our_R, 3381414 Tot_R, 1572864 Out_W, 3 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[613080, 402480, 792576] Per Layer Input Reads, 1808136 In_R, [54, 72, 288] Per Layer W_R, 414 W_R, 1572864 Our_R, 3381414 Tot_R, 1572864 Out_W, 3 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [613080, 402480, 792576], in_reads = 1808136, per_layer_w_reads = [54, 72, 288], w_reads = 414, out_reads = 1572864, out_writes = 1572864, out_reads_factors = 3
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ GlobalBuffer:	227328 In_R, 12414 W_R, 32768 Our_R, 272510 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 227328 In_R, [54, 72, 12288] Per Layer W_R, 12414 W_R, 32768 Our_R, 272510 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 227328, per_layer_w_reads = [54, 72, 12288], w_reads = 12414, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	128 In_R, 140 W_R, 0 Our_R, 268 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[40, 72, 16] Per Layer Input Reads, 128 In_R, [36, 72, 32] Per Layer W_R, 140 W_R, 0 Our_R, 268 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [40, 72, 16], in_reads = 128, per_layer_w_reads = [36, 72, 32], w_reads = 140, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	108 In_R, 154 W_R, 0 Our_R, 262 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[40, 36, 32] Per Layer Input Reads, 108 In_R, [18, 72, 64] Per Layer W_R, 154 W_R, 0 Our_R, 262 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [40, 36, 32], in_reads = 108, per_layer_w_reads = [18, 72, 64], w_reads = 154, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	216 In_R, 207 W_R, 0 Our_R, 423 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[90, 54, 72] Per Layer Input Reads, 216 In_R, [9, 54, 144] Per Layer W_R, 207 W_R, 0 Our_R, 423 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [90, 54, 72], in_reads = 216, per_layer_w_reads = [9, 54, 144], w_reads = 207, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 288 Our_R, 1152 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 288 Our_R, 1152 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 288, out_writes = 288, out_reads_factors = 9
+-- spatial-memory levels co-optimization --
+No valid follow-up configuration, stopping, current Wart: 3.578e-17
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+Level: DRAM: Here I am
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+Level: DRAM: Here I am
+AFTER BYPASS of all operands:
+ DRAM:		1808136 In_R, 414 W_R, 1572864 Our_R, 3381414 Tot_R, 1572864 Out_W, 3 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[613080, 402480, 792576] Per Layer Input Reads, 1808136 In_R, [54, 72, 288] Per Layer W_R, 414 W_R, 1572864 Our_R, 3381414 Tot_R, 1572864 Out_W, 3 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [613080, 402480, 792576], in_reads = 1808136, per_layer_w_reads = [54, 72, 288], w_reads = 414, out_reads = 1572864, out_writes = 1572864, out_reads_factors = 3
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ GlobalBuffer:	227328 In_R, 12414 W_R, 32768 Our_R, 272510 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 227328 In_R, [54, 72, 12288] Per Layer W_R, 12414 W_R, 32768 Our_R, 272510 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 227328, per_layer_w_reads = [54, 72, 12288], w_reads = 12414, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	128 In_R, 140 W_R, 0 Our_R, 268 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[40, 72, 16] Per Layer Input Reads, 128 In_R, [36, 72, 32] Per Layer W_R, 140 W_R, 0 Our_R, 268 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [40, 72, 16], in_reads = 128, per_layer_w_reads = [36, 72, 32], w_reads = 140, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	108 In_R, 154 W_R, 0 Our_R, 262 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[40, 36, 32] Per Layer Input Reads, 108 In_R, [18, 72, 64] Per Layer W_R, 154 W_R, 0 Our_R, 262 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [40, 36, 32], in_reads = 108, per_layer_w_reads = [18, 72, 64], w_reads = 154, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	216 In_R, 207 W_R, 0 Our_R, 423 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[90, 54, 72] Per Layer Input Reads, 216 In_R, [9, 54, 144] Per Layer W_R, 207 W_R, 0 Our_R, 423 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [90, 54, 72], in_reads = 216, per_layer_w_reads = [9, 54, 144], w_reads = 207, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 288 Our_R, 1152 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 288 Our_R, 1152 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 288, out_writes = 288, out_reads_factors = 9
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
+Level: DRAM: Here I am
+BEFORE BYPASS: Per Layer In reads: [276672, 166400, 297216], Per Layer W Reads: [54, 72, 4608]  In reads: 740288, W reads: 4734, Out reads: 524288
+Level: DRAM: operand = in, levels = None
+Level: DRAM: operand = w, levels = None
+Level: DRAM: operand = out, levels = None
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+End MOPs with Bypasses for Level: DRAM
+
+
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [153600, 49152, 24576], Per Layer W Reads: [0, 0, 0]  In reads: 227328, W reads: 0, Out reads: 0
+Level: GlobalBuffer: operand = in, levels = None
+Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>]
+Chiamo non recursive MOPs su Level: InRegister. Operand: w
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	0 In_R, 154 W_R, 0 Our_R, 154 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [18, 72, 64] Per Layer W_R, 154 W_R, 0 Our_R, 154 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [18, 72, 64], w_reads = 154, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[18, 72, 64] w_bp=154, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 154, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [18, 72, 64], out_reads: 0, out_writes: 0
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [54, 72, 64]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 190, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [54, 72, 64], out_reads: 0, out_writes: 0
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [54, 72, 64]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[54, 72, 64], w_bp=190, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 384, Level: GlobalBuffer: per_layer_w_reads_bp = [20736, 27648, 24576] w_reads_bp = 190
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=454656, per_layer_w_reads = [20736, 27648, 24576] w_bp=72960, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>, <levels.MemLevel object at 0x7ed5a3ebea40>]
+Chiamo non recursive MOPs su Level: WRegister. Operand: out
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 32, out_writes = 32, out_reads_factors = 1
+After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=32, ignore_bypasses=True (bypass operand out)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=256, stationarity_to_address=True (bypass operand out)
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=681984, per_layer_w_reads = [20736, 27648, 24576] w_bp=145920, out_bp=32768, ignore_bypasses=False (bypass operand out)
+AFTER BYPASS of all operands:
+ GlobalBuffer:	681984 In_R, 145920 W_R, 32768 Our_R, 860672 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 681984 In_R, [20736, 27648, 24576] Per Layer W_R, 145920 W_R, 32768 Our_R, 860672 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 681984, per_layer_w_reads = [20736, 27648, 24576], w_reads = 145920, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+End MOPs with Bypasses for Level: GlobalBuffer
+
+
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7ed5a3ebea40>, <levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: in
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	864 In_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[288, 288, 288] Per Layer Input Reads, 864 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [288, 288, 288], in_reads = 864, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[288, 288, 288] in_bp=864, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
+Start inbtwn: Level: InRegister
+Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+Level: InRegister: in_btwn_factors_full = 18, in_reads_bp = 15552
+Level: InRegister: per_layer_in_reads_bp = [13436928, 13436928, 13436928]
+End inbtwn
+Level: InRegister: MOPs for per_layer_in_reads_bp=[13436928, 13436928, 13436928], in_bp=15552, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
+Level: InRegister: MOPs after bypasses for per_layer_in_reads = [53747712, 53747712, 53747712] in_bp=161243136, per_layer_w_reads = [0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
+Level: InRegister: operand = w, levels = None
+Level: InRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ InRegister:	161243136 In_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[53747712, 53747712, 53747712] Per Layer Input Reads, 161243136 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [53747712, 53747712, 53747712], in_reads = 161243136, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: InRegister
+
+
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: WRegister: operand = in, levels = None
+Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: w
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[288, 288, 288] w_bp=864, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: WRegister
+End inbtwn
+Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[288, 288, 288], w_bp=864, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 18, Level: WRegister: per_layer_w_reads_bp = [5184, 5184, 5184] w_reads_bp = 864
+Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0, 0] in_bp=0, per_layer_w_reads = [5184, 5184, 5184] w_bp=15552, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: WRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [5184, 5184, 5184] Per Layer W_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [5184, 5184, 5184], w_reads = 15552, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: WRegister
+
+
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 288
+Level: OutRegister: operand = in, levels = None
+Level: OutRegister: operand = w, levels = None
+Level: OutRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 288, out_writes = 288, out_reads_factors = 9
+End MOPs with Bypasses for Level: OutRegister
+
+
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
+Level: DRAM: Here I am
+BEFORE BYPASS: Per Layer In reads: [276672, 166400, 297216], Per Layer W Reads: [54, 72, 4608]  In reads: 740288, W reads: 4734, Out reads: 524288
+Level: DRAM: operand = in, levels = None
+Level: DRAM: operand = w, levels = None
+Level: DRAM: operand = out, levels = None
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+End MOPs with Bypasses for Level: DRAM
+
+
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [153600, 49152, 24576], Per Layer W Reads: [0, 0, 0]  In reads: 227328, W reads: 0, Out reads: 0
+Level: GlobalBuffer: operand = in, levels = None
+Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>]
+Chiamo non recursive MOPs su Level: InRegister. Operand: w
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	0 In_R, 154 W_R, 0 Our_R, 154 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [18, 72, 64] Per Layer W_R, 154 W_R, 0 Our_R, 154 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [18, 72, 64], w_reads = 154, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[18, 72, 64] w_bp=154, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 154, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [18, 72, 64], out_reads: 0, out_writes: 0
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [54, 72, 64]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 190, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [54, 72, 64], out_reads: 0, out_writes: 0
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [54, 72, 64]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[54, 72, 64], w_bp=190, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 384, Level: GlobalBuffer: per_layer_w_reads_bp = [20736, 27648, 24576] w_reads_bp = 190
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=454656, per_layer_w_reads = [20736, 27648, 24576] w_bp=72960, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>, <levels.MemLevel object at 0x7ed5a3ebea40>]
+Chiamo non recursive MOPs su Level: WRegister. Operand: out
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 32, out_writes = 32, out_reads_factors = 1
+After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=32, ignore_bypasses=True (bypass operand out)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=256, stationarity_to_address=True (bypass operand out)
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=681984, per_layer_w_reads = [20736, 27648, 24576] w_bp=145920, out_bp=32768, ignore_bypasses=False (bypass operand out)
+AFTER BYPASS of all operands:
+ GlobalBuffer:	681984 In_R, 145920 W_R, 32768 Our_R, 860672 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 681984 In_R, [20736, 27648, 24576] Per Layer W_R, 145920 W_R, 32768 Our_R, 860672 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 681984, per_layer_w_reads = [20736, 27648, 24576], w_reads = 145920, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+End MOPs with Bypasses for Level: GlobalBuffer
+
+
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7ed5a3ebea40>, <levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: in
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	864 In_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[288, 288, 288] Per Layer Input Reads, 864 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [288, 288, 288], in_reads = 864, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[288, 288, 288] in_bp=864, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
+Start inbtwn: Level: InRegister
+Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+Level: InRegister: in_btwn_factors_full = 18, in_reads_bp = 15552
+Level: InRegister: per_layer_in_reads_bp = [13436928, 13436928, 13436928]
+End inbtwn
+Level: InRegister: MOPs for per_layer_in_reads_bp=[13436928, 13436928, 13436928], in_bp=15552, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
+Level: InRegister: MOPs after bypasses for per_layer_in_reads = [53747712, 53747712, 53747712] in_bp=161243136, per_layer_w_reads = [0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
+Level: InRegister: operand = w, levels = None
+Level: InRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ InRegister:	161243136 In_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[53747712, 53747712, 53747712] Per Layer Input Reads, 161243136 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [53747712, 53747712, 53747712], in_reads = 161243136, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: InRegister
+
+
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: WRegister: operand = in, levels = None
+Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: w
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[288, 288, 288] w_bp=864, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: WRegister
+End inbtwn
+Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[288, 288, 288], w_bp=864, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 18, Level: WRegister: per_layer_w_reads_bp = [5184, 5184, 5184] w_reads_bp = 864
+Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0, 0] in_bp=0, per_layer_w_reads = [5184, 5184, 5184] w_bp=15552, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: WRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [5184, 5184, 5184] Per Layer W_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [5184, 5184, 5184], w_reads = 15552, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: WRegister
+
+
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 288
+Level: OutRegister: operand = in, levels = None
+Level: OutRegister: operand = w, levels = None
+Level: OutRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 288, out_writes = 288, out_reads_factors = 9
+End MOPs with Bypasses for Level: OutRegister
+
+
+
+Final condition:
+Wart: 3.578e-17
+EDP: 7.326e+13 (J*cycle)
+DRAM ----------> Q: 16, S2: 3
+GlobalBuffer --> P: 64, Q: 2, R2: 3
+SACols --------> Q: 8
+SARows --------> M: 3
+InRegister ----> C1: 2, C2: 2
+WRegister -----> R0: 3, R1: 3, C2: 2
+OutRegister ---> P: 4, K: 8, S1: 3, S0: 3
+Compute -------
+
+Visited mappings: 1
+
+Performed moves: 0
+Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=3, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
+Level: DRAM: Here I am
+BEFORE BYPASS: Per Layer In reads: [276672, 166400, 297216], Per Layer W Reads: [54, 72, 4608]  In reads: 740288, W reads: 4734, Out reads: 524288
+Level: DRAM: operand = in, levels = None
+Level: DRAM: operand = w, levels = None
+Level: DRAM: operand = out, levels = None
+AFTER BYPASS of all operands:
+ DRAM:		740288 In_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ DRAM:		[276672, 166400, 297216] Per Layer Input Reads, 740288 In_R, [54, 72, 4608] Per Layer W_R, 4734 W_R, 524288 Our_R, 1269310 Tot_R, 524288 Out_W, 1 Out_R_Fac
+Level: DRAM: MOPS: per_layer_in_reads = [276672, 166400, 297216], in_reads = 740288, per_layer_w_reads = [54, 72, 4608], w_reads = 4734, out_reads = 524288, out_writes = 524288, out_reads_factors = 1
+End MOPs with Bypasses for Level: DRAM
+
+
+Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [153600, 49152, 24576], Per Layer W Reads: [0, 0, 0]  In reads: 227328, W reads: 0, Out reads: 0
+Level: GlobalBuffer: operand = in, levels = None
+Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>]
+Chiamo non recursive MOPs su Level: InRegister. Operand: w
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ InRegister:	0 In_R, 154 W_R, 0 Our_R, 154 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [18, 72, 64] Per Layer W_R, 154 W_R, 0 Our_R, 154 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [18, 72, 64], w_reads = 154, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[18, 72, 64] w_bp=154, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 154, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [18, 72, 64], out_reads: 0, out_writes: 0
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [54, 72, 64]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 190, out_reads_bp = 0, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [54, 72, 64], out_reads: 0, out_writes: 0
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [54, 72, 64]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[54, 72, 64], w_bp=190, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 384, Level: GlobalBuffer: per_layer_w_reads_bp = [20736, 27648, 24576] w_reads_bp = 190
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=454656, per_layer_w_reads = [20736, 27648, 24576] w_bp=72960, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7ed5a3ebe830>, <levels.FanoutLevel object at 0x7ed5a3ebe950>, <levels.MemLevel object at 0x7ed5a3ebea10>, <levels.MemLevel object at 0x7ed5a3ebea40>]
+Chiamo non recursive MOPs su Level: WRegister. Operand: out
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 32 Our_R, 32 Tot_R, 32 Out_W, 1 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 32, out_writes = 32, out_reads_factors = 1
+After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=32, ignore_bypasses=True (bypass operand out)
+Start inbtwn: Level: GlobalBuffer
+Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+dim: M, factors.dimProduct(dim): 3
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 32, ignore_bypasses = False
+SONO IN MULBYDIM per_layer_in_reads: [0, 0, 0], per_layer_w_reads: [0, 0, 0], out_reads: 32, out_writes: 32
+per_layer_in_reads_bp = [0, 0, 0], per_layer_w_reads_bp = [0, 0, 0]
+End inbtwn
+Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=256, stationarity_to_address=True (bypass operand out)
+Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [153600, 49152, 24576] in_bp=681984, per_layer_w_reads = [20736, 27648, 24576] w_bp=145920, out_bp=32768, ignore_bypasses=False (bypass operand out)
+AFTER BYPASS of all operands:
+ GlobalBuffer:	681984 In_R, 145920 W_R, 32768 Our_R, 860672 Tot_R, 32768 Out_W, 1 Out_R_Fac
+AFTER SPATIALS:
+ GlobalBuffer:	[153600, 49152, 24576] Per Layer Input Reads, 681984 In_R, [20736, 27648, 24576] Per Layer W_R, 145920 W_R, 32768 Our_R, 860672 Tot_R, 32768 Out_W, 1 Out_R_Fac
+Level: GlobalBuffer: MOPS: per_layer_in_reads = [153600, 49152, 24576], in_reads = 681984, per_layer_w_reads = [20736, 27648, 24576], w_reads = 145920, out_reads = 32768, out_writes = 32768, out_reads_factors = 1
+End MOPs with Bypasses for Level: GlobalBuffer
+
+
+Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7ed5a3ebea40>, <levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: in
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	864 In_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[288, 288, 288] Per Layer Input Reads, 864 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [288, 288, 288], in_reads = 864, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[288, 288, 288] in_bp=864, per_layer_w_reads_bp=[0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
+Start inbtwn: Level: InRegister
+Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 864, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
+Level: InRegister: in_btwn_factors_full = 18, in_reads_bp = 15552
+Level: InRegister: per_layer_in_reads_bp = [13436928, 13436928, 13436928]
+End inbtwn
+Level: InRegister: MOPs for per_layer_in_reads_bp=[13436928, 13436928, 13436928], in_bp=15552, per_layer_w_reads_bp=[0, 0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
+Level: InRegister: MOPs after bypasses for per_layer_in_reads = [53747712, 53747712, 53747712] in_bp=161243136, per_layer_w_reads = [0, 0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
+Level: InRegister: operand = w, levels = None
+Level: InRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ InRegister:	161243136 In_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ InRegister:	[53747712, 53747712, 53747712] Per Layer Input Reads, 161243136 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 161243136 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: InRegister: MOPS: per_layer_in_reads = [53747712, 53747712, 53747712], in_reads = 161243136, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: InRegister
+
+
+Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=3, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 0
+Level: WRegister: operand = in, levels = None
+Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7ed5a3ebea70>]
+Chiamo non recursive MOPs su Level: OutRegister. Operand: w
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [288, 288, 288] Per Layer W_R, 864 W_R, 0 Our_R, 864 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [288, 288, 288], w_reads = 864, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0] in_bp=0, per_layer_w_reads_bp=[288, 288, 288] w_bp=864, out_bp=0, ignore_bypasses=True (bypass operand w)
+Start inbtwn: Level: WRegister
+End inbtwn
+Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0, 0], in_bp=0, per_layer_w_reads_bp=[288, 288, 288], w_bp=864, out_bp=0, stationarity_to_address=False (bypass operand w)
+Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
+AAAA factors_full: 18, Level: WRegister: per_layer_w_reads_bp = [5184, 5184, 5184] w_reads_bp = 864
+Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0, 0] in_bp=0, per_layer_w_reads = [5184, 5184, 5184] w_bp=15552, out_bp=0, ignore_bypasses=False (bypass operand w)
+Level: WRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ WRegister:	0 In_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+AFTER SPATIALS:
+ WRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [5184, 5184, 5184] Per Layer W_R, 15552 W_R, 0 Our_R, 15552 Tot_R, 0 Out_W, 0 Out_R_Fac
+Level: WRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [5184, 5184, 5184], w_reads = 15552, out_reads = 0, out_writes = 0, out_reads_factors = 0
+End MOPs with Bypasses for Level: WRegister
+
+
+Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=3, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+BEFORE BYPASS: Per Layer In reads: [0, 0, 0], Per Layer W Reads: [0, 0, 0]  In reads: 0, W reads: 0, Out reads: 288
+Level: OutRegister: operand = in, levels = None
+Level: OutRegister: operand = w, levels = None
+Level: OutRegister: operand = out, levels = None
+AFTER BYPASS of all operands:
+ OutRegister:	0 In_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+AFTER SPATIALS:
+ OutRegister:	[0, 0, 0] Per Layer Input Reads, 0 In_R, [0, 0, 0] Per Layer W_R, 0 W_R, 288 Our_R, 288 Tot_R, 288 Out_W, 9 Out_R_Fac
+Level: OutRegister: MOPS: per_layer_in_reads = [0, 0, 0], in_reads = 0, per_layer_w_reads = [0, 0, 0], w_reads = 0, out_reads = 288, out_writes = 288, out_reads_factors = 9
+End MOPs with Bypasses for Level: OutRegister
+
+
+
+Finished in: 0.045s
+
+Best mapping found with:
+	Wart: 3.578e-17
+	EDP: 7.326e+13 (J*cycle)
+	Energy: 4.930e+07 (uJ)
+	Latency: 1.486e+12 (cc)
+
+Mapping:
+DRAM ----------> Q: 16, S2: 3
+GlobalBuffer --> P: 64, Q: 2, R2: 3
+SACols --------> Q: 8
+SARows --------> M: 3
+InRegister ----> C1: 2, C2: 2
+WRegister -----> R0: 3, R1: 3, C2: 2
+OutRegister ---> P: 4, K: 8, S1: 3, S0: 3
+Compute -------
+
+Final MOPs per memory level:
+DRAM:		Out_R = 0 (reads) + 0 (drains), Out_W = 524288 (updates) + 0 (fills)
+DRAM:		Per-Layer In_R: [L0: 276672, L1: 166400, L2: 297216], Total: 740288
+DRAM:		Per-Layer W_R: [L0: 54, L1: 72, L2: 4608], Total: 4734
+DRAM:		740288 In_R, 4734 W_R, 0 Our_R, 745022 Tot_R,
+		0 In_W, 0 W_W, 524288 Out_W, 524288 Tot_W
+GlobalBuffer:	Out_R = 1048576 (reads) + 524288 (drains), Out_W = 1572864 (updates) + 0 (fills)
+GlobalBuffer:	Per-Layer In_R: [L0: 7372800, L1: 2359296, L2: 1179648], Total: 10911744
+GlobalBuffer:	Per-Layer W_R: [L0: 995328, L1: 1327104, L2: 1179648], Total: 3502080
+GlobalBuffer:	10911744 In_R, 3502080 W_R, 1572864 Our_R, 15986688 Tot_R,
+		740288 In_W, 4734 W_W, 1572864 Out_W, 2317886 Tot_W
+InRegister:	Per-Layer In_R: [L0: 23776267862016, L1: 23776267862016, L2: 23776267862016], Total: 71328803586048
+InRegister:	Per-Layer W_R: [L0: 0, L1: 0, L2: 0], Total: 0
+InRegister:	71328803586048 In_R, 0 W_R, 0 Our_R, 71328803586048 Tot_R,
+		10911744 In_W, 0 W_W, 0 Out_W, 10911744 Tot_W
+WRegister:	Per-Layer In_R: [L0: 0, L1: 0, L2: 0], Total: 0
+WRegister:	Per-Layer W_R: [L0: 9172942848, L1: 9172942848, L2: 9172942848], Total: 27518828544
+WRegister:	0 In_R, 27518828544 W_R, 0 Our_R, 27518828544 Tot_R,
+		0 In_W, 84049920 W_W, 0 Out_W, 84049920 Tot_W
+OutRegister:	Out_R = 9171369984 (reads) + 4718592 (drains), Out_W = 9172942848 (updates) + 3145728 (fills)
+OutRegister:	Per-Layer In_R: [L0: 0, L1: 0, L2: 0], Total: 0
+OutRegister:	Per-Layer W_R: [L0: 0, L1: 0, L2: 0], Total: 0
+OutRegister:	0 In_R, 0 W_R, 9176088576 Our_R, 9176088576 Tot_R,
+		0 In_W, 0 W_W, 9176088576 Out_W, 9176088576 Tot_W
+Totals:		71365515234878 R, 9273892414 W, 71374789127292 Tot
+Energy:		49297896.121 uJ
+
+Final Latency per level:
+DRAM:		1486016741376cc RD and 1486016741376cc FU Latency, 4.0 R and 4.0 W Bandwidth,
+		0.000 R and 0.000 U and 0.000 F and 0.000 D Ideal Bandwidth,
+		30958682112cc per Tile, 0 Stall Cycles
+GlobalBuffer:	1486016741376cc RD and 1486016741376cc FU Latency, 16.0 R and 16.0 W Bandwidth,
+		0.000 R and 0.000 U and 0.000 F and 0.000 D Ideal Bandwidth,
+		80621568cc per Tile, 0 Stall Cycles
+InRegister:	1486016741376cc RD and 573308928cc FU Latency, 2.0 R and 2.0 W Bandwidth,
+		5184.000 R and 0.000 U and 0.001 F and 0.000 D Ideal Bandwidth,
+		7776cc per Tile, 1485443432448 Stall Cycles
+WRegister:	573308928cc RD and 382205952cc FU Latency, 2.0 R and 2.0 W Bandwidth,
+		3.000 R and 0.000 U and 0.009 F and 0.000 D Ideal Bandwidth,
+		288cc per Tile, 191102976 Stall Cycles
+OutRegister:	382205952cc RD and 382205952cc FU Latency, 2.0 R and 2.0 W Bandwidth,
+		1.000 R and 1.000 U and 0.000 F and 0.001 D Ideal Bandwidth,
+		1cc per Tile, 0 Stall Cycles
+Max Latency:	1486016741376cc of level InRegister

@@ -250,6 +250,7 @@ def factorsIterator(arch : Arch, iterate_amounts : bool = False, skip_spatial : 
         if skip_spatial and isinstance(arch[level_idx], SpatialLevel) or skip_memories and isinstance(arch[level_idx], MemLevel):
             continue
         for dim in arch[level_idx].dataflow:
+            ## if M: {2: 3, 5:1} => iterates over 2,5
             for factor in list(arch[level_idx].factors[dim].keys()):
                 # check constraints on factors to avoid proposing invalid mappings
                 if dim not in arch[level_idx].factors_constraints:
