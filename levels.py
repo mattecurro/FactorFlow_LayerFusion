@@ -1295,14 +1295,15 @@ class FanoutLevel(SpatialLevel):
         print(f"SONO IN MULBYDIM per_layer_in_reads: {per_layer_in_reads}, per_layer_w_reads: {per_layer_w_reads}, out_reads: {out_reads}, out_writes: {out_writes}")
         if self.selective_multicast_support:
             ## ERROR changes needed to handle multi layers for input
-            for dim_sum in self.arch.coupling.in_coupling:
-                if len(dim_sum) > 1: #TODO: could optimize by skipping this whole if and its else if all dimProduct(dim)-s are 1!
-                    strides = [self.arch.getInStride(dim) for dim in dim_sum]
-                    in_reads //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
-                    in_reads *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
-                else:
-                    in_reads *= self.factors.dimProduct(dim_sum[0])
-            ## fix to handle multi layers
+            for layer_idx in range(self.arch.coupling.getNumLayers()):
+                for dim_sum in self.arch.coupling.in_coupling[layer_idx]:
+                    if len(dim_sum) > 1: #TODO: could optimize by skipping this whole if and its else if all dimProduct(dim)-s are 1!
+                        strides = [self.arch.getInStride(dim) for dim in dim_sum]
+                        per_layer_in_reads[layer_idx] //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
+                        per_layer_in_reads[layer_idx] *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
+                    else:
+                        per_layer_in_reads[layer_idx] *= self.factors.dimProduct(dim_sum[0])
+            ## fix strides to handle multi layers
             ## ERROR
             for layer_idx in range(self.arch.coupling.getNumLayers()):
                 for dim_sum in self.arch.coupling.flat_w_coupling[layer_idx]:
