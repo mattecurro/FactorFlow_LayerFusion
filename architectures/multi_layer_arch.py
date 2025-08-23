@@ -402,13 +402,13 @@ arch = small_2_layer_fixed_multilayer_mapping_conv = Arch([
     ),
     FanoutLevel(
         name = "SACols",
-        mesh = 6,
+        mesh = 4,
         dims = ['Q', 'K'],  # Only final layer dimensions
         factors_constraints = {'Q': 2}
     ),
     FanoutLevel(
         name = "SARows", 
-        mesh = 12,
+        mesh = 3,
         dims = ['M'],  # Only output dimensions
         factors_constraints = {'M': 3}
     ),
@@ -419,7 +419,7 @@ arch = small_2_layer_fixed_multilayer_mapping_conv = Arch([
         value_access_energy = 0.69,
         bandwidth = 4,
         factors_constraints = {
-            'C1': 2},
+            'C1': 2, 'S1': 3},
         bypasses = ['w', 'out']
     ),
     MemLevel(
@@ -437,7 +437,7 @@ arch = small_2_layer_fixed_multilayer_mapping_conv = Arch([
         size = 16*2,
         value_access_energy = 1.34,
         bandwidth = 4,
-        factors_constraints = {'S0': 3, 'S1': 3},
+        factors_constraints = {'S0': 3},
         bypasses = ['in', 'w']
     ),
     ComputeLevel(
