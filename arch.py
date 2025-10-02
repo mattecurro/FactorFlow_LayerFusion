@@ -5,6 +5,7 @@ from copy import deepcopy
 from settings import *
 from factors import *
 from utils import *
+from heuristic_check import ConvolutionScheduleValidator
 
 if TYPE_CHECKING:
     from levels import *
@@ -14,7 +15,7 @@ else:
 """
 Class wrapping a list of levels into an architecture.
 In FF, the terms outermost and innermost refer to the first and last elements
-in the list, in accordance with the HW componenets represented by levels.
+in the list, in accordance with the HW components represented by levels.
 
 This class becomes operational in 5 steps:
 1) construction of the 'Level' instances it wraps <- per-level arguments
@@ -54,7 +55,45 @@ class Arch(list[Level]):
         next((level for level in self[::-1] if isinstance(level, MemLevel)), None).next_is_compute = True
 
     """
-    Returns a compact representation of the current mapping.
+    Adapter that uses ConvolutionScheduleValidator to validate the current mapping against convolution loop scheduling heuristics.
+    """
+    def _validateConvolutionHeuristic(self, dimension: str) -> bool:
+        try:
+            # TODO: Check if this looks like a convolution workload: use coupling
+            
+    
+            # Extract tiling information from current mapping
+            tiling = {}
+            loop_order = []
+
+            # TODO: Check ONLY the fused layer where is present the modified dimension
+            # Use Coupling to find the dimensions_to_check
+            # e.g.: dimension = P/R{num_layers}/X => check heuristic for P, R{num_layers}, X
+            # e.g. if num_layers <= 2 AND dimension = Z/C => check heuristic for Z/C 
+
+
+            # for dim in dimensions_to_check: for each level: 
+                # find level.factors.dimProduct(dim)                    => tiling
+                # find relative loop_order between dimensions_to_check  => loop_order
+
+            if not tiling:
+                # No factors assigned yet, trivially valid
+                return True
+            
+            # Create validator and check
+            validator = ConvolutionScheduleValidator()
+            is_valid, _ = validator.validate_heuristic(tiling, loop_order)
+            
+            return is_valid
+            
+        except Exception as e:
+            # If heuristic check fails for any reason, don't block the move
+            # You might want to log this for debugging
+            print(f"Warning: Heuristic check failed with error: {e}")
+            return True
+
+    """
+    Returns a compact representation of the current mapping (LevelCore).
     
     Arguments:
     - copy: if True, the returned mapping is a deep-copy of the current one
@@ -126,7 +165,8 @@ class Arch(list[Level]):
     - skip_dst_constraints: if True, any constraints violation on the destination level
                             is ignored.
     """
-    def moveFactor(self, src_level_idx : int, dst_level_idx : int, dimension : str, factor : int, amount : int = 1, skip_src_constraints : bool = False, skip_dst_constraints : bool = False) -> bool:
+    # se con q ,svado verso esterno no prob
+    def moveFactor(self, src_level_idx : int, dst_level_idx : int, dimension : str, factor : int, amount : int = 1, skip_src_constraints : bool = False, skip_dst_constraints : bool = False, skip_heuristic_check : bool = False) -> bool:
         # check that the factor exists in the required amount
         if not self[src_level_idx].removeFactor(dimension, factor, amount):
             return False
@@ -145,6 +185,19 @@ class Arch(list[Level]):
                 self[i].tile_sizes[dimension] //= factor_to_amount
         # check dst and all in between constraints
         if not skip_dst_constraints and not all([level.checkFactorsConstraints() for level in (self[src_level_idx:dst_level_idx+1] if src_level_idx < dst_level_idx else self[dst_level_idx:src_level_idx+1])]):
+            ## Rollback
+            self[src_level_idx].addFactor(dimension, factor, amount)
+            assert self[dst_level_idx].removeFactor(dimension, factor, amount) # something is broken, cannot undo the move
+            if src_level_idx < dst_level_idx:
+                for i in range(src_level_idx, dst_level_idx):
+                    self[i].tile_sizes[dimension] //= factor_to_amount
+            elif src_level_idx > dst_level_idx:
+                for i in range(dst_level_idx, src_level_idx):
+                    self[i].tile_sizes[dimension] *= factor_to_amount
+            return False
+        # If we reach this point, the move was successful: check if the mapping is still valid
+        if not skip_heuristic_check and not self._validateConvolutionHeuristic(dimension):
+            ## Rollback due to heuristic violation
             self[src_level_idx].addFactor(dimension, factor, amount)
             assert self[dst_level_idx].removeFactor(dimension, factor, amount) # something is broken, cannot undo the move
             if src_level_idx < dst_level_idx:

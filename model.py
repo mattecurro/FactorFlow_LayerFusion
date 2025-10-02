@@ -14,6 +14,7 @@ Updates the MOPs and Latency data of each level w.r.t. the current mapping.
 ## in_reads non è più un intero ma una lista
 ## w_reads non è più un intero ma una lista
 def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
+    print("é stato chiamato update stats! \n\n")
     assert arch.initialized, f"Arch {arch.name}: architecture not initialized, ensure to call 'initFactors' first."
     
     # MOPs:
@@ -22,17 +23,27 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     spatial_iterations = 1
     last_in_reads, last_w_reads, last_out_reads, last_out_writes = 0, 0, 0, 0
     acc_out_reads_factors = 1
-
+    #print("DEBUG updateStats:)")
     # NOTE: here we compute total MOPs, not per-instance
     for i in range(len(arch)):
         level = arch[i]
         if isinstance(level, MemLevel):
             # multiply by spatial_iterations too because memory is replicated spatially
+            print("Questo mops è chiamato da update stats")            
             level_mops = level.MOPs()
             ## Get base MOPs for this level
             per_layer_in_reads, per_layer_w_reads, out_reads, out_writes, out_reads_factors = level_mops
-#            print(f"DEBUG updateStats {level.name}: per_layer_w_reads = {per_layer_w_reads}")            
+#            print(f"DEBUG updateStats:) Level {level.name}:")
+#            print(f"Level: {level.name}"
+#                  f"\n  per_layer_in_reads: {per_layer_in_reads}"
+#                  f"\n  per_layer_w_reads: {per_layer_w_reads}"
+#                  f"\n  out_reads: {out_reads}"
+#                  f"\n  out_writes: {out_writes}"
+#                  f"\n  out_reads_factors: {out_reads_factors}")
+            #print(f"DEBUG updateStats:) Level {level.name}: temporal_iterations = {temporal_iterations}, spatial_iterations = {spatial_iterations}")
             scale = temporal_iterations*spatial_iterations
+            ## DEBUG
+            #scale = 1
             per_layer_in_reads = [m*scale for m in per_layer_in_reads]
             per_layer_w_reads = [m*scale for m in per_layer_w_reads]
             in_reads = sum(per_layer_in_reads) # sum all input reads
@@ -40,7 +51,13 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             out_reads = out_reads * scale # output reads are not per-layer, so scale them directly
             out_writes = out_writes * scale # output writes are not per-layer, so scale them directly
             out_reads_factors = level_mops[4]*acc_out_reads_factors
-
+#            print(f"  scaled per_layer_in_reads: {per_layer_in_reads}"
+#                  f"\n  scaled per_layer_w_reads: {per_layer_w_reads}"
+#                  f"\n  scaled in_reads: {in_reads}"
+#                  f"\n  scaled w_reads: {w_reads}"
+#                  f"\n  scaled out_reads: {out_reads}"
+#                  f"\n  scaled out_writes: {out_writes}"
+#                  f"\n  acc_out_reads_factors: {out_reads_factors}")
             if not bias_read and out_reads_factors != 0:
                 out_reads = (out_reads*(out_reads_factors - 1))//out_reads_factors
             if 'in' not in level.bypasses:
@@ -62,6 +79,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     last_out_writes = out_writes
             else:
                 level.setAboveMOPs(0, 0)
+            ## DOUBT
             level.setMOPs(per_layer_in_reads = per_layer_in_reads,
                           per_layer_w_reads = per_layer_w_reads,
                           out_reads = out_reads,
@@ -83,8 +101,11 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             # spatial reuse of an operand occurs if the fanout is along a dimension not coupled to such operand,
             # hence, the operand is read once, but written once per instance (modeled by last_XX_reads)
             # TODO: add NoC modeling and accumulate data transfer energy here!
+            
+            ## DOUBT 
             for dim in level.dataflow:
                 iterations = level.factors.dimProduct(dim)
+                ## DOUBT
                 if dim not in arch.coupling.flat_in_coupling:
                     last_in_reads *= iterations
                 if dim not in arch.coupling.flat_w_coupling:

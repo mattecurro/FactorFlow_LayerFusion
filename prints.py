@@ -166,6 +166,7 @@ of a certain component, otherwise they are aggregate across all such instances.
 Default is False.
 """
 def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
+    print("PRINT MOP FUSION!!!")
     tot_reads = 0
     tot_writes = 0
     WMOPs = 0

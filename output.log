@@ -1,6 +1,6 @@
-WARNING: coupling {dims: ['N', 'P', 'Q', 'K', 'R2', 'S2', 'C2', 'R1', 'S1', 'C1', 'R0', 'S0', 'M'], in_coupling: [['N'], ['P', 'R2', 'R1', 'R0'], ['Q', 'S2', 'S1', 'S0'], ['M']], w_coupling: [[['M'], ['C1'], ['R0'], ['S0']], [['C1'], ['C2'], ['R1'], ['S1']], [['C2'], ['K'], ['R2'], ['S2']]], out_coupling: [['N'], ['P'], ['Q'], ['K']], in_strides: {'P': 'Pstride', 'Q': 'Qstride', 'R0': 'Rdilation0', 'S0': 'Sdilation0', 'R1': 'Rdilation1', 'S1': 'Sdilation1', 'R2': 'Rdilation2', 'S2': 'Sdilation2'}, w_strides: [{}, {}, {}], out_strides: {}} has strides applied to a sum of more than 2 indices on its input tensor (<filter object at 0x7c0a79818b20>), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.
+WARNING: coupling {dims: ['N', 'P', 'Q', 'K', 'R2', 'S2', 'C2', 'R1', 'S1', 'C1', 'R0', 'S0', 'M'], in_coupling: [['N'], ['P', 'R2', 'R1', 'R0'], ['Q', 'S2', 'S1', 'S0'], ['M']], w_coupling: [[['M'], ['C1'], ['R0'], ['S0']], [['C1'], ['C2'], ['R1'], ['S1']], [['C2'], ['K'], ['R2'], ['S2']]], out_coupling: [['N'], ['P'], ['Q'], ['K']], in_strides: {'P': 'Pstride', 'Q': 'Qstride', 'R0': 'Rdilation0', 'S0': 'Sdilation0', 'R1': 'Rdilation1', 'S1': 'Sdilation1', 'R2': 'Rdilation2', 'S2': 'Sdilation2'}, w_strides: [{}, {}, {}], out_strides: {}} has strides applied to a sum of more than 2 indices on its input tensor (<filter object at 0x756f1c88cb20>), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.
 -------- architecture --------
-WARNING: coupling {dims: ['N', 'P', 'Q', 'K', 'R1', 'S1', 'C1', 'R0', 'S0', 'M'], in_coupling: [['N'], ['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']], w_coupling: [[['M'], ['C1'], ['R0'], ['S0']], [['C1'], ['K'], ['R1'], ['S1']]], out_coupling: [['N'], ['P'], ['Q'], ['K']], in_strides: {'P': 'Pstride', 'Q': 'Qstride', 'R0': 'Rdilation0', 'S0': 'Sdilation0', 'R1': 'Rdilation1', 'S1': 'Sdilation1'}, w_strides: [{}, {}], out_strides: {}} has strides applied to a sum of more than 2 indices on its input tensor (<filter object at 0x7c0a7962f0a0>), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.
+WARNING: coupling {dims: ['N', 'P', 'Q', 'K', 'R1', 'S1', 'C1', 'R0', 'S0', 'M'], in_coupling: [['N'], ['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']], w_coupling: [[['M'], ['C1'], ['R0'], ['S0']], [['C1'], ['K'], ['R1'], ['S1']]], out_coupling: [['N'], ['P'], ['Q'], ['K']], in_strides: {'P': 'Pstride', 'Q': 'Qstride', 'R0': 'Rdilation0', 'S0': 'Sdilation0', 'R1': 'Rdilation1', 'S1': 'Sdilation1'}, w_strides: [{}, {}], out_strides: {}} has strides applied to a sum of more than 2 indices on its input tensor (<filter object at 0x756f1c6a4f70>), as a result a less-efficient enumeration algorithm will be used to compute the distinct values originating by such strided sums instead of the exact expression for distinct values which is available only for strided sums of maximum 2 indices.
 Architecture: architectures/multi_layer_arch.py -> arch
 -------- computation  --------
 Computation: architectures/2layer_comp.py -> comp: {P: 6, Q: 6, K: 2, R0: 3, S0: 3, C1: 2, R1: 3, S1: 3, M: 3}
@@ -11,18 +11,20 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-INFO: Added high constraint for intermediate dimension S0 in level InRegister
-INFO: Added high constraint for intermediate dimension C1 in level InRegister
-INFO: Added high constraint for intermediate dimension R0 in level InRegister
 INFO: Added high constraint for intermediate dimension N in level InRegister
-INFO: Added high constraint for intermediate dimension S0 in level WRegister
-INFO: Added high constraint for intermediate dimension C1 in level WRegister
-INFO: Added high constraint for intermediate dimension R0 in level WRegister
+INFO: Added high constraint for intermediate dimension S0 in level InRegister
+INFO: Added high constraint for intermediate dimension R0 in level InRegister
+INFO: Added high constraint for intermediate dimension C1 in level InRegister
 INFO: Added high constraint for intermediate dimension N in level WRegister
-INFO: Added high constraint for intermediate dimension S0 in level OutRegister
-INFO: Added high constraint for intermediate dimension C1 in level OutRegister
-INFO: Added high constraint for intermediate dimension R0 in level OutRegister
+INFO: Added high constraint for intermediate dimension S0 in level WRegister
+INFO: Added high constraint for intermediate dimension R0 in level WRegister
+INFO: Added high constraint for intermediate dimension C1 in level WRegister
 INFO: Added high constraint for intermediate dimension N in level OutRegister
+INFO: Added high constraint for intermediate dimension S0 in level OutRegister
+INFO: Added high constraint for intermediate dimension R0 in level OutRegister
+INFO: Added high constraint for intermediate dimension C1 in level OutRegister
+Starting engine with mapper: breadthfirst_local
+
 INFO: forcefully updating setting ITERATE_AMOUNTS to True
 INFO: forcefully updating setting STEPS_TO_EXPLORE to 4
 INFO: forcefully updating setting CO_OPT_STEPS_TO_EXPLORE to 4
@@ -36,151 +38,140 @@ INFO: forcefully updating setting SPATIAL_ITERATE_AMOUNTS to True
 WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.
 INFO: running multithreaded with THREADS_COUNT = 8
 
-Level DRAM (1 candidate permutations)
-Level GlobalBuffer (1 candidate permutations)
-Level InRegister (1 candidate permutations)
-Level WRegister (1 candidate permutations)
-Level OutRegister (1 candidate permutations)
 -------- factorFlow --------
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
-Level: DRAM: Here I am
+é stato chiamato update stats! 
+
+
+Questo mops è chiamato da update stats
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
 BEFORE BYPASS: Per Layer In reads: [420, 160], Per Layer W Reads: [54, 216]  In reads: 580, W reads: 270, Out reads: 72
-Level: DRAM: operand = in, levels = None
-Level: DRAM: operand = w, levels = None
-Level: DRAM: operand = out, levels = None
 AFTER BYPASS of all operands:
  DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
+DEBUG DRAM AFTER BYPASS: 
+  per_layer_in_reads: [420, 160]
+  per_layer_w_reads: [54, 216]
+  in_reads: 580, w_reads: 270
 End MOPs with Bypasses for Level: DRAM
 
 
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
 BEFORE BYPASS: Per Layer In reads: [450, 108], Per Layer W Reads: [0, 0]  In reads: 558, W reads: 0, Out reads: 0
-Level: GlobalBuffer: operand = in, levels = None
-Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>]
-Chiamo non recursive MOPs su Level: InRegister. Operand: w
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Level: WRegister: actual_dataflow = ['R0']
 AFTER BYPASS of all operands:
- InRegister:	0 In_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[18, 6] w_bp=24, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 24, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [18, 6], out_reads: 0, out_writes: 0
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 60, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [54, 6], out_reads: 0, out_writes: 0
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[54, 6], w_bp=60, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 9, Level: GlobalBuffer: per_layer_w_reads_bp = [486, 54] w_reads_bp = 60
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1116, per_layer_w_reads = [486, 54] w_bp=540, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>, <levels.MemLevel object at 0x7c0a7962f520>]
-Chiamo non recursive MOPs su Level: WRegister. Operand: out
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- WRegister:	0 In_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 1, out_writes = 1, out_reads_factors = 1
-After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=1, ignore_bypasses=True (bypass operand out)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=2, stationarity_to_address=True (bypass operand out)
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1674, per_layer_w_reads = [486, 54] w_bp=1080, out_bp=6, ignore_bypasses=False (bypass operand out)
-AFTER BYPASS of all operands:
- GlobalBuffer:	1674 In_R, 1080 W_R, 6 Our_R, 2760 Tot_R, 6 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 1674 In_R, [486, 54] Per Layer W_R, 1080 W_R, 6 Our_R, 2760 Tot_R, 6 Out_W, 1 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 1674, per_layer_w_reads = [486, 54], w_reads = 1080, out_reads = 6, out_writes = 6, out_reads_factors = 1
+ GlobalBuffer:	558 In_R, 540 W_R, 6 Our_R, 1104 Tot_R, 6 Out_W, 1 Out_R_Fac
+DEBUG GlobalBuffer AFTER BYPASS: 
+  per_layer_in_reads: [450, 108]
+  per_layer_w_reads: [486, 54]
+  in_reads: 558, w_reads: 540
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: InRegister: actual_dataflow = ['C1', 'S1']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7c0a7962f520>, <levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: in
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	6 In_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[3, 3] Per Layer Input Reads, 6 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [3, 3], in_reads = 6, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[3, 3] in_bp=6, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
-Start inbtwn: Level: InRegister
-Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-Level: InRegister: in_btwn_factors_full = 3, in_reads_bp = 18
-Level: InRegister: per_layer_in_reads_bp = [108, 108]
-End inbtwn
-Level: InRegister: MOPs for per_layer_in_reads_bp=[108, 108], in_bp=18, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
-Level: InRegister: MOPs after bypasses for per_layer_in_reads = [648, 648] in_bp=1296, per_layer_w_reads = [0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
-Level: InRegister: operand = w, levels = None
-Level: InRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 0: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: OutRegister, Layer 0: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 0: multiplying for dim S0 with n_iterations = 3
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 1: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: OutRegister, Layer 1: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 1: multiplying for dim S0 with n_iterations = 3
+Level: OutRegister: after first part Total Input reads: 6, per_layer_in_reads = [3, 3]
 AFTER BYPASS of all operands:
  InRegister:	1296 In_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[648, 648] Per Layer Input Reads, 1296 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [648, 648], in_reads = 1296, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG InRegister AFTER BYPASS: 
+  per_layer_in_reads: [648, 648]
+  per_layer_w_reads: [0, 0]
+  in_reads: 1296, w_reads: 0
 End MOPs with Bypasses for Level: InRegister
 
 
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: WRegister: actual_dataflow = ['R0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: WRegister: operand = in, levels = None
-Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: w
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	0 In_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [3, 3] Per Layer W_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [3, 3], w_reads = 6, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[3, 3] w_bp=6, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: WRegister
-End inbtwn
-Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[3, 3], w_bp=6, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 3, Level: WRegister: per_layer_w_reads_bp = [9, 9] w_reads_bp = 6
-Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0] in_bp=0, per_layer_w_reads = [9, 9] w_bp=18, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: WRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [9, 9] Per Layer W_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [9, 9], w_reads = 18, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG WRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [9, 9]
+  in_reads: 0, w_reads: 18
 End MOPs with Bypasses for Level: WRegister
 
 
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: OutRegister: actual_dataflow = ['S0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 3
-Level: OutRegister: operand = in, levels = None
-Level: OutRegister: operand = w, levels = None
-Level: OutRegister: operand = out, levels = None
 AFTER BYPASS of all operands:
  OutRegister:	0 In_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 3, out_writes = 3, out_reads_factors = 3
+DEBUG OutRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [0, 0]
+  in_reads: 0, w_reads: 0
 End MOPs with Bypasses for Level: OutRegister
 
 
-Initial condition (Wart: 5.064e-07):
+Initial condition (Wart: 1.013e-06):
 DRAM ----------> P: 2, Q: 3, K: 2
 GlobalBuffer --> P: 3, R1: 3
 SACols --------> Q: 2
@@ -192,525 +183,670 @@ Compute -------
 
 Starting FactorFlow tiling optimization:
 
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
-Level: DRAM: Here I am
+é stato chiamato update stats! 
+
+
+Questo mops è chiamato da update stats
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
 BEFORE BYPASS: Per Layer In reads: [420, 160], Per Layer W Reads: [54, 216]  In reads: 580, W reads: 270, Out reads: 72
-Level: DRAM: operand = in, levels = None
-Level: DRAM: operand = w, levels = None
-Level: DRAM: operand = out, levels = None
 AFTER BYPASS of all operands:
  DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
+DEBUG DRAM AFTER BYPASS: 
+  per_layer_in_reads: [420, 160]
+  per_layer_w_reads: [54, 216]
+  in_reads: 580, w_reads: 270
 End MOPs with Bypasses for Level: DRAM
 
 
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
 BEFORE BYPASS: Per Layer In reads: [450, 108], Per Layer W Reads: [0, 0]  In reads: 558, W reads: 0, Out reads: 0
-Level: GlobalBuffer: operand = in, levels = None
-Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>]
-Chiamo non recursive MOPs su Level: InRegister. Operand: w
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Level: WRegister: actual_dataflow = ['R0']
 AFTER BYPASS of all operands:
- InRegister:	0 In_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[18, 6] w_bp=24, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 24, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [18, 6], out_reads: 0, out_writes: 0
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 60, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [54, 6], out_reads: 0, out_writes: 0
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[54, 6], w_bp=60, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 9, Level: GlobalBuffer: per_layer_w_reads_bp = [486, 54] w_reads_bp = 60
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1116, per_layer_w_reads = [486, 54] w_bp=540, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>, <levels.MemLevel object at 0x7c0a7962f520>]
-Chiamo non recursive MOPs su Level: WRegister. Operand: out
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- WRegister:	0 In_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 1, out_writes = 1, out_reads_factors = 1
-After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=1, ignore_bypasses=True (bypass operand out)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=2, stationarity_to_address=True (bypass operand out)
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1674, per_layer_w_reads = [486, 54] w_bp=1080, out_bp=6, ignore_bypasses=False (bypass operand out)
-AFTER BYPASS of all operands:
- GlobalBuffer:	1674 In_R, 1080 W_R, 6 Our_R, 2760 Tot_R, 6 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 1674 In_R, [486, 54] Per Layer W_R, 1080 W_R, 6 Our_R, 2760 Tot_R, 6 Out_W, 1 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 1674, per_layer_w_reads = [486, 54], w_reads = 1080, out_reads = 6, out_writes = 6, out_reads_factors = 1
+ GlobalBuffer:	558 In_R, 540 W_R, 6 Our_R, 1104 Tot_R, 6 Out_W, 1 Out_R_Fac
+DEBUG GlobalBuffer AFTER BYPASS: 
+  per_layer_in_reads: [450, 108]
+  per_layer_w_reads: [486, 54]
+  in_reads: 558, w_reads: 540
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: InRegister: actual_dataflow = ['C1', 'S1']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7c0a7962f520>, <levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: in
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	6 In_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[3, 3] Per Layer Input Reads, 6 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [3, 3], in_reads = 6, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[3, 3] in_bp=6, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
-Start inbtwn: Level: InRegister
-Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-Level: InRegister: in_btwn_factors_full = 3, in_reads_bp = 18
-Level: InRegister: per_layer_in_reads_bp = [108, 108]
-End inbtwn
-Level: InRegister: MOPs for per_layer_in_reads_bp=[108, 108], in_bp=18, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
-Level: InRegister: MOPs after bypasses for per_layer_in_reads = [648, 648] in_bp=1296, per_layer_w_reads = [0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
-Level: InRegister: operand = w, levels = None
-Level: InRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 0: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: OutRegister, Layer 0: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 0: multiplying for dim S0 with n_iterations = 3
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 1: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: OutRegister, Layer 1: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 1: multiplying for dim S0 with n_iterations = 3
+Level: OutRegister: after first part Total Input reads: 6, per_layer_in_reads = [3, 3]
 AFTER BYPASS of all operands:
  InRegister:	1296 In_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[648, 648] Per Layer Input Reads, 1296 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [648, 648], in_reads = 1296, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG InRegister AFTER BYPASS: 
+  per_layer_in_reads: [648, 648]
+  per_layer_w_reads: [0, 0]
+  in_reads: 1296, w_reads: 0
 End MOPs with Bypasses for Level: InRegister
 
 
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: WRegister: actual_dataflow = ['R0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: WRegister: operand = in, levels = None
-Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: w
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	0 In_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [3, 3] Per Layer W_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [3, 3], w_reads = 6, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[3, 3] w_bp=6, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: WRegister
-End inbtwn
-Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[3, 3], w_bp=6, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 3, Level: WRegister: per_layer_w_reads_bp = [9, 9] w_reads_bp = 6
-Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0] in_bp=0, per_layer_w_reads = [9, 9] w_bp=18, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: WRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [9, 9] Per Layer W_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [9, 9], w_reads = 18, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG WRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [9, 9]
+  in_reads: 0, w_reads: 18
 End MOPs with Bypasses for Level: WRegister
 
 
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: OutRegister: actual_dataflow = ['S0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 3
-Level: OutRegister: operand = in, levels = None
-Level: OutRegister: operand = w, levels = None
-Level: OutRegister: operand = out, levels = None
 AFTER BYPASS of all operands:
  OutRegister:	0 In_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 3, out_writes = 3, out_reads_factors = 3
+DEBUG OutRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [0, 0]
+  in_reads: 0, w_reads: 0
 End MOPs with Bypasses for Level: OutRegister
 
 
+-- Initialization --
 -- local search of spatial levels --
-No valid follow-up configuration, stopping, current Wart: 5.064e-07
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-Level: DRAM: Here I am
-AFTER BYPASS of all operands:
- DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- GlobalBuffer:	558 In_R, 108 W_R, 6 Our_R, 672 Tot_R, 6 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 558 In_R, [54, 54] Per Layer W_R, 108 W_R, 6 Our_R, 672 Tot_R, 6 Out_W, 1 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 558, per_layer_w_reads = [54, 54], w_reads = 108, out_reads = 6, out_writes = 6, out_reads_factors = 1
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- GlobalBuffer:	558 In_R, 72 W_R, 18 Our_R, 648 Tot_R, 18 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 558 In_R, [54, 18] Per Layer W_R, 72 W_R, 18 Our_R, 648 Tot_R, 18 Out_W, 3 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 558, per_layer_w_reads = [54, 18], w_reads = 72, out_reads = 18, out_writes = 18, out_reads_factors = 3
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- InRegister:	21 In_R, 60 W_R, 0 Our_R, 81 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[15, 6] Per Layer Input Reads, 21 In_R, [54, 6] Per Layer W_R, 60 W_R, 0 Our_R, 81 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [15, 6], in_reads = 21, per_layer_w_reads = [54, 6], w_reads = 60, out_reads = 0, out_writes = 0, out_reads_factors = 0
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- InRegister:	36 In_R, 24 W_R, 0 Our_R, 60 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[30, 6] Per Layer Input Reads, 36 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 60 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [30, 6], in_reads = 36, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Choices after one step: {}
+No valid follow-up configuration, stopping, current Wart: 1.013e-06
+Total moves: 0
+Total choices: 1
+Choices: {}
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Actual dataflow: ['C1', 'S1'], len - 1: 1
+Level: InRegister: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = S1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: InRegister, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: InRegister, Layer 0: after no spatial, Input layer_read = 15, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: InRegister, Layer 0: after first part before acc remain Input layer_read = 15, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['C1', 'S1']
+actual_dataflow[:i+1] = ['C1']
+Level: InRegister, Layer 0: multiplying for dim C1 with n_iterations = 2
+Actual dataflow: ['C1', 'S1'], len - 1: 1
+Level: InRegister: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = S1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: InRegister, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: InRegister, Layer 1: after no spatial, Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: InRegister, Layer 1: after first part before acc remain Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['C1', 'S1']
+actual_dataflow[:i+1] = ['C1']
+Level: InRegister, Layer 1: multiplying for dim C1 with n_iterations = 2
+Level: InRegister: after first part Total Input reads: 36, per_layer_in_reads = [30, 6]
 -- local search of memory levels --
-No valid follow-up configuration, stopping, current Wart: 5.064e-07
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-Level: DRAM: Here I am
-AFTER BYPASS of all operands:
- DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- GlobalBuffer:	558 In_R, 108 W_R, 6 Our_R, 672 Tot_R, 6 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 558 In_R, [54, 54] Per Layer W_R, 108 W_R, 6 Our_R, 672 Tot_R, 6 Out_W, 1 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 558, per_layer_w_reads = [54, 54], w_reads = 108, out_reads = 6, out_writes = 6, out_reads_factors = 1
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- GlobalBuffer:	558 In_R, 72 W_R, 18 Our_R, 648 Tot_R, 18 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 558 In_R, [54, 18] Per Layer W_R, 72 W_R, 18 Our_R, 648 Tot_R, 18 Out_W, 3 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 558, per_layer_w_reads = [54, 18], w_reads = 72, out_reads = 18, out_writes = 18, out_reads_factors = 3
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- InRegister:	21 In_R, 60 W_R, 0 Our_R, 81 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[15, 6] Per Layer Input Reads, 21 In_R, [54, 6] Per Layer W_R, 60 W_R, 0 Our_R, 81 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [15, 6], in_reads = 21, per_layer_w_reads = [54, 6], w_reads = 60, out_reads = 0, out_writes = 0, out_reads_factors = 0
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- InRegister:	36 In_R, 24 W_R, 0 Our_R, 60 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[30, 6] Per Layer Input Reads, 36 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 60 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [30, 6], in_reads = 36, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
+Choices after one step: {}
+No valid follow-up configuration, stopping, current Wart: 1.013e-06
+Total moves: 0
+Total choices: 1
+Choices: {}
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Actual dataflow: ['C1', 'S1'], len - 1: 1
+Level: InRegister: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = S1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: InRegister, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: InRegister, Layer 0: after no spatial, Input layer_read = 15, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: InRegister, Layer 0: after first part before acc remain Input layer_read = 15, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['C1', 'S1']
+actual_dataflow[:i+1] = ['C1']
+Level: InRegister, Layer 0: multiplying for dim C1 with n_iterations = 2
+Actual dataflow: ['C1', 'S1'], len - 1: 1
+Level: InRegister: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = S1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: InRegister, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: InRegister, Layer 1: after no spatial, Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: InRegister, Layer 1: after first part before acc remain Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['C1', 'S1']
+actual_dataflow[:i+1] = ['C1']
+Level: InRegister, Layer 1: multiplying for dim C1 with n_iterations = 2
+Level: InRegister: after first part Total Input reads: 36, per_layer_in_reads = [30, 6]
 -- spatial-memory levels co-optimization --
-No valid follow-up configuration, stopping, current Wart: 5.064e-07
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-Level: DRAM: Here I am
-AFTER BYPASS of all operands:
- DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- GlobalBuffer:	558 In_R, 108 W_R, 6 Our_R, 672 Tot_R, 6 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 558 In_R, [54, 54] Per Layer W_R, 108 W_R, 6 Our_R, 672 Tot_R, 6 Out_W, 1 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 558, per_layer_w_reads = [54, 54], w_reads = 108, out_reads = 6, out_writes = 6, out_reads_factors = 1
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- GlobalBuffer:	558 In_R, 72 W_R, 18 Our_R, 648 Tot_R, 18 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 558 In_R, [54, 18] Per Layer W_R, 72 W_R, 18 Our_R, 648 Tot_R, 18 Out_W, 3 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 558, per_layer_w_reads = [54, 18], w_reads = 72, out_reads = 18, out_writes = 18, out_reads_factors = 3
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- InRegister:	21 In_R, 60 W_R, 0 Our_R, 81 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[15, 6] Per Layer Input Reads, 21 In_R, [54, 6] Per Layer W_R, 60 W_R, 0 Our_R, 81 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [15, 6], in_reads = 21, per_layer_w_reads = [54, 6], w_reads = 60, out_reads = 0, out_writes = 0, out_reads_factors = 0
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=True, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- InRegister:	36 In_R, 24 W_R, 0 Our_R, 60 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[30, 6] Per Layer Input Reads, 36 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 60 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [30, 6], in_reads = 36, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
-Level: DRAM: Here I am
+Choices after one step: {}
+No valid follow-up configuration, stopping, current Wart: 1.013e-06
+Total moves: 0
+Total choices: 1
+Choices: {}
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
+Questo MOPs è dentro pickBestPermsIteratively!!!
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Actual dataflow: ['C1', 'S1'], len - 1: 1
+Level: InRegister: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = S1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: InRegister, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: InRegister, Layer 0: after no spatial, Input layer_read = 15, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: InRegister, Layer 0: after first part before acc remain Input layer_read = 15, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['C1', 'S1']
+actual_dataflow[:i+1] = ['C1']
+Level: InRegister, Layer 0: multiplying for dim C1 with n_iterations = 2
+Actual dataflow: ['C1', 'S1'], len - 1: 1
+Level: InRegister: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = S1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: InRegister, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: InRegister, Layer 1: after no spatial, Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: InRegister, Layer 1: after first part before acc remain Input layer_read = 3, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['C1', 'S1']
+actual_dataflow[:i+1] = ['C1']
+Level: InRegister, Layer 1: multiplying for dim C1 with n_iterations = 2
+Level: InRegister: after first part Total Input reads: 36, per_layer_in_reads = [30, 6]
+é stato chiamato update stats! 
+
+
+Questo mops è chiamato da update stats
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
 BEFORE BYPASS: Per Layer In reads: [420, 160], Per Layer W Reads: [54, 216]  In reads: 580, W reads: 270, Out reads: 72
-Level: DRAM: operand = in, levels = None
-Level: DRAM: operand = w, levels = None
-Level: DRAM: operand = out, levels = None
 AFTER BYPASS of all operands:
  DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
+DEBUG DRAM AFTER BYPASS: 
+  per_layer_in_reads: [420, 160]
+  per_layer_w_reads: [54, 216]
+  in_reads: 580, w_reads: 270
 End MOPs with Bypasses for Level: DRAM
 
 
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
 BEFORE BYPASS: Per Layer In reads: [450, 108], Per Layer W Reads: [0, 0]  In reads: 558, W reads: 0, Out reads: 0
-Level: GlobalBuffer: operand = in, levels = None
-Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>]
-Chiamo non recursive MOPs su Level: InRegister. Operand: w
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Level: WRegister: actual_dataflow = ['R0']
 AFTER BYPASS of all operands:
- InRegister:	0 In_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[18, 6] w_bp=24, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 24, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [18, 6], out_reads: 0, out_writes: 0
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 60, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [54, 6], out_reads: 0, out_writes: 0
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[54, 6], w_bp=60, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 9, Level: GlobalBuffer: per_layer_w_reads_bp = [486, 54] w_reads_bp = 60
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1116, per_layer_w_reads = [486, 54] w_bp=540, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>, <levels.MemLevel object at 0x7c0a7962f520>]
-Chiamo non recursive MOPs su Level: WRegister. Operand: out
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- WRegister:	0 In_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 1, out_writes = 1, out_reads_factors = 1
-After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=1, ignore_bypasses=True (bypass operand out)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=2, stationarity_to_address=True (bypass operand out)
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1674, per_layer_w_reads = [486, 54] w_bp=1080, out_bp=18, ignore_bypasses=False (bypass operand out)
-AFTER BYPASS of all operands:
- GlobalBuffer:	1674 In_R, 1080 W_R, 18 Our_R, 2772 Tot_R, 18 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 1674 In_R, [486, 54] Per Layer W_R, 1080 W_R, 18 Our_R, 2772 Tot_R, 18 Out_W, 3 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 1674, per_layer_w_reads = [486, 54], w_reads = 1080, out_reads = 18, out_writes = 18, out_reads_factors = 3
+ GlobalBuffer:	558 In_R, 540 W_R, 6 Our_R, 1104 Tot_R, 6 Out_W, 1 Out_R_Fac
+DEBUG GlobalBuffer AFTER BYPASS: 
+  per_layer_in_reads: [450, 108]
+  per_layer_w_reads: [486, 54]
+  in_reads: 558, w_reads: 540
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: InRegister: actual_dataflow = ['C1', 'S1']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7c0a7962f520>, <levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: in
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	6 In_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[3, 3] Per Layer Input Reads, 6 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [3, 3], in_reads = 6, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[3, 3] in_bp=6, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
-Start inbtwn: Level: InRegister
-Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-Level: InRegister: in_btwn_factors_full = 3, in_reads_bp = 18
-Level: InRegister: per_layer_in_reads_bp = [108, 108]
-End inbtwn
-Level: InRegister: MOPs for per_layer_in_reads_bp=[108, 108], in_bp=18, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
-Level: InRegister: MOPs after bypasses for per_layer_in_reads = [648, 648] in_bp=1296, per_layer_w_reads = [0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
-Level: InRegister: operand = w, levels = None
-Level: InRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 0: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: OutRegister, Layer 0: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 0: multiplying for dim S0 with n_iterations = 3
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 1: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: OutRegister, Layer 1: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 1: multiplying for dim S0 with n_iterations = 3
+Level: OutRegister: after first part Total Input reads: 6, per_layer_in_reads = [3, 3]
 AFTER BYPASS of all operands:
  InRegister:	1296 In_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[648, 648] Per Layer Input Reads, 1296 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [648, 648], in_reads = 1296, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG InRegister AFTER BYPASS: 
+  per_layer_in_reads: [648, 648]
+  per_layer_w_reads: [0, 0]
+  in_reads: 1296, w_reads: 0
 End MOPs with Bypasses for Level: InRegister
 
 
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: WRegister: actual_dataflow = ['R0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: WRegister: operand = in, levels = None
-Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: w
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	0 In_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [3, 3] Per Layer W_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [3, 3], w_reads = 6, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[3, 3] w_bp=6, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: WRegister
-End inbtwn
-Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[3, 3], w_bp=6, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 3, Level: WRegister: per_layer_w_reads_bp = [9, 9] w_reads_bp = 6
-Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0] in_bp=0, per_layer_w_reads = [9, 9] w_bp=18, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: WRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [9, 9] Per Layer W_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [9, 9], w_reads = 18, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG WRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [9, 9]
+  in_reads: 0, w_reads: 18
 End MOPs with Bypasses for Level: WRegister
 
 
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: OutRegister: actual_dataflow = ['S0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 3
-Level: OutRegister: operand = in, levels = None
-Level: OutRegister: operand = w, levels = None
-Level: OutRegister: operand = out, levels = None
 AFTER BYPASS of all operands:
  OutRegister:	0 In_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 3, out_writes = 3, out_reads_factors = 3
+DEBUG OutRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [0, 0]
+  in_reads: 0, w_reads: 0
 End MOPs with Bypasses for Level: OutRegister
 
 
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
-Level: DRAM: Here I am
+é stato chiamato update stats! 
+
+
+Questo mops è chiamato da update stats
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
 BEFORE BYPASS: Per Layer In reads: [420, 160], Per Layer W Reads: [54, 216]  In reads: 580, W reads: 270, Out reads: 72
-Level: DRAM: operand = in, levels = None
-Level: DRAM: operand = w, levels = None
-Level: DRAM: operand = out, levels = None
 AFTER BYPASS of all operands:
  DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
+DEBUG DRAM AFTER BYPASS: 
+  per_layer_in_reads: [420, 160]
+  per_layer_w_reads: [54, 216]
+  in_reads: 580, w_reads: 270
 End MOPs with Bypasses for Level: DRAM
 
 
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
 BEFORE BYPASS: Per Layer In reads: [450, 108], Per Layer W Reads: [0, 0]  In reads: 558, W reads: 0, Out reads: 0
-Level: GlobalBuffer: operand = in, levels = None
-Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>]
-Chiamo non recursive MOPs su Level: InRegister. Operand: w
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Level: WRegister: actual_dataflow = ['R0']
 AFTER BYPASS of all operands:
- InRegister:	0 In_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[18, 6] w_bp=24, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 24, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [18, 6], out_reads: 0, out_writes: 0
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 60, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [54, 6], out_reads: 0, out_writes: 0
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[54, 6], w_bp=60, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 9, Level: GlobalBuffer: per_layer_w_reads_bp = [486, 54] w_reads_bp = 60
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1116, per_layer_w_reads = [486, 54] w_bp=540, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>, <levels.MemLevel object at 0x7c0a7962f520>]
-Chiamo non recursive MOPs su Level: WRegister. Operand: out
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- WRegister:	0 In_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 1, out_writes = 1, out_reads_factors = 1
-After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=1, ignore_bypasses=True (bypass operand out)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=2, stationarity_to_address=True (bypass operand out)
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1674, per_layer_w_reads = [486, 54] w_bp=1080, out_bp=18, ignore_bypasses=False (bypass operand out)
-AFTER BYPASS of all operands:
- GlobalBuffer:	1674 In_R, 1080 W_R, 18 Our_R, 2772 Tot_R, 18 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 1674 In_R, [486, 54] Per Layer W_R, 1080 W_R, 18 Our_R, 2772 Tot_R, 18 Out_W, 3 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 1674, per_layer_w_reads = [486, 54], w_reads = 1080, out_reads = 18, out_writes = 18, out_reads_factors = 3
+ GlobalBuffer:	558 In_R, 540 W_R, 6 Our_R, 1104 Tot_R, 6 Out_W, 1 Out_R_Fac
+DEBUG GlobalBuffer AFTER BYPASS: 
+  per_layer_in_reads: [450, 108]
+  per_layer_w_reads: [486, 54]
+  in_reads: 558, w_reads: 540
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: InRegister: actual_dataflow = ['C1', 'S1']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7c0a7962f520>, <levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: in
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	6 In_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[3, 3] Per Layer Input Reads, 6 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [3, 3], in_reads = 6, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[3, 3] in_bp=6, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
-Start inbtwn: Level: InRegister
-Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-Level: InRegister: in_btwn_factors_full = 3, in_reads_bp = 18
-Level: InRegister: per_layer_in_reads_bp = [108, 108]
-End inbtwn
-Level: InRegister: MOPs for per_layer_in_reads_bp=[108, 108], in_bp=18, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
-Level: InRegister: MOPs after bypasses for per_layer_in_reads = [648, 648] in_bp=1296, per_layer_w_reads = [0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
-Level: InRegister: operand = w, levels = None
-Level: InRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 0: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: OutRegister, Layer 0: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 0: multiplying for dim S0 with n_iterations = 3
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 1: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: OutRegister, Layer 1: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 1: multiplying for dim S0 with n_iterations = 3
+Level: OutRegister: after first part Total Input reads: 6, per_layer_in_reads = [3, 3]
 AFTER BYPASS of all operands:
  InRegister:	1296 In_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[648, 648] Per Layer Input Reads, 1296 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [648, 648], in_reads = 1296, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG InRegister AFTER BYPASS: 
+  per_layer_in_reads: [648, 648]
+  per_layer_w_reads: [0, 0]
+  in_reads: 1296, w_reads: 0
 End MOPs with Bypasses for Level: InRegister
 
 
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: WRegister: actual_dataflow = ['R0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: WRegister: operand = in, levels = None
-Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: w
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	0 In_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [3, 3] Per Layer W_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [3, 3], w_reads = 6, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[3, 3] w_bp=6, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: WRegister
-End inbtwn
-Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[3, 3], w_bp=6, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 3, Level: WRegister: per_layer_w_reads_bp = [9, 9] w_reads_bp = 6
-Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0] in_bp=0, per_layer_w_reads = [9, 9] w_bp=18, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: WRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [9, 9] Per Layer W_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [9, 9], w_reads = 18, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG WRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [9, 9]
+  in_reads: 0, w_reads: 18
 End MOPs with Bypasses for Level: WRegister
 
 
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: OutRegister: actual_dataflow = ['S0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 3
-Level: OutRegister: operand = in, levels = None
-Level: OutRegister: operand = w, levels = None
-Level: OutRegister: operand = out, levels = None
 AFTER BYPASS of all operands:
  OutRegister:	0 In_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 3, out_writes = 3, out_reads_factors = 3
+DEBUG OutRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [0, 0]
+  in_reads: 0, w_reads: 0
 End MOPs with Bypasses for Level: OutRegister
 
 
 
 Final condition:
-Wart: 5.064e-07
-EDP: 6.922e-02 (J*cycle)
+Wart: 1.013e-06
+EDP: 6.910e-02 (J*cycle)
 DRAM ----------> P: 2, Q: 3, K: 2
-GlobalBuffer --> R1: 3, P: 3
+GlobalBuffer --> P: 3, R1: 3
 SACols --------> Q: 2
 SARows --------> M: 3
 InRegister ----> C1: 2, S1: 3
@@ -721,156 +857,150 @@ Compute -------
 Visited mappings: 1
 
 Performed moves: 0
-Level: DRAM: has self.in_bp=1, self.w_bp=1, self.out_bp=1, num_layers=2, in_bp=1, w_bp=1, out_bp=1, ignore_bypasses=False
-Level: DRAM: Here I am
+é stato chiamato update stats! 
+
+
+Questo mops è chiamato da update stats
+Level: DRAM: actual_dataflow = ['P', 'Q', 'K']
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1', 'S0']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1', 'S0'], tile_sizes other dims = [3, 3], strides = [1, 1, 1]
+Level: DRAM, Layer 0: after no next compute, Input layer_read = 10, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+dim_sum that is not innermost_dim_sum = [['P', 'R1', 'R0'], ['M']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 0: after no spatial, Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+Level: DRAM, Layer 0: after first part before acc remain Input layer_read = 210, i = 0, innermost_dim_sum = ['Q', 'S1', 'S0']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 0: multiplying for dim P with n_iterations = 2
+Actual dataflow: ['P', 'Q', 'K'], len - 1: 2
+Level: DRAM: innermost_dim_sum found = ['Q', 'S1']
+actual_dataflow[1] = Q, tile_size = 2, n_iterations = 3, innermost_dim_sum = ['Q', 'S1'], tile_sizes other dims = [3], strides = [1, 1]
+Level: DRAM, Layer 1: after no next compute, Input layer_read = 8, i = 0, innermost_dim_sum = ['Q', 'S1']
+dim_sum that is not innermost_dim_sum = [['P', 'R1'], ['C1']]
+distinct_values([3,3,1], [1,1,1]) = 5
+distinct_values([1],[1]) = 1
+prod: 25
+Level: DRAM, Layer 1: after no spatial, Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+Level: DRAM, Layer 1: after first part before acc remain Input layer_read = 80, i = 0, innermost_dim_sum = ['Q', 'S1']
+actual_dataflow = ['P', 'Q', 'K']
+actual_dataflow[:i+1] = ['P']
+Level: DRAM, Layer 1: multiplying for dim P with n_iterations = 2
+Level: DRAM: after first part Total Input reads: 580, per_layer_in_reads = [420, 160]
 BEFORE BYPASS: Per Layer In reads: [420, 160], Per Layer W Reads: [54, 216]  In reads: 580, W reads: 270, Out reads: 72
-Level: DRAM: operand = in, levels = None
-Level: DRAM: operand = w, levels = None
-Level: DRAM: operand = out, levels = None
 AFTER BYPASS of all operands:
  DRAM:		580 In_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- DRAM:		[420, 160] Per Layer Input Reads, 580 In_R, [54, 216] Per Layer W_R, 270 W_R, 72 Our_R, 922 Tot_R, 72 Out_W, 1 Out_R_Fac
-Level: DRAM: MOPS: per_layer_in_reads = [420, 160], in_reads = 580, per_layer_w_reads = [54, 216], w_reads = 270, out_reads = 72, out_writes = 72, out_reads_factors = 1
+DEBUG DRAM AFTER BYPASS: 
+  per_layer_in_reads: [420, 160]
+  per_layer_w_reads: [54, 216]
+  in_reads: 580, w_reads: 270
 End MOPs with Bypasses for Level: DRAM
 
 
-Level: GlobalBuffer: has self.in_bp=1, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=1, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: GlobalBuffer: actual_dataflow = ['P', 'R1']
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1', 'R0']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1', 'R0'], tile_sizes other dims = [1, 3], strides = [1, 1, 1]
+Level: GlobalBuffer, Layer 0: after no next compute, Input layer_read = 5, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: GlobalBuffer, Layer 0: after Spatial, Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+Level: GlobalBuffer, Layer 0: after first part before acc remain Input layer_read = 150, i = 0, innermost_dim_sum = ['P', 'R1', 'R0']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 0: multiplying for dim P with n_iterations = 3
+Actual dataflow: ['P', 'R1'], len - 1: 1
+Level: GlobalBuffer: innermost_dim_sum found = ['P', 'R1']
+actual_dataflow[1] = R1, tile_size = 1, n_iterations = 3, innermost_dim_sum = ['P', 'R1'], tile_sizes other dims = [1], strides = [1, 1]
+Level: GlobalBuffer, Layer 1: after no next compute, Input layer_read = 3, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 2, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 3}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: GlobalBuffer, Layer 1: after Spatial, Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+Level: GlobalBuffer, Layer 1: after first part before acc remain Input layer_read = 36, i = 0, innermost_dim_sum = ['P', 'R1']
+actual_dataflow = ['P', 'R1']
+actual_dataflow[:i+1] = ['P']
+Level: GlobalBuffer, Layer 1: multiplying for dim P with n_iterations = 3
+Level: GlobalBuffer: after first part Total Input reads: 558, per_layer_in_reads = [450, 108]
 BEFORE BYPASS: Per Layer In reads: [450, 108], Per Layer W Reads: [0, 0]  In reads: 558, W reads: 0, Out reads: 0
-Level: GlobalBuffer: operand = in, levels = None
-Level: GlobalBuffer: operand = w, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>]
-Chiamo non recursive MOPs su Level: InRegister. Operand: w
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
+Level: InRegister: actual_dataflow = ['C1', 'S1']
+Level: WRegister: actual_dataflow = ['R0']
 AFTER BYPASS of all operands:
- InRegister:	0 In_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [18, 6] Per Layer W_R, 24 W_R, 0 Our_R, 24 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [18, 6], w_reads = 24, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: InRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[18, 6] w_bp=24, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 24, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [18, 6], out_reads: 0, out_writes: 0
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = False, in_reads_bp = 0, w_reads_bp = 60, out_reads_bp = 0, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [54, 6], out_reads: 0, out_writes: 0
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [54, 6]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[54, 6], w_bp=60, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: GlobalBuffer: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 9, Level: GlobalBuffer: per_layer_w_reads_bp = [486, 54] w_reads_bp = 60
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1116, per_layer_w_reads = [486, 54] w_bp=540, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: GlobalBuffer: operand = out, levels = [<levels.FanoutLevel object at 0x7c0a7962f280>, <levels.FanoutLevel object at 0x7c0a7962f490>, <levels.MemLevel object at 0x7c0a7962f4f0>, <levels.MemLevel object at 0x7c0a7962f520>]
-Chiamo non recursive MOPs su Level: WRegister. Operand: out
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=False, w_bp=False, out_bp=True, ignore_bypasses=True
-AFTER BYPASS of all operands:
- WRegister:	0 In_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 1 Our_R, 1 Tot_R, 1 Out_W, 1 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 1, out_writes = 1, out_reads_factors = 1
-After non recursive call for Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=1, ignore_bypasses=True (bypass operand out)
-Start inbtwn: Level: GlobalBuffer
-Level: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-In_btwn MemLevel of: GlobalBuffer: in_btwn = InRegister, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-Level: GlobalBuffer: in_btwn = SARows, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-dim: M, factors.dimProduct(dim): 3
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-Level: GlobalBuffer: in_btwn = SACols, stationarity_to_address = True, in_reads_bp = 0, w_reads_bp = 0, out_reads_bp = 1, ignore_bypasses = False
-SONO IN MULBYDIM per_layer_in_reads: [0, 0], per_layer_w_reads: [0, 0], out_reads: 1, out_writes: 1
-per_layer_in_reads_bp = [0, 0], per_layer_w_reads_bp = [0, 0]
-End inbtwn
-Level: GlobalBuffer: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=2, stationarity_to_address=True (bypass operand out)
-Level: GlobalBuffer: MOPs after bypasses for per_layer_in_reads = [450, 108] in_bp=1674, per_layer_w_reads = [486, 54] w_bp=1080, out_bp=18, ignore_bypasses=False (bypass operand out)
-AFTER BYPASS of all operands:
- GlobalBuffer:	1674 In_R, 1080 W_R, 18 Our_R, 2772 Tot_R, 18 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- GlobalBuffer:	[450, 108] Per Layer Input Reads, 1674 In_R, [486, 54] Per Layer W_R, 1080 W_R, 18 Our_R, 2772 Tot_R, 18 Out_W, 3 Out_R_Fac
-Level: GlobalBuffer: MOPS: per_layer_in_reads = [450, 108], in_reads = 1674, per_layer_w_reads = [486, 54], w_reads = 1080, out_reads = 18, out_writes = 18, out_reads_factors = 3
+ GlobalBuffer:	558 In_R, 540 W_R, 6 Our_R, 1104 Tot_R, 6 Out_W, 1 Out_R_Fac
+DEBUG GlobalBuffer AFTER BYPASS: 
+  per_layer_in_reads: [450, 108]
+  per_layer_w_reads: [486, 54]
+  in_reads: 558, w_reads: 540
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
-Level: InRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: InRegister: actual_dataflow = ['C1', 'S1']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: InRegister: operand = in, levels = [<levels.MemLevel object at 0x7c0a7962f520>, <levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: in
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=True, w_bp=False, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	6 In_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[3, 3] Per Layer Input Reads, 6 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [3, 3], in_reads = 6, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[3, 3] in_bp=6, per_layer_w_reads_bp=[0, 0] w_bp=0, out_bp=0, ignore_bypasses=True (bypass operand in)
-Start inbtwn: Level: InRegister
-Level: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-In_btwn MemLevel of: InRegister: in_btwn = WRegister, stationarity_to_address = False, in_reads_bp = 6, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
-Level: InRegister: in_btwn_factors_full = 3, in_reads_bp = 18
-Level: InRegister: per_layer_in_reads_bp = [108, 108]
-End inbtwn
-Level: InRegister: MOPs for per_layer_in_reads_bp=[108, 108], in_bp=18, per_layer_w_reads_bp=[0, 0], w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
-Level: InRegister: MOPs after bypasses for per_layer_in_reads = [648, 648] in_bp=1296, per_layer_w_reads = [0, 0] w_bp=0, out_bp=0, ignore_bypasses=False (bypass operand in)
-Level: InRegister: operand = w, levels = None
-Level: InRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 0: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[0] = [['P', 'R1', 'R0'], ['Q', 'S1', 'S0'], ['M']]
+Level: OutRegister, Layer 0: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 0: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 0: multiplying for dim S0 with n_iterations = 3
+Actual dataflow: ['S0'], len - 1: 0
+Level: OutRegister, Layer 1: after no next compute, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: next_spatial_unroll = {'N': 1, 'P': 1, 'Q': 1, 'K': 1, 'R1': 1, 'S1': 1, 'C1': 1, 'R0': 1, 'S0': 1, 'M': 1}, input_couplings[1] = [['P', 'R1'], ['Q', 'S1'], ['C1']]
+Level: OutRegister, Layer 1: after Spatial, Input layer_read = 1, i = 0, innermost_dim_sum = None
+Level: OutRegister, Layer 1: after first part before acc remain Input layer_read = 1, i = 0, innermost_dim_sum = None
+actual_dataflow = ['S0']
+actual_dataflow[:i+1] = ['S0']
+Level: OutRegister, Layer 1: multiplying for dim S0 with n_iterations = 3
+Level: OutRegister: after first part Total Input reads: 6, per_layer_in_reads = [3, 3]
 AFTER BYPASS of all operands:
  InRegister:	1296 In_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- InRegister:	[648, 648] Per Layer Input Reads, 1296 In_R, [0, 0] Per Layer W_R, 0 W_R, 0 Our_R, 1296 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: InRegister: MOPS: per_layer_in_reads = [648, 648], in_reads = 1296, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG InRegister AFTER BYPASS: 
+  per_layer_in_reads: [648, 648]
+  per_layer_w_reads: [0, 0]
+  in_reads: 1296, w_reads: 0
 End MOPs with Bypasses for Level: InRegister
 
 
-Level: WRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=0, num_layers=2, in_bp=0, w_bp=0, out_bp=0, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: WRegister: actual_dataflow = ['R0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 0
-Level: WRegister: operand = in, levels = None
-Level: WRegister: operand = w, levels = [<levels.MemLevel object at 0x7c0a7962f550>]
-Chiamo non recursive MOPs su Level: OutRegister. Operand: w
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=False, w_bp=True, out_bp=False, ignore_bypasses=True
-AFTER BYPASS of all operands:
- OutRegister:	0 In_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [3, 3] Per Layer W_R, 6 W_R, 0 Our_R, 6 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [3, 3], w_reads = 6, out_reads = 0, out_writes = 0, out_reads_factors = 0
-After non recursive call for Level: OutRegister: MOPs for per_layer_in_reads_bp=[0, 0] in_bp=0, per_layer_w_reads_bp=[3, 3] w_bp=6, out_bp=0, ignore_bypasses=True (bypass operand w)
-Start inbtwn: Level: WRegister
-End inbtwn
-Level: WRegister: MOPs for per_layer_in_reads_bp=[0, 0], in_bp=0, per_layer_w_reads_bp=[3, 3], w_bp=6, out_bp=0, stationarity_to_address=False (bypass operand w)
-Level: WRegister: stationarity_to_address is False, dataflow handled among inner loops
-AAAA factors_full: 3, Level: WRegister: per_layer_w_reads_bp = [9, 9] w_reads_bp = 6
-Level: WRegister: MOPs after bypasses for per_layer_in_reads = [0, 0] in_bp=0, per_layer_w_reads = [9, 9] w_bp=18, out_bp=0, ignore_bypasses=False (bypass operand w)
-Level: WRegister: operand = out, levels = None
+Level: OutRegister: actual_dataflow = ['S0']
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-AFTER SPATIALS:
- WRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [9, 9] Per Layer W_R, 18 W_R, 0 Our_R, 18 Tot_R, 0 Out_W, 0 Out_R_Fac
-Level: WRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [9, 9], w_reads = 18, out_reads = 0, out_writes = 0, out_reads_factors = 0
+DEBUG WRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [9, 9]
+  in_reads: 0, w_reads: 18
 End MOPs with Bypasses for Level: WRegister
 
 
-Level: OutRegister: has self.in_bp=0, self.w_bp=0, self.out_bp=1, num_layers=2, in_bp=0, w_bp=0, out_bp=1, ignore_bypasses=False
+Questo mops è chiamato da update stats
+Level: OutRegister: actual_dataflow = ['S0']
 BEFORE BYPASS: Per Layer In reads: [0, 0], Per Layer W Reads: [0, 0]  In reads: 0, W reads: 0, Out reads: 3
-Level: OutRegister: operand = in, levels = None
-Level: OutRegister: operand = w, levels = None
-Level: OutRegister: operand = out, levels = None
 AFTER BYPASS of all operands:
  OutRegister:	0 In_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-AFTER SPATIALS:
- OutRegister:	[0, 0] Per Layer Input Reads, 0 In_R, [0, 0] Per Layer W_R, 0 W_R, 3 Our_R, 3 Tot_R, 3 Out_W, 3 Out_R_Fac
-Level: OutRegister: MOPS: per_layer_in_reads = [0, 0], in_reads = 0, per_layer_w_reads = [0, 0], w_reads = 0, out_reads = 3, out_writes = 3, out_reads_factors = 3
+DEBUG OutRegister AFTER BYPASS: 
+  per_layer_in_reads: [0, 0]
+  per_layer_w_reads: [0, 0]
+  in_reads: 0, w_reads: 0
 End MOPs with Bypasses for Level: OutRegister
 
 
 
-Finished in: 0.034s
+Finished in: 0.089s
 
 Best mapping found with:
-	Wart: 5.064e-07
-	EDP: 6.922e-02 (J*cycle)
-	Energy: 9.890e-01 (uJ)
+	Wart: 1.013e-06
+	EDP: 6.910e-02 (J*cycle)
+	Energy: 9.873e-01 (uJ)
 	Latency: 6.998e+04 (cc)
 
 Mapping:
 DRAM ----------> P: 2, Q: 3, K: 2
-GlobalBuffer --> R1: 3, P: 3
+GlobalBuffer --> P: 3, R1: 3
 SACols --------> Q: 2
 SARows --------> M: 3
 InRegister ----> C1: 2, S1: 3
@@ -879,16 +1009,17 @@ OutRegister ---> S0: 3
 Compute -------
 
 Final MOPs per memory level:
+PRINT MOP FUSION!!!
 DRAM:		Out_R = 0 (reads) + 0 (drains), Out_W = 72 (updates) + 0 (fills)
 DRAM:		Per-Layer In_R: [L0: 420, L1: 160], Total: 580
 DRAM:		Per-Layer W_R: [L0: 54, L1: 216], Total: 270
 DRAM:		580 In_R, 270 W_R, 0 Our_R, 850 Tot_R,
 		0 In_W, 0 W_W, 72 Out_W, 72 Tot_W
-GlobalBuffer:	Out_R = 144 (reads) + 72 (drains), Out_W = 216 (updates) + 0 (fills)
+GlobalBuffer:	Out_R = 0 (reads) + 72 (drains), Out_W = 72 (updates) + 0 (fills)
 GlobalBuffer:	Per-Layer In_R: [L0: 5400, L1: 1296], Total: 6696
 GlobalBuffer:	Per-Layer W_R: [L0: 5832, L1: 648], Total: 6480
-GlobalBuffer:	6696 In_R, 6480 W_R, 216 Our_R, 13392 Tot_R,
-		580 In_W, 270 W_W, 216 Out_W, 1066 Tot_W
+GlobalBuffer:	6696 In_R, 6480 W_R, 72 Our_R, 13248 Tot_R,
+		580 In_W, 270 W_W, 72 Out_W, 922 Tot_W
 InRegister:	Per-Layer In_R: [L0: 419904, L1: 419904], Total: 839808
 InRegister:	Per-Layer W_R: [L0: 0, L1: 0], Total: 0
 InRegister:	839808 In_R, 0 W_R, 0 Our_R, 839808 Tot_R,
@@ -897,20 +1028,20 @@ WRegister:	Per-Layer In_R: [L0: 0, L1: 0], Total: 0
 WRegister:	Per-Layer W_R: [L0: 34992, L1: 34992], Total: 69984
 WRegister:	0 In_R, 69984 W_R, 0 Our_R, 69984 Tot_R,
 		0 In_W, 38880 W_W, 0 Out_W, 38880 Tot_W
-OutRegister:	Out_R = 34776 (reads) + 648 (drains), Out_W = 34992 (updates) + 432 (fills)
+OutRegister:	Out_R = 34776 (reads) + 216 (drains), Out_W = 34992 (updates) + 0 (fills)
 OutRegister:	Per-Layer In_R: [L0: 0, L1: 0], Total: 0
 OutRegister:	Per-Layer W_R: [L0: 0, L1: 0], Total: 0
-OutRegister:	0 In_R, 0 W_R, 35424 Our_R, 35424 Tot_R,
-		0 In_W, 0 W_W, 35424 Out_W, 35424 Tot_W
-Totals:		959458 R, 82138 W, 1041596 Tot
-Energy:		0.989 uJ
+OutRegister:	0 In_R, 0 W_R, 34992 Our_R, 34992 Tot_R,
+		0 In_W, 0 W_W, 34992 Out_W, 34992 Tot_W
+Totals:		958882 R, 81562 W, 1040444 Tot
+Energy:		0.987 uJ
 
 Final Latency per level:
 DRAM:		69984cc RD and 69984cc FU Latency, 4.0 R and 4.0 W Bandwidth,
 		0.012 R and 0.001 U and 0.000 F and 0.000 D Ideal Bandwidth,
 		5832cc per Tile, 0 Stall Cycles
 GlobalBuffer:	69984cc RD and 69984cc FU Latency, 16.0 R and 16.0 W Bandwidth,
-		0.190 R and 0.003 U and 0.012 F and 0.001 D Ideal Bandwidth,
+		0.188 R and 0.001 U and 0.012 F and 0.001 D Ideal Bandwidth,
 		648cc per Tile, 0 Stall Cycles
 InRegister:	69984cc RD and 5832cc FU Latency, 2.0 R and 2.0 W Bandwidth,
 		24.000 R and 0.000 U and 0.191 F and 0.000 D Ideal Bandwidth,
@@ -919,6 +1050,6 @@ WRegister:	5832cc RD and 5832cc FU Latency, 2.0 R and 2.0 W Bandwidth,
 		2.000 R and 0.000 U and 1.111 F and 0.000 D Ideal Bandwidth,
 		3cc per Tile, 0 Stall Cycles
 OutRegister:	5832cc RD and 5832cc FU Latency, 2.0 R and 2.0 W Bandwidth,
-		0.994 R and 1.000 U and 0.012 F and 0.019 D Ideal Bandwidth,
+		0.994 R and 1.000 U and 0.000 F and 0.006 D Ideal Bandwidth,
 		1cc per Tile, 0 Stall Cycles
 Max Latency:	69984cc of level InRegister

@@ -41,6 +41,7 @@ def forcedSettingsUpdate(arch : Arch, verbose : bool = True) -> None:
 Mapper entry point.
 """
 def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool, verbose : bool = False) -> tuple[float, int, float, int, float, float, Arch]:
+    print(f"Starting engine with mapper: {Settings.MAPPER}\n")
     try:
         forcedSettingsUpdate(arch, verbose = Settings.VERBOSE)
         start_time = time.time()
@@ -69,7 +70,7 @@ def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool,
         end_time = time.time() - start_time
         
         edp = EDP(arch, bias_read, True)
-        ## potential error
+        ## DOUBT potential error
         mops = MOPs(arch)
         energy = Energy(arch, True)
         latency = Latency(arch)

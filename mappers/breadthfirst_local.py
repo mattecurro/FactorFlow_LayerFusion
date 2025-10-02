@@ -198,21 +198,26 @@ def pickBestPermsIteratively(arch : Arch) -> None:
         w_matters = 'w' not in level.bypasses or levels_handling_bypass_dataflows['w'] == i
         out_matters = 'out' not in level.bypasses or levels_handling_bypass_dataflows['out'] == i
         
+        ## DEBUG!! THIS IS AN ERROR NOW!!
         if len(dims_not_at_one) == 2: # two dimension iterated, pick the best order between them
             dims_at_one = [dim for dim in arch.coupling.dims if level.factors.dimProduct(dim) == 1]
-            candidate_perms = [dims_at_one + dims_not_at_one, dims_at_one + dims_not_at_one[::-1]]
+            ## DEBUG THIS LINE WORKS I WANT TO NOT HAVE THE MULTIPLE CANDIDATES
+            ## ERROR!!! this is ok
+            #candidate_perms = [dims_at_one + dims_not_at_one, dims_at_one + dims_not_at_one[::-1]]
         ## change that with the num_layers
         # for example for 3 layer: 12        
         elif len(dims_not_at_one) < len(arch.coupling.dims): # some dimensions not iterated, check equi-dataflow matches
             candidate_perms = candidate_perms_per_mem_level[i]
             candidate_perms = filterEquiDataflowPerms(level, arch.coupling, candidate_perms, in_matters, w_matters, out_matters)
         else: # six dimensions iterated, all candidates must be tried
-            candidate_perms = candidate_perms_per_mem_level[i]
-        
+            candidate_perms = candidate_perms_per_mem_level[i]        
         best_perm, best_mops = None, math.inf
         for perm in candidate_perms:
             level.dataflow = perm
             # TODO: unfair, because the cost of reads and write is not identical...and we are ignoring other mops types...this is not a great proxy for reuse!
+            print("Questo MOPs è dentro pickBestPermsIteratively!!!")
+#            print(f"perm: {perm}")
+#            print(f"Level: {level.name}")
             per_layer_in_reads, per_layer_w_reads, out_reads, out_writes, _ = level.MOPs(in_matters, w_matters, out_matters, True)
             in_reads = sum(per_layer_in_reads)
             w_reads = sum(per_layer_w_reads)
@@ -427,6 +432,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
         # when failing to find a better mapping, increase the explored hops ('steps_to_explore') until they reach Settings.STEPS_TO_EXPLORE, then terminate if no better mapping is found, otherswise reset the hops to one
         steps_to_explore = initial_steps_to_explore
         while not Settings.forced_termination_flag:
+            ## first
             if steps_to_explore == initial_steps_to_explore:
                 if Settings.MULTITHREADED:
                     for task in factorsIterator(arch, iterate_amounts = iterate_amounts, skip_spatial = freeze_spatials):
@@ -445,6 +451,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
                     align_threads = True
                 else:
                     choices = exploreOneStep(arch, remaining_steps = initial_steps_to_explore, freeze_spatials = freeze_spatials, freeze_memories = freeze_memories, freeze_perms = freeze_perms, iterate_amounts = iterate_amounts, limit_n_dst_to_c_src = limit_n_dst_to_c_src)
+                print(f"Choices after one step: {choices}")
             else:
                 # >>> GREEDY BREADH-FIST: at this point we retain only the best "further" choice for each choice we already have, as to not grow exponentially the number of choices.
                 if Settings.MULTITHREADED:
@@ -461,6 +468,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
                     align_threads = True
                 else:
                     choices = exploreOneStepFurther(arch, {choice: wart for choice, wart in choices.items() if len(choice) // 5 >= steps_to_explore - steps_to_explore_increment}, remaining_steps = steps_to_explore_increment, freeze_spatials = freeze_spatials, freeze_memories = freeze_memories, freeze_perms = freeze_perms, iterate_amounts = iterate_amounts, limit_n_dst_to_c_src = limit_n_dst_to_c_src)
+                print(f"Choices after further step: {choices}")
             # >>> GREEDY MOVE <<<
             best_choice = max(choices, key = choices.get, default = None)
             if not best_choice or choices[best_choice] < best_wart:
@@ -468,6 +476,9 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
                     steps_to_explore += steps_to_explore_increment
                 else:
                     if verbose: print(f"No valid follow-up configuration, stopping, current Wart: {best_wart:.3e}" if not best_choice else f"Stopping with current Wart: {best_wart:.3e}, while best choice is: {choices[best_choice]:.3e}")
+                    if verbose: print(f"Total moves: {moves_count}")
+                    if verbose: print(f"Total choices: {len(already_seen)}")
+                    if verbose: print(f"Choices: {choices}")
                     break
             else:
                 # each individual choice is defined by 5 parameters, chained to another 5 for each nested exploration step
@@ -483,13 +494,17 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Fal
                     for i in range(len(update_local_arch)):
                         update_local_arch[i] = True
         if not freeze_perms:
+            ## DEBUG
+#            print("Ciaociaociao sono in una parte strana di local search")
             pickBestPermsIteratively(arch)
     
     if not already_initialized:
         if Settings.LOCAL_SEARCH_SPATIAL_LEVELS:
             # NOTE: use a higher STEPS_TO_EXPLORE and 'iterate_amounts' to prevent disjoint large prime factors to contend with many small ones shared with the spatial level's available mesh.
             # NOTE: do not use "freeze_perms" here, as it makes the comparison unfair and has little overhead anyway, working only on the outermost memory!
+            if verbose: print("-- Initialization --")
             if verbose: print("-- local search of spatial levels --")
+            ## freeze memories, optimize spatials
             localSearch(initial_steps_to_explore = Settings.SPATIAL_STEPS_TO_EXPLORE, final_steps_to_explore = Settings.SPATIAL_STEPS_TO_EXPLORE, freeze_memories = True, freeze_spatials = False, iterate_amounts = Settings.SPATIAL_ITERATE_AMOUNTS, limit_n_dst_to_c_src = Settings.SPATIAL_LIMIT_NEXT_STEP_DST_TO_CURRENT_SRC) # optimize spatial levels, may only remove factors from memory levels
         else:
             if verbose: print("-- fanout maximization --")
@@ -555,8 +570,7 @@ def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : 
                 # same as above, but we don't have halo reuse
                 candidate_perms = filter_equivalent_perms(candidate_perms, coupling_sets)
             candidate_perms_per_mem_level.append(candidate_perms)
-            print(f"Level {level.name} ({len(candidate_perms)} candidate permutations)")
-    
+            
     arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
     if verbose: print("\nPerformed moves:", moves)
     if thread_idx == -1:
