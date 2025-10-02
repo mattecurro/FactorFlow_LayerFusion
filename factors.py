@@ -422,8 +422,7 @@ class Shape(dict[str, int]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
-    ## Where do we use Shape memFootprint?
+    ## it is not used anymore, but it may be useful to have it
     def memFootprint(self, coupling : Coupling) -> int:
         input_size = prod(sum(self[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in coupling.in_coupling)
         output_size = prod(sum(self[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in coupling.out_coupling)
@@ -564,11 +563,14 @@ class Factors(dict[str, dict[int, int]]):
     (It is assumed that a level always stores all data for the
     iterations unfolding over it)
     """
-    def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1) -> int:
+    def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1, int_bp: bool = 1) -> int:
         input_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.in_coupling)*in_bp
         output_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.out_coupling)*out_bp
-        weight_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in w_coupling) for w_coupling in arch.coupling.w_coupling)*w_bp
-        return input_size + output_size + weight_size
+        weight_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in w_coupling) for w_coupling in arch.coupling.w_coupling.values())*w_bp
+        intermediate_input_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_i_coupling) for int_i_coupling in arch.coupling.int_in_coupling.values())
+        intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
+        intermediate_size = (intermediate_input_size + intermediate_output_size)*int_bp
+        return input_size + output_size + weight_size + intermediate_size
         # TODO: uncomment me to fix invalid mappings!
         #return (prod(distinct_values([tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum], [arch.getInStride(dim) for dim in dim_sum]) for dim_sum in arch.coupling.in_coupling)*in_bp +
         #        prod(distinct_values([tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum], [arch.getWStride(dim) for dim in dim_sum]) for dim_sum in arch.coupling.w_coupling)*w_bp +
