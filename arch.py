@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List
 from copy import deepcopy
 
 from settings import *
@@ -54,44 +54,7 @@ class Arch(list[Level]):
         self.setupSpatialLevelPointers()
         next((level for level in self[::-1] if isinstance(level, MemLevel)), None).next_is_compute = True
 
-    """
-    Adapter that uses ConvolutionScheduleValidator to validate the current mapping against convolution loop scheduling heuristics.
-    """
-    def _validateConvolutionHeuristic(self, dimension: str) -> bool:
-        try:
-            # TODO: Check if this looks like a convolution workload: use coupling
-            
     
-            # Extract tiling information from current mapping
-            tiling = {}
-            loop_order = []
-
-            # TODO: Check ONLY the fused layer where is present the modified dimension
-            # Use Coupling to find the dimensions_to_check
-            # e.g.: dimension = P/R{num_layers}/X => check heuristic for P, R{num_layers}, X
-            # e.g. if num_layers <= 2 AND dimension = Z/C => check heuristic for Z/C 
-
-
-            # for dim in dimensions_to_check: for each level: 
-                # find level.factors.dimProduct(dim)                    => tiling
-                # find relative loop_order between dimensions_to_check  => loop_order
-
-            if not tiling:
-                # No factors assigned yet, trivially valid
-                return True
-            
-            # Create validator and check
-            validator = ConvolutionScheduleValidator()
-            is_valid, _ = validator.validate_heuristic(tiling, loop_order)
-            
-            return is_valid
-            
-        except Exception as e:
-            # If heuristic check fails for any reason, don't block the move
-            # You might want to log this for debugging
-            print(f"Warning: Heuristic check failed with error: {e}")
-            return True
-
     """
     Returns a compact representation of the current mapping (LevelCore).
     
@@ -147,6 +110,193 @@ class Arch(list[Level]):
             print(f"WARNING: the used coupling ({coupling.compactStr()}) is not a subcoupling of arch {self.name}'s coupling ({self.coupling.compactStr()}), but is still compatible.")
         comp.fitToCoupling(self.coupling)
 
+    """Parse 'r1' -> ('r', 1), 's2' -> ('s', 2)"""
+    def parse_loop_name(self, name: str) -> Tuple[str, int]:
+        base = ''.join(c for c in name if c.isalpha())
+        level = ''.join(c for c in name if c.isdigit())
+        level = int(level) if level else 1
+        return base, level
+
+    """
+        Validate the heuristic for given tiling and loop order.
+
+        Heuristic: For each X loop level:
+        Q_iterations + S_iterations - 1 <= X_iterations
+
+        Returns: (is_valid_overall) #, list_of_validation_results)
+    """
+    def validate_heuristic(self, tiling: Dict[str, int], loop_order: List[str]) -> bool:
+        #results = []
+
+        # Check if the dimension in loop_order before the first 'x' are with iteration equal to 1
+        for i, loop in enumerate(reversed(loop_order)):
+            base, level = self.parse_loop_name(loop)
+            if base != 'x':
+                # base_iter is the number of iterations of the position in the loop order correspondent to base
+                iter_key = f'iterations_{loop}'
+                if iter_key in tiling:
+                    if tiling[iter_key] != 1:
+                        return False
+            else: break
+
+        # Extract X loop positions and identify their levels
+        x_positions = []
+        for i, loop in enumerate(loop_order):
+            #print(f"i: {i}, loop: {loop}")
+            base, level = self.parse_loop_name(loop)
+            if base == 'x':
+                x_positions.append((i, loop, level))
+
+
+        #print(f"x_position: {x_positions}")
+        # Sort by level (innermost first for processing)
+        x_positions.sort(key=lambda x: -x[2])
+        overall_valid = True
+
+        for x_pos_idx, (pos, x_loop, x_level) in enumerate(x_positions):
+            # Find the next outer X loop position (if exists)
+            next_outer_x_pos = None
+            if x_pos_idx < len(x_positions) - 1:
+                next_outer_x_pos = x_positions[x_pos_idx + 1][0]
+            else:
+                next_outer_x_pos = -1  # Before all loops
+
+            # Calculate Q_iterations: product of Q loops between current X and next outer X
+            q_iterations = 1
+            q_loops_used = []
+
+            # Calculate S_iterations: product of S loops between current X and next outer X
+            s_iterations = 1
+            s_loops_used = []
+
+            # Look at loops between next_outer_x_pos and current pos
+            for i in range(next_outer_x_pos + 1, len(loop_order)):
+                loop = loop_order[i]
+                base, level = self.parse_loop_name(loop)
+
+                if base == 'q':
+                    iter_key = f'iterations_{loop}'
+                    if iter_key in tiling:
+                        q_iterations *= tiling[iter_key]
+                        q_loops_used.append(f"{loop}={tiling[iter_key]}")
+                elif base == 's':
+                    iter_key = f'iterations_{loop}'
+                    if iter_key in tiling:
+                        s_iterations *= tiling[iter_key]
+                        s_loops_used.append(f"{loop}={tiling[iter_key]}")
+
+
+            # Calculate X_iterations: current X and all inner X loops
+            x_iterations = tiling[f'iterations_{x_loop}']
+            x_loops_used = [f"{x_loop}={x_iterations}"]
+
+            # Add inner X loops
+            for inner_x_pos, inner_x_loop, _ in x_positions:
+                if inner_x_pos > pos:
+                    inner_x_iter = tiling[f'iterations_{inner_x_loop}']
+                    x_iterations *= inner_x_iter
+                    x_loops_used.append(f"{inner_x_loop}={inner_x_iter}")
+
+            # Special case: outermost X level should check against total dimensions
+            if x_pos_idx == len(x_positions) - 1:
+                # For outermost level, check total coverage
+                total_q = 1
+                total_s = 1
+                total_x = 1
+
+                for loop in loop_order:
+                    base, _ = self.parse_loop_name(loop)
+                    iter_key = f'iterations_{loop}'
+                    if iter_key in tiling:
+                        if base == 'q':
+                            total_q *= tiling[iter_key]
+                        elif base == 's':
+                            total_s *= tiling[iter_key]
+                        elif base == 'x':
+                            total_x *= tiling[iter_key]
+
+                q_iterations = total_q
+                s_iterations = total_s
+                x_iterations = total_x
+
+            # Check the heuristic
+            lhs = q_iterations + s_iterations - 1
+            is_valid = lhs <= x_iterations
+
+## DEBUG
+            # Create calculation string
+#            if q_loops_used or s_loops_used:
+#                q_calc = " * ".join(q_loops_used) if q_loops_used else "1"
+#                s_calc = " * ".join(s_loops_used) if s_loops_used else "1"
+#            else:
+#                q_calc = str(q_iterations)
+#                s_calc = str(s_iterations)
+
+#            x_calc = " * ".join(x_loops_used)
+
+#            calc_str = f"Q_iter={q_iterations} ({q_calc}), S_iter={s_iterations} ({s_calc}), X_iter={x_iterations} ({x_calc}) → {lhs} <= {x_iterations}? {is_valid}"
+
+            #result = ValidationResult(
+            #    level_name=x_loop,
+            #    q_iterations=q_iterations,
+            #    s_iterations=s_iterations,
+            #    x_iterations=x_iterations,
+            #    is_valid=is_valid,
+            #    calculation_str=calc_str
+            #)
+
+            #results.append(result)
+            if not is_valid:
+                overall_valid = False
+
+        # Reverse to show from innermost to outermost
+        
+        #results.reverse()
+
+        return overall_valid
+
+    """Create a simulated tiling state showing what iterations would be after the move"""        
+    def _createSimulatedTilingAfterMove(self, src_level_idx: int, dst_level_idx: int, dimension: str, factor: int, amount: int) -> Dict[str, int]:
+        simulated_tiling = {}
+        factor_to_amount = factor**amount
+        
+        for level_idx, level in enumerate(self):
+            for dim in level.dataflow:
+                current_iterations = level.factors.dimProduct(dim)
+                
+                # Simulate the effect of the move
+                if level_idx == src_level_idx and dim == dimension:
+                    simulated_iterations = current_iterations // factor_to_amount
+                elif level_idx == dst_level_idx and dim == dimension:
+                    simulated_iterations = current_iterations * factor_to_amount
+                else:
+                    simulated_iterations = current_iterations
+                    
+                # Map to the format expected by validate_heuristic
+                loop_name = f"{dim.lower()}{level_idx}" 
+                simulated_tiling[f"iterations_{loop_name}"] = simulated_iterations
+        
+        return simulated_tiling
+
+    """Extract current loop order from the architecture"""        
+    def _extractLoopOrder(self) -> List[str]:
+        loop_order = []
+        for level_idx, level in enumerate(self):
+            for dim in level.dataflow:
+                loop_name = f"{dim.lower()}{level_idx}" 
+                loop_order.append(loop_name)
+        return loop_order
+    
+    """Extract current tiling from the architecture"""        
+    def _extractCurrentTiling(self) -> Dict[str, int]:
+        current_tiling = {}
+        for level_idx, level in enumerate(self):
+            for dim in level.dataflow:
+                current_iterations = level.factors.dimProduct(dim)
+                loop_name = f"{dim.lower()}{level_idx}" 
+                current_tiling[f"iterations_{loop_name}"] = current_iterations
+        return current_tiling
+    
     """
     Moves a factor between the same dimension of two levels, transitioning
     between adjacent mappings. It also updates tile sizes accordingly for all levels
@@ -166,7 +316,7 @@ class Arch(list[Level]):
                             is ignored.
     """
     # se con q ,svado verso esterno no prob
-    def moveFactor(self, src_level_idx : int, dst_level_idx : int, dimension : str, factor : int, amount : int = 1, skip_src_constraints : bool = False, skip_dst_constraints : bool = False, skip_heuristic_check : bool = False) -> bool:
+    def moveFactor(self, src_level_idx : int, dst_level_idx : int, dimension : str, factor : int, amount : int = 1, skip_src_constraints : bool = False, skip_dst_constraints : bool = False, skip_heuristic_check : bool = False) -> bool:           
         # check that the factor exists in the required amount
         if not self[src_level_idx].removeFactor(dimension, factor, amount):
             return False
@@ -196,17 +346,20 @@ class Arch(list[Level]):
                     self[i].tile_sizes[dimension] *= factor_to_amount
             return False
         # If we reach this point, the move was successful: check if the mapping is still valid
-        if not skip_heuristic_check and not self._validateConvolutionHeuristic(dimension):
-            ## Rollback due to heuristic violation
-            self[src_level_idx].addFactor(dimension, factor, amount)
-            assert self[dst_level_idx].removeFactor(dimension, factor, amount) # something is broken, cannot undo the move
-            if src_level_idx < dst_level_idx:
-                for i in range(src_level_idx, dst_level_idx):
-                    self[i].tile_sizes[dimension] //= factor_to_amount
-            elif src_level_idx > dst_level_idx:
-                for i in range(dst_level_idx, src_level_idx):
-                    self[i].tile_sizes[dimension] *= factor_to_amount
-            return False
+        if not skip_heuristic_check:
+            loop_order = self._extractLoopOrder()
+            current_tiling = self._extractCurrentTiling()
+            if not self.validate_heuristic(current_tiling, loop_order):
+                ## Rollback due to heuristic violation
+                self[src_level_idx].addFactor(dimension, factor, amount)
+                assert self[dst_level_idx].removeFactor(dimension, factor, amount) # something is broken, cannot undo the move
+                if src_level_idx < dst_level_idx:
+                    for i in range(src_level_idx, dst_level_idx):
+                        self[i].tile_sizes[dimension] //= factor_to_amount
+                elif src_level_idx > dst_level_idx:
+                    for i in range(dst_level_idx, src_level_idx):
+                        self[i].tile_sizes[dimension] *= factor_to_amount
+                return False
         return True
 
     """

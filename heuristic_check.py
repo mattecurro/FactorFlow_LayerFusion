@@ -10,9 +10,9 @@ from dataclasses import dataclass
 import json
 
 # Feature map dimensions
-FEATURE_MAP_Q = 40  # Output dimension
+FEATURE_MAP_Q = 6  # Output dimension
 FEATURE_MAP_S = 3   # Filter dimension
-FEATURE_MAP_X = 42  # Intermediate dimension (S+Q-1)
+FEATURE_MAP_X = 8  # Intermediate dimension (S+Q-1)
 FEATURE_MAP_R = 1   # Input filter dimension
 
 @dataclass
@@ -226,17 +226,62 @@ def main():
     validator = ConvolutionScheduleValidator()
 
     # Example of custom configuration
+    """
     custom_tiling = {
-        'iterations_q1': 5, 'iterations_x1': 6, 'iterations_s1': 1,
-        'iterations_q2': 8, 'iterations_s2': 3, 'iterations_x2': 7,
-        'iterations_q3': 1, 'iterations_s3': 1, 'iterations_x3': 1
+        'iterations_q1': 2,
+        'iterations_q2': 3,
+        'iterations_q3': 1,
+        'iterations_q4': 1,
+        'iterations_q5': 1,
+        'iterations_q6': 1,
+        'iterations_q7': 1,
+        'iterations_s1': 1,
+        'iterations_s2': 3,
+        'iterations_s3': 1,
+        'iterations_s4': 1,
+        'iterations_s5': 1,
+        'iterations_s6': 1,
+        'iterations_s7': 1,
+        'iterations_x1': 1,
+        'iterations_x2': 4,
+        'iterations_x3': 2,
+        'iterations_x4': 1,
+        'iterations_x5': 1,
+        'iterations_x6': 1,
+        'iterations_x7': 1,
     }
-
-    custom_order = ['x3', 'q2', 'q3', 's1', 's2', 'x2', 'q1', 'x1', 's3']
+"""
+    custom_tiling = {
+        'iterations_q1': 1,
+        'iterations_q2': 2,
+        'iterations_q3': 3,
+        'iterations_q4': 1,
+        'iterations_q5': 1,
+        'iterations_q6': 1,
+        'iterations_q7': 1,
+        'iterations_s1': 1,
+        'iterations_s2': 1,
+        'iterations_s3': 3,
+        'iterations_s4': 1,
+        'iterations_s5': 1,
+        'iterations_s6': 1,
+        'iterations_s7': 1,
+        'iterations_x1': 1,
+        'iterations_x2': 2,
+        'iterations_x3': 4,
+        'iterations_x4': 1,
+        'iterations_x5': 1,
+        'iterations_x6': 1,
+        'iterations_x7': 1,
+    }
+    custom_order = ['q1', 'x1', 's1', 's2', 'q2', 'x2', 'x3', 'q3', 's3', 'q4', 's4', 'x4', 'x5', 'q5', 's5', 'q6', 's6', 'x6', 'q7', 's7', 'x7']
 
     # Validate with heuristic
     is_valid, _ = validator.validate_heuristic(custom_tiling, custom_order)
     print(f"\nCustom Configuration Validation Result: {'VALID' if is_valid else 'INVALID'}")
+        
+    #call to print_validation_report
+    validator.print_validation_report("Custom Configuration", custom_tiling, custom_order)
 
 if __name__ == "__main__":
     main()

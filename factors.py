@@ -337,6 +337,13 @@ class Coupling:
         else:
             raise Exception(f"Unrecognized operand ({operand}) in coupling.")
     
+    """Returns the input coupling."""
+    def getInputCoupling(self) -> list[list[str]]:
+        return self.in_coupling
+
+    """Returns the flat input coupling."""
+    def getFlatInputCoupling(self) -> list[str]:
+        return self.flat_in_coupling
 
     """Returns the weight coupling for a specific layer."""
     def getWeightCoupling(self, layer_index: int) -> list[list[str]]:
@@ -380,10 +387,31 @@ class Coupling:
             return self.flat_int_in_coupling[layer_index]
         raise IndexError(f"Layer index {layer_index} not found in flat intermediate input coupling.")
 
+    """Returns the output coupling."""
+    def getOutputCoupling(self) -> list[list[str]]:
+        return self.out_coupling
+    
+    """Returns the flat output coupling for a specific layer."""
+    def getFlatOutputCoupling(self, layer_index: int) -> list[str]:
+        if layer_index in self.flat_out_coupling:
+            return self.flat_out_coupling[layer_index]
+        raise IndexError(f"Layer index {layer_index} not found in flat output coupling.")
+
     """Returns the number of layers in this coupling."""
     def getNumLayers(self) -> int:
         """Returns the number of layers in this coupling."""
         return len(self.w_coupling)
+
+    """Returns the input strides."""
+    def getInputStrides(self) -> dict[str, str]:
+        return self.in_strides
+    
+    """Returns the intermediate input strides for a specific layer."""        
+    def getIntermediateInputStrides(self, layer_index: int) -> dict[str, str]:
+        if layer_index in self.int_in_strides:
+            return self.int_in_strides[layer_index]
+        raise IndexError(f"Layer index {layer_index} not found in intermediate input strides.")
+    
 
     """
     Returns a compact string representing the coupling.
@@ -517,7 +545,7 @@ class Factors(dict[str, dict[int, int]]):
 
     """Total number of iterations across all three dimensions."""
     def fullProduct(self) -> int:
-        return prod(self._dim_products.values())
+        return prod(self._dim_products.values())        
 
     """
     Recomputes the correct values for the dimProducts as of the current

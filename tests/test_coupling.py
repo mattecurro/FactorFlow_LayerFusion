@@ -392,7 +392,7 @@ def test_is_compatible_coupling_with_strides():
 """Test isCompatibleCoupling with intermediate layers and (different) strides"""
 def test_is_compatible_coupling_with_intermediate_layers_with_strides():
     dims = ['P', 'Q', 'C2', 'C1', 'R1', 'S1', 'C0', 'R0', 'S0', 'X', 'Y', 'Z']
-    in_coupling = [['X', 'R0'], ['Y', 'S0'], 'C0']
+    in_coupling = [['Y', 'R0'], ['X', 'S0'], 'C0']
     w_coupling = {0: ['C0', 'Z', 'R0', 'S0'], 1: ['C1', 'C2', 'R1', 'S1']}
     out_coupling = ['P', 'Q', 'C2']
     int_in_coupling = {1: [['P', 'R1'], ['Q', 'S1'], 'C1']}
