@@ -1,10 +1,12 @@
-from computations import create_nlayer_conv_coupling
+from computations import *
 from levels import *
 from arch import *
 
 # Create a 3-layer convolution coupling for the architecture
-multilayer_conv_coupling = create_nlayer_conv_coupling(num_layers=3, with_stride=False, with_batches=True)
+#multilayer_conv_coupling = create_nlayer_conv_coupling(3)
 
+
+"""
 arch_multilayer_conv = Arch([
     MemLevel(
         name = "DRAM",
@@ -73,65 +75,64 @@ arch_multilayer_conv = Arch([
         factors_constraints = {}
     )
 ], coupling=multilayer_conv_coupling, name="Multi-Layer Convolution Architecture")
-
-fixed_multilayer_mapping_conv = Arch([
+"""
+arch = fixed_multilayer_mapping_conv = Arch([
     MemLevel(
         name = "DRAM",
-        dataflow_constraints = ['N', 'M', 'P', 'Q', 'K', 'R2', 'S2', 'R0', 'R1', 'C2', 'C1', 'S1', 'S0'],  # ONLY final layer + output dims
+        dataflow_constraints = ['P', 'Q', 'C1'],  
         size = 2**64-1,
         value_access_energy = 64.00,
         bandwidth = 8,
-        factors_constraints = {'Q': 16, 'R2': 1, 'S2': 3},  # Remove conflicting constraints        
-        #factors_constraints = {'S1': 1, 'S0': 1, 'R1': 1, 'R0': 1, 'C1': 1, 'C2': 1},  # Remove conflicting constraints
+        factors_constraints = {'Q': 3, 'P': 2, 'C1': 2},  
         bypasses = []
     ),
     MemLevel(
         name = "GlobalBuffer",
-        dataflow_constraints = ['N', 'M', 'P', 'Q', 'K', 'R2', 'S2', 'R0', 'R1', 'C2', 'C1', 'S1', 'S0'],  # ONLY final layer + output dims
+        dataflow_constraints = ['P', 'X', 'R1', 'Y'],  
         size = 16384*8,
         value_access_energy = 2.02,
         bandwidth = 32,
-        factors_constraints = {'Q': 2, 'P': 64, 'R2': 3},  # Remove conflicting constraints
+        factors_constraints = {'P': 3, 'X': 2, 'R1': 3, 'Y': 4},  
         bypasses = []
     ),
     FanoutLevel(
         name = "SACols",
-        mesh = 14,
-        dims = ['Q', 'K'],  # Only final layer dimensions
-        factors_constraints = {'Q': 8}
+        mesh = 2,
+        dims = ['Y', 'Q'],  
+        factors_constraints = {'Y': 2, 'Q': 2}
     ),
     FanoutLevel(
         name = "SARows", 
-        mesh = 12,
-        dims = ['M'],  # Only output dimensions
-        factors_constraints = {'M': 3}
+        mesh = 2,
+        dims = ['C1'],  # Only output dimensions
+        factors_constraints = {'C1': 2}
     ),
     MemLevel(
         name = "InRegister",
-        dataflow_constraints = ['N', 'M', 'P', 'Q', 'K', 'R2', 'S2', 'R0', 'R1', 'C2', 'C1', 'S1', 'S0'],  # Empty = all dimensions allowed
+        dataflow_constraints = ['S1', 'Z'],
         size = 48*2,  # Reduced size since handling all dimensions
         value_access_energy = 0.69,
         bandwidth = 4,
         factors_constraints = {
-            'C1': 2, 'C2': 2},
+            'S1': 3, 'Z': 4},
         bypasses = ['w', 'out']
     ),
     MemLevel(
         name = "WRegister",
-        dataflow_constraints = ['N', 'M', 'P', 'Q', 'K', 'R2', 'S2', 'R0', 'R1', 'C2', 'C1', 'S1', 'S0'],  # Empty = all dimensions allowed
+        dataflow_constraints = ['C2'],
         size = 192*2,
         value_access_energy = 1.97,
         bandwidth = 4,
-        factors_constraints = {'R0': 3, 'R1': 3, 'C2': 2},
+        factors_constraints = {'C2': 2},
         bypasses = ['in', 'out']
     ),
     MemLevel(
         name = "OutRegister",
-        dataflow_constraints = ['N', 'M', 'P', 'Q', 'K', 'R2', 'S2', 'R0', 'R1', 'C2', 'C1', 'S1', 'S0'],  # Empty = all dimensions allowed
+        dataflow_constraints = ['X','S0','R0','C0'],
         size = 16*2,
         value_access_energy = 1.34,
         bandwidth = 4,
-        factors_constraints = {'S1': 3, 'S0': 3, 'P': 4, 'K': 8},
+        factors_constraints = {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3},
         bypasses = ['in', 'w']
     ),
     ComputeLevel(
@@ -141,11 +142,11 @@ fixed_multilayer_mapping_conv = Arch([
         cycles = 1,
         factors_constraints = {}
     )
-], coupling = multilayer_conv_coupling, name="Fixed Multi-Layer Convolution Architecture with Mapping Constraints",
+], coupling = conv_2layers_coupling, name="Fixed Multi-Layer Convolution Architecture with Mapping Constraints",
 )
 
 
-
+"""
 small_fixed_multilayer_mapping_conv = Arch([
     MemLevel(
         name = "DRAM",
@@ -216,7 +217,6 @@ small_fixed_multilayer_mapping_conv = Arch([
 ], coupling = multilayer_conv_coupling, name="Fixed Multi-Layer Convolution Architecture with Mapping Constraints",
 )
 
-"""
 arch = arch_multilayer_conv = Arch([
     MemLevel(
         name = "DRAM",
@@ -287,8 +287,8 @@ arch = arch_multilayer_conv = Arch([
 """
 
 # Alternative: 2-layer version for smaller workloads
-multilayer_conv_coupling_2layer = create_nlayer_conv_coupling(num_layers=2, with_stride=True, with_batches=True)
-
+#multilayer_conv_coupling_2layer = create_nlayer_conv_coupling(num_layers=2, with_stride=True, with_batches=True)
+"""
 arch_multilayer_conv_2layer = Arch([
     MemLevel(
         name = "DRAM",
@@ -449,7 +449,7 @@ small_2_layer_fixed_multilayer_mapping_conv = Arch([
 ], coupling = multilayer_conv_coupling_2layer, name="Fixed Multi-Layer Convolution Architecture with Mapping Constraints",
 )
 
-arch = no_bypass_small_2_layer_fixed_multilayer_mapping_conv = Arch([
+no_bypass_small_2_layer_fixed_multilayer_mapping_conv = Arch([
         MemLevel(
         name = "DRAM",
         dataflow_constraints = ['N', 'M', 'P', 'Q', 'K', 'R0', 'R1', 'C1', 'S1', 'S0'],  # ONLY final layer + output dims
@@ -517,3 +517,4 @@ arch = no_bypass_small_2_layer_fixed_multilayer_mapping_conv = Arch([
     )
 ], coupling = multilayer_conv_coupling_2layer, name="Fixed Multi-Layer Convolution Architecture with Mapping Constraints",
 )
+"""

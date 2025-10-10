@@ -392,10 +392,8 @@ class Coupling:
         return self.out_coupling
     
     """Returns the flat output coupling for a specific layer."""
-    def getFlatOutputCoupling(self, layer_index: int) -> list[str]:
-        if layer_index in self.flat_out_coupling:
-            return self.flat_out_coupling[layer_index]
-        raise IndexError(f"Layer index {layer_index} not found in flat output coupling.")
+    def getFlatOutputCoupling(self,) -> list[str]:
+        return self.flat_out_coupling
 
     """Returns the number of layers in this coupling."""
     def getNumLayers(self) -> int:

@@ -1,4 +1,4 @@
-from computations import gemm_coupling, conv_coupling, conv_coupling_with_stride, conv_coupling_with_stride_and_batches
+from computations import *
 from levels import *
 from arch import *
 

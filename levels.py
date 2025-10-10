@@ -1302,7 +1302,8 @@ class MemLevel(Level):
         base_check = self.factors.memFootprint(self.tile_sizes, self.arch, not self.bypasses or 'in' not in self.bypasses, not self.bypasses or 'w' not in self.bypasses, not self.bypasses or 'out' not in self.bypasses) <= self.size/self.multiple_buffering and super().checkFactorsConstraints()
         if not base_check:
             return False
-            
+        """    
+        ## FIX THIS    
         # Layer fusion constraint: no iterations on intermediate layer dimensions (except last layer)
         if hasattr(self.arch.coupling, 'w_coupling') and len(self.arch.coupling.w_coupling) > 1:
             # Get the number of layers
@@ -1323,7 +1324,8 @@ class MemLevel(Level):
                 ## Check if forbidden have at most 1 iteration
                 for dim in forbidden_dims:
                     if dim in self.dataflow and self.factors.dimProduct(dim) > 1:
-                        return False            
+                        return False      
+            """      
         return True
 
     """

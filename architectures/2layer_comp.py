@@ -9,11 +9,14 @@ coupling = create_nlayer_conv_coupling(num_layers=2)
 comp = Shape(
     P = 6,
     Q = 6,
-    K = 2,
-    R0 = 3,
+    Y = 8,
+    X = 8,
+    Z = 4,
+    C0 = 3,
+    C1 = 4,
     S0 = 3,
-    C1 = 2,
+    R0 = 3,
     R1 = 3,
     S1 = 3,
-    M = 3
+    C2 = 2
 )

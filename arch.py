@@ -373,17 +373,21 @@ class Arch(list[Level]):
         # initialize with all factors on first level, all tile sizes of 1!
         self[0].factors = Factors({dim: prime_factors(comp[dim]) for dim in self.coupling.dims})
         # Handle both single-layer and multi-layer w_strides
-        if isinstance(self.coupling.w_strides, list):
-            # Multi-layer case: flatten all layer stride dictionaries
-            all_w_strides = {}
-            for layer_strides in self.coupling.w_strides:
-                all_w_strides.update(layer_strides)
-            w_stride_values = list(all_w_strides.values())
-        else:
-            # Single-layer case: use directly
-            w_stride_values = list(self.coupling.w_strides.values())
-        
-        self.stride_values = {dim: (comp[dim] if dim in comp else 1) for dim in list(self.coupling.in_strides.values()) + w_stride_values + list(self.coupling.out_strides.values())}
+        all_stride_values = []
+        # Input Strides
+        all_stride_values.extend(self.coupling.getInputStrides().values())
+        # Weight Strides
+        for layer_idx, layer_w_strides in self.coupling.getWeightStrides(layer_idx):
+            all_stride_values.extend(layer_w_strides.values())
+        # Output Strides
+        all_stride_values.extend(self.coupling.getOutputStrides().values())    
+        # Intermediate Input Strides
+        for layer_idx, layer_int_in_strides in self.coupling.getIntermediateInputStrides(layer_idx):
+            all_stride_values.extend(layer_int_in_strides.values())
+        # Intermediate Output Strides
+        for layer_idx, layer_int_out_strides in self.coupling.getIntermediateOutputStrides(layer_idx):
+            all_stride_values.extend(layer_int_out_strides.values())
+        self.stride_values = {dim: (comp[dim] if dim in comp else 1) for dim in all_stride_values}
         self.initialized = True
 
     """
@@ -478,7 +482,7 @@ class Arch(list[Level]):
     """
     def setupBypasses(self) -> None:
         # bypasses at the initial level simply skip the cost of operands
-        for bypass in ['in', 'w', 'out']:
+        for bypass in ['in', 'w', 'out', 'int']:
             # if the first MemLevel has a bypass, no need to initialize it, just let it
             # affect its internal MOPs computation and that's it!
             last_before_bypass = 0
@@ -569,7 +573,13 @@ class Arch(list[Level]):
         ## intermediate dims
         num_layers = self.coupling.getNumLayers()
         if num_layers > 1:
-            final_layer_dims = {'P', 'Q', 'M', 'K',f'R{num_layers-1}', f'S{num_layers-1}'}
+            final_layer_dims = set()
+            # Add final output coupling dimensions
+            final_layer_dims.update(self.coupling.getFlatOutputCoupling())
+            # Add final layer weight coupling dimensions
+            final_layer_dims.update(self.coupling.getFlatWeightCoupling(num_layers - 1))
+            # Add final layer input coupling dimensions
+            final_layer_dims.update(self.coupling.getFlatInputCoupling())
             intermediate_dims = set(self.coupling.dims) - final_layer_dims
             for level in self:
                 if isinstance(level, MemLevel) and any(name in level.name.lower() for name in ['register', 'reg']):
@@ -577,7 +587,6 @@ class Arch(list[Level]):
                         if dim in level.dataflow:
                             #level.factors_constraints[dim] = 2**32
                             print(f"INFO: Added high constraint for intermediate dimension {dim} in level {level.name}")
-
 
         failed = False
         for dim in self.coupling.dims:
@@ -629,25 +638,6 @@ class Arch(list[Level]):
                 physical_instances *= level.mesh
         return area
 
-    """
-    Returns the current stride for a dimension indexing the input tensor.
-    """
-    def getInStride(self, dim : str) -> int:
-        return self.stride_values[self.coupling.in_strides[dim]] if dim in self.coupling.in_strides else 1
-
-    """
-        Returns the stride value for a given dimension in the weight tensor at the specified layer.
-    """
-    def getWStride(self, dim: str, layer_idx: int = 0) -> int:
-        if isinstance(self.coupling.w_strides, list):
-            # Multi-layer case
-            if layer_idx < len(self.coupling.w_strides) and dim in self.coupling.w_strides[layer_idx]:
-                return self.stride_values[self.coupling.w_strides[layer_idx][dim]]
-        else:
-            # Single-layer case
-            if dim in self.coupling.w_strides:
-                return self.stride_values[self.coupling.w_strides[dim]]
-        return 1
 
     """
     Returns the current stride for a dimension indexing the output tensor.

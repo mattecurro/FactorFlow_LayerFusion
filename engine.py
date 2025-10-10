@@ -40,7 +40,7 @@ def forcedSettingsUpdate(arch : Arch, verbose : bool = True) -> None:
 """
 Mapper entry point.
 """
-def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool, verbose : bool = False) -> tuple[float, int, float, int, float, float, Arch]:
+def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool, verbose : bool = True) -> tuple[float, int, float, int, float, float, Arch]:
     print(f"Starting engine with mapper: {Settings.MAPPER}\n")
     try:
         forcedSettingsUpdate(arch, verbose = Settings.VERBOSE)

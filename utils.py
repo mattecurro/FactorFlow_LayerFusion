@@ -65,8 +65,21 @@ elements of 'array'. The array elements retain their order, while those of
 """
 def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
     ## DEBUG
-    """
-    if len(elements) > 10 :
+    import time
+    import traceback
+    start_time = time.time()
+    
+    # Get caller information
+    caller_info = traceback.extract_stack()[-2]
+    caller_file = caller_info.filename.split('/')[-1]  # Just filename, not full path
+    caller_line = caller_info.lineno
+    caller_function = caller_info.name
+    
+    print(f"DEBUG interleave: START - Called from {caller_file}:{caller_line} in {caller_function}()")
+    print(f"                       array={array}, elements={elements} (len={len(elements)})")
+    
+
+    if len(elements) > 6 :
         if not elements:
             return [array]
         results = []
@@ -77,7 +90,7 @@ def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
             results.append(array[:mid_pos] + elements + array[mid_pos:])
         print(f"interleave: too many elements ({len(elements)}), returning {len(results)} results")
         return results
-    """
+    
     def recursive_insert(arr, elems):
         if not elems:
             return [arr]
@@ -94,6 +107,9 @@ placeholder elements (having value 'placeholder'), inserts in all
 possible ways the remaining entries of 'elements' in the template.
 """
 def slot_in(template : list[T], elements : list[T], placeholder: T) -> list[list[T]]:
+    import time
+    start_time = time.time()
+    print(f"Debug slot: Start template={template}, elements={elements}, placeholder={placeholder}")
     placeholder_indices = [i for i, x in enumerate(template) if x == placeholder]
     num_placeholders = len(placeholder_indices)
     remaining_elements = [x for x in elements if x not in template]

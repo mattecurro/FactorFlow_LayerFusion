@@ -1,11 +1,41 @@
 from factors import Shape, Coupling
 
+# DIMENSION and COUPLING for 2 Layers Convolution:
+# C0: Filter0 depth/Input depth
+# Y: Intermediate Out height
+# X: Intermediate Out width
+# R0: Filter0 height
+# S0: Filter0 width
+# C1: Filter1 depth/Intermediate In depth
+# Z: Filter0 num/Intermediate Out depth
+# R1: Filter1 height
+# S1: Filter1 width
+# C2: Filter1 num/Out depth
+# P: Out height
+# Q: Out width
+# => Y+R0-1: Intermediate Out height
+# => X+S0-1: Intermediate Out width
+# MAC: Intermediate_Out[z][y][x] += W0[z][c0][r0][s0] * In[c0][y+r0][x+s0]
+# => P+R1-1: Intermediate Input height
+# => Q+S1-1: Intermediate Input width
+# MAC: Out[c2][p][q] += W1[c2][c1][r1][s1] * Intermediate_In[c1][p+r1][q+s1]
+conv_2layers_coupling = Coupling(
+                                dims = ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'],
+                                in_coupling = ['C0', ['Y', 'R0'], ['X', 'S0']],      # In
+                                w_coupling = {
+                                    0: ['Z', 'C0', 'R0', 'S0'],               # W0
+                                    1: ['C2', 'C1', 'R1', 'S1']            # W1
+                                },
+                                int_in_coupling = { 0: ['Z', 'Y', 'X'] },                      # Intermediate_Out
+                                int_out_coupling = { 0: ['C1', ['P', 'R1'], ['Q', 'S1']] },      # Intermediate_In
+                                out_coupling = ['C2', 'P', 'Q'])                       # Out
+
 # DIMENSIONS and COUPLING for GEMMS:
 # M: Weight/Out rows
 # K: Inner dimension, Weight cols/In rows
 # N: In/Out cols
 # ==> MAC: Out[m][n] += W[m][k] * In[k][n]
-gemm_coupling = Coupling(['M', 'K', 'N'], ['K', 'N'], ['M', 'K'], ['M', 'N'])
+gemm_coupling = Coupling(dims = ['M', 'K', 'N'], in_coupling = ['K', 'N'], w_coupling = {0: ['M', 'K']}, out_coupling = ['M', 'N'])
 
 # DIMENSIONS and COUPLING for CONVOLUTIONS:
 # M: Filter num/Out depth
@@ -19,28 +49,56 @@ gemm_coupling = Coupling(['M', 'K', 'N'], ['K', 'N'], ['M', 'K'], ['M', 'N'])
 # ==> MAC: Out[m][p][q] += W[m][c][r][s] * In[c][p+r][q+s]
 # VGG16-L0 -> C: 3, M: 64, P: 224, Q: 224, R: 3, S: 3
 # Output shape: [64, 222, 222], Weight shape: [64, 3, 3, 3], Input shape: [3, 224, 224]
-conv_coupling = Coupling(['M', 'P', 'Q', 'C', 'R', 'S'], ['C', ['P', 'R'], ['Q', 'S']], ['M', 'C', 'R', 'S'], ['M', 'P', 'Q'])
+conv_coupling = Coupling(
+    dims = ['M', 'P', 'Q', 'C', 'R', 'S'], 
+    in_coupling = ['C', ['P', 'R'], ['Q', 'S']], 
+    w_coupling = {0: ['M', 'C', 'R', 'S']},  # Changed from list to dict
+    out_coupling = ['M', 'P', 'Q']
+)
 # WITH STRIDE the indexing becomes:
 # => Pstride*P+Rdilation*R-1: Input height
 # => Qstride*Q+Sdilation*S-1: Input width
 # ==> MAC: Out[m][p][q] += W[m][c][r][s] * In[c][p*Pstride+r*Rdilation][q*Qstride+s*Sdilation]
-conv_coupling_with_stride = Coupling(['M', 'P', 'Q', 'C', 'R', 'S'], ['C', ['P', 'R'], ['Q', 'S']], ['M', 'C', 'R', 'S'], ['M', 'P', 'Q'], in_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'})
+conv_coupling_with_stride = Coupling(
+    dims = ['M', 'P', 'Q', 'C', 'R', 'S'], 
+    in_coupling = ['C', ['P', 'R'], ['Q', 'S']], 
+    w_coupling = {0: ['M', 'C', 'R', 'S']},  # Changed from list to dict
+    out_coupling = ['M', 'P', 'Q'], 
+    in_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'}
+)
 # WITH BATCHES too we get:
 # N: Batch size
 # ==> MAC: Out[n][m][p][q] += W[m][c][r][s] * In[n][c][p*Pstride+r*Rdilation][q*Qstride+s*Sdilation]
-conv_coupling_with_stride_and_batches = Coupling(['N', 'M', 'P', 'Q', 'C', 'R', 'S'], ['N', 'C', ['P', 'R'], ['Q', 'S']], ['M', 'C', 'R', 'S'], ['N', 'M', 'P', 'Q'], in_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'})
+conv_coupling_with_stride_and_batches = Coupling(
+    dims = ['N', 'M', 'P', 'Q', 'C', 'R', 'S'], 
+    in_coupling = ['N', 'C', ['P', 'R'], ['Q', 'S']], 
+    w_coupling = {0: ['M', 'C', 'R', 'S']},  # Changed from list to dict
+    out_coupling = ['N', 'M', 'P', 'Q'], 
+    in_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'}
+)
 # In a TRANSPOSED CONVOLUTION DIMENSIONS become:
 # P: Input height
 # Q: Input width
 # => P+R-1: Out height
 # => Q+S-1: Out width
 # ==> MAC: Out[m][p+r][q+s] += W[m][c][r][s] * In[c][p][q] (stride and dilation omitted for clarity)
-transposed_conv_coupling = Coupling(['M', 'P', 'Q', 'C', 'R', 'S'], ['C', 'P', 'Q'], ['M', 'C', 'R', 'S'], ['M', ['P', 'R'], ['Q', 'S']], out_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'})
+transposed_conv_coupling = Coupling(
+    dims = ['M', 'P', 'Q', 'C', 'R', 'S'], 
+    in_coupling = ['C', 'P', 'Q'], 
+    w_coupling = {0: ['M', 'C', 'R', 'S']},  # Changed from list to dict
+    out_coupling = ['M', ['P', 'R'], ['Q', 'S']], 
+    out_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'}
+)
 # WITH BATCHES too we get:
 # N: Batch size
 # ==> MAC: Out[n][m][p+r][q+s] += W[m][c][r][s] * In[n][c][p][q] (stride and dilation omitted for clarity)
-transposed_conv_coupling_with_batches = Coupling(['N', 'M', 'P', 'Q', 'C', 'R', 'S'], ['N', 'C', 'P', 'Q'], ['M', 'C', 'R', 'S'], ['N', 'M', ['P', 'R'], ['Q', 'S']], out_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'})
-
+transposed_conv_coupling_with_batches = Coupling(
+    dims = ['N', 'M', 'P', 'Q', 'C', 'R', 'S'], 
+    in_coupling = ['N', 'C', 'P', 'Q'], 
+    w_coupling = {0: ['M', 'C', 'R', 'S']},  # Changed from list to dict
+    out_coupling = ['N', 'M', ['P', 'R'], ['Q', 'S']], 
+    out_strides = {'P': 'Pstride', 'R': 'Rdilation', 'Q': 'Qstride', 'S': 'Sdilation'}
+)
 # NOTE: each comp must be strictly compatible with its coupling, that is, it must assign a value to each of the coupling's dimensions.
 #       Then, the comp's coupling may happen to be a subcoupling of the one used to define the current architecture.
 
@@ -245,59 +303,85 @@ benchmark_convs_batched = {
 """    
 def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with_batches: bool = False) -> Coupling:
     # Build dimensions list
-    dims = ['P', 'Q']
+    dims = ['P', 'Q', 'C0']
     
     # Add batch dimension if needed
     if with_batches:
-        dims.insert(0, 'N')
-    
-    # Add output channel dimension (K for the last layer)
-    dims.append('K')
-    
+        dims.append('N')
+
+    for i in range(num_layers-1):
+        dims.extend([f'Y{i}', f'X{i}'])
+        
     # Add dimensions for each layer
-    for i in range(num_layers-1, -1, -1):
+    for i in range(num_layers):
         # Add filter dimensions for this layer
         dims.extend([f'R{i}', f'S{i}'])
+        # Add channel dimensions 
+        dims.append(f'C{i+1}')
+
+
+    # Initialize coupling variables
+    in_coupling = None
+    w_coupling = {}
+    int_in_coupling = {}
+    int_out_coupling = {}
+    out_coupling = None
+
+    if num_layers == 1:
+        # Single layer convolution
+        dims = ['M', 'P', 'Q', 'C', 'R', 'S']
+        in_coupling = ['C', ['P', 'R'], ['Q', 'S']]
+        w_coupling = {0: ['M', 'C', 'R', 'S']}
+        out_coupling = ['M', 'P', 'Q']
+    elif num_layers == 2:
+        # For 2 layers, use the existing conv_2layers_coupling structure
+        dims = ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q']
+        in_coupling = ['C0', ['Y', 'R0'], ['X', 'S0']]
+        w_coupling = {
+            0: ['Z', 'C0', 'R0', 'S0'],
+            1: ['C2', 'C1', 'R1', 'S1']
+        }
+        int_in_coupling = {0: ['Z', 'Y', 'X']}
+        int_out_coupling = {0: ['C1', ['P', 'R1'], ['Q', 'S1']]}
+        out_coupling = ['C2', 'P', 'Q']    
+    # For more than 2 layers, set up intermediate layers        
+    else:
+        in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']]
+        for i in range(num_layers):
+            w_coupling[i] = [f'C{i+1}', f'C{i}', f'R{i}', f'S{i}']
+        for i in range(num_layers - 1):
+            int_out_coupling[i] = [f'C{i+1}', f'Y{i}', f'X{i}']
+            int_in_coupling[i] = [f'C{i+1}', [f'Y{i+1}', f'R{i+1}'], [f'X{i+1}', f'S{i+1}']]
+        for i in range(num_layers):
+            if i == 0:
+                # First layer: input to first intermediate
+                w_coupling[i] = ['C1', 'C0', 'R0', 'S0']
+                if i < num_layers - 1:
+                    int_out_coupling[i] = ['C1', 'Y0', 'X0']
+            elif i == num_layers - 1:
+                # Last layer: final intermediate to output
+                in_coupling = ['C' + str(i), ['Y' + str(i-1), 'R' + str(i)], ['X' + str(i-1), 'S' + str(i)]]
+                w_coupling[i] = ['C' + str(i+1), 'C' + str(i), 'R' + str(i), 'S' + str(i)]
+                out_coupling = ['C' + str(i+1), 'P', 'Q']
+                dims.extend(['C' + str(i+1)])
+            else:
+                # Middle layers: intermediate to intermediate
+                int_in_coupling[i-1] = ['C' + str(i), ['Y' + str(i-1), 'R' + str(i)], ['X' + str(i-1), 'S' + str(i)]]
+                w_coupling[i] = ['C' + str(i+1), 'C' + str(i), 'R' + str(i), 'S' + str(i)]
+                int_out_coupling[i-1] = ['C' + str(i), 'Y' + str(i-1), 'X' + str(i-1)]
+                dims.extend(['Y' + str(i-1), 'X' + str(i-1), 'C' + str(i)])
+    
+    if with_batches and num_layers > 1:
+        in_coupling.insert(0, 'N')
+        out_coupling.insert(0, 'N')
+        for i in range(num_layers - 1):
+            int_in_coupling[i].insert(0, 'N')
+            int_out_coupling[i].insert(0, 'N')
+       
         
-        # Add channel dimensions (except for the last layer which uses K)
-        if i > 0:
-            dims.append(f'C{i}')
-        else:
-            dims.append('M')  # Input channels for first layer
-    
-    # Build input coupling
-    p_dims = ['P'] + [f'R{i}' for i in range(num_layers-1, -1, -1)]
-    
-    
-    q_dims = ['Q'] + [f'S{i}' for i in range(num_layers-1, -1, -1)]
-    
-    in_coupling = [p_dims, q_dims, ['M']]
-    if with_batches:
-        in_coupling.insert(0, ['N'])
-    
-    # Build weight couplings for each layer
-    weight_couplings = []
-    
-    # First layer: M -> C1
-    weight_couplings.append(['M', 'C1', 'R0', 'S0'])
-    
-    # Middle layers
-    for i in range(1, num_layers-1):
-        weight_couplings.append([f'C{i}', f'C{i+1}', f'R{i}', f'S{i}'])
-    
-    # Last layer: CN-1 -> K
-    if num_layers > 1:
-        weight_couplings.append([f'C{num_layers-1}', 'K', f'R{num_layers-1}', f'S{num_layers-1}'])
-    
-    # Output coupling
-    out_coupling = []
-    if with_batches:
-        out_coupling.append('N')
-    out_coupling.extend(['P', 'Q', 'K'])
-    
     # Create strides if needed
     in_strides = None
-    weight_strides = None
+    w_strides = None
     out_strides = None
     
     if with_stride:
@@ -311,33 +395,35 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
     return Coupling(
         dims = dims,
         in_coupling = in_coupling,
-        w_coupling = weight_couplings,
+        w_coupling = w_coupling,
+        int_in_coupling = int_in_coupling if int_in_coupling else None,
+        int_out_coupling = int_out_coupling if int_out_coupling else None,
         out_coupling = out_coupling,
         in_strides = in_strides,
-        w_strides = weight_strides,
+        w_strides = w_strides,
         out_strides = out_strides
     )
 
 # 3-layer convolution example
-conv_3layer = create_nlayer_conv_coupling(num_layers=3)
+#conv_3layers_coupling = create_nlayer_conv_coupling(num_layers=3)
 
 # 4-layer convolution example
-conv_4layer = create_nlayer_conv_coupling(num_layers=4)
+#conv_4layers_coupling = create_nlayer_conv_coupling(num_layers=4)
 
 # 3-layer convolution with stride and batches
-conv_3layer_with_stride_and_batches = create_nlayer_conv_coupling(num_layers=3, with_stride=True, with_batches=True)
+#conv_3layer_with_stride_and_batches = create_nlayer_conv_coupling(num_layers=3, with_stride=True, with_batches=True)
 
-comp = Shape(
-    P = 256,
-    Q = 256,
-    K = 8,
-    R0 = 3,
-    S0 = 3,
-    C1 = 2,
-    R1 = 3,
-    S1 = 3,
-    R2 = 3,  # You'll need to specify R2 and S2 for the third layer
-    S2 = 3,
-    C2 = 4,  # You'll need to specify C2 for the connection between layers
-    M = 3
-)
+#comp = Shape(
+#    P = 256,
+#    Q = 256,
+#    K = 8,
+#    R0 = 3,
+#    S0 = 3,
+#    C1 = 2,
+#    R1 = 3,
+#    S1 = 3,
+#    R2 = 3,  # You'll need to specify R2 and S2 for the third layer
+#    S2 = 3,
+#    C2 = 4,  # You'll need to specify C2 for the connection between layers
+#    M = 3
+#)
