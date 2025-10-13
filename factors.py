@@ -400,6 +400,7 @@ class Coupling:
         """Returns the number of layers in this coupling."""
         return len(self.w_coupling)
 
+
     """Returns the input strides."""
     def getInputStrides(self) -> dict[str, str]:
         return self.in_strides
@@ -410,7 +411,15 @@ class Coupling:
             return self.int_in_strides[layer_index]
         raise IndexError(f"Layer index {layer_index} not found in intermediate input strides.")
     
+    """Returns the intermediate output strides for a specific layer."""
+    def getIntermediateOutputStrides(self, layer_index: int) -> dict[str, str]:
+        if layer_index in self.int_out_strides:
+            return self.int_out_strides[layer_index]
+        raise IndexError(f"Layer index {layer_index} not found in intermediate output strides.")
 
+    """Returns the output strides."""
+    def getOutputStrides(self) -> dict[str, str]:
+        return self.out_strides
     """
     Returns a compact string representing the coupling.
     """

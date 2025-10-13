@@ -376,17 +376,19 @@ class Arch(list[Level]):
         all_stride_values = []
         # Input Strides
         all_stride_values.extend(self.coupling.getInputStrides().values())
-        # Weight Strides
-        for layer_idx, layer_w_strides in self.coupling.getWeightStrides(layer_idx):
-            all_stride_values.extend(layer_w_strides.values())
+        # Collect all stride values from all layers
+        for layer_idx in range(self.coupling.getNumLayers()):
+            # Weight strides for this layer
+            all_stride_values.extend(self.coupling.getWeightStrides(layer_idx).values())
+            
+            # Intermediate strides for this layer (if they exist)
+            if hasattr(self.coupling, 'int_in_strides') and layer_idx in self.coupling.int_in_strides:
+                all_stride_values.extend(self.coupling.getIntermediateInputStrides(layer_idx).values())
+            
+            if hasattr(self.coupling, 'int_out_strides') and layer_idx in self.coupling.int_out_strides:
+                all_stride_values.extend(self.coupling.getIntermediateOutputStrides(layer_idx).values())
         # Output Strides
         all_stride_values.extend(self.coupling.getOutputStrides().values())    
-        # Intermediate Input Strides
-        for layer_idx, layer_int_in_strides in self.coupling.getIntermediateInputStrides(layer_idx):
-            all_stride_values.extend(layer_int_in_strides.values())
-        # Intermediate Output Strides
-        for layer_idx, layer_int_out_strides in self.coupling.getIntermediateOutputStrides(layer_idx):
-            all_stride_values.extend(layer_int_out_strides.values())
         self.stride_values = {dim: (comp[dim] if dim in comp else 1) for dim in all_stride_values}
         self.initialized = True
 
@@ -444,7 +446,7 @@ class Arch(list[Level]):
                     constraint = constr_factors.dimProduct(dim)
                     if dim_size%constraint == 0:
                         for fact, amount in constr_factors[dim].items():
-                            assert self.moveFactor(0, i, dim, fact, amount, True, True), f"Arch {self.name} -> Level: {level.name}: Constraints are not satisfiable! Cannot give {amount} instances of prime factor {fact} to level {level.name} on dimension {dim}."
+                            assert self.moveFactor(0, i, dim, fact, amount, True, True, True), f"Arch {self.name} -> Level: {level.name}: Constraints are not satisfiable! Cannot give {amount} instances of prime factor {fact} to level {level.name} on dimension {dim}."
                     else:
                         padded_dim_size = dim_size + constraint - dim_size%constraint
                         if verbose_padding: print(f"PADDING: Arch: {self.name} -> Level: {level.name}: enlarged {dim} from {dim_size} to {padded_dim_size} to respect constraints.")
@@ -452,7 +454,7 @@ class Arch(list[Level]):
                         self[0].factors.resetDimProducts([dim])
                         for fact, amount in constr_factors[dim].items():
                             # be wary that here we skip constraints checks in moveFactor, so one must follow up this method with checkFactorsConstraints
-                            assert self.moveFactor(0, i, dim, fact, amount, True, True), f"Arch: {self.name} -> Level: {level.name}: Failed to enforce constraints even with padding..."
+                            assert self.moveFactor(0, i, dim, fact, amount, True, True, True), f"Arch: {self.name} -> Level: {level.name}: Failed to enforce constraints even with padding..."
 
     """
     Checks factors allocation constraints. Returns True if no violation is found.
@@ -581,6 +583,8 @@ class Arch(list[Level]):
             # Add final layer input coupling dimensions
             final_layer_dims.update(self.coupling.getFlatInputCoupling())
             intermediate_dims = set(self.coupling.dims) - final_layer_dims
+            print(f"final_layer_dims: {final_layer_dims}, coupling.dims: {self.coupling.dims}")
+            print(f"INFO: Arch: {self.name}: identified intermediate dimensions: {intermediate_dims}")
             for level in self:
                 if isinstance(level, MemLevel) and any(name in level.name.lower() for name in ['register', 'reg']):
                     for dim in intermediate_dims:
@@ -645,6 +649,31 @@ class Arch(list[Level]):
     def getOutStride(self, dim : str) -> int:
         return self.stride_values[self.coupling.out_strides[dim]] if dim in self.coupling.out_strides else 1
 
+    """ 
+    Returns the current stride for a dimension indexing the input tensor.
+    """
+    def getInStride(self, dim : str) -> int:
+        return self.stride_values[self.coupling.in_strides[dim]] if dim in self.coupling.in_strides else 1
+
+    """
+    Returns the current stride for a dimension indexing the intermediate input tensor.
+    """
+    def getIntermediateInputStride(self, dim : str, layer_idx : int = 0) -> int:
+        return self.stride_values[self.coupling.int_in_strides[layer_idx][dim]] if dim in self.coupling.int_in_strides[layer_idx] else 1
+
+    """
+    Returns the current stride for a dimension indexing the intermediate output tensor.
+    """
+    def getIntermediateOutputStride(self, dim : str, layer_idx : int = 0) -> int:
+        return self.stride_values[self.coupling.int_out_strides[layer_idx][dim]] if dim in self.coupling.int_out_strides[layer_idx] else 1
+
+    """
+    Returns the current stride for a dimension indexing the weight tensor.
+    """
+    def getWStride(self, dim : str, layer_idx : int = 0) -> int:
+        return self.stride_values[self.coupling.w_strides[layer_idx][dim]] if dim in self.coupling.w_strides[layer_idx] else 1
+
+    
     def __repr__(self) -> str:
         return f"<object Arch: name: {self.name}, levels: {super().__repr__()}>"
     

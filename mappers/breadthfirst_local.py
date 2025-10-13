@@ -582,17 +582,18 @@ def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : 
             
             all_int_in_dims = set()
             all_int_out_dims = set()
-            for layer_idx in range(arch.coupling.getNumLayers()):
-                layer_int_in_coupling = arch.coupling.getFlatIntInCoupling(layer_idx)
-                layer_int_out_coupling = arch.coupling.getFlatIntOutCoupling(layer_idx)
+            for layer_idx in range(arch.coupling.getNumLayers()-1):
+                print(arch.coupling.getFlatIntermediateInputCoupling(layer_idx))
+                layer_int_in_coupling = arch.coupling.getFlatIntermediateInputCoupling(layer_idx)
+                layer_int_out_coupling = arch.coupling.getFlatIntermediateOutputCoupling(layer_idx)
                 all_int_in_dims.update(layer_int_in_coupling)
                 all_int_out_dims.update(layer_int_out_coupling)
 
-            coupling_sets = [frozenset(arch.coupling.getFlatInCoupling()),
+            coupling_sets = [frozenset(arch.coupling.getFlatInputCoupling()),
                              frozenset(all_w_dims), # use all weight dimensions, not just the first layer
                              frozenset(all_int_in_dims),
                              frozenset(all_int_out_dims),
-                             frozenset(arch.coupling.getFlatOutCoupling())]
+                             frozenset(arch.coupling.getFlatOutputCoupling())]
             if False and level.multiple_reuses:
                 w_has_dimsum = any(
                     any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in layer_w_coupling) 

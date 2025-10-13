@@ -89,7 +89,7 @@ arch = fixed_multilayer_mapping_conv = Arch([
     MemLevel(
         name = "GlobalBuffer",
         dataflow_constraints = ['P', 'X', 'R1', 'Y'],  
-        size = 16384*8,
+        size = 16384*100,
         value_access_energy = 2.02,
         bandwidth = 32,
         factors_constraints = {'P': 3, 'X': 2, 'R1': 3, 'Y': 4},  
@@ -97,7 +97,7 @@ arch = fixed_multilayer_mapping_conv = Arch([
     ),
     FanoutLevel(
         name = "SACols",
-        mesh = 2,
+        mesh = 4,
         dims = ['Y', 'Q'],  
         factors_constraints = {'Y': 2, 'Q': 2}
     ),
