@@ -26,8 +26,8 @@ conv_2layers_coupling = Coupling(
                                     0: ['Z', 'C0', 'R0', 'S0'],               # W0
                                     1: ['C2', 'C1', 'R1', 'S1']            # W1
                                 },
-                                int_in_coupling = { 0: ['Z', 'Y', 'X'] },                      # Intermediate_Out
-                                int_out_coupling = { 0: ['C1', ['P', 'R1'], ['Q', 'S1']] },      # Intermediate_In
+                                int_in_coupling = { 0: ['C1', ['P', 'R1'], ['Q', 'S1']]},                      # Intermediate_Out
+                                int_out_coupling = { 0: ['Z', 'Y', 'X'] },      # Intermediate_In
                                 out_coupling = ['C2', 'P', 'Q'])                       # Out
 
 # DIMENSIONS and COUPLING for GEMMS:
@@ -341,8 +341,8 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
             0: ['Z', 'C0', 'R0', 'S0'],
             1: ['C2', 'C1', 'R1', 'S1']
         }
-        int_in_coupling = {0: ['Z', 'Y', 'X']}
-        int_out_coupling = {0: ['C1', ['P', 'R1'], ['Q', 'S1']]}
+        int_out_coupling = {0: ['Z', 'Y', 'X']}
+        int_in_coupling = {0: ['C1', ['P', 'R1'], ['Q', 'S1']]}
         out_coupling = ['C2', 'P', 'Q']    
     # For more than 2 layers, set up intermediate layers        
     else:

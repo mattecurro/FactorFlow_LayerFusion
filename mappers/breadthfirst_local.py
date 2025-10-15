@@ -220,8 +220,9 @@ def pickBestPermsIteratively(arch : Arch) -> None:
         in_matters = 'in' not in level.bypasses or levels_handling_bypass_dataflows['in'] == i
         w_matters = 'w' not in level.bypasses or levels_handling_bypass_dataflows['w'] == i
         out_matters = 'out' not in level.bypasses or levels_handling_bypass_dataflows['out'] == i
-        int_in_matters = 'int' not in level.bypasses or levels_handling_bypass_dataflows['int'] == i
-        int_out_matters = 'int' not in level.bypasses or levels_handling_bypass_dataflows['int'] == i
+        int_matters = 'int' not in level.bypasses or levels_handling_bypass_dataflows['int'] == i
+        int_in_matters = int_matters
+        int_out_matters = int_matters
         ## DEBUG!! THIS IS AN ERROR NOW!!
         if len(dims_not_at_one) == 2: # two dimension iterated, pick the best order between them
             dims_at_one = [dim for dim in arch.coupling.dims if level.factors.dimProduct(dim) == 1]

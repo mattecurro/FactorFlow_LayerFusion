@@ -105,7 +105,7 @@ class Arch(list[Level]):
     """
     def checkCouplingCompatibility(self, coupling : Coupling, comp : Shape, verbose : bool = False) -> None:
         assert coupling.isCompatibleComp(comp), f"The provided computation ({comp}) is not compatible with the provided coupling ({coupling.compactStr()}), note that each dimension and stride of the latter must appear in the computation."
-        assert self.coupling.isCompatibleCoupling(coupling), f"The provided coupling ({coupling.compactStr()}) is not compatible with arch {self.name}'s coupling ({self.coupling.compactStr()})."
+        assert self.coupling.isCompatibleCoupling(coupling), f"The provided coupling ({coupling}) is not compatible with arch {self.name}'s coupling ({self.coupling.compactStr()})."
         if verbose and not self.coupling.isSubcoupling(coupling):
             print(f"WARNING: the used coupling ({coupling.compactStr()}) is not a subcoupling of arch {self.name}'s coupling ({self.coupling.compactStr()}), but is still compatible.")
         comp.fitToCoupling(self.coupling)
