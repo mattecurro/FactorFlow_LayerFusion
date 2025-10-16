@@ -31,7 +31,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
         level = arch[i]
         if isinstance(level, MemLevel):
             # multiply by spatial_iterations too because memory is replicated spatially
-            print("Questo mops è chiamato da update stats")            
+            print("\n\nQuesto mops è chiamato da update stats")            
             level_mops = level.MOPs()
             ## Get base MOPs for this level
             in_reads, per_layer_w_reads, per_layer_int_in_reads, per_layer_int_out_reads, per_layer_int_out_writes, out_reads, out_writes, out_reads_factors = level_mops

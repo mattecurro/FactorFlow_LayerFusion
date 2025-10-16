@@ -574,11 +574,13 @@ class MemLevel(Level):
     ##
     ## in_reads, per_layer_w_reads_bp, per_layer_int_in_reads_bp, per_layer_int_out_reads_bp, out_reads_bp, out_writes_bp, out_reads_bp_factors
     def MOPs(self, in_bp : Optional[bool] = None, w_bp : Optional[bool] = None, out_bp : Optional[bool] = None, int_bp : Optional[bool] = None, ignore_bypasses : bool = False) -> tuple[int, dict[int, int], dict[int, int], dict[int, int], dict[int, int], int, int, int]:
+        print(f"arch.name: {self.arch.name}, level.name: {self.name}")
         in_bp = in_bp if in_bp != None else self.in_bp
         w_bp = w_bp if w_bp != None else self.w_bp
         out_bp = out_bp if out_bp != None else self.out_bp
         int_bp = int_bp if int_bp != None else self.int_bp
         num_layers = self.arch.coupling.getNumLayers()        
+        print(f"Level: {self.name}: Starting MOPs calculation with in_bp: {in_bp}, w_bp: {w_bp}, out_bp: {out_bp}, int_bp: {int_bp}, ignore_bypasses: {ignore_bypasses}, dataflow: {self.dataflow}, factors: {self.factors}, tile_sizes: {self.tile_sizes}, factors_constraints: {self.factors_constraints}, bypasses: {self.bypasses}, multiple_buffering: {self.multiple_buffering}, multiple_reuses: {self.multiple_reuses}")
         ## List of dim in df with loops > one
         # ignore loops at one
         # filter takes: bool, iterable
@@ -596,6 +598,7 @@ class MemLevel(Level):
                         set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
                         set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
                     )
+                    print(f"Layer 0 relevant dims: {layer_relevant_dims}")
                 elif layer_id == self.arch.coupling.getNumLayers() - 1:
                     print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatOutputCoupling(): {self.arch.coupling.getFlatOutputCoupling()}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}")
                     layer_relevant_dims = (
@@ -617,7 +620,9 @@ class MemLevel(Level):
         else:
             actual_dataflow_per_layer[0] = actual_dataflow
         print(f"Level: {self.name}: actual_dataflow_per_layer: {actual_dataflow_per_layer}, actual_dataflow: {actual_dataflow}, dataflow: {self.dataflow}, factors: {self.factors}, num layers: {num_layers}")
-        
+        print(f"tile size for each dim in actual_dataflow: {[ (dim, self.tile_sizes[dim]) for dim in actual_dataflow ]}")
+        print(f"tile size for each dim in actual_dataflow-per_layer[0]: {[ (dim, self.tile_sizes[dim]) for dim in actual_dataflow_per_layer[0] ]}")
+        print(f"tile size for each dim in actual_dataflow_per_layer[1]: { [ (dim, self.tile_sizes[dim]) for dim in actual_dataflow_per_layer[1] ] if 1 in actual_dataflow_per_layer else 'N/A' }")
         # stationarity calculation for inputs
         in_reads = int(in_bp)
         if in_bp:
@@ -721,7 +726,7 @@ class MemLevel(Level):
         per_layer_w_reads: dict[int, int] = {}
         for layer_idx in range(num_layers):
             per_layer_w_reads[layer_idx] = int(w_bp)
-        print(f"Initialization Level: {self.name}: w_reads = {w_reads}, per_layer_w_reads = {per_layer_w_reads}")
+        print(f"\nInitialization Level: {self.name}: w_reads = {w_reads}, per_layer_w_reads = {per_layer_w_reads}")
         print(f"w_bp: {w_bp}")
         if w_bp:
             ## Handle each weight Layer separately      
@@ -769,14 +774,14 @@ class MemLevel(Level):
             per_layer_int_in_reads[layer_idx] = int(int_bp)
         if int_bp and per_layer_int_in_reads:
             for layer_id in range(num_layers - 1):
-                print(f"Initialization Level: {self.name}, Layer {layer_id}: int_in_reads = {int_in_reads}, per_layer_int_in_reads = {per_layer_int_in_reads}")
+                print(f"\nInitialization Level: {self.name}, Layer {layer_id}: int_in_reads = {int_in_reads}, per_layer_int_in_reads = {per_layer_int_in_reads}")
                 ## Handle each intermediate Layer separately
                 layer_read = 1
                 i = len(actual_dataflow_per_layer[layer_idx + 1]) - 1
                 innermost_dim_sum = None
                 if not self.next_is_compute:
                     skipped = False
-                    print(f"actual_dataflow_per_layer[{layer_idx}] = {actual_dataflow_per_layer[layer_idx + 1]}, flat_intermediate_input_coupling[{layer_idx}] = {self.arch.coupling.getFlatIntermediateInputCoupling(layer_idx)}")
+                    print(f"actual_dataflow_per_layer[{layer_idx+1}] = {actual_dataflow_per_layer[layer_idx + 1]}, flat_intermediate_input_coupling[{layer_idx}] = {self.arch.coupling.getFlatIntermediateInputCoupling(layer_idx)}")
                     print(f"tile size for each dim of actual_dataflow_per_layer[{layer_idx + 1}]: {[self.tile_sizes[dim] for dim in actual_dataflow_per_layer[layer_idx + 1]]}")
                     while i >= 0 and (actual_dataflow_per_layer[layer_idx + 1][i] not in self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)):
                         i -= 1
@@ -816,11 +821,11 @@ class MemLevel(Level):
                 per_layer_int_out_reads[layer_id] = int(int_bp)
         if int_bp and per_layer_int_out_reads:
             ## Handle each intermediate output layer separately      
-            for layer_id in range(num_layers-1):
+            for layer_id in range(num_layers-1):               
                 layer_read = 1
                 i = len(actual_dataflow_per_layer[layer_id]) - 1
                 innermost_dim_sum = None
-                print(f"Initialization Level: {self.name}, Layer {layer_id}: int_out_reads = {int_out_reads}, per_layer_int_out_reads = {per_layer_int_out_reads}")
+                print(f"\nInitialization Level: {self.name}, Layer {layer_id}: int_out_reads = {int_out_reads}, per_layer_int_out_reads = {per_layer_int_out_reads}")
                 if not self.next_is_compute:
                     skipped = False
                     print(f"actual_dataflow_per_layer[{layer_id}] = {actual_dataflow_per_layer[layer_id]}, flat_intermediate_output_coupling[{layer_id}] = {self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id)}")

@@ -434,9 +434,9 @@ class Coupling:
 
         # Add intermediate layer information
         int_str = []
-        for layer_id in self.int_in_coupling:
+        for layer_id in range(self.getNumLayers()-1):
             int_str.append(f"IntIn{layer_id}: " + coup2str(self.int_in_coupling[layer_id], self.int_in_strides[layer_id]))
-        for layer_id in self.int_out_coupling:
+        for layer_id in range(self.getNumLayers()-1):
             int_str.append(f"IntOut{layer_id}: " + coup2str(self.int_out_coupling[layer_id], self.int_out_strides[layer_id]))
 
         return f"dims: {''.join(self.dims)}, in_coupling: {coup2str(self.in_coupling, self.in_strides)}, w_coupling: {''.join(w_str)}, out_coupling: {coup2str(self.out_coupling, self.out_strides)}"

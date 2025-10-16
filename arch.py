@@ -33,6 +33,7 @@ Constructor arguments:
 class Arch(list[Level]):
     def __init__(self, levels : list[Level], coupling : Coupling, name : str ="<unnamed architecture>"):
         self.name : str = name
+        print(f"Creating architecture: {self.name} with coupling: {coupling.compactStr()}")
         # TODO: maybe store Wart, EDP, etc. here?
         self.coupling : Coupling = coupling
         self.stride_values : dict[str, int] = {}
@@ -586,8 +587,8 @@ class Arch(list[Level]):
             print(f"final_layer_dims: {final_layer_dims}, coupling.dims: {self.coupling.dims}")
             print(f"INFO: Arch: {self.name}: identified intermediate dimensions: {intermediate_dims}")
             for level in self:
-                if isinstance(level, MemLevel) and any(name in level.name.lower() for name in ['register', 'reg']):
-                    for dim in intermediate_dims:
+                if isinstance(level, MemLevel) and any(name in level.name.lower() for name in ['inregister','register', 'reg']):
+                    for dim in ['P', 'R1']:
                         if dim in level.dataflow:
                             #level.factors_constraints[dim] = 2**32
                             print(f"INFO: Added high constraint for intermediate dimension {dim} in level {level.name}")

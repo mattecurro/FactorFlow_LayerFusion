@@ -1,4 +1,13 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K], out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S], out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K], out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S], out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K], out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S], out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K], out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S], out_coupling: [N][M][P][Q]
 -------- architecture --------
+Creating architecture: Fixed Multi-Layer Convolution Architecture with Mapping Constraints with coupling: dims: C0YXR0S0ZC1R1S1C2PQ, in_coupling: [C0][Y+R0][X+S0], w_coupling: W0: [Z][C0][R0][S0]W1: [C2][C1][R1][S1], out_coupling: [C2][P][Q]
 Architecture: architectures/multi_layer_arch.py -> arch
 -------- computation  --------
 Computation: architectures/2layer_comp.py -> comp: {P: 6, Q: 6, Y: 8, X: 8, Z: 4, C0: 3, C1: 4, S0: 3, R0: 3, R1: 3, S1: 3, C2: 2}
@@ -9,11 +18,14 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'R0', 'S1', 'P', 'C2', 'R1', 'C0', 'Y', 'X', 'Q', 'S0', 'C1'}, coupling.dims: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q']
+final_layer_dims: {'S1', 'C0', 'X', 'C2', 'R1', 'P', 'R0', 'Q', 'Y', 'C1', 'S0'}, coupling.dims: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q']
 INFO: Arch: Fixed Multi-Layer Convolution Architecture with Mapping Constraints: identified intermediate dimensions: {'Z'}
-INFO: Added high constraint for intermediate dimension Z in level InRegister
-INFO: Added high constraint for intermediate dimension Z in level WRegister
-INFO: Added high constraint for intermediate dimension Z in level OutRegister
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
 Starting engine with mapper: breadthfirst_local
 
 INFO: forcefully updating setting ITERATE_AMOUNTS to True
@@ -53,16 +65,25 @@ interleave: too many elements (8), returning 3 results
 é stato chiamato update stats! 
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: 1, w_bp: 1, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['P', 'Q', 'C1', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['P', 'Q', 'C1', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: 1
@@ -86,8 +107,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -96,6 +118,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -123,10 +146,18 @@ DEBUG DRAM AFTER BYPASS:
 End MOPs with Bypasses for Level: DRAM
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: 1, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['P', 'X', 'R1', 'Y', 'C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['P', 'X', 'R1', 'Y', 'C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -136,16 +167,19 @@ input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
 
+
 Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -155,9 +189,16 @@ intermediate out layer 0 read after next_spatials handling: 32
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 256
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
@@ -181,9 +222,16 @@ weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, ignore_bypasses: True, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
@@ -203,14 +251,24 @@ DEBUG GlobalBuffer AFTER BYPASS:
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['S1', 'Z']
 layer read after innermost_dim_sum handling: 3
@@ -219,6 +277,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -230,9 +289,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: False, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -240,6 +305,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
@@ -253,14 +319,24 @@ DEBUG InRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: InRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: WRegister: innermost_dim_sum = None, i = -1, actual_dataflow = ['C2']
 layer read after innermost_dim_sum handling: 1
@@ -269,6 +345,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: WRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -280,9 +357,16 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 4
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 1, Per Layer Intermediate Output reads: 4, Per Layer Intermediate Output writes: 4 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 weight layer 0 read after innermost_dim_sum handling: 1
@@ -303,17 +387,28 @@ DEBUG WRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: WRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -349,16 +444,25 @@ Starting FactorFlow tiling optimization:
 é stato chiamato update stats! 
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: 1, w_bp: 1, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['P', 'Q', 'C1', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['P', 'Q', 'C1', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: 1
@@ -382,8 +486,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -392,6 +497,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -419,10 +525,18 @@ DEBUG DRAM AFTER BYPASS:
 End MOPs with Bypasses for Level: DRAM
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: 1, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['P', 'X', 'R1', 'Y', 'C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['P', 'X', 'R1', 'Y', 'C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -432,16 +546,19 @@ input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
 
+
 Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -451,9 +568,16 @@ intermediate out layer 0 read after next_spatials handling: 32
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 256
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
@@ -477,9 +601,16 @@ weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, ignore_bypasses: True, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
@@ -499,14 +630,24 @@ DEBUG GlobalBuffer AFTER BYPASS:
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['S1', 'Z']
 layer read after innermost_dim_sum handling: 3
@@ -515,6 +656,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -526,9 +668,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: False, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -536,6 +684,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
@@ -549,14 +698,24 @@ DEBUG InRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: InRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: WRegister: innermost_dim_sum = None, i = -1, actual_dataflow = ['C2']
 layer read after innermost_dim_sum handling: 1
@@ -565,6 +724,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: WRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -576,9 +736,16 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 4
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 1, Per Layer Intermediate Output reads: 4, Per Layer Intermediate Output writes: 4 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 weight layer 0 read after innermost_dim_sum handling: 1
@@ -599,17 +766,28 @@ DEBUG WRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: WRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -637,15 +815,22 @@ No valid follow-up configuration, stopping, current Wart: 4.466e-06
 Total moves: 0
 Total choices: 1
 Choices: {}
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -669,8 +854,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -679,6 +865,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -697,9 +884,15 @@ output layer 1 read after no next_spatials handling: 12
 out remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'Q']
 output layer 1 final read: 72, out_reads_factors (orthogonal to output) = 1
 BEFORE BYPASS: In reads: 300, Per Layer W Reads: {0: 108, 1: 432}  Per Layer Intermediate Input reads: 480, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 540, Out reads: 72
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -708,6 +901,7 @@ Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innerm
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
 
 Initialization Level: GlobalBuffer: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -725,14 +919,16 @@ weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 12
 weight remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'R1']
 Level: GlobalBuffer, Layer 1: final Weight layer_read = 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -747,9 +943,15 @@ output layer 1 read after next_spatials handling: 4
 out remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 output layer 1 final read: 12, out_reads_factors (orthogonal to output) = 1
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 108, 1: 108}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 216, Out reads: 12
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: False, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
 Level: InRegister: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 0, actual_dataflow_per_layer[0] = ['Z']
 Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0] = ['Z']
 input read after innermost_dim_sum handling: 1
@@ -757,6 +959,7 @@ Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, inner
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
 
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -780,8 +983,9 @@ weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['Z', 'S1']
 layer read after innermost_dim_sum handling: 3
@@ -790,6 +994,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -801,9 +1006,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 54, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: False, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'S1', 'Z'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'S1', 'Z'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
 Level: InRegister: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 0, actual_dataflow_per_layer[0] = ['Z']
 Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0] = ['Z']
 input read after innermost_dim_sum handling: 1
@@ -811,6 +1022,7 @@ Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, inner
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
 
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -834,8 +1046,9 @@ weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['S1', 'Z']
 layer read after innermost_dim_sum handling: 3
@@ -844,6 +1057,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -855,9 +1069,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 54, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -865,6 +1085,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -876,11 +1097,13 @@ weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
 Level: OutRegister, Layer 1: final Weight layer_read = 1
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -898,15 +1121,22 @@ No valid follow-up configuration, stopping, current Wart: 4.466e-06
 Total moves: 0
 Total choices: 1
 Choices: {}
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -930,8 +1160,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -940,6 +1171,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -958,9 +1190,15 @@ output layer 1 read after no next_spatials handling: 12
 out remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'Q']
 output layer 1 final read: 72, out_reads_factors (orthogonal to output) = 1
 BEFORE BYPASS: In reads: 300, Per Layer W Reads: {0: 108, 1: 432}  Per Layer Intermediate Input reads: 480, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 540, Out reads: 72
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -969,6 +1207,7 @@ Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innerm
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
 
 Initialization Level: GlobalBuffer: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -986,14 +1225,16 @@ weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 12
 weight remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'R1']
 Level: GlobalBuffer, Layer 1: final Weight layer_read = 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -1008,9 +1249,15 @@ output layer 1 read after next_spatials handling: 4
 out remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 output layer 1 final read: 12, out_reads_factors (orthogonal to output) = 1
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 108, 1: 108}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 216, Out reads: 12
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: False, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
 Level: InRegister: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 0, actual_dataflow_per_layer[0] = ['Z']
 Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0] = ['Z']
 input read after innermost_dim_sum handling: 1
@@ -1018,6 +1265,7 @@ Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, inner
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
 
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1041,8 +1289,9 @@ weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['Z', 'S1']
 layer read after innermost_dim_sum handling: 3
@@ -1051,6 +1300,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -1062,9 +1312,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 54, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: False, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'S1', 'Z'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'S1', 'Z'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
 Level: InRegister: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 0, actual_dataflow_per_layer[0] = ['Z']
 Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0] = ['Z']
 input read after innermost_dim_sum handling: 1
@@ -1072,6 +1328,7 @@ Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, inner
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
 
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1095,8 +1352,9 @@ weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['S1', 'Z']
 layer read after innermost_dim_sum handling: 3
@@ -1105,6 +1363,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -1116,9 +1375,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 54, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -1126,6 +1391,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1137,11 +1403,13 @@ weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
 Level: OutRegister, Layer 1: final Weight layer_read = 1
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -1159,15 +1427,22 @@ No valid follow-up configuration, stopping, current Wart: 4.466e-06
 Total moves: 0
 Total choices: 1
 Choices: {}
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1191,8 +1466,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -1201,6 +1477,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -1219,9 +1496,15 @@ output layer 1 read after no next_spatials handling: 12
 out remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'Q']
 output layer 1 final read: 72, out_reads_factors (orthogonal to output) = 1
 BEFORE BYPASS: In reads: 300, Per Layer W Reads: {0: 108, 1: 432}  Per Layer Intermediate Input reads: 480, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 540, Out reads: 72
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -1230,6 +1513,7 @@ Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innerm
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
 
 Initialization Level: GlobalBuffer: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1247,14 +1531,16 @@ weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 12
 weight remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'R1']
 Level: GlobalBuffer, Layer 1: final Weight layer_read = 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -1269,9 +1555,15 @@ output layer 1 read after next_spatials handling: 4
 out remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 output layer 1 final read: 12, out_reads_factors (orthogonal to output) = 1
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 108, 1: 108}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 216, Out reads: 12
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: False, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
 Level: InRegister: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 0, actual_dataflow_per_layer[0] = ['Z']
 Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0] = ['Z']
 input read after innermost_dim_sum handling: 1
@@ -1279,6 +1571,7 @@ Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, inner
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
 
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1302,8 +1595,9 @@ weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['Z', 'S1']
 layer read after innermost_dim_sum handling: 3
@@ -1312,6 +1606,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -1323,9 +1618,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 54, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: False, int_bp: True, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'S1', 'Z'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'S1', 'Z'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('S1', 1), ('Z', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
 Level: InRegister: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 0, actual_dataflow_per_layer[0] = ['Z']
 Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0] = ['Z']
 input read after innermost_dim_sum handling: 1
@@ -1333,6 +1634,7 @@ Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, inner
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
 
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1356,8 +1658,9 @@ weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['S1', 'Z']
 layer read after innermost_dim_sum handling: 3
@@ -1366,6 +1669,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -1377,9 +1681,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 54, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: True, out_bp: True, int_bp: True, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -1387,6 +1697,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
@@ -1398,11 +1709,13 @@ weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
 Level: OutRegister, Layer 1: final Weight layer_read = 1
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -1417,16 +1730,25 @@ BEFORE BYPASS: In reads: 108, Per Layer W Reads: {0: 108, 1: 1}  Per Layer Inter
 é stato chiamato update stats! 
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: 1, w_bp: 1, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: 1
@@ -1450,8 +1772,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -1460,6 +1783,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -1487,10 +1811,18 @@ DEBUG DRAM AFTER BYPASS:
 End MOPs with Bypasses for Level: DRAM
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: 1, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -1500,16 +1832,19 @@ input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
 
+
 Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -1519,9 +1854,16 @@ intermediate out layer 0 read after next_spatials handling: 32
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 256
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
@@ -1545,9 +1887,16 @@ weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, ignore_bypasses: True, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
@@ -1567,14 +1916,24 @@ DEBUG GlobalBuffer AFTER BYPASS:
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['Z', 'S1']
 layer read after innermost_dim_sum handling: 3
@@ -1583,6 +1942,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -1594,9 +1954,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: False, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -1604,6 +1970,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
@@ -1617,14 +1984,24 @@ DEBUG InRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: InRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: WRegister: innermost_dim_sum = None, i = -1, actual_dataflow = ['C2']
 layer read after innermost_dim_sum handling: 1
@@ -1633,6 +2010,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: WRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -1644,9 +2022,16 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 4
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 1, Per Layer Intermediate Output reads: 4, Per Layer Intermediate Output writes: 4 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 weight layer 0 read after innermost_dim_sum handling: 1
@@ -1667,17 +2052,28 @@ DEBUG WRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: WRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -1701,16 +2097,25 @@ End MOPs with Bypasses for Level: OutRegister
 é stato chiamato update stats! 
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: 1, w_bp: 1, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: 1
@@ -1734,8 +2139,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -1744,6 +2150,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -1771,10 +2178,18 @@ DEBUG DRAM AFTER BYPASS:
 End MOPs with Bypasses for Level: DRAM
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: 1, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -1784,16 +2199,19 @@ input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
 
+
 Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -1803,9 +2221,16 @@ intermediate out layer 0 read after next_spatials handling: 32
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 256
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
@@ -1829,9 +2254,16 @@ weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, ignore_bypasses: True, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
@@ -1851,14 +2283,24 @@ DEBUG GlobalBuffer AFTER BYPASS:
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['Z', 'S1']
 layer read after innermost_dim_sum handling: 3
@@ -1867,6 +2309,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -1878,9 +2321,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: False, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -1888,6 +2337,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
@@ -1901,14 +2351,24 @@ DEBUG InRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: InRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: WRegister: innermost_dim_sum = None, i = -1, actual_dataflow = ['C2']
 layer read after innermost_dim_sum handling: 1
@@ -1917,6 +2377,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: WRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -1928,9 +2389,16 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 4
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 1, Per Layer Intermediate Output reads: 4, Per Layer Intermediate Output writes: 4 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 weight layer 0 read after innermost_dim_sum handling: 1
@@ -1951,17 +2419,28 @@ DEBUG WRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: WRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -2001,16 +2480,25 @@ Performed moves: 0
 é stato chiamato update stats! 
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: DRAM
+Level: DRAM: Starting MOPs calculation with in_bp: 1, w_bp: 1, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, tile_sizes: {C0: 3, Y: 8, X: 8, R0: 3, S0: 3, Z: 4, C1: 2, R1: 3, S1: 3, C2: 2, P: 3, Q: 2}, factors_constraints: {'Q': 3, 'P': 2, 'C1': 2}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: DRAM: actual_dataflow_per_layer: {0: [], 1: ['P', 'Q', 'C1']}, actual_dataflow: ['P', 'Q', 'C1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'R1', 'S1', 'C2', 'P', 'Q', 'C1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {2: 1}, R1: {}, S1: {}, C2: {}, P: {2: 1}, Q: {3: 1}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 3), ('Q', 2), ('C1', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 3), ('Q', 2), ('C1', 2)]
 Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dataflow_per_layer[0] = []
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
 
 Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: 1
@@ -2034,8 +2522,9 @@ weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 Level: DRAM, Layer 1: final Weight layer_read = 432
+
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
 layer read after innermost_dim_sum handling: 1
@@ -2044,6 +2533,7 @@ self.tile_size[dim] for dim in dim_sum: [[2], [3, 3], [2, 3]]
 intermediate in layer 0 read after no next_spatials handling: 40
 intermediate in remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
 intermediate in layer 0 final read: 480
+
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -2071,10 +2561,18 @@ DEBUG DRAM AFTER BYPASS:
 End MOPs with Bypasses for Level: DRAM
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: GlobalBuffer
+Level: GlobalBuffer: Starting MOPs calculation with in_bp: 1, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, tile_sizes: {C0: 3, Y: 2, X: 4, R0: 3, S0: 3, Z: 4, C1: 2, R1: 1, S1: 3, C2: 2, P: 1, Q: 2}, factors_constraints: {'P': 3, 'X': 2, 'R1': 3, 'Y': 4}, bypasses: [], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: GlobalBuffer: actual_dataflow_per_layer: {0: ['X', 'Y'], 1: ['P', 'R1']}, actual_dataflow: ['P', 'X', 'R1', 'Y'], dataflow: ['C0', 'R0', 'S0', 'Z', 'C1', 'S1', 'C2', 'Q', 'P', 'X', 'R1', 'Y'], factors: {C0: {}, Y: {2: 2}, X: {2: 1}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {3: 1}, S1: {}, C2: {}, P: {3: 1}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('P', 1), ('X', 4), ('R1', 1), ('Y', 2)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 4), ('Y', 2)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('P', 1), ('R1', 1)]
 Level: GlobalBuffer: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = 1, actual_dataflow_per_layer[0] = ['X', 'Y']
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1, 'S0': 1}
@@ -2084,16 +2582,19 @@ input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
 actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
 
+
 Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = ['P', 'R1'], i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
 layer read after innermost_dim_sum handling: 3
 intermediate in layer 0 read after next_spatials handling: 36
 intermediate in remaining dim in actual_dataflow_per_layer[1][:1]: ['P']
 intermediate in layer 0 final read: 108
+
 Initialization Level: GlobalBuffer, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
@@ -2103,9 +2604,16 @@ intermediate out layer 0 read after next_spatials handling: 32
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 256
 BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 108, Per Layer Intermediate Output reads: 256, Per Layer Intermediate Output writes: 256 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
@@ -2129,9 +2637,16 @@ weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
 Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, ignore_bypasses: True, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
@@ -2151,14 +2666,24 @@ DEBUG GlobalBuffer AFTER BYPASS:
 End MOPs with Bypasses for Level: GlobalBuffer
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: InRegister
+Level: InRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 2, P: 1, Q: 1}, factors_constraints: {'S1': 3, 'Z': 4}, bypasses: ['w', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('Z', 1), ('S1', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('Z', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: [('S1', 1)]
+
 Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = ['Q', 'S1'], i = 0, actual_dataflow = ['Z', 'S1']
 layer read after innermost_dim_sum handling: 3
@@ -2167,6 +2692,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 3
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 3
+
 Initialization Level: InRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['Z'], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
@@ -2178,9 +2704,15 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 16
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 3, Per Layer Intermediate Output reads: 16, Per Layer Intermediate Output writes: 16 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: True, w_bp: False, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
 input read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1, 'S0': 1}
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
@@ -2188,6 +2720,7 @@ Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
 actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
 
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: False
@@ -2201,14 +2734,24 @@ DEBUG InRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: InRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: WRegister
+Level: WRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 1, ignore_bypasses: False, dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, tile_sizes: {C0: 3, Y: 1, X: 4, R0: 3, S0: 3, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'C2': 2}, bypasses: ['in', 'out'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('C2', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: []
+tile size for each dim in actual_dataflow_per_layer[1]: [('C2', 1)]
+
 Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
-actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
+actual_dataflow_per_layer[1] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: WRegister: innermost_dim_sum = None, i = -1, actual_dataflow = ['C2']
 layer read after innermost_dim_sum handling: 1
@@ -2217,6 +2760,7 @@ self.tile_size[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 intermediate in layer 0 read after no next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: WRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z', 'Y', 'X']
 tile size for each dim of actual_dataflow_per_layer[0]: []
@@ -2228,9 +2772,16 @@ intermediate out layer 0 read after no next_spatials handling: 4
 intermediate out remaining dim in actual_dataflow_per_layer[0
 intermediate out layer 0 final read: 4
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 1, Per Layer Intermediate Output reads: 4, Per Layer Intermediate Output writes: 4 W reads: 0, Out reads: 0
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, ignore_bypasses: True, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
 w_bp: True
 weight layer 0 read after innermost_dim_sum handling: 1
@@ -2251,17 +2802,28 @@ DEBUG WRegister AFTER BYPASS:
 End MOPs with Bypasses for Level: WRegister
 
 
+
+
 Questo mops è chiamato da update stats
+arch.name: Fixed Multi-Layer Convolution Architecture with Mapping Constraints, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_bp: 1, ignore_bypasses: False, dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, tile_sizes: {C0: 1, Y: 1, X: 1, R0: 1, S0: 1, Z: 1, C1: 1, R1: 1, S1: 1, C2: 1, P: 1, Q: 1}, factors_constraints: {'X': 4, 'S0': 3, 'R0': 3, 'C0': 3}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
+Layer 0 relevant dims: {'C0', 'X', 'Y', 'Z', 'R0', 'S0'}
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+tile size for each dim in actual_dataflow: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow-per_layer[0]: [('X', 1), ('S0', 1), ('R0', 1), ('C0', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: []
+
 Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
 w_bp: 0
+
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
 intermediate in layer 0 final read: 1
+
 Initialization Level: OutRegister, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate out layer 0 read after next_spatials handling: 1
@@ -2283,7 +2845,7 @@ End MOPs with Bypasses for Level: OutRegister
 
 
 
-Finished in: 0.475s
+Finished in: 0.110s
 
 Best mapping found with:
 	Wart: 4.466e-06
