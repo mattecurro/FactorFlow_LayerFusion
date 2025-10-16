@@ -711,16 +711,18 @@ class MemLevel(Level):
                 for dim_sum in self.arch.coupling.in_coupling if dim_sum is not innermost_dim_sum)
                 print(f"Level: {self.name}, Layer {0}: after Spatial, Input in_reads = {in_reads}, i = {i}, innermost_dim_sum = {innermost_dim_sum}")
             print(f"input remaining dim in actual_dataflow_per_layer[0][:{i+1}]: {actual_dataflow_per_layer[0][:i+1]}")
+            print(f"actual_dataflow_per_layer[0]: {actual_dataflow_per_layer[0]}, i = {i}")
             for dim in actual_dataflow_per_layer[0][:i+1]:
                 in_reads *= self.factors.dimProduct(dim)
-            print(f"Level: {self.name}, Layer {0}: final Input in_reads = {in_reads}")    
+            print(f"Level: {self.name}, Layer {0}: final Input in_reads = {in_reads}\n")    
 
         # stationarity calculation for weights
         w_reads = int(w_bp)
         per_layer_w_reads: dict[int, int] = {}
         for layer_idx in range(num_layers):
             per_layer_w_reads[layer_idx] = int(w_bp)
-#        print(f"Initialization Level: {self.name}: w_reads = {w_reads}, per_layer_w_reads = {per_layer_w_reads}")
+        print(f"Initialization Level: {self.name}: w_reads = {w_reads}, per_layer_w_reads = {per_layer_w_reads}")
+        print(f"w_bp: {w_bp}")
         if w_bp:
             ## Handle each weight Layer separately      
             for layer_idx in range(num_layers):
@@ -741,7 +743,7 @@ class MemLevel(Level):
                     if innermost_dim_sum:
                         layer_read *= distinct_values([self.factors.dimProduct(actual_dataflow_per_layer[layer_idx][i])*self.tile_sizes[actual_dataflow_per_layer[layer_idx][i]]] + [self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_per_layer[layer_idx][i]], [self.arch.getWStride(actual_dataflow_per_layer[layer_idx][i], layer_idx)] + [self.arch.getWStride(dim, layer_idx) for dim in innermost_dim_sum if dim != actual_dataflow_per_layer[layer_idx][i]])
                         i -= 1
-                print(f"layer read after innermost_dim_sum handling: {layer_read}")
+                print(f"weight layer {layer_idx} read after innermost_dim_sum handling: {layer_read}")
                 if not self.next_spatials:
                     print(f"innermost_dim_sum: {innermost_dim_sum}, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling({layer_idx}) if dim_sum is not innermost_dim_sum: {[dim_sum for dim_sum in self.arch.coupling.getWeightCoupling(layer_idx) if dim_sum is not innermost_dim_sum]}")
                     print(f"self.tile_size[dim] for dim in dim_sum: {[[self.tile_sizes[dim] for dim in dim_sum] for dim_sum in self.arch.coupling.getWeightCoupling(layer_idx) if dim_sum is not innermost_dim_sum]}")
@@ -754,6 +756,7 @@ class MemLevel(Level):
                 print(f"weight remaining dim in actual_dataflow_per_layer[{layer_idx}][:{i+1}]: {actual_dataflow_per_layer[layer_idx][:i+1]}")
                 for dim in actual_dataflow_per_layer[layer_idx][:i+1]:
                     layer_read *= self.factors.dimProduct(dim)
+                print(f"Level: {self.name}, Layer {layer_idx}: final Weight layer_read = {layer_read}")    
                 per_layer_w_reads[layer_idx] = layer_read
             w_reads = sum(per_layer_w_reads.values())
 

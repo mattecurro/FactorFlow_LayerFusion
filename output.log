@@ -9,7 +9,7 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'S0', 'C0', 'C2', 'R1', 'Q', 'C1', 'R0', 'S1', 'Y', 'P', 'X'}, coupling.dims: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q']
+final_layer_dims: {'R0', 'S1', 'P', 'C2', 'R1', 'C0', 'Y', 'X', 'Q', 'S0', 'C1'}, coupling.dims: ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q']
 INFO: Arch: Fixed Multi-Layer Convolution Architecture with Mapping Constraints: identified intermediate dimensions: {'Z'}
 INFO: Added high constraint for intermediate dimension Z in level InRegister
 INFO: Added high constraint for intermediate dimension Z in level WRegister
@@ -61,25 +61,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: 1
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -127,7 +133,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -148,28 +158,34 @@ BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Interme
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
 out layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.out_coupling if dim_sum is not innermost_dim_sum: [['C2'], ['P'], ['Q']]
@@ -191,6 +207,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -220,7 +238,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 BEFORE BYPASS: In reads: 108, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 0, Out reads: 0
 AFTER BYPASS of all operands:
  InRegister:	0 In_R, 7 W_R, 0 Our_R, 7 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -235,6 +257,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -259,12 +283,16 @@ BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermedi
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
-layer read after innermost_dim_sum handling: 1
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 1}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 109, Out reads: 0
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 1 W_R, 0 Our_R, 1 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -279,6 +307,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -327,25 +357,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: 1
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -393,7 +429,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -414,28 +454,34 @@ BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Interme
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
 out layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.out_coupling if dim_sum is not innermost_dim_sum: [['C2'], ['P'], ['Q']]
@@ -457,6 +503,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['S1', 'Z'], dataflow: ['S1', 'Z', 'C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -486,7 +534,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 BEFORE BYPASS: In reads: 108, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 0, Out reads: 0
 AFTER BYPASS of all operands:
  InRegister:	0 In_R, 7 W_R, 0 Our_R, 7 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -501,6 +553,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -525,12 +579,16 @@ BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermedi
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
-layer read after innermost_dim_sum handling: 1
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 1}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 109, Out reads: 0
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 1 W_R, 0 Our_R, 1 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -545,6 +603,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['X', 'S0', 'R0', 'C0', 'Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -584,25 +644,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -640,19 +706,25 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
 Level: GlobalBuffer: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'X', 'R1', 'Y']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: GlobalBuffer, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'R1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = None, i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 12
 weight remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'R1']
+Level: GlobalBuffer, Layer 1: final Weight layer_read = 108
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -683,25 +755,31 @@ Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0
 input read after innermost_dim_sum handling: 1
 Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -731,25 +809,31 @@ Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0
 input read after innermost_dim_sum handling: 1
 Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -779,13 +863,19 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
-layer read after innermost_dim_sum handling: 1
+
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -815,25 +905,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -871,19 +967,25 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
 Level: GlobalBuffer: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'X', 'R1', 'Y']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: GlobalBuffer, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'R1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = None, i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 12
 weight remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'R1']
+Level: GlobalBuffer, Layer 1: final Weight layer_read = 108
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -914,25 +1016,31 @@ Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0
 input read after innermost_dim_sum handling: 1
 Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -962,25 +1070,31 @@ Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0
 input read after innermost_dim_sum handling: 1
 Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1010,13 +1124,19 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
-layer read after innermost_dim_sum handling: 1
+
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -1046,25 +1166,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -1102,19 +1228,25 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['X', 'Y'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [4, 2]
 Level: GlobalBuffer: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'X', 'R1', 'Y']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: GlobalBuffer, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'R1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
 Level: GlobalBuffer: innermost_dim_sum = None, i = 1, actual_dataflow = ['P', 'X', 'R1', 'Y']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 12
 weight remaining dim in actual_dataflow_per_layer[1][:2]: ['P', 'R1']
+Level: GlobalBuffer, Layer 1: final Weight layer_read = 108
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -1145,25 +1277,31 @@ Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0
 input read after innermost_dim_sum handling: 1
 Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1193,25 +1331,31 @@ Level: InRegister: innermost_dim_sum = None, i = -1, actual_dataflow_per_layer[0
 input read after innermost_dim_sum handling: 1
 Level: InRegister, Layer 0: after no Spatial, Input in_reads = 54, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: ['Z'], i = -1
 Level: InRegister, Layer 0: final Input in_reads = 54
+
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['S1', 'Z']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1241,13 +1385,19 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
-layer read after innermost_dim_sum handling: 1
+
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -1275,25 +1425,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: 1
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -1341,7 +1497,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -1362,28 +1522,34 @@ BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Interme
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
 out layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.out_coupling if dim_sum is not innermost_dim_sum: [['C2'], ['P'], ['Q']]
@@ -1405,6 +1571,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1434,7 +1602,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 BEFORE BYPASS: In reads: 108, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 0, Out reads: 0
 AFTER BYPASS of all operands:
  InRegister:	0 In_R, 7 W_R, 0 Our_R, 7 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -1449,6 +1621,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1473,12 +1647,16 @@ BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermedi
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
-layer read after innermost_dim_sum handling: 1
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 1}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 109, Out reads: 0
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 1 W_R, 0 Our_R, 1 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -1493,6 +1671,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -1529,25 +1709,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: 1
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -1595,7 +1781,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -1616,28 +1806,34 @@ BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Interme
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
 out layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.out_coupling if dim_sum is not innermost_dim_sum: [['C2'], ['P'], ['Q']]
@@ -1659,6 +1855,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1688,7 +1886,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 BEFORE BYPASS: In reads: 108, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 0, Out reads: 0
 AFTER BYPASS of all operands:
  InRegister:	0 In_R, 7 W_R, 0 Our_R, 7 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -1703,6 +1905,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1727,12 +1931,16 @@ BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermedi
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
-layer read after innermost_dim_sum handling: 1
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 1}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 109, Out reads: 0
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 1 W_R, 0 Our_R, 1 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -1747,6 +1955,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -1799,25 +2009,31 @@ Level: DRAM: flat_in_coupling = ['C0', 'Y', 'R0', 'X', 'S0'], i = -1, actual_dat
 input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 300, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
+actual_dataflow_per_layer[0]: [], i = -1
 Level: DRAM, Layer 0: final Input in_reads = 300
+
+Initialization Level: DRAM: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: 1
 actual_dataflow_per_layer[0] = [], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: []
 Level: DRAM: innermost_dim_sum = None, i = -1, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[4], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 108
 weight layer 0 read after next_spatials handling: 108
 weight remaining dim in actual_dataflow_per_layer[0][:0]: []
+Level: DRAM, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['P', 'Q', 'C1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
 Level: DRAM: innermost_dim_sum = None, i = 2, actual_dataflow = ['P', 'Q', 'C1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [2], [3], [3]]
 weight layer 1 read after no next_spatials handling: 36
 weight layer 1 read after next_spatials handling: 36
 weight remaining dim in actual_dataflow_per_layer[1][:3]: ['P', 'Q', 'C1']
+Level: DRAM, Layer 1: final Weight layer_read = 432
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'Q', 'C1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [3, 2, 2]
@@ -1865,7 +2081,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 2, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[3], [2, 3], [4, 3]]
 Level: GlobalBuffer, Layer 0: after Spatial, Input in_reads = 108, i = 1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:2]: ['X', 'Y']
+actual_dataflow_per_layer[0]: ['X', 'Y'], i = 1
 Level: GlobalBuffer, Layer 0: final Input in_reads = 864
+
+Initialization Level: GlobalBuffer: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: GlobalBuffer, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['P', 'R1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1, 1]
@@ -1886,28 +2106,34 @@ BEFORE BYPASS: In reads: 864, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Interme
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
 actual_dataflow_per_layer[0] = ['Z'], flat_weight_coupling[0] = ['Z', 'C0', 'R0', 'S0']
 tile size for each dim of actual_dataflow_per_layer[0]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z'], ['C0'], ['R0'], ['S0']]
 self.tile_size[dim] for dim in dim_sum: [[1], [3], [3], [3]]
 weight layer 0 read after no next_spatials handling: 27
 weight layer 0 read after next_spatials handling: 27
 weight remaining dim in actual_dataflow_per_layer[0][:1]: ['Z']
+Level: InRegister, Layer 0: final Weight layer_read = 108
 actual_dataflow_per_layer[1] = ['S1'], flat_weight_coupling[1] = ['C2', 'C1', 'R1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
 Level: InRegister: innermost_dim_sum = None, i = 0, actual_dataflow = ['Z', 'S1']
-layer read after innermost_dim_sum handling: 1
+weight layer 1 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(1) if dim_sum is not innermost_dim_sum: [['C2'], ['C1'], ['R1'], ['S1']]
 self.tile_size[dim] for dim in dim_sum: [[2], [1], [1], [1]]
 weight layer 1 read after no next_spatials handling: 2
 weight layer 1 read after next_spatials handling: 2
 weight remaining dim in actual_dataflow_per_layer[1][:1]: ['S1']
+Level: InRegister, Layer 1: final Weight layer_read = 6
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 6}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 114, Out reads: 0
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 Initialization Level: WRegister, Layer 1: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['C2']
 out layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.out_coupling if dim_sum is not innermost_dim_sum: [['C2'], ['P'], ['Q']]
@@ -1929,6 +2155,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: InRegister: actual_dataflow_per_layer: {0: ['Z'], 1: ['S1']}, actual_dataflow: ['Z', 'S1'], dataflow: ['C0', 'Y', 'X', 'R0', 'S0', 'C1', 'R1', 'C2', 'P', 'Q', 'Z', 'S1'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {2: 2}, C1: {}, R1: {}, S1: {3: 1}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: InRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: InRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['S1'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1958,7 +2186,11 @@ innermost_dim_sum: None, next_spatial_unroll: {'C0': 1, 'Y': 1, 'R0': 1, 'X': 1,
 tile sizes[dim] for dim in dim_sum: [[1], [1, 1], [1, 1]]
 Level: OutRegister, Layer 0: after Spatial, Input in_reads = 1, i = 3, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
+actual_dataflow_per_layer[0]: ['X', 'S0', 'R0', 'C0'], i = 3
 Level: OutRegister, Layer 0: final Input in_reads = 108
+
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: False
 BEFORE BYPASS: In reads: 108, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 0, Out reads: 0
 AFTER BYPASS of all operands:
  InRegister:	0 In_R, 7 W_R, 0 Our_R, 7 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -1973,6 +2205,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: WRegister: actual_dataflow_per_layer: {0: [], 1: ['C2']}, actual_dataflow: ['C2'], dataflow: ['C2', 'C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'P', 'Q'], factors: {C0: {}, Y: {}, X: {}, R0: {}, S0: {}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {2: 1}, P: {}, Q: {}}, num layers: 2
+Initialization Level: WRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: WRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 actual_dataflow_per_layer[0] = ['C2'], flat_intermediate_input_coupling[0] = ['C1', 'P', 'R1', 'Q', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: [1]
@@ -1997,12 +2231,16 @@ BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 0, 1: 0}  Per Layer Intermedi
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
-layer read after innermost_dim_sum handling: 1
+Initialization Level: OutRegister: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1}
+w_bp: True
+weight layer 0 read after innermost_dim_sum handling: 1
 weight layer 0 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[0][:4]: ['X', 'S0', 'R0', 'C0']
-layer read after innermost_dim_sum handling: 1
+Level: OutRegister, Layer 0: final Weight layer_read = 108
+weight layer 1 read after innermost_dim_sum handling: 1
 weight layer 1 read after next_spatials handling: 1
 weight remaining dim in actual_dataflow_per_layer[1][:0]: []
+Level: OutRegister, Layer 1: final Weight layer_read = 1
 BEFORE BYPASS: In reads: 0, Per Layer W Reads: {0: 108, 1: 1}  Per Layer Intermediate Input reads: 0, Per Layer Intermediate Output reads: 0, Per Layer Intermediate Output writes: 0 W reads: 109, Out reads: 0
 AFTER BYPASS of all operands:
  WRegister:	0 In_R, 1 W_R, 0 Our_R, 1 Tot_R, 0 Out_W, 0 Out_R_Fac
@@ -2017,6 +2255,8 @@ Questo mops è chiamato da update stats
 getFlatInputCoupling(0): ['C0', 'Y', 'R0', 'X', 'S0'], getFlatWeightCoupling(0): ['Z', 'C0', 'R0', 'S0'], getFlatIntermediateOutputCoupling(0): ['Z', 'Y', 'X']
 getFlatWeightCoupling(1): ['C2', 'C1', 'R1', 'S1'], getFlatOutputCoupling(): ['C2', 'P', 'Q'], getFlatIntermediateInputCoupling(0): ['C1', 'P', 'R1', 'Q', 'S1']
 Level: OutRegister: actual_dataflow_per_layer: {0: ['X', 'S0', 'R0', 'C0'], 1: []}, actual_dataflow: ['X', 'S0', 'R0', 'C0'], dataflow: ['Y', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q', 'X', 'S0', 'R0', 'C0'], factors: {C0: {3: 1}, Y: {}, X: {2: 2}, R0: {3: 1}, S0: {3: 1}, Z: {}, C1: {}, R1: {}, S1: {}, C2: {}, P: {}, Q: {}}, num layers: 2
+Initialization Level: OutRegister: w_reads = 0, per_layer_w_reads = {0: 0, 1: 0}
+w_bp: 0
 Initialization Level: OutRegister, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1}
 layer read after innermost_dim_sum handling: 1
 intermediate in layer 0 read after next_spatials handling: 1
@@ -2043,7 +2283,7 @@ End MOPs with Bypasses for Level: OutRegister
 
 
 
-Finished in: 0.660s
+Finished in: 0.475s
 
 Best mapping found with:
 	Wart: 4.466e-06
