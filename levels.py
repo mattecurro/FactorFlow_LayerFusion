@@ -588,35 +588,36 @@ class MemLevel(Level):
         actual_dataflow = list(filter(lambda dim : self.factors.dimProduct(dim) > 1, self.dataflow))
         # separate the actual_dataflow per layer: dict[n_layer, order of loop of that ]
         actual_dataflow_per_layer: dict[int, list[str]] = {}
-        if self.arch.coupling.getNumLayers() > 1:        
-            for layer_id in range(self.arch.coupling.getNumLayers()):
-                # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
-                if layer_id == 0:
-                    print(f"getFlatInputCoupling(0): {self.arch.coupling.getFlatInputCoupling()}, getFlatWeightCoupling(0): {self.arch.coupling.getFlatWeightCoupling(0)}, getFlatIntermediateOutputCoupling(0): {self.arch.coupling.getFlatIntermediateOutputCoupling(0)}")
-                    layer_relevant_dims = (
-                        set(self.arch.coupling.getFlatInputCoupling()) |
-                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                    )
-                    print(f"Layer 0 relevant dims: {layer_relevant_dims}")
-                elif layer_id == self.arch.coupling.getNumLayers() - 1:
-                    print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatOutputCoupling(): {self.arch.coupling.getFlatOutputCoupling()}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}")
-                    layer_relevant_dims = (
-                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatOutputCoupling()) |
-                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
-                    )
-                else:
-                    print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}, getFlatIntermediateOutputCoupling({layer_id}): {self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id)}")
-                    layer_relevant_dims = (
-                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                    )
-                actual_dataflow_per_layer[layer_id] = [
-                    dim for dim in actual_dataflow 
-                    if dim in layer_relevant_dims
-                ]
+        if self.arch.coupling.getNumLayers() > 1:
+          for layer_id in range(self.arch.coupling.getNumLayers()):
+            # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
+            if layer_id == 0:
+                print(f"getFlatInputCoupling(0): {self.arch.coupling.getFlatInputCoupling()}, getFlatWeightCoupling(0): {self.arch.coupling.getFlatWeightCoupling(0)}, getFlatIntermediateOutputCoupling(0): {self.arch.coupling.getFlatIntermediateOutputCoupling(0)}")
+                layer_relevant_dims = (
+                    set(self.arch.coupling.getFlatInputCoupling()) |
+                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                    set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                )
+                print(f"Layer 0 relevant dims: {layer_relevant_dims}")
+            elif layer_id == self.arch.coupling.getNumLayers() - 1:
+                print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatOutputCoupling(): {self.arch.coupling.getFlatOutputCoupling()}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}")
+                layer_relevant_dims = (
+                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                    set(self.arch.coupling.getFlatOutputCoupling()) |
+                    set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
+                )
+            else:
+                print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}, getFlatIntermediateOutputCoupling({layer_id}): {self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id)}")
+                layer_relevant_dims = (
+                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                    set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)) |
+                    set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                )
+            actual_dataflow_per_layer[layer_id] = [
+                dim for dim in actual_dataflow 
+                if dim in layer_relevant_dims
+            ]
+            print(f"actual_dataflow_per_layer[{layer_id}]: {actual_dataflow_per_layer[layer_id]} for layer {layer_id} with relevant dims {layer_relevant_dims}")
         else:
             actual_dataflow_per_layer[0] = actual_dataflow
         print(f"Level: {self.name}: actual_dataflow_per_layer: {actual_dataflow_per_layer}, actual_dataflow: {actual_dataflow}, dataflow: {self.dataflow}, factors: {self.factors}, num layers: {num_layers}")
@@ -756,6 +757,8 @@ class MemLevel(Level):
                     print(f"weight layer {layer_idx} read after no next_spatials handling: {layer_read}")
                 else:
                     next_spatial_unroll = {dim: prod(level.factors.dimProduct(dim) for level in self.next_spatials if not level.selective_multicast_support) for dim in self.arch.coupling.getFlatWeightCoupling(layer_idx)}
+                    print(f"innermost_dim_sum: {innermost_dim_sum}, next_spatial_unroll: {next_spatial_unroll}")
+                    print(f"tile sizes[dim] for dim in dim_sum: {[[self.tile_sizes[dim] for dim in dim_sum] for dim_sum in self.arch.coupling.getWeightCoupling(layer_idx) if dim_sum is not innermost_dim_sum]}")
                     layer_read *= prod(distinct_values([self.tile_sizes[dim]//next_spatial_unroll[dim] for dim in dim_sum], [self.arch.getWStride(dim, layer_idx) for dim in dim_sum])*prod(next_spatial_unroll[dim] for dim in dim_sum) for dim_sum in self.arch.coupling.getWeightCoupling(layer_idx) if dim_sum is not innermost_dim_sum)
                 print(f"weight layer {layer_idx} read after next_spatials handling: {layer_read}")
                 print(f"weight remaining dim in actual_dataflow_per_layer[{layer_idx}][:{i+1}]: {actual_dataflow_per_layer[layer_idx][:i+1]}")
@@ -791,6 +794,8 @@ class MemLevel(Level):
                     if innermost_dim_sum and (not all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in self.next_spatials) or (skipped and not self.multiple_reuses)):
                         innermost_dim_sum = None
                     if innermost_dim_sum:
+                        print(f"self.factors.dimProduct(actual_dataflow_per_layer[{layer_id + 1}][{i}]): {self.factors.dimProduct(actual_dataflow_per_layer[layer_id + 1][i])}, self.tile_sizes[actual_dataflow_per_layer[{layer_id + 1}][{i}]]: {self.tile_sizes[actual_dataflow_per_layer[layer_id + 1][i]]}")
+                        print(f"[self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_per_layer[{layer_id + 1}][{i}]]: {[self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_per_layer[layer_id + 1][i]]}")
                         layer_read *= distinct_values([self.factors.dimProduct(actual_dataflow_per_layer[layer_id + 1][i])*self.tile_sizes[actual_dataflow_per_layer[layer_id + 1][i]]] + [self.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_per_layer[layer_id + 1][i]], [self.arch.getIntermediateInputStride(actual_dataflow_per_layer[layer_id + 1][i], layer_id)] + [self.arch.getIntermediateInputStride(dim, layer_id) for dim in innermost_dim_sum if dim != actual_dataflow_per_layer[layer_id + 1][i]])
                         i -= 1
                 print(f"layer read after innermost_dim_sum handling: {layer_read}")
@@ -802,6 +807,9 @@ class MemLevel(Level):
                 else:
                     next_spatial_unroll = {dim: prod(level.factors.dimProduct(dim) for level in self.next_spatials if not level.selective_multicast_support) for dim in self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)}
                     layer_read *= prod(distinct_values([self.tile_sizes[dim]//next_spatial_unroll[dim] for dim in dim_sum], [self.arch.getIntermediateInputStride(dim, layer_id) for dim in dim_sum])*prod(next_spatial_unroll[dim] for dim in dim_sum) for dim_sum in self.arch.coupling.getIntermediateInputCoupling(layer_id) if dim_sum is not innermost_dim_sum)
+                    print(f"innermost_dim_sum: {innermost_dim_sum}, next_spatial_unroll: {next_spatial_unroll}")
+                    print(f" dims in dim_sum: {[dim_sum for dim_sum in self.arch.coupling.getIntermediateInputCoupling(layer_id) if dim_sum is not innermost_dim_sum]}")
+                    print(f"tile sizes[dim] for dim in dim_sum: {[[self.tile_sizes[dim] for dim in dim_sum] for dim_sum in self.arch.coupling.getIntermediateInputCoupling(layer_id) if dim_sum is not innermost_dim_sum]}")
                     print(f"intermediate in layer {layer_id} read after next_spatials handling: {layer_read}")
                 print(f"intermediate in remaining dim in actual_dataflow_per_layer[{layer_id + 1}][:{i+1}]: {actual_dataflow_per_layer[layer_id + 1][:i+1]}")
                 ## DOUBT
@@ -846,11 +854,13 @@ class MemLevel(Level):
                     print(f"self.tile_size[dim] for dim in dim_sum: {[[self.tile_sizes[dim] for dim in dim_sum] for dim_sum in self.arch.coupling.getIntermediateOutputCoupling(layer_idx) if dim_sum is not innermost_dim_sum]}")
                     layer_read *= prod(distinct_values([self.tile_sizes[dim] for dim in dim_sum], [self.arch.getIntermediateOutputStride(dim, layer_id) for dim in dim_sum]) for dim_sum in self.arch.coupling.getIntermediateOutputCoupling(layer_id) if dim_sum is not innermost_dim_sum)
                     print(f"intermediate out layer {layer_id} read after no next_spatials handling: {layer_read}")
-                else:
+                else:                   
                     next_spatial_unroll = {dim: prod(level.factors.dimProduct(dim) for level in self.next_spatials if not level.selective_multicast_support) for dim in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id)}
                     layer_read *= prod(distinct_values([self.tile_sizes[dim]//next_spatial_unroll[dim] for dim in dim_sum], [self.arch.getIntermediateOutputStride(dim, layer_id) for dim in dim_sum])*prod(next_spatial_unroll[dim] for dim in dim_sum) for dim_sum in self.arch.coupling.getIntermediateOutputCoupling(layer_id) if dim_sum is not innermost_dim_sum)
+                    print(f"innermost_dim_sum: {innermost_dim_sum}, next_spatial_unroll: {next_spatial_unroll}")
+                    print(f"tile sizes[dim] for dim in dim_sum: {[[self.tile_sizes[dim] for dim in dim_sum] for dim_sum in self.arch.coupling.getIntermediateOutputCoupling(layer_id) if dim_sum is not innermost_dim_sum]}")
                     print(f"intermediate out layer {layer_id} read after next_spatials handling: {layer_read}")
-                print(f"intermediate out remaining dim in actual_dataflow_per_layer[{layer_id}")
+                print(f"intermediate out remaining dim in actual_dataflow_per_layer[{layer_id}][:{i+1}]: {actual_dataflow_per_layer[layer_id][:i+1]}")
                 for dim in actual_dataflow_per_layer[layer_id][:i+1]:
                     layer_read *= self.factors.dimProduct(dim)
                 print(f"intermediate out layer {layer_id} final read: {layer_read}")
@@ -889,7 +899,9 @@ class MemLevel(Level):
                 print(f"output layer {out_layer_id} read after no next_spatials handling: {out_reads}")
             else:
                 next_spatial_unroll = {dim: prod(level.factors.dimProduct(dim) for level in self.next_spatials if not level.selective_multicast_support) for dim in self.arch.coupling.getFlatOutputCoupling()}
-                out_reads *= prod(distinct_values([self.tile_sizes[dim]//next_spatial_unroll[dim] for dim in dim_sum], [self.arch.getOutStride(dim) for dim in dim_sum])*prod(next_spatial_unroll[dim] for dim in dim_sum) for dim_sum in self.arch.coupling.out_coupling if dim_sum is not innermost_dim_sum)
+                out_reads *= prod(distinct_values([self.tile_sizes[dim]//next_spatial_unroll[dim] for dim in dim_sum], [self.arch.getOutStride(dim) for dim in dim_sum])*prod(next_spatial_unroll[dim] for dim in dim_sum) for dim_sum in self.arch.coupling.getOutputCoupling() if dim_sum is not innermost_dim_sum)
+                print(f"innermost_dim_sum: {innermost_dim_sum}, next_spatial_unroll: {next_spatial_unroll}")
+                print(f"tile sizes[dim] for dim in dim_sum: {[[self.tile_sizes[dim] for dim in dim_sum] for dim_sum in self.arch.coupling.getOutputCoupling() if dim_sum is not innermost_dim_sum]}")
                 print(f"output layer {out_layer_id} read after next_spatials handling: {out_reads}")
             print(f"out remaining dim in actual_dataflow_per_layer[{out_layer_id}][:{i+1}]: {actual_dataflow_per_layer[out_layer_id][:i+1]}")
             for dim in actual_dataflow_per_layer[out_layer_id][:i+1]:
@@ -900,18 +912,21 @@ class MemLevel(Level):
         out_writes = out_reads
 
         # print bypasses
-        print("BEFORE BYPASS:" +
+        print(f"BEFORE BYPASS: ignore_bypasses: {ignore_bypasses}," +
               f" In reads: {in_reads}, Per Layer W Reads: {per_layer_w_reads} " +
-              f" Per Layer Intermediate Input reads: {int_in_reads}, Per Layer Intermediate Output reads: {int_out_reads}, Per Layer Intermediate Output writes: {int_out_writes} W reads: {w_reads}, Out reads: {out_reads}")
+              f" Per Layer Intermediate Input reads: {int_in_reads}, Per Layer Intermediate Output reads: {int_out_reads}, Per Layer Intermediate Output writes: {int_out_writes} W reads: {w_reads}, Out reads: {out_reads},")
         
+
         # handle bypasses
-        if not ignore_bypasses:            
+        if not ignore_bypasses:        
+            print("I AM HANDLING BYPASS NOW")    
             for operand, levels in self.next_levels_with_bypass.items():
-                print(f"Level: {self.name}: operand = {operand}, levels = {levels}")
+                print(f"Level: {self.name}: operand = {operand}")
                 if levels != None:
                     # 'level' is the level immediately above the one that stores the bypassed operand after the self level
                     ## in_between == all in between levels skipped                     
                     in_between, level = levels[:-1], levels[-1]
+                    print(f"Final level name before not bypassing: {level.name}")
                     ## True => no recursive call to this line
                     ## in GB dovrei fare bypass sui pesi
 #                    print(f"Chiamo non recursive MOPs su Level: {level.name}. Operand: {operand}")
@@ -932,7 +947,8 @@ class MemLevel(Level):
                     ## parto dal livello più basso
 #                    print(f"Start inbtwn: Level: {self.name}")
                     for in_btwn in in_between[::-1]:
-#                        print(f"Level: {self.name}: in_btwn = {in_btwn.name}, stationarity_to_address = {stationarity_to_address}, in_reads_bp = {in_reads_bp}, w_reads_bp = {w_reads_bp}, out_reads_bp = {out_reads_bp}, ignore_bypasses = {ignore_bypasses}")
+                        print(f"I'm going from the down (Compute) to the top")
+                        print(f"Level: {self.name}: in_btwn = {in_btwn.name}, stationarity_to_address = {stationarity_to_address}, in_reads_bp = {in_reads_bp}, w_reads_bp = {w_reads_bp}, out_reads_bp = {out_reads_bp}, ignore_bypasses = {ignore_bypasses}")
                         if isinstance(in_btwn, MemLevel):
                             ## actual_dataflow_bp for the in_btwn level
                             # ignore loops at one
@@ -1015,10 +1031,11 @@ class MemLevel(Level):
                                 per_layer_w_reads_bp.append(int(w_reads_bp))
                             if w_reads_bp:
                                 if stationarity_to_address:
+                                    print(f"Level: {self.name}: Handling Weight Bypass with stationarity_to_address = {stationarity_to_address}")
                                     for layer_idx in range(num_layers):
                                         layer_read = 1
                                         i = len(actual_dataflow_per_layer_bp[layer_idx]) - 1
-                                        while i >= 0 and (actual_dataflow_per_layer_bp[layer_idx][i] not in self.arch.coupling.flat_w_coupling):
+                                        while i >= 0 and (actual_dataflow_per_layer_bp[layer_idx][i] not in self.arch.coupling.getFlatWeightCoupling(layer_idx)):
                                             i -= 1
                                         stationarity_to_address = i < 0
                                         innermost_dim_sum = self.arch.coupling.getDimSum('w', actual_dataflow_per_layer_bp[layer_idx][i], 2, layer_idx) if i >= 0 else None
@@ -1034,6 +1051,7 @@ class MemLevel(Level):
 #                                    print(f"per_layer_w_reads_bp = {per_layer_w_reads_bp}")
 #                                    print(f"Total W reads: {w_reads_bp}")
                                 else:
+                                    print(f"Level: {self.name}: Handling Weight Bypass with stationarity_to_address = {stationarity_to_address}")
                                     ## I'M NOT HANDLING THIS PROBLEM CORRECTLY
                                     for layer_idx in range(num_layers):
                                         per_layer_w_reads_bp[layer_idx] *= in_btwn_factors_full_per_layer[layer_idx]
@@ -1044,16 +1062,16 @@ class MemLevel(Level):
                                 if stationarity_to_address:
                                     for layer_id in range(num_layers):
                                         layer_read = 1
-                                        i = len(actual_dataflow_per_layer_bp[layer_id]) - 1
-                                        while i >= 0 and (actual_dataflow_per_layer_bp[layer_id][i] not in self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)):
+                                        i = len(actual_dataflow_per_layer_bp[layer_id + 1]) - 1
+                                        while i >= 0 and (actual_dataflow_per_layer_bp[layer_id + 1][i] not in self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)):
                                             i -= 1
                                         stationarity_to_address = i < 0
-                                        innermost_dim_sum = self.arch.coupling.getDimSum('int_in', actual_dataflow_per_layer_bp[layer_id][i], 2, layer_id) if i >= 0 else None
-                                        if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in in_btwn.next_spatials) and (i == len(actual_dataflow_per_layer_bp[layer_id]) - 1 or self.multiple_reuses)):
-                                            layer_read //= distinct_values([in_btwn.tile_sizes[dim] for dim in innermost_dim_sum], [self.arch.getIntermediateInStrideput(dim, layer_id) for dim in innermost_dim_sum])
-                                            layer_read *= distinct_values([in_btwn.factors.dimProduct(actual_dataflow_per_layer_bp[layer_id][i])*in_btwn.tile_sizes[actual_dataflow_per_layer_bp[layer_id][i]]] + [in_btwn.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_per_layer_bp[layer_id][i]], [self.arch.getIntermediateInStrideput(actual_dataflow_per_layer_bp[layer_id][i], layer_id)] + [self.arch.getIntermediateInStrideput(dim, layer_id) for dim in innermost_dim_sum if dim != actual_dataflow_per_layer_bp[layer_id][i]])
+                                        innermost_dim_sum = self.arch.coupling.getDimSum('int_in', actual_dataflow_per_layer_bp[layer_id + 1][i], 2, layer_id) if i >= 0 else None
+                                        if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in in_btwn.next_spatials) and (i == len(actual_dataflow_per_layer_bp[layer_id + 1]) - 1 or self.multiple_reuses)):
+                                            layer_read //= distinct_values([in_btwn.tile_sizes[dim] for dim in innermost_dim_sum], [self.arch.getIntermediateInputStride(dim, layer_id) for dim in innermost_dim_sum])
+                                            layer_read *= distinct_values([in_btwn.factors.dimProduct(actual_dataflow_per_layer_bp[layer_id + 1][i]) * in_btwn.tile_sizes[actual_dataflow_per_layer_bp[layer_id + 1][i]]] + [in_btwn.tile_sizes[dim] for dim in innermost_dim_sum if dim != actual_dataflow_per_layer_bp[layer_id + 1][i]], [self.arch.getIntermediateInputStride(actual_dataflow_per_layer_bp[layer_id + 1][i], layer_id)] + [self.arch.getIntermediateInputStride(dim, layer_id) for dim in innermost_dim_sum if dim != actual_dataflow_per_layer_bp[layer_id + 1][i]])
                                             i -= 1
-                                        for dim in actual_dataflow_per_layer_bp[layer_id][:i+1]:
+                                        for dim in actual_dataflow_per_layer_bp[layer_id + 1][:i+1]:
                                             layer_read *= in_btwn.factors.dimProduct(dim)
                                         per_layer_int_in_reads_bp[layer_id] = layer_read
                                     int_in_reads_bp = sum(per_layer_int_in_reads_bp.values())
@@ -1105,10 +1123,9 @@ class MemLevel(Level):
                             if out_reads_bp:
                                 if stationarity_to_address:
                                     i = len(actual_dataflow_per_layer_bp[out_layer_id]) - 1
-                                    while i >= 0 and (actual_dataflow_per_layer_bp[out_layer_id][i] not in self.arch.coupling.flat_out_coupling):
+                                    while i >= 0 and (actual_dataflow_per_layer_bp[out_layer_id][i] not in self.arch.coupling.getFlatOutCoupling()):
                                         i -= 1
                                     stationarity_to_address = i < 0
-                                    ## DOUBT
                                     innermost_dim_sum = self.arch.coupling.getDimSum('out', actual_dataflow_per_layer_bp[out_layer_id][i], 2) if i >= 0 else None
                                     #print(f"Level: {self.name}: innermost_dim_sum_out = {innermost_dim_sum}, i = {i}, actual_dataflow = {actual_dataflow_bp}")
                                     if innermost_dim_sum and (all(all(sp_level.factors.dimProduct(dim) == 1 for dim in innermost_dim_sum) for sp_level in in_btwn.next_spatials) and (i == len(actual_dataflow_per_layer_bp[out_layer_id]) - 1 or self.multiple_reuses)):
@@ -1118,7 +1135,7 @@ class MemLevel(Level):
                                     for dim in actual_dataflow_per_layer_bp[out_layer_id][:i+1]:
                                         out_reads_bp *= in_btwn.factors.dimProduct(dim)
                                         out_writes_bp *= in_btwn.factors.dimProduct(dim)
-                                        if dim not in self.arch.coupling.flat_out_coupling:
+                                        if dim not in self.arch.coupling.getFlatOutCoupling():
                                             out_reads_bp_factors *= in_btwn.factors.dimProduct(dim)
                                 else:
                                     out_reads_bp = in_btwn_factors_full_per_layer[num_layers-1]*out_reads_bp
@@ -1127,6 +1144,7 @@ class MemLevel(Level):
                             #in_btwn.bp_stationarity_solved_here[operand] = stationarity_to_address != old_stationarity_to_address
                         ## MODIFY MULBYDIM
                         else:
+                            print(f"Level: {self.name}, not MemLevel")
                             ## mulByDim calculates MOPs for spatial levels
                             ## it multiplies the MOPs by the factors of the dimensions (i.e. how many parallel instances are there)
                             in_reads_bp, per_layer_w_reads_bp, per_layer_int_in_reads_bp, per_layer_int_out_reads_bp, per_layer_int_out_writes_bp, out_reads_bp, out_writes_bp = in_btwn.mulByDim(in_reads_bp, per_layer_w_reads_bp, per_layer_int_in_reads_bp, per_layer_int_out_reads_bp, per_layer_int_out_writes_bp, out_reads_bp, out_writes_bp)
@@ -1582,9 +1600,9 @@ class FanoutLevel(SpatialLevel):
     # here you receive the reads/writes done by an instance, and need to
     # return the reads/writes that are needed for all instances.    
     def mulByDim(self, in_reads : int, per_layer_w_reads : dict[int, int], per_layer_int_in_reads : dict[int, int], per_layer_int_out_reads : dict[int, int], per_layer_int_out_writes : dict[int, int], out_reads : int, out_writes : int) -> tuple[int, dict[int, int], dict[int, int], dict[int, int], dict[int, int], int, int]:
-#        print(f"SONO IN MULBYDIM per_layer_in_reads: {per_layer_in_reads}, per_layer_w_reads: {per_layer_w_reads}, out_reads: {out_reads}, out_writes: {out_writes}")
+        print(f"SONO IN MULBYDIM self.name {self.name} in_reads: {in_reads}, per_layer_w_reads: {per_layer_w_reads}, out_reads: {out_reads}, out_writes: {out_writes}, per_layer_int_in_reads: {per_layer_int_in_reads}, per_layer_int_out_reads: {per_layer_int_out_reads}, per_layer_int_out_writes: {per_layer_int_out_writes}")
         if self.selective_multicast_support:
-            for dim_sum in self.arch.coupling.in_coupling:
+            for dim_sum in self.arch.coupling.getInputCoupling():
                 if len(dim_sum) > 1:
                     strides = [self.arch.getInStride(dim) for dim in dim_sum]
                     in_reads //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
@@ -1599,16 +1617,15 @@ class FanoutLevel(SpatialLevel):
                         per_layer_w_reads[layer_idx] *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
                     else:
                         per_layer_w_reads[layer_idx] *= self.factors.dimProduct(dim_sum[0])
-            for layer_idx, int_in_coupling in self.arch.coupling.getIntermediateInputCoupling().items():     
-                    if layer_idx in per_layer_int_in_reads:
-                        for dim_sum in int_in_coupling:
-                            if len(dim_sum) > 1:
-                                strides = [self.arch.getIntermediateInStrideputs(dim, layer_idx) for dim in dim_sum]
-                                per_layer_int_in_reads[layer_idx] //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
-                                per_layer_int_in_reads[layer_idx] *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
-                            else:
-                                per_layer_int_in_reads[layer_idx] *= self.factors.dimProduct(dim_sum[0])
-            
+            for layer_idx in range(self.arch.coupling.getNumLayers()) - 1:
+                for dim_sum in self.arch.coupling.getIntermediateInputCoupling(layer_idx):
+                    if len(dim_sum) > 1:
+                        strides = [self.arch.getIntermediateInputStride(dim, layer_idx) for dim in dim_sum]
+                        per_layer_int_in_reads[layer_idx] //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
+                        per_layer_int_in_reads[layer_idx] *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
+                    else:
+                        per_layer_int_in_reads[layer_idx] *= self.factors.dimProduct(dim_sum[0])
+    
             for dim_sum in self.arch.coupling.getOutputCoupling():
                 if len(dim_sum) > 1:
                     strides = [self.arch.getOutStride(dim) for dim in dim_sum]
@@ -1621,14 +1638,12 @@ class FanoutLevel(SpatialLevel):
             
             for layer_idx in range(self.arch.coupling.getNumLayers()):
                 per_layer_w_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatWeightCoupling(layer_idx))
-            
-            for layer_idx in per_layer_int_in_reads.keys():
-                per_layer_int_in_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatIntermediateInputCoupling(layer_idx))
 
-            for layer_idx in per_layer_int_out_reads.keys():
+            for layer_idx in range(self.arch.coupling.getNumLayers() - 1):
+                per_layer_int_in_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatIntermediateInputCoupling(layer_idx))
                 per_layer_int_out_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
 
-            out_reads *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.flat_out_coupling)
+            out_reads *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatOutputCoupling())
         if self.selective_reduction_support:
             for dim_sum in self.arch.coupling.getOutputCoupling():
                 if len(dim_sum) > 1:
@@ -1647,23 +1662,56 @@ class FanoutLevel(SpatialLevel):
                         else:
                             per_layer_int_out_writes[layer_id] *= self.factors.dimProduct(dim_sum[0])
         else:
-            out_writes *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.flat_out_coupling)
+            out_writes *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatOutputCoupling())
 
             for layer_id in per_layer_int_out_writes.keys():
                 per_layer_int_out_writes[layer_id] *= prod(self.factors.dimProduct(dim) for dim in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))        
         if not self.spatial_multicast_support:
-            in_reads *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.getFlatInputCoupling())           
+            
+            # dataflow_per_layer
+            dataflow_per_layer: dict[int, list[str]] = {}
+            if self.arch.coupling.getNumLayers() > 1:
+                for layer_id in range(self.arch.coupling.getNumLayers()):
+                    # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
+                    if layer_id == 0:
+                        print(f"getFlatInputCoupling(0): {self.arch.coupling.getFlatInputCoupling()}, getFlatWeightCoupling(0): {self.arch.coupling.getFlatWeightCoupling(0)}, getFlatIntermediateOutputCoupling(0): {self.arch.coupling.getFlatIntermediateOutputCoupling(0)}")
+                        layer_relevant_dims = (
+                            set(self.arch.coupling.getFlatInputCoupling()) |
+                            set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                            set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                        )
+                        print(f"Layer 0 relevant dims: {layer_relevant_dims}")
+                    elif layer_id == self.arch.coupling.getNumLayers() - 1:
+                        print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatOutputCoupling(): {self.arch.coupling.getFlatOutputCoupling()}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}")
+                        layer_relevant_dims = (
+                            set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                            set(self.arch.coupling.getFlatOutputCoupling()) |
+                            set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
+                        )
+                    else:
+                        print(f"getFlatWeightCoupling({layer_id}): {self.arch.coupling.getFlatWeightCoupling(layer_id)}, getFlatIntermediateInputCoupling({layer_id-1}): {self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)}, getFlatIntermediateOutputCoupling({layer_id}): {self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id)}")
+                        layer_relevant_dims = (
+                            set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                            set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)) |
+                            set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                        )
+                    dataflow_per_layer[layer_id] = [
+                        dim for dim in self.dataflow 
+                        if dim in layer_relevant_dims
+                    ]
+            else:
+                dataflow_per_layer[0] = self.dataflow.copy()
+            in_reads *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[0] if dim not in self.arch.coupling.getFlatInputCoupling())
             for layer_idx in range(self.arch.coupling.getNumLayers()):
-                per_layer_w_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_w_coupling[layer_idx])
-            for layer_idx in per_layer_int_in_reads.keys():
-                per_layer_int_in_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.getFlatIntermediateInputCoupling(layer_idx))
-            for layer_idx in per_layer_int_out_reads.keys():
-                per_layer_int_out_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-            out_reads *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_out_coupling)
+                per_layer_w_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[layer_idx] if dim not in self.arch.coupling.getFlatWeightCoupling(layer_idx))
+            for layer_idx in range(self.arch.coupling.getNumLayers() - 1):
+                per_layer_int_in_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[layer_idx + 1] if dim not in self.arch.coupling.getFlatIntermediateInputCoupling(layer_idx))
+                per_layer_int_out_reads[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[layer_idx] if dim not in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
+            out_reads *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[self.arch.coupling.getNumLayers() - 1] if dim not in self.arch.coupling.getFlatOutputCoupling())
         if not self.spatial_reduction_support:
-            out_writes *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.flat_out_coupling)
-            for layer_idx in per_layer_int_out_writes.keys():
-                per_layer_int_out_writes[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in self.dataflow if dim not in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
+            out_writes *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[0] if dim not in self.arch.coupling.getFlatOutputCoupling())
+            for layer_idx in range(self.arch.coupling.getNumLayers() - 1):
+                per_layer_int_out_writes[layer_idx] *= prod(self.factors.dimProduct(dim) for dim in dataflow_per_layer[layer_idx] if dim not in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
         return in_reads, per_layer_w_reads, per_layer_int_in_reads, per_layer_int_out_reads, per_layer_int_out_writes, out_reads, out_writes
 
     """
