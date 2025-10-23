@@ -25,10 +25,39 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     last_in_reads, last_w_reads, last_out_reads, last_out_writes = 0, 0, 0, 0
     last_int_in_reads, last_int_out_reads = 0, 0
     acc_out_reads_factors = 1
+
+
+
     #print("DEBUG updateStats:)")
     # NOTE: here we compute total MOPs, not per-instance
     for i in range(len(arch)):
         level = arch[i]
+        # Initialize dataflow per layer
+        dataflow_per_layer = {}
+        if num_layers > 1:
+            for layer_idx in range(num_layers):
+                if layer_idx == 0:
+                    layer_relevant_dims = (
+                        set(arch.coupling.getFlatInputCoupling()) |
+                        set(arch.coupling.getFlatWeightCoupling(layer_idx))|
+                        set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
+                    )
+                elif layer_idx == num_layers - 1:
+                    layer_relevant_dims = (
+                        set(arch.coupling.getFlatOutputCoupling()) |
+                        set(arch.coupling.getFlatWeightCoupling(layer_idx))|
+                        set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1))
+                    )
+                else:
+                    layer_relevant_dims = (
+                        set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1)) |
+                        set(arch.coupling.getFlatWeightCoupling(layer_idx))|
+                        set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
+                    )
+                dataflow_per_layer[layer_idx] = [dim for dim in level.dataflow if dim in layer_relevant_dims]
+        else:
+            dataflow_per_layer[0] = level.dataflow.copy()
+
         if isinstance(level, MemLevel):
             # multiply by spatial_iterations too because memory is replicated spatially
             print("\n\nQuesto mops è chiamato da update stats")     
@@ -40,40 +69,40 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             int_in_reads = sum(per_layer_int_in_reads.values()) if per_layer_int_in_reads else 0
             int_out_reads = sum(per_layer_int_out_reads.values()) if per_layer_int_out_reads else 0
             int_out_writes = sum(per_layer_int_out_writes.values()) if per_layer_int_out_writes else 0
-#            print(f"DEBUG updateStats:) Level {level.name}:")
-#            print(f"Level: {level.name}"
-#                  f"\n  per_layer_in_reads: {per_layer_in_reads}"
-#                  f"\n  per_layer_w_reads: {per_layer_w_reads}"
-#                  f"\n  out_reads: {out_reads}"
-#                  f"\n  out_writes: {out_writes}"
-#                  f"\n  out_reads_factors: {out_reads_factors}")
-            #print(f"DEBUG updateStats:) Level {level.name}: temporal_iterations = {temporal_iterations}, spatial_iterations = {spatial_iterations}")
+            print(f"DEBUG updateStats pre scaling: Level {level.name}:"
+                  f"\n  in_reads: {in_reads}"
+                  f"\n  per_layer_w_reads: {per_layer_w_reads}"
+                  f"\n  w_reads: {w_reads}"
+                  f"\n  per_layer_int_in_reads: {per_layer_int_in_reads}"
+                  f"\n  per_layer_int_out_reads: {per_layer_int_out_reads}"
+                  f"\n  out_reads: {out_reads}"
+                  f"\n  out_reads_factors: {out_reads_factors}")
+            print(f"temporal_iterations_per_layer before update: {temporal_iterations_per_layer}, spatial_iterations_per_layer before update: {spatial_iterations_per_layer}")
             scale_per_layer = {}
             for layer_idx in range(num_layers):
                 scale_per_layer[layer_idx] = temporal_iterations_per_layer[layer_idx]*spatial_iterations_per_layer[layer_idx]
+            print(f"scale per layer: {scale_per_layer}")
             in_reads = in_reads * scale_per_layer[0]
+            print(f"scaled in_reads: {in_reads}")
             for layer_id, w_read in per_layer_w_reads.items():
                 per_layer_w_reads[layer_id] = w_read * scale_per_layer[layer_id]
+            print(f"scaled per_layer_w_reads before sum: {per_layer_w_reads}")
             w_reads = sum(per_layer_w_reads.values())
             for layer_id, int_in_read in per_layer_int_in_reads.items():
-                per_layer_int_in_reads[layer_id] = int_in_read * scale_per_layer[layer_id]
+                per_layer_int_in_reads[layer_id] = int_in_read * scale_per_layer[layer_id+1]
+            print(f"scaled per_layer_int_in_reads before sum: {per_layer_int_in_reads}")
             int_in_reads = sum(per_layer_int_in_reads.values()) 
             for layer_id, int_out_read in per_layer_int_out_reads.items():
                 per_layer_int_out_reads[layer_id] = int_out_read * scale_per_layer[layer_id]
+            print(f"scaled per_layer_int_out_reads before sum: {per_layer_int_out_reads}")
             int_out_reads = sum(per_layer_int_out_reads.values())
             for layer_id, int_out_write in per_layer_int_out_writes.items():
                 per_layer_int_out_writes[layer_id] = int_out_write * scale_per_layer[layer_id]
             int_out_writes = sum(per_layer_int_out_writes.values())
             out_reads = out_reads * scale_per_layer[num_layers - 1]
+            print(f"scaled out_reads: {out_reads}")
             out_writes = out_writes * scale_per_layer[num_layers - 1]
             out_reads_factors = out_reads_factors * acc_out_reads_factors
-# print(f"  scaled per_layer_in_reads: {per_layer_in_reads}"
-#                  f"\n  scaled per_layer_w_reads: {per_layer_w_reads}"
-#                  f"\n  scaled in_reads: {in_reads}"
-#                  f"\n  scaled w_reads: {w_reads}"
-#                  f"\n  scaled out_reads: {out_reads}"
-#                  f"\n  scaled out_writes: {out_writes}"
-#                  f"\n  acc_out_reads_factors: {out_reads_factors}")
             if not bias_read and out_reads_factors != 0:
                 out_reads = (out_reads*(out_reads_factors - 1))//out_reads_factors
             if 'in' not in level.bypasses:
@@ -103,6 +132,16 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     last_out_writes = out_writes
             else:
                 level.setAboveMOPs(0, 0)
+            print(f"DEBUG updateStats post scaling: Level {level.name}:"
+                  f"\n  in_reads: {in_reads}"
+                  f"\n  per_layer_w_reads: {per_layer_w_reads}"
+                  f"\n  w_reads: {w_reads}"
+                  f"\n  per_layer_int_in_reads: {per_layer_int_in_reads}"
+                  f"\n  int_in_reads: {int_in_reads}"
+                  f"\n  per_layer_int_out_reads: {per_layer_int_out_reads}"
+                  f"\n  int_out_reads: {int_out_reads}"
+                  f"\n  out_reads: {out_reads}"
+                  f"\n  out_reads_factors: {out_reads_factors}")
             ## Update level MOPs
             level.setMOPs(
                 in_reads=in_reads,
@@ -156,50 +195,55 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     dataflow_per_layer[layer_idx] = [dim for dim in level.dataflow if dim in layer_relevant_dims]
             else:
                 dataflow_per_layer[0] = level.dataflow.copy()
-            # Update temporal and spatial iterations per layer
+            # Update temporal iterations per layer
             for layer_idx in range(num_layers):
                 layer_factors_product = 1
                 for dim in dataflow_per_layer[layer_idx]:
                     layer_factors_product *= level.factors.dimProduct(dim)
+                    print(f"Updated considering level: {level.name}, this dim: {dim} is considered in temporal_iterations_per_layer[{layer_idx}]")
                 temporal_iterations_per_layer[layer_idx] *= layer_factors_product
             acc_out_reads_factors *= math.prod(level.factors.dimProduct(dim) for dim in dataflow_per_layer[num_layers-1] if dim not in level.arch.coupling.flat_out_coupling)
         elif isinstance(level, FanoutLevel):
             for layer_idx in range(num_layers):
-                layer_factors_product = 1
-                for dim in level.dataflow:
-                    layer_factors_product *= level.factors.dimProduct(dim)
-                spatial_iterations_per_layer[layer_idx] *= layer_factors_product
-            # spatial reuse of an operand occurs if the fanout is along a dimension not coupled to such operand,
-            # hence, the operand is read once, but written once per instance (modeled by last_XX_reads)
-            # TODO: add NoC modeling and accumulate data transfer energy here!
-            
-            ## DOUBT 
-            iterations_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
-            for layer_idx in range(num_layers):
-                for dim in dataflow_per_layer[layer_idx]:
-                    iterations_per_layer[layer_idx] *= level.factors.dimProduct(dim)
+                # spatial reuse of an operand occurs if the fanout is along a dimension not coupled to such operand,
+                # hence, the operand is read once, but written once per instance (modeled by last_XX_reads)
+                # TODO: add NoC modeling and accumulate data transfer energy here!
+                layer_spatial_iterations = 1
+                for dim in level.dataflow_per_layer[layer_idx]:
+                    layer_spatial_iterations *= level.factors.dimProduct(dim)
+                spatial_iterations_per_layer[layer_idx] *= layer_spatial_iterations
+
+                for dim in level.dataflow_per_layer[layer_idx]:
+                    layer_iterations = level.factors.dimProduct(dim)
+                    # Layer 0: has input and intermediate output
                     if layer_idx == 0:
                         if dim not in arch.coupling.getFlatInputCoupling():
-                            last_in_reads *= iterations_per_layer[layer_idx]
-                        if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
-                            last_w_reads *= iterations_per_layer[layer_idx]
+                            last_in_reads *= layer_iterations
                         if dim not in arch.coupling.getFlatIntermediateOutputCoupling(layer_idx):
-                            last_int_out_reads *= iterations_per_layer[layer_idx]
+                            last_int_out_reads *= layer_iterations
+                        if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
+                            last_w_reads *= layer_iterations
+                            
+                    # Last layer: has intermediate input and final output
                     elif layer_idx == num_layers - 1:
                         if dim not in arch.coupling.getFlatOutputCoupling():
-                            last_out_reads *= iterations_per_layer[layer_idx]
-                            last_out_writes *= iterations_per_layer[layer_idx]
-                        if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
-                            last_w_reads *= iterations_per_layer[layer_idx]
+                            last_out_reads *= layer_iterations
+                            last_out_writes *= layer_iterations
                         if dim not in arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1):
-                            last_int_in_reads *= iterations_per_layer[layer_idx]
+                            last_int_in_reads *= layer_iterations
+                        if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
+                            last_w_reads *= layer_iterations
+                            
+                    # Middle layers: have both intermediate input and output
                     else:
                         if dim not in arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1):
-                            last_int_in_reads *= iterations_per_layer[layer_idx]
-                        if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
-                            last_w_reads *= iterations_per_layer[layer_idx]
+                            last_int_in_reads *= layer_iterations
                         if dim not in arch.coupling.getFlatIntermediateOutputCoupling(layer_idx):
-                            last_int_out_reads *= iterations_per_layer[layer_idx]    
+                            last_int_out_reads *= layer_iterations
+                        if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
+                            last_w_reads *= layer_iterations
+                    
+            print(f"Updated considering level: {level.name}, this dim: {dim} is considered in spatial_iterations_per_layer[{layer_idx}]")
         elif isinstance(level, ComputeLevel):
             # TODO: remove cost of first output accumulate if bias_read is False!
             # => not needed because the cost of the add is << than the multiply!
@@ -266,30 +310,6 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             max_latency = max(max_latency, level.getSettedLatency())
             #print(f"Leakage level {level.name}: {level.Leakage(level.getSettedLatency())*powered_instances}")
             WMOPs += level.Leakage(level.getSettedLatency())*powered_instances
-            dataflow_per_layer = {}
-            if num_layers > 1:
-                for layer_idx in range(num_layers):
-                    if layer_idx == 0:
-                        layer_relevant_dims = (
-                            set(arch.coupling.getFlatInputCoupling()) |
-                            set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                            set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-                        )
-                    elif layer_idx == num_layers - 1:
-                        layer_relevant_dims = (
-                            set(arch.coupling.getFlatOutputCoupling()) |
-                            set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                            set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1))
-                        )
-                    else:
-                        layer_relevant_dims = (
-                            set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1)) |
-                            set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                            set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-                        )
-                    dataflow_per_layer[layer_idx] = [dim for dim in level.dataflow if dim in layer_relevant_dims]
-            else:
-                dataflow_per_layer[0] = level.dataflow.copy()
             # Update temporal and spatial iterations per layer
             for layer_idx in range(num_layers):
                 layer_factors_product = 1

@@ -326,14 +326,10 @@ class Coupling:
             raise IndexError(f"Layer index {layer_index} not found in flat weight coupling.")
         elif operand == 'out':
             return self.flat_out_coupling
-        elif operand == 'int_in':
+        elif operand == 'int':
             if layer_index in self.flat_int_in_coupling:
                 return self.flat_int_in_coupling[layer_index]
-            raise IndexError(f"Layer index {layer_index} not found in flat intermediate input coupling.")
-        elif operand == 'int_out':
-            if layer_index in self.flat_int_out_coupling:
-                return self.flat_int_out_coupling[layer_index]
-            raise IndexError(f"Layer index {layer_index} not found in flat intermediate output coupling.")  
+            raise IndexError(f"Layer index {layer_index} not found in flat intermediate input/output coupling.")
         else:
             raise Exception(f"Unrecognized operand ({operand}) in coupling.")
     

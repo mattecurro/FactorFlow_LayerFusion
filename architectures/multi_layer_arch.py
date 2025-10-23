@@ -124,7 +124,7 @@ arch = fixed_multilayer_mapping_conv = Arch([
         value_access_energy = 1.97,
         bandwidth = 4,
         factors_constraints = {'C2': 2},
-        bypasses = ['in', 'out']
+        bypasses = ['in', 'int', 'out']
     ),
     MemLevel(
         name = "OutRegister",
