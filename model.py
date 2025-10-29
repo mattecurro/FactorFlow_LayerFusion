@@ -15,20 +15,13 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     print("é stato chiamato update stats! \n\n")
     assert arch.initialized, f"Arch {arch.name}: architecture not initialized, ensure to call 'initFactors' first."
     
-    # MOPs:
-    WMOPs = 0
+    WMOPs_per_layer = {layer_id: 0 for layer_id in range(arch.coupling.getNumLayers())}
     num_layers = arch.coupling.getNumLayers()
     temporal_iterations_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
     spatial_iterations_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
-    temporal_iterations = 1
-    # backward compatibility
     last_in_reads, last_w_reads, last_out_reads, last_out_writes = 0, 0, 0, 0
     last_int_in_reads, last_int_out_reads = 0, 0
     acc_out_reads_factors = 1
-
-
-
-    #print("DEBUG updateStats:)")
     # NOTE: here we compute total MOPs, not per-instance
     for i in range(len(arch)):
         level = arch[i]
@@ -78,9 +71,8 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                   f"\n  out_reads: {out_reads}"
                   f"\n  out_reads_factors: {out_reads_factors}")
             print(f"temporal_iterations_per_layer before update: {temporal_iterations_per_layer}, spatial_iterations_per_layer before update: {spatial_iterations_per_layer}")
-            scale_per_layer = {}
-            for layer_idx in range(num_layers):
-                scale_per_layer[layer_idx] = temporal_iterations_per_layer[layer_idx]*spatial_iterations_per_layer[layer_idx]
+            # Scale MOPs according to temporal and spatial iterations per layer
+            scale_per_layer = {layer_id: temporal_iterations_per_layer[layer_id]*spatial_iterations_per_layer[layer_id] for layer_id in range(num_layers)}
             print(f"scale per layer: {scale_per_layer}")
             in_reads = in_reads * scale_per_layer[0]
             print(f"scaled in_reads: {in_reads}")
@@ -103,6 +95,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             print(f"scaled out_reads: {out_reads}")
             out_writes = out_writes * scale_per_layer[num_layers - 1]
             out_reads_factors = out_reads_factors * acc_out_reads_factors
+            # Adjust for bias read if needed, update writes, DRAINS management
             if not bias_read and out_reads_factors != 0:
                 out_reads = (out_reads*(out_reads_factors - 1))//out_reads_factors
             if 'in' not in level.bypasses:
@@ -115,7 +108,6 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 last_w_reads = w_reads
             else:
                 w_writes = 0
-            # Handle intermediate operand bypasses
             if 'int' not in level.bypasses:
                 int_in_writes = last_int_in_reads   # intermediate input reads above are written here
                 int_out_writes += last_int_out_reads # intermediate output reads above are written here
@@ -152,57 +144,33 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 out_reads=out_reads,
                 out_writes=out_writes
             )
-            # Store individual operand reads for backward compatibility
-            level.in_reads = in_reads
-            level.w_reads = w_reads
-            level.int_in_reads = int_in_reads
-            level.int_out_reads = int_out_reads
-            level.out_reads = out_reads
-            level.int_in_writes = int_in_writes
-            level.int_out_writes = int_out_writes
-            level.temporal_iterations_per_layer = temporal_iterations_per_layer.copy()
-            level.spatial_iterations_per_layer = spatial_iterations_per_layer.copy()
-            
-            
+            level.temporal_iterations_per_layer = temporal_iterations_per_layer.copy()  
             # Calculate total reads and writes for energy calculation
             total_reads = in_reads + w_reads + int_in_reads + int_out_reads + out_reads
-            total_writes = in_writes + w_writes + int_in_writes + int_out_writes + out_writes
-            
-            level.active_instances = sum(spatial_iterations_per_layer.values())
-            WMOPs += level.WMOPs(total_reads, total_writes)
-
-            dataflow_per_layer = {}
+            total_writes = in_writes + w_writes + int_in_writes + int_out_writes + out_writes            
+            total_reads_per_layer = {layer_id: 0 for layer_id in range(num_layers)}
             if num_layers > 1:
-                for layer_idx in range(num_layers):
-                    if layer_idx == 0:
-                        layer_relevant_dims = (
-                            set(arch.coupling.getFlatInputCoupling()) |
-                            set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                            set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-                        )
-                    elif layer_idx == num_layers - 1:
-                        layer_relevant_dims = (
-                            set(arch.coupling.getFlatOutputCoupling()) |
-                            set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                            set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1))
-                        )
-                    else:
-                        layer_relevant_dims = (
-                            set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1)) |
-                            set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                            set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-                        )
-                    dataflow_per_layer[layer_idx] = [dim for dim in level.dataflow if dim in layer_relevant_dims]
+                total_reads_per_layer[0] = in_reads + per_layer_w_reads.get(0, 0) + per_layer_int_out_reads.get(0, 0)
+                for layer_idx in range(1, num_layers - 1):
+                    total_reads_per_layer[layer_idx] = per_layer_int_in_reads.get(layer_idx - 1, 0) + per_layer_w_reads.get(layer_idx, 0) + per_layer_int_out_reads.get(layer_idx, 0)
+                total_reads_per_layer[num_layers - 1] = per_layer_int_in_reads.get(num_layers - 2, 0) + per_layer_w_reads.get(num_layers - 1, 0) + out_reads
+                for layer_id in range(num_layers):
+                    print(f"Level {level.name} total_reads_per_layer[{layer_id}]: {total_reads_per_layer[layer_id]}")
+                    WMOPs_per_layer[layer_id] += level.WMOPs(total_reads_per_layer[layer_id], total_writes)
             else:
-                dataflow_per_layer[0] = level.dataflow.copy()
+                total_reads = in_reads + w_reads + out_reads
+                WMOPs_per_layer[0] += level.WMOPs(total_reads, total_writes)
+
+            level.active_instances_per_layer = spatial_iterations_per_layer.copy()
+            
             # Update temporal iterations per layer
             for layer_idx in range(num_layers):
                 layer_factors_product = 1
                 for dim in dataflow_per_layer[layer_idx]:
                     layer_factors_product *= level.factors.dimProduct(dim)
-                    print(f"Updated considering level: {level.name}, this dim: {dim} is considered in temporal_iterations_per_layer[{layer_idx}]")
+#                    print(f"Updated considering level: {level.name}, this dim: {dim} is considered in temporal_iterations_per_layer[{layer_idx}]")
                 temporal_iterations_per_layer[layer_idx] *= layer_factors_product
-            acc_out_reads_factors *= math.prod(level.factors.dimProduct(dim) for dim in dataflow_per_layer[num_layers-1] if dim not in level.arch.coupling.flat_out_coupling)
+            acc_out_reads_factors *= math.prod(level.factors.dimProduct(dim) for dim in dataflow_per_layer[num_layers-1] if dim not in level.arch.coupling.getFlatOutputCoupling())
         elif isinstance(level, FanoutLevel):
             for layer_idx in range(num_layers):
                 # spatial reuse of an operand occurs if the fanout is along a dimension not coupled to such operand,
@@ -212,7 +180,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 for dim in level.dataflow_per_layer[layer_idx]:
                     layer_spatial_iterations *= level.factors.dimProduct(dim)
                 spatial_iterations_per_layer[layer_idx] *= layer_spatial_iterations
-
+                # Update last_operand_reads accordingly
                 for dim in level.dataflow_per_layer[layer_idx]:
                     layer_iterations = level.factors.dimProduct(dim)
                     # Layer 0: has input and intermediate output
@@ -222,8 +190,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         if dim not in arch.coupling.getFlatIntermediateOutputCoupling(layer_idx):
                             last_int_out_reads *= layer_iterations
                         if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
-                            last_w_reads *= layer_iterations
-                            
+                            last_w_reads *= layer_iterations                            
                     # Last layer: has intermediate input and final output
                     elif layer_idx == num_layers - 1:
                         if dim not in arch.coupling.getFlatOutputCoupling():
@@ -232,8 +199,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         if dim not in arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1):
                             last_int_in_reads *= layer_iterations
                         if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
-                            last_w_reads *= layer_iterations
-                            
+                            last_w_reads *= layer_iterations                           
                     # Middle layers: have both intermediate input and output
                     else:
                         if dim not in arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1):
@@ -241,15 +207,15 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         if dim not in arch.coupling.getFlatIntermediateOutputCoupling(layer_idx):
                             last_int_out_reads *= layer_iterations
                         if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
-                            last_w_reads *= layer_iterations
-                    
+                            last_w_reads *= layer_iterations                    
             print(f"Updated considering level: {level.name}, this dim: {dim} is considered in spatial_iterations_per_layer[{layer_idx}]")
         elif isinstance(level, ComputeLevel):
             # TODO: remove cost of first output accumulate if bias_read is False!
             # => not needed because the cost of the add is << than the multiply!
-            level.temporal_iterations = sum(temporal_iterations_per_layer.values())
-            level.active_instances = sum(spatial_iterations_per_layer.values())
-            WMOPs += level.computeCost(level.temporal_iterations*level.active_instances)
+            level.temporal_iterations_per_layer = temporal_iterations_per_layer.copy()
+            level.active_instances_per_layer = spatial_iterations_per_layer.copy()
+            for layer_id in range(num_layers):
+                WMOPs_per_layer[layer_id] += level.computeCostPerLayer(layer_id, temporal_iterations_per_layer[layer_id]*level.active_instances_per_layer[layer_id])
             # compute is meant to be the innermost level
             break
     
@@ -267,11 +233,22 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
         level = arch[i]
         previous_fanout_pe_to_pe_warmup = 0
         if isinstance(level, MemLevel):
-            scaling = level.active_instances*level.temporal_iterations
-            cc_per_all_tiles = cc_per_tile*level.factors.fullProduct()
-            scaled_cc_per_all_tiles = scaling*cc_per_all_tiles
-            ideal_bandwidth_read = level.getRead()/scaled_cc_per_all_tiles # original -more readable- formulation: (level.getRead()/scaling)/(cc_per_tile*level.factors.fullProduct())
-            ideal_bandwidth_update = level.getUpdate()/scaled_cc_per_all_tiles
+            scaling_per_layer = {layer_id: level.active_instances_per_layer[layer_id] * level.temporal_iterations_per_layer[layer_id] for layer_id in range(num_layers)}
+            layer_factors_full = {layer_id: 1 for layer_id in range(num_layers)}
+            for layer_id in range(num_layers):
+                for dim in dataflow_per_layer[layer_id]:
+                    layer_factors_full[layer_id] *= level.factors.dimProduct(dim)
+            cc_per_all_tiles_per_layer = {layer_id: cc_per_tile*layer_factors_full[layer_id] for layer_id in range(num_layers)}
+            scaled_cc_per_all_tiles = {layer_id: cc_per_all_tiles_per_layer[layer_id]*scaling_per_layer[layer_id] for layer_id in range(num_layers)}
+            ideal_bandwidth_read_per_layer = {}
+            ideal_bandwidth_update_per_layer = {}
+            ideal_bandwidth_fill_per_layer = {}
+            ideal_bandwidth_drain_per_layer = {}
+            for layer_id in range(num_layers):
+                ideal_bandwidth_read_per_layer[layer_id] = level.getRead()/scaled_cc_per_all_tiles[layer_id]
+                ideal_bandwidth_update_per_layer[layer_id] = level.getUpdate()/scaled_cc_per_all_tiles[layer_id]
+                ideal_bandwidth_fill_per_layer[layer_id] = level.getFill()/scaled_cc_per_all_tiles[layer_id]
+                ideal_bandwidth_drain_per_layer[layer_id] = level.getDrain()/scaled_cc_per_all_tiles[layer_id] if not Settings.FREE_DRAINS else 0
             # TODO: this should get divided per-operand, as depending on the dataflow, an operand may have more or less iterations to be loaded
             # TODO: support double buffering on a per-operand basis
             # NOTE: the current implementation coincides with Timeloop's notion of Buffets, but it is not exact...
@@ -279,37 +256,61 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             #outermost_available_iterations = 1 if level.multiple_buffering == 1 else level.factors.dimProduct(level.dataflow[0])*(level.multiple_buffering - 1)
             #ideal_bandwidth_fill = (level.getFill()/scaling)/(cc_per_tile*level.factors.dimProduct(level.dataflow[1])*level.factors.dimProduct(level.dataflow[2])*outermost_available_iterations)
             #ideal_bandwidth_drain = (level.getDrain()/scaling)/(cc_per_tile*level.factors.dimProduct(level.dataflow[1])*level.factors.dimProduct(level.dataflow[2])*outermost_available_iterations)
-            ideal_bandwidth_fill = level.getFill()/scaled_cc_per_all_tiles
-            ideal_bandwidth_drain = level.getDrain()/scaled_cc_per_all_tiles if not Settings.FREE_DRAINS else 0
             # bandwidth is statically divided between reads and writes
             # NOTE: warmup cycles cannot be used to compensate for a lack of bandiwidth at regime
-            if ideal_bandwidth_read + ideal_bandwidth_drain <= level.read_bandwidth:
-                latency_read_drain = cc_per_all_tiles + previous_fanout_pe_to_pe_warmup*cc_per_tile
-            else:
-                latency_read_drain = ((level.getRead() + level.getDrain())/scaling)*(1/level.read_bandwidth) if not Settings.FREE_DRAINS else (level.getRead()/scaling)*(1/level.read_bandwidth)
-            if ideal_bandwidth_fill + ideal_bandwidth_update <= level.write_bandwidth:
-                latency_fill_update = cc_per_all_tiles + previous_fanout_pe_to_pe_warmup*cc_per_tile
-            else:
-                latency_fill_update = ((level.getFill() + level.getUpdate())/scaling)*(1/level.write_bandwidth)
-            latency = max(latency_read_drain, latency_fill_update)
-            stall_cycles = latency - cc_per_all_tiles
-            level.setLatency(latency_read_drain = latency_read_drain*level.temporal_iterations, latency_fill_update = latency_fill_update*level.temporal_iterations, cc_per_tile = cc_per_tile, stall_cycles = stall_cycles*level.temporal_iterations, ideal_bandwidth_read = ideal_bandwidth_read, ideal_bandwidth_update = ideal_bandwidth_update, ideal_bandwidth_fill = ideal_bandwidth_fill, ideal_bandwidth_drain = ideal_bandwidth_drain)
-            #Timeloop does this (loosing knowledge of true behaviour): cc_per_tile = cc_per_tile*level.factors.fullProduct()
+            latency_read_drain_per_layer = {}
+            latency_fill_update_per_layer = {}
+            for layer_id in range(num_layers):
+                if ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id] <= level.read_bandwidth:
+                    latency_read_drain_per_layer[layer_id] = cc_per_all_tiles_per_layer[layer_id] + previous_fanout_pe_to_pe_warmup * cc_per_tile
+                else:
+                    latency_read_drain_per_layer[layer_id] = ((level.getRead() + level.getDrain()) / scaling_per_layer[layer_id]) * (1 / level.read_bandwidth) if not Settings.FREE_DRAINS else (level.getRead() / scaling_per_layer[layer_id]) * (1 / level.read_bandwidth)
+                if ideal_bandwidth_fill_per_layer[layer_id] + ideal_bandwidth_update_per_layer[layer_id] <= level.write_bandwidth:
+                    latency_fill_update_per_layer[layer_id] = cc_per_all_tiles_per_layer[layer_id] + previous_fanout_pe_to_pe_warmup * cc_per_tile
+                else:
+                    latency_fill_update_per_layer[layer_id] = ((level.getFill() + level.getUpdate()) / scaling_per_layer[layer_id]) * (1 / level.write_bandwidth)
+            ## DOUBT
+            max_layer_latency = max(max(latency_read_drain_per_layer[layer_id], latency_fill_update_per_layer[layer_id]) for layer_id in range(num_layers))
+            
+            # Calculate stall cycles (use average across layers for now, or pick maximum)
+            avg_cc_per_all_tiles = sum(cc_per_all_tiles_per_layer.values()) / num_layers
+            stall_cycles = max_layer_latency - avg_cc_per_all_tiles            
+            # Use aggregated values for setLatency (you may need to adjust this based on your needs)
+            avg_latency_read_drain = sum(latency_read_drain_per_layer.values()) / num_layers
+            avg_latency_fill_update = sum(latency_fill_update_per_layer.values()) / num_layers
+            avg_ideal_bandwidth_read = sum(ideal_bandwidth_read_per_layer.values()) / num_layers
+            avg_ideal_bandwidth_update = sum(ideal_bandwidth_update_per_layer.values()) / num_layers
+            avg_ideal_bandwidth_fill = sum(ideal_bandwidth_fill_per_layer.values()) / num_layers
+            avg_ideal_bandwidth_drain = sum(ideal_bandwidth_drain_per_layer.values()) / num_layers
+            avg_temporal_iterations = sum(level.temporal_iterations_per_layer.values()) / num_layers
+            
+            level.setLatency(
+                latency_read_drain=avg_latency_read_drain * avg_temporal_iterations,
+                latency_fill_update=avg_latency_fill_update * avg_temporal_iterations,
+                cc_per_tile=cc_per_tile,
+                stall_cycles=stall_cycles * avg_temporal_iterations,
+                ideal_bandwidth_read=avg_ideal_bandwidth_read,
+                ideal_bandwidth_update=avg_ideal_bandwidth_update,
+                ideal_bandwidth_fill=avg_ideal_bandwidth_fill,
+                ideal_bandwidth_drain=avg_ideal_bandwidth_drain
+            )#Timeloop does this (loosing knowledge of true behaviour): cc_per_tile = cc_per_tile*level.factors.fullProduct()
             previous_fanout_pe_to_pe_warmup = 0
-            cc_per_tile = latency
+            cc_per_tile = max_layer_latency
         elif isinstance(level, FanoutLevel) and level.pe_to_pe:
             # pe-to-pe forwarding implies that the SA operates as a PIPELINE, which has overall latency equal to that of an operation but a warmup dependent on the mesh size
             previous_fanout_pe_to_pe_warmup = level.mesh - 1
     
     # Active instances, leakage, and final latency:
     temporal_iterations_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
-    powered_instances = 1
+    powered_instances_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
     for i in range(len(arch)):
         level = arch[i]
         if isinstance(level, MemLevel):
             max_latency = max(max_latency, level.getSettedLatency())
             #print(f"Leakage level {level.name}: {level.Leakage(level.getSettedLatency())*powered_instances}")
-            WMOPs += level.Leakage(level.getSettedLatency())*powered_instances
+            # Add leakage energy per layer 
+            for layer_id in range(num_layers):
+                WMOPs_per_layer[layer_id] += level.Leakage(level.getSettedLatency()) * powered_instances_per_layer[layer_id]
             # Update temporal and spatial iterations per layer
             for layer_idx in range(num_layers):
                 layer_factors_product = 1
@@ -317,17 +318,32 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     layer_factors_product *= level.factors.dimProduct(dim)
                 temporal_iterations_per_layer[layer_idx] *= layer_factors_product
         elif isinstance(level, FanoutLevel):
-            max_latency = max(max_latency, level.latency()*sum(temporal_iterations_per_layer.values()))
-            if level.power_gating_support:
-                powered_instances *= level.factors.fullProduct()
-            else:
-                powered_instances *= level.mesh
+            # Calculate max temporal iterations across all layers
+            max_temporal = max(temporal_iterations_per_layer.values())
+            max_latency = max(max_latency, level.latency() * max_temporal)
+            
+            # Update powered instances per layer
+            for layer_id in range(num_layers):
+                if level.power_gating_support:
+                    layer_factors_product = 1
+                    for dim in dataflow_per_layer[layer_id]:
+                        layer_factors_product *= level.factors.dimProduct(dim)
+                    powered_instances_per_layer[layer_id] *= layer_factors_product
+                else:
+                    powered_instances_per_layer[layer_id] *= level.mesh
+                    
         elif isinstance(level, ComputeLevel):
-            max_latency = max(max_latency, level.latency()*sum(temporal_iterations_per_layer.values()))
-            WMOPs += level.Leakage(level.latency())*powered_instances
+            max_temporal = max(temporal_iterations_per_layer.values())
+            max_latency = max(max_latency, level.latency() * max_temporal)
+            
+            for layer_id in range(num_layers):
+                WMOPs_per_layer[layer_id] += level.Leakage(level.latency() * temporal_iterations_per_layer[layer_id]) * powered_instances_per_layer[layer_id]
             break
     
-    return WMOPs, max_latency
+    # Sum up WMOPs across all layers for backward compatibility
+    total_WMOPs = sum(WMOPs_per_layer.values())
+
+    return total_WMOPs, max_latency
 
 """
 Weighted Arithmetic Intensity (WART)
@@ -380,9 +396,10 @@ def Energy(arch : Arch, pJ_to_uJ : bool = False) -> float:
         elif isinstance(level, FanoutLevel):
             continue
         elif isinstance(level, ComputeLevel):
-            WMOPs += level.computeCost(level.temporal_iterations*level.active_instances)
+            for layer_id in range(arch.coupling.getNumLayers()):
+                WMOPs += level.computeCostPerLayer(layer_id, level.temporal_iterations_per_layer[layer_id] * level.active_instances_per_layer[layer_id])
             break
-    return WMOPs*(10**-6 if pJ_to_uJ else 1)
+    return WMOPs * (10**-6 if pJ_to_uJ else 1)
 
 """
 Total read and write Memory Operations (MOPs)

@@ -550,6 +550,7 @@ class Factors(dict[str, dict[int, int]]):
     def fullProduct(self) -> int:
         return prod(self._dim_products.values())        
 
+
     """
     Recomputes the correct values for the dimProducts as of the current
     factors. Must be called any time factors are updated directly, without
