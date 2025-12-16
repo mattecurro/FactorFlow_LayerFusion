@@ -2,6 +2,112 @@ from computations import *
 from levels import *
 from arch import *
 
+arch = arch_depfin_complete = Arch([
+    MemLevel(
+        name = "DRAM",
+        size = 2**64-1, 
+        # 50 pJ/transferred bit (?)
+        value_access_energy = 50.0, 
+        bandwidth = 8, # as eyeriss (?) 
+        bypasses = [],
+        dataflow_constraints = ['C2', 'Z2', 'R2', 'S2', 'Q', 'P'], 
+        factors_constraints = {'C2': 1, 'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 10, 'P': 704}
+    ),
+    
+    # On-Chip SRAM: DepFiN ha memorie fisicamente separate per pesi e feature
+    # "1056kB Features, 524kB Weights" table 11
+    # "Both memories consist of multiple banks of single-port SRAMs" 
+    MemLevel(
+        name = "FeatureMemory", # FMEM
+        size = 1056 * 1024, # 1056 kB in bits
+        value_access_energy = 2.02, # SRAM eyeriss 
+        bandwidth = 128,
+        bypasses = ['w'],
+        dataflow_constraints = ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0'],
+        factors_constraints = {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}
+    ),
+    
+    MemLevel(
+        name = "WeightMemory", # WMEM
+        size = 524 * 1024, # 524 kB in bits
+        value_access_energy = 2.02, # SRAM eyeriss
+        bandwidth = 16, # "16 weights are provided in parallel" 
+        bypasses = ['in', 'int', 'out'],
+        dataflow_constraints = ['R0','S0'],
+        factors_constraints = {'R0': 3, 'S0': 3}
+    ),
+
+    FanoutLevel(
+        name = "SACols_2",
+        mesh = 128, 
+        dims = ['Q'], # Corrisponde a Ox (Output Width)
+        factors_constraints = {'Q': 128}
+    ),
+
+    # "spatially unrolling the output channel (OC) loop" 
+    # "16 equivalent weights for 16 different OCs are broadcasted horizontally" 
+    FanoutLevel(
+        name = "SARows_2", 
+        mesh = 16,
+        dims = ['Z2'], # Corrisponde a OC (Output Channels/K)
+        factors_constraints = {'Z2': 16}
+    ),
+
+    FanoutLevel(
+        name = "SACols_1",
+        mesh = 128, 
+        dims = ['X1'], # Corrisponde a Ox (Output Width)
+        factors_constraints = {'X1': 128}
+    ),
+
+    # "spatially unrolling the output channel (OC) loop" 
+    # "16 equivalent weights for 16 different OCs are broadcasted horizontally" 
+    FanoutLevel(
+        name = "SARows_1", 
+        mesh = 16,
+        dims = ['Z1'], # Corrisponde a OC (Output Channels/K)
+        factors_constraints = {'Z1': 16}
+    ),
+
+    FanoutLevel(
+        name = "SACols_0",
+        mesh = 128, 
+        dims = ['X0'], # Corrisponde a Ox (Output Width)
+        factors_constraints = {'X0': 128}
+    ),
+
+    # "spatially unrolling the output channel (OC) loop" 
+    # "16 equivalent weights for 16 different OCs are broadcasted horizontally" 
+    FanoutLevel(
+        name = "SARows_0", 
+        mesh = 16,
+        dims = ['Z0'], # Corrisponde a OC (Output Channels/K)
+        factors_constraints = {'Z0': 16}
+    ),
+
+    # Registri nei PE
+    # "Accumulation: fully in PE" 
+    # "Each PE therefore has ten accumulation registers" 
+    MemLevel(
+        name = "AccumulationOutRegister",
+        size = 10, # "Accumulation REGF (10x32b)"
+        value_access_energy = 1.34, # As per eyeriss
+        bandwidth = 1,
+        # Output stationarity: si accumula qui prima di scrivere in FMEM
+        bypasses = ['in', 'w'],
+        dataflow_constraints = ['X0'],
+        factors_constraints = {'X0': 1}
+    ),
+
+
+    ComputeLevel(
+        name = "Compute",
+        mesh = 1, # 1 MAC per PE
+        compute_energy = 0.21, # As per eyeriss 12nm
+        cycles = 1,
+        factors_constraints = {}
+    )
+], coupling=conv_3layers_coupling, name="DepFiN Architecture")
 
 # Create a 3-layer convolution coupling for the architecture
 #multilayer_conv_coupling = create_nlayer_conv_coupling(3)
@@ -84,121 +190,6 @@ arch_ez_depfin = Arch([
 ], coupling=easy_conv_3layers_coupling, name="DepFiN Architecture")
 
 
-arch = arch_depfin_complete = Arch([
-    MemLevel(
-        name = "DRAM",
-        size = 2**64-1, 
-        # 50 pJ/transferred bit (?)
-        value_access_energy = 50.0, 
-        bandwidth = 8, # as eyeriss (?) 
-        bypasses = [],
-        dataflow_constraints = ['C2', 'Z2', 'R2', 'S2', 'Q', 'P'], 
-        factors_constraints = {'C2': 1, 'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 10, 'P': 704}
-    ),
-    
-    # On-Chip SRAM: DepFiN ha memorie fisicamente separate per pesi e feature
-    # "1056kB Features, 524kB Weights" table 11
-    # "Both memories consist of multiple banks of single-port SRAMs" 
-      
-    MemLevel(
-        name = "FeatureMemory", # FMEM
-        size = 1056 * 1024, # 1056 kB in bits
-        value_access_energy = 2.02, # SRAM eyeriss 
-        bandwidth = 128,
-        bypasses = ['w'],
-        dataflow_constraints = ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0'],
-        factors_constraints = {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}
-    ),
-    
-    MemLevel(
-        name = "WeightMemory", # WMEM
-        size = 524 * 1024, # 524 kB in bits
-        value_access_energy = 2.02, # SRAM eyeriss
-        bandwidth = 16, # "16 weights are provided in parallel" 
-        bypasses = ['in', 'int', 'out'],
-        dataflow_constraints = ['R0','S0'],
-        factors_constraints = {'R0': 1, 'S0': 1}
-    ),
-
-    
-    # input reuse
-    FanoutLevel(
-        name = "SACols_2",
-        mesh = 128, 
-        dims = ['Q'], # Corrisponde a Ox (Output Width)
-        #factors_constraints = {'Q': 128}
-        factors_constraints = {'Q': 128}
-    ),
-
-    # Livello Spaziale 2: Righe (Parallelismo su Output Channels M)
-    # "spatially unrolling the output channel (OC) loop" 
-    # "16 equivalent weights for 16 different OCs are broadcasted horizontally" 
-    FanoutLevel(
-        name = "SARows_2", 
-        mesh = 16,
-        dims = ['Z2'], # Corrisponde a OC (Output Channels/K)
-        factors_constraints = {'Z2': 16}
-    ),
-
-    FanoutLevel(
-        name = "SACols_1",
-        mesh = 128, 
-        dims = ['X1'], # Corrisponde a Ox (Output Width)
-        #factors_constraints = {'Q': 128}
-        factors_constraints = {'X1': 128}
-    ),
-
-    # Livello Spaziale 2: Righe (Parallelismo su Output Channels M)
-    # "spatially unrolling the output channel (OC) loop" 
-    # "16 equivalent weights for 16 different OCs are broadcasted horizontally" 
-    FanoutLevel(
-        name = "SARows_1", 
-        mesh = 16,
-        dims = ['Z1'], # Corrisponde a OC (Output Channels/K)
-        factors_constraints = {'Z1': 16}
-    ),
-
-    FanoutLevel(
-        name = "SACols_0",
-        mesh = 128, 
-        dims = ['X0'], # Corrisponde a Ox (Output Width)
-        #factors_constraints = {'Q': 128}
-        factors_constraints = {'X0': 128}
-    ),
-
-    # Livello Spaziale 2: Righe (Parallelismo su Output Channels M)
-    # "spatially unrolling the output channel (OC) loop" 
-    # "16 equivalent weights for 16 different OCs are broadcasted horizontally" 
-    FanoutLevel(
-        name = "SARows_0", 
-        mesh = 16,
-        dims = ['Z0'], # Corrisponde a OC (Output Channels/K)
-        factors_constraints = {'Z0': 16}
-    ),
-
-    # Registri nei PE
-    # "Accumulation: fully in PE" 
-    # "Each PE therefore has ten accumulation registers" 
-    MemLevel(
-        name = "AccumulationOutRegister",
-        size = 10, # "Accumulation REGF (10x32b)"
-        value_access_energy = 1.34, # As per eyeriss
-        bandwidth = 1,
-        # Output stationarity: si accumula qui prima di scrivere in FMEM
-        bypasses = ['in', 'w'],
-        dataflow_constraints = ['X0'],
-        factors_constraints = {'X0': 1}
-    ),
-
-
-    ComputeLevel(
-        name = "Compute",
-        mesh = 1, # 1 MAC per PE
-        compute_energy = 0.21, # As per eyeriss 12nm
-        cycles = 1,
-        factors_constraints = {}
-    )
-], coupling=conv_3layers_coupling, name="DepFiN Architecture")
 
 """
 arch_depfin_mapping_changed = Arch([
