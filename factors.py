@@ -426,7 +426,7 @@ class Coupling:
         w_str = []
         
         for layer_id, w_coupling in self.w_coupling.items():
-            w_str.append(f"W{layer_id}: " + coup2str(w_coupling, self.w_strides[layer_id]))
+            w_str.append(f"W{layer_id}: " + coup2str(w_coupling, self.w_strides[layer_id]) + ",")
 
         # Add intermediate layer information
         int_str = []
@@ -597,11 +597,41 @@ class Factors(dict[str, dict[int, int]]):
     """
     def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1, int_bp: bool = 1) -> int:
         input_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.in_coupling)*in_bp
+        for dim_sum in arch.coupling.in_coupling:
+            for dim in dim_sum:
+                print(f"Dim {dim}: tile size {tile_sizes[dim]}, iterations {self._dim_products[dim]}")
+                print(f"Product: {tile_sizes[dim]*self._dim_products[dim]}")
+                print(f"len(dim_sum): {len(dim_sum)}")
+        print(f"Input size: {input_size}\n")
         output_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.out_coupling)*out_bp
+        for dim_sum in arch.coupling.out_coupling:
+            for dim in dim_sum:
+                print(f"Dim {dim}: tile size {tile_sizes[dim]}, iterations {self._dim_products[dim]}")
+                print(f"Product: {tile_sizes[dim]*self._dim_products[dim]}")
+                print(f"len(dim_sum): {len(dim_sum)}")
+        print(f"Output size: {output_size}\n")
         weight_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in w_coupling) for w_coupling in arch.coupling.w_coupling.values())*w_bp
+        for dim in dim_sum:
+            print(f"Dim {dim}: tile size {tile_sizes[dim]}, iterations {self._dim_products[dim]}")
+            print(f"Product: {tile_sizes[dim]*self._dim_products[dim]}")
+            print(f"len(dim_sum): {len(dim_sum)}")
+        print(f"Weight size: {weight_size}\n")
         intermediate_input_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_i_coupling) for int_i_coupling in arch.coupling.int_in_coupling.values())
-        intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
-        intermediate_size = (intermediate_input_size + intermediate_output_size)*int_bp
+        for int_i_coupling in arch.coupling.int_in_coupling.values():
+            for dim_sum in int_i_coupling:
+                for dim in dim_sum:
+                    print(f"Dim {dim}: tile size {tile_sizes[dim]}, iterations {self._dim_products[dim]}")
+                    print(f"len(dim_sum): {len(dim_sum)}")
+                print(f"sum for dim_sum {dim_sum}: {sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1}")
+            print(f"prod: {prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_i_coupling)}")
+            print(f"end int_i\n")
+        print(f"Intermediate input size: {intermediate_input_size}")
+#        intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
+#        intermediate_size = (intermediate_input_size + intermediate_output_size)*int_bp
+        intermediate_size = intermediate_input_size*int_bp
+        print(f"Total intermediate size (input + output): {intermediate_size}\n")
+        print(f"input_size: {input_size}, output_size: {output_size}, weight_size: {weight_size}, intermediate_size: {intermediate_size}")
+        print(f"Total mem footprint: {input_size + output_size + weight_size + intermediate_size}\n\n\n")
         return input_size + output_size + weight_size + intermediate_size
         # TODO: uncomment me to fix invalid mappings!
         #return (prod(distinct_values([tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum], [arch.getInStride(dim) for dim in dim_sum]) for dim_sum in arch.coupling.in_coupling)*in_bp +

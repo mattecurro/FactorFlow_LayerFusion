@@ -1,5 +1,26 @@
 from factors import Shape, Coupling
 
+# DIMENSIONS and COUPLING for 2 Layer GEMM:
+# C0: Filter0 depth/Input depth
+# Y: Intermediate Out height/Input height
+# Z: Filter0 num/Intermediate Out depth  
+# C1: Filter1 depth/Intermediate In depth
+# P: Out height
+# C2: Filter1 num/Out depth
+# MAC1: Intermediate_Out[z][y] += W0[z][c0] * In[c0][y]
+# MAC2: Out[c2][p] += W1[c2][c1] * Intermediate_In[c1][p]
+gemm_2layers_coupling = Coupling(
+                                dims = ['C0', 'Y', 'Z', 'C1', 'P', 'C2'],
+                                in_coupling = ['C0', 'Y'],        # In
+                                w_coupling = {
+                                    0: ['Z', 'C0'],               # W0
+                                    1: ['C2', 'C1']               # W1
+                                },
+                                int_in_coupling = { 0: ['C1', 'P']},       # Intermediate_Out
+                                int_out_coupling = { 0: ['Z', 'Y'] },      # Intermediate_In
+                                out_coupling = ['C2', 'P'])                # Out
+
+
 # DIMENSION and COUPLING for 2 Layers Convolution:
 # C0: Filter0 depth/Input depth
 # Y: Intermediate Out height
@@ -29,6 +50,44 @@ conv_2layers_coupling = Coupling(
                                 int_in_coupling = { 0: ['C1', ['P', 'R1'], ['Q', 'S1']]},                      # Intermediate_Out
                                 int_out_coupling = { 0: ['Z', 'Y', 'X'] },      # Intermediate_In
                                 out_coupling = ['C2', 'P', 'Q'])                       # Out
+
+conv_3layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],               # In
+    w_coupling= {
+        0: ['Z0', 'C0', 'R0', 'S0'],                                # W0
+        1: ['Z1', 'C1', 'R1', 'S1'],                                # W1
+        2: ['Z2', 'C2', 'R2', 'S2']                                 # W2
+    },
+    int_in_coupling = {
+        0: ['C1', ['Y1', 'R1'], ['X1', 'S1']],                      # Intermediate_Out L1
+        1: ['C2', ['P', 'R2'], ['Q', 'S2']]                         # Intermediate_Out L2
+    },
+    int_out_coupling = {
+        0: ['Z0', 'Y0', 'X0'],                                      # Intermediate_In L1
+        1: ['Z1', 'Y1', 'X1']                                       # Intermediate_In L2
+    },
+    out_coupling = ['Z2', 'P', 'Q']                                 # Out
+)
+
+easy_conv_3layers_coupling = Coupling(
+    dims = ['Q', 'Z2', 'C2', 'S2', 'X1', 'Z1', 'C1', 'S1', 'X0', 'Z0', 'S0', 'C0'],
+    in_coupling = ['C0', ['X0', 'S0']],      # In
+    w_coupling= {
+        0: ['Z0', 'C0', 'S0'],               # W0
+        1: ['Z1', 'C1', 'S1'],               # W1
+        2: ['Z2', 'C2', 'S2']                # W2
+    },
+    int_in_coupling = {
+        0: ['C1', ['X1', 'S1']],                      # Intermediate_Out L1
+        1: ['C2', ['Q', 'S2']]                        # Intermediate_Out L2
+    },
+    int_out_coupling = {
+        0: ['Z0', 'X0'],      # Intermediate_In L1
+        1: ['Z1', 'X1']       # Intermediate_In L2
+    },
+    out_coupling = ['Z2', 'Q']                        # Out
+)
 
 # DIMENSIONS and COUPLING for GEMMS:
 # M: Weight/Out rows
@@ -427,3 +486,4 @@ def create_nlayer_conv_coupling(num_layers: int, with_stride: bool = False, with
 #    C2 = 4,  # You'll need to specify C2 for the connection between layers
 #    M = 3
 #)
+

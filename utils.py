@@ -79,7 +79,7 @@ def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
     print(f"                       array={array}, elements={elements} (len={len(elements)})")
     
 
-    if len(elements) > 6 :
+    if len(elements) > 9 :
         if not elements:
             return [array]
         results = []

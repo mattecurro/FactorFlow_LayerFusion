@@ -236,6 +236,7 @@ if __name__ == "__main__":
             Settings.MULTITHREADED = False
     printopt("Threads:", Settings.THREADS_COUNT)
     
+
     if options["quiet"]:
         Settings.VERBOSE = False
     

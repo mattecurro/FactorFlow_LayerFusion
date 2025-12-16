@@ -165,7 +165,6 @@ class Settings(metaclass = MetaSettings):
     THREADS_COUNT = 8
     # Timeout for all blocking synchronization methods (e.g. join, wait).
     TIMEOUT = 0.001
-
     # flag used to propagate a ctrl+c to all threads
     forced_termination_flag = False
 

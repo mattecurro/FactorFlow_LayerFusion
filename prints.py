@@ -170,6 +170,7 @@ def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
     tot_reads = 0
     tot_writes = 0
     num_layers = arch.coupling.getNumLayers()
+    WMOPs = 0
     WMOPs_per_layer = {layer_id: 0 for layer_id in range(num_layers)}
     for level in arch:
         if isinstance(level, MemLevel):
@@ -179,39 +180,45 @@ def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
                 scaling_per_layer[layer_id] = level.active_instances_per_layer.get(layer_id, 1) if per_instance else 1
             
             if 'out' not in level.bypasses:
-                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Output Reads = {(level.out_reads - level.last_out_writes)/scaling_per_layer[num_layers-1]:.0f} (reads) + {level.last_out_writes/scaling_per_layer[num_layers-1]:.0f} (drains), Output Writes = {(level.out_writes - level.last_out_reads)/scaling_per_layer[num_layers-1]:.0f} (updates) + {level.last_out_reads/scaling_per_layer[num_layers-1]:.0f} (fills)")
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Output Reads = {(level.out_reads - level.last_out_writes)/scaling_per_layer[num_layers-1]:,.0f} (reads) + {level.last_out_writes/scaling_per_layer[num_layers-1]:,.0f} (drains), Output Writes = {(level.out_writes - level.last_out_reads)/scaling_per_layer[num_layers-1]:,.0f} (updates) + {level.last_out_reads/scaling_per_layer[num_layers-1]:,.0f} (fills)")
 
+            if 'in' not in level.bypasses:
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Input Reads = {level.in_reads/scaling_per_layer[0]:,.0f} (reads), Input Writes = {level.in_writes/scaling_per_layer[0]:,.0f} (writes)")
             # Print per-layer weight reads if available
             if hasattr(level, 'per_layer_w_reads') and level.per_layer_w_reads:
-                layer_w_str = ""
-                for layer_id in range(num_layers):
-                    layer_w_str += ", ".join([f"Per layer W Reads:{layer_id}: {reads/scaling_per_layer[layer_id]:.0f}" for i, reads in level.per_layer_w_reads[layer_id] if i == layer_id])
-                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer W_R: [{layer_w_str}], Total: ---")
-            
+                total = sum(reads/scaling_per_layer[layer_id] for layer_id, reads in level.per_layer_w_reads.items())
+                layer_w_str = ", ".join([f"L{layer_id}: {reads/scaling_per_layer[layer_id]:,.0f}" 
+                                        for layer_id, reads in level.per_layer_w_reads.items()])
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer W_R: [{layer_w_str}], Total: {total:,.0f}")
+
             # Print per-layer intermediate input reads if available
             if hasattr(level, 'per_layer_int_in_reads') and level.per_layer_int_in_reads:
-                for layer_id in range(num_layers):
-                    layer_int_in_str += ", ".join([f"Per layer Int In Reads:{layer_id}: {reads/scaling_per_layer[layer_id]:.0f}" for i, reads in level.per_layer_int_in_reads[layer_id] if i == layer_id])
-                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_In_R: [{layer_int_in_str}], Total: ---")
+                total = sum(reads/scaling_per_layer[layer_id] for layer_id, reads in level.per_layer_int_in_reads.items())
+                layer_int_in_str = ", ".join([f"L{layer_id}: {reads/scaling_per_layer[layer_id]:,.0f}" 
+                                             for layer_id, reads in level.per_layer_int_in_reads.items()])
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_In_R: [{layer_int_in_str}], Total: {total:,.0f}")
 
             # Print per-layer intermediate output reads if available
             if hasattr(level, 'per_layer_int_out_reads') and level.per_layer_int_out_reads:
-                for layer_id in range(num_layers):
-                    layer_int_out_str += ", ".join([f"Per layer Int Out Reads:{layer_id}: {reads/scaling_per_layer[layer_id]:.0f}" for i, reads in level.per_layer_int_out_reads[layer_id] if i == layer_id])
-                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_Out_R: [{layer_int_out_str}], Total: ---")
-            
+                total = sum(reads/scaling_per_layer[layer_id] for layer_id, reads in level.per_layer_int_out_reads.items())
+                layer_int_out_str = ", ".join([f"L{layer_id}: {reads/scaling_per_layer[layer_id]:,.0f}" 
+                                                for layer_id, reads in level.per_layer_int_out_reads.items()])
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_Out_R: [{layer_int_out_str}], Total: {total:,.0f}")
+
             # Print per-layer intermediate output writes if available
             if hasattr(level, 'per_layer_int_out_writes') and level.per_layer_int_out_writes:
-                for layer_id in range(num_layers):
-                    layer_int_out_w_str += ", ".join([f"Per layer Int Out Writes:{layer_id}: {writes/scaling_per_layer[layer_id]:.0f}" for i, writes in level.per_layer_int_out_writes[layer_id] if i == layer_id])
-                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_Out_W: [{layer_int_out_w_str}], Total: ---")
+                total = sum(writes/scaling_per_layer[layer_id] for layer_id, writes in level.per_layer_int_out_writes.items())
+                layer_int_out_w_str = ", ".join([f"L{layer_id}: {writes/scaling_per_layer[layer_id]:,.0f}" 
+                                                  for layer_id, writes in level.per_layer_int_out_writes.items()])
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_Out_W: [{layer_int_out_w_str}], Total: {total:,.0f}")
 
             # Total reads and writes
             reads = level.in_reads + level.w_reads + level.int_in_reads + level.int_out_reads + level.out_reads
             writes = level.in_writes + level.w_writes + level.int_in_writes + level.int_out_writes + level.out_writes
+            print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Total Reads = {reads:,.0f}, Total Writes = {writes:,.0f}")
             # Print summary line
-            #print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.in_reads/scaling:.0f} In_R, {level.w_reads/scaling:.0f} W_R, {level.int_in_reads/scaling:.0f} Int_In_R, {level.int_out_reads/scaling:.0f} Int_Out_R, {level.out_reads/scaling:.0f} Out_R, {reads/scaling:.0f} Tot_R,")
-            #print(f"\t\t{level.in_writes/scaling:.0f} In_W, {level.w_writes/scaling:.0f} W_W, {level.int_in_writes/scaling:.0f} Int_In_W, {level.int_out_writes/scaling:.0f} Int_Out_W, {level.out_writes/scaling:.0f} Out_W, {writes/scaling:.0f} Tot_W")
+            #print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.in_reads/scaling:,.0f} In_R, {level.w_reads/scaling:,.0f} W_R, {level.int_in_reads/scaling:,.0f} Int_In_R, {level.int_out_reads/scaling:,.0f} Int_Out_R, {level.out_reads/scaling:,.0f} Out_R, {reads/scaling:,.0f} Tot_R,")
+            #print(f"\t\t{level.in_writes/scaling:,.0f} In_W, {level.w_writes/scaling:,.0f} W_W, {level.int_in_writes/scaling:,.0f} Int_In_W, {level.int_out_writes/scaling:,.0f} Int_Out_W, {level.out_writes/scaling:,.0f} Out_W, {writes/scaling:,.0f} Tot_W")
             tot_reads += reads
             tot_writes += writes
             ## to fix
@@ -222,8 +229,8 @@ def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
             ## to fix
             WMOPs += level.computeCost(level.temporal_iterations*level.active_instances)
             break
-    print(f"Totals:\t\t{tot_reads:.0f} R, {tot_writes:.0f} W, {tot_reads+tot_writes:.0f} Tot")
-    print(f"Energy:\t\t{WMOPs*10**-6:.3f} uJ")
+    print(f"Totals:\t\t{tot_reads:,.0f} R, {tot_writes:,.0f} W, {tot_reads+tot_writes:,.0f} Tot")
+    print(f"Energy:\t\t{WMOPs*10**-6:,.3f} uJ")
 
 """
 Print to stdout a summary of the latency, bandwidth and stalls across the levels
@@ -246,12 +253,12 @@ def printLatency(arch : Arch) -> None:
             if max_latency <= level.getSettedLatency():
                 max_latency = level.getSettedLatency()
                 max_latency_level_name = level.name
-            print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.latency_read_drain:.0f}cc RD and {level.latency_fill_update:.0f}cc FU Latency, {level.read_bandwidth:.1f} R and {level.write_bandwidth:.1f} W Bandwidth,\n\t\t{level.ideal_bandwidth_read:.3f} R and {level.ideal_bandwidth_update:.3f} U and {level.ideal_bandwidth_fill:.3f} F and {level.ideal_bandwidth_drain:.3f} D Ideal Bandwidth,\n\t\t{level.cc_per_tile:.0f}cc per Tile, {level.stall_cycles:.0f} Stall Cycles")
+            print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.latency_read_drain:,.0f} cc RD and {level.latency_fill_update:,.0f} cc FU Latency, {level.read_bandwidth:,.1f} R and {level.write_bandwidth:,.1f} W Bandwidth,\n\t\t{level.ideal_bandwidth_read:,.3f} R and {level.ideal_bandwidth_update:,.3f} U and {level.ideal_bandwidth_fill:,.3f} F and {level.ideal_bandwidth_drain:,.3f} D Ideal Bandwidth,\n\t\t{level.cc_per_tile:,.0f} cc per Tile, {level.stall_cycles:,.0f} Stall Cycles")
         elif isinstance(level, FanoutLevel):
             continue
         elif isinstance(level, ComputeLevel):
             break
-    print(f"Max Latency:\t{max_latency:.0f}cc of level {max_latency_level_name}")
+    print(f"Max Latency:\t{max_latency:,.0f} cc of level {max_latency_level_name}")
 
 """
 Print to stdout the total amount of padding required by the different dimensions

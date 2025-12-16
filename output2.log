@@ -19,7 +19,7 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'Y', 'C1', 'P', 'C2', 'C0'}, coupling.dims: ['C0', 'Y', 'Z', 'C1', 'P', 'C2']
+final_layer_dims: {'C0', 'C1', 'C2', 'Y', 'P'}, coupling.dims: ['C0', 'Y', 'Z', 'C1', 'P', 'C2']
 INFO: Arch: Fixed Multi-Layer GEMM Architecture with Mapping Constraints: identified intermediate dimensions: {'Z'}
 Starting engine with mapper: breadthfirst_local
 
@@ -414,7 +414,7 @@ Level GlobalBuffer total_reads_per_layer[1]: 1572864
 Level GlobalBuffer total_WMOPs: 3078561792.0
 Level GlobalBuffer real WMOPs: 634884096
 
-Finished in: 0.148s
+Finished in: 0.079s
 
 Best mapping found with:
 	Wart: 1.551e-10
@@ -430,15 +430,19 @@ MACC ----------
 Final MOPs per memory level:
 PRINT MOP FUSION!!!
 MainMemory:	Output Reads = 0 (reads) + 0 (drains), Output Writes = 8,192 (updates) + 0 (fills)
+MainMemory:	Input Reads = 524,288 (reads), Input Writes = 0 (writes)
 MainMemory:	Per-Layer W_R: [L0: 4,096, L1: 524,288], Total: 528,384
 MainMemory:	Per-Layer Int_In_R: [L0: 0], Total: 0
 MainMemory:	Per-Layer Int_Out_R: [L0: 0], Total: 0
 MainMemory:	Per-Layer Int_Out_W: [L0: 0], Total: 0
+MainMemory:	Total Reads = 1,052,672, Total Writes = 8,192
 GlobalBuffer:	Output Reads = 516,096 (reads) + 8,192 (drains), Output Writes = 524,288 (updates) + 0 (fills)
+GlobalBuffer:	Input Reads = 524,288 (reads), Input Writes = 0 (writes)
 GlobalBuffer:	Per-Layer W_R: [L0: 524,288, L1: 524,288], Total: 1,048,576
 GlobalBuffer:	Per-Layer Int_In_R: [L0: 524,288], Total: 524,288
 GlobalBuffer:	Per-Layer Int_Out_R: [L0: 524,288], Total: 524,288
 GlobalBuffer:	Per-Layer Int_Out_W: [L0: 524,288], Total: 524,288
+GlobalBuffer:	Total Reads = 3,145,728, Total Writes = 1,048,576
 Totals:		4,198,400 R, 1,056,768 W, 5,255,168 Tot
 Energy:		236,326.381 uJ
 
