@@ -7,8 +7,10 @@ Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [
 Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
 Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
 -------- architecture --------
-Creating architecture: DepFiN Architecture with coupling: dims: QZ2C2S2X1Z1C1S1X0Z0S0C0, in_coupling: [C0][X0+S0], w_coupling: W0: [Z0][C0][S0],W1: [Z1][C1][S1],W2: [Z2][C2][S2],, out_coupling: [Z2][Q]
 Creating architecture: DepFiN Architecture with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+Creating architecture: DepFiN Architecture with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+Creating architecture: DepFiN Architecture with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+Creating architecture: DepFiN Architecture with coupling: dims: QZ2C2S2X1Z1C1S1X0Z0S0C0, in_coupling: [C0][X0+S0], w_coupling: W0: [Z0][C0][S0],W1: [Z1][C1][S1],W2: [Z2][C2][S2],, out_coupling: [Z2][Q]
 Architecture: architectures/multi_layer_arch.py -> arch
 -------- computation  --------
 Computation: architectures/3layer_comp.py -> comp: {P: 704, Q: 1280, Z2: 16, C2: 32, R2: 1, S2: 1, X1: 128, Y1: 1, Z1: 32, R1: 3, S1: 3, X0: 128, Y0: 1, C1: 32, Z0: 32, R0: 3, S0: 3, C0: 3}
@@ -19,8 +21,8 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'C2', 'R2', 'Y0', 'S2', 'C0', 'Q', 'X0', 'R0', 'S0', 'Z2', 'P'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
-INFO: Arch: DepFiN Architecture: identified intermediate dimensions: {'X1', 'R1', 'Z1', 'Y1', 'S1', 'Z0', 'C1'}
+final_layer_dims: {'P', 'C0', 'Y0', 'S2', 'R2', 'Z2', 'Q', 'C2', 'X0', 'S0', 'R0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: DepFiN Architecture: identified intermediate dimensions: {'Y1', 'C1', 'S1', 'Z1', 'R1', 'X1', 'Z0'}
 INFO: Added high constraint for intermediate dimension P in level AccumulationOutRegister
 INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutRegister
 Starting engine with mapper: breadthfirst_local
@@ -110,13 +112,13 @@ len(dim_sum): 1
 Dim Y0: tile size 1, iterations 1
 Product: 1
 len(dim_sum): 2
-Dim R0: tile size 1, iterations 3
+Dim R0: tile size 3, iterations 1
 Product: 3
 len(dim_sum): 2
 Dim X0: tile size 128, iterations 1
 Product: 128
 len(dim_sum): 2
-Dim S0: tile size 1, iterations 3
+Dim S0: tile size 3, iterations 1
 Product: 3
 len(dim_sum): 2
 Input size: 1170
@@ -184,14 +186,14 @@ len(dim_sum): 1
 Dim Y0: tile size 1, iterations 1
 Product: 1
 len(dim_sum): 2
-Dim R0: tile size 1, iterations 1
-Product: 1
+Dim R0: tile size 1, iterations 3
+Product: 3
 len(dim_sum): 2
 Dim X0: tile size 128, iterations 1
 Product: 128
 len(dim_sum): 2
-Dim S0: tile size 1, iterations 1
-Product: 1
+Dim S0: tile size 1, iterations 3
+Product: 3
 len(dim_sum): 2
 Input size: 0
 
@@ -209,7 +211,7 @@ Output size: 0
 Dim Q: tile size 128, iterations 1
 Product: 128
 len(dim_sum): 1
-Weight size: 48
+Weight size: 176
 
 Dim C1: tile size 1, iterations 1
 len(dim_sum): 1
@@ -246,8 +248,8 @@ end int_i
 Intermediate input size: 256
 Total intermediate size (input + output): 256
 
-input_size: 0, output_size: 0, weight_size: 48, intermediate_size: 256
-Total mem footprint: 304
+input_size: 0, output_size: 0, weight_size: 176, intermediate_size: 256
+Total mem footprint: 432
 
 
 
@@ -353,7 +355,7 @@ input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 1170, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
-Level: DRAM, Layer 0: final Input in_reads = 1170
+Level: DRAM, Layer 0: final Input in_reads = 1,170
 
 
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
@@ -365,7 +367,7 @@ innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getIntermediateI
 self.tile_size[dim] for dim in dim_sum: [[32], [1, 3], [128, 3]]
 intermediate in layer 0 read after no next_spatials handling: 12480
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
-intermediate in layer 0 final read: 12480
+intermediate in layer 0 final read: 12,480
 
 Initialization Level: DRAM, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 12480, 1: 1}
 actual_dataflow_per_layer[2] = ['Q', 'P'], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
@@ -378,7 +380,7 @@ innermost_dim_sum: ['P', 'R2'], dim_sum: dim_sum in self.arch.coupling.getInterm
 self.tile_size[dim] for dim in dim_sum: [[32], [128, 1]]
 intermediate in layer 1 read after no next_spatials handling: 2883584
 intermediate in remaining dim in actual_dataflow_per_layer[2][:1]: ['Q']
-intermediate in layer 1 final read: 28835840
+intermediate in layer 1 final read: 28,835,840
 
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
@@ -390,7 +392,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 0 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 4096
+intermediate out layer 0 final read: 4,096
 
 Initialization Level: DRAM, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 4096, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -402,7 +404,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 1 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 4096
+intermediate out layer 1 final read: 4,096
 
 Initialization Level: DRAM, Layer 2: out_reads = 1, innermost_dim_sum = None, i = 1, actual_dataflow = ['Q', 'P']
 out layer read after innermost_dim_sum handling: 1
@@ -414,7 +416,7 @@ actual_dataflow_per_layer[1]: [], i = 1
 
 output layer 2 final read: 14417920, out_reads_factors (orthogonal to output) = 1
 
-BEFORE BYPASS: ignore_bypasses: False, In reads: 1170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
+BEFORE BYPASS: ignore_bypasses: False, In reads: 1,170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 12480, 1: 28835840}, int_in_reads: 28848320, Per Layer Intermediate Output reads: {0: 4096, 1: 4096}, int_out_reads: 8192, Out reads: 14417920
 ignore_bypasses: False, self.next_spatial.names: []
 I AM HANDLING BYPASS NOW
@@ -428,13 +430,13 @@ Level: DRAM: Operand = w
 Final level name before not bypassing: FeatureMemory
 I call MOPs on FeatureMemory
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -443,16 +445,16 @@ Stationarity calculation for Level: FeatureMemory: in_bp = False, w_bp = True, i
 
 
 Initialization Level: FeatureMemory: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1, 2: 1}
-actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
-tile size for each dim of actual_dataflow_per_layer[0]: [1, 1, 1, 16]
-Level: FeatureMemory: innermost_dim_sum = None, i = 3, actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0']
+actual_dataflow_per_layer[0] = ['C0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 16]
+Level: FeatureMemory: innermost_dim_sum = None, i = 1, actual_dataflow_per_layer[0] = ['C0', 'Z0']
 weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z0'], ['C0'], ['R0'], ['S0']]
-self.tile_size[dim] for dim in dim_sum: [[16], [1], [1], [1]]
-weight layer 0 read after no next_spatials handling: 16
-weight layer 0 read after next_spatials handling: 16
-weight remaining dim in actual_dataflow_per_layer[0][:4]: ['C0', 'R0', 'S0', 'Z0']
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0'], i = 3
+self.tile_size[dim] for dim in dim_sum: [[16], [1], [3], [3]]
+weight layer 0 read after no next_spatials handling: 144
+weight layer 0 read after next_spatials handling: 144
+weight remaining dim in actual_dataflow_per_layer[0][:2]: ['C0', 'Z0']
+actual_dataflow_per_layer[0]: ['C0', 'Z0'], i = 1
 
 Level: FeatureMemory, Layer 0: final Weight layer_read = 864
 actual_dataflow_per_layer[1] = ['C1', 'S1', 'R1', 'Z1'], flat_weight_coupling[1] = ['Z1', 'C1', 'R1', 'S1']
@@ -466,7 +468,7 @@ weight layer 1 read after next_spatials handling: 16
 weight remaining dim in actual_dataflow_per_layer[1][:4]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1'], i = 3
 
-Level: FeatureMemory, Layer 1: final Weight layer_read = 9216
+Level: FeatureMemory, Layer 1: final Weight layer_read = 9,216
 actual_dataflow_per_layer[2] = ['C2'], flat_weight_coupling[2] = ['Z2', 'C2', 'R2', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: [1]
 Level: FeatureMemory: innermost_dim_sum = None, i = 0, actual_dataflow_per_layer[2] = ['C2']
@@ -550,13 +552,13 @@ Level DRAM real WMOPs: 2344917700.0
 Questo mops è chiamato da update stats
 Level: FeatureMemory, arch bypasses for the level: ['w'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -645,7 +647,7 @@ in_btwn: MOPs results: in_reads_bp: 128, per_layer_w_reads_bp: {0: 0, 1: 0, 2: 0
 I'm going from the down (Compute) to the top
 Level: FeatureMemory: in_btwn = WeightMemory, stationarity_to_address = True, in_reads_bp = 128, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
 in_btwn name: WeightMemory, Handling Input Bypass with stationarity_to_address = False
-Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0', 'R0', 'S0']
+Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0']
 End inbtwn
 Now I will do MyLevel: FeatureMemory: MOPs for per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, in_bp=128, per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
 per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 0
@@ -661,13 +663,13 @@ Level: FeatureMemory: Operand = out
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -709,13 +711,13 @@ Level: FeatureMemory: Operand = int
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -726,7 +728,7 @@ Stationarity calculation for Level: WeightMemory: in_bp = False, w_bp = False, i
 Initialization Level: WeightMemory, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_input_coupling[1] = ['C1', 'Y1', 'R1', 'X1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C1': 1, 'Y1': 1, 'R1': 1, 'X1': 128, 'S1': 1}
  dims in dim_sum: [['C1'], ['Y1', 'R1'], ['X1', 'S1']]
@@ -738,7 +740,7 @@ intermediate in layer 0 final read: 128
 Initialization Level: WeightMemory, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 128, 1: 1}
 actual_dataflow_per_layer[2] = [], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C2': 1, 'P': 1, 'R2': 1, 'Q': 128, 'S2': 1}
  dims in dim_sum: [['C2'], ['P', 'R2'], ['Q', 'S2']]
@@ -748,16 +750,16 @@ intermediate in remaining dim in actual_dataflow_per_layer[2][:0]: []
 intermediate in layer 1 final read: 128
 
 Initialization Level: WeightMemory, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
-actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
-tile size for each dim of actual_dataflow_per_layer[0]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+actual_dataflow_per_layer[0] = ['R0', 'S0'], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 1]
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'Z0': 16, 'Y0': 1, 'X0': 128}
 tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 0 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 2048
+intermediate out layer 0 final read: 2,048
 
 Initialization Level: WeightMemory, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 2048, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -769,7 +771,7 @@ tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 1 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 2048
+intermediate out layer 1 final read: 2,048
 
 BEFORE BYPASS: ignore_bypasses: True, In reads: 0, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 128, 1: 128}, int_in_reads: 256, Per Layer Intermediate Output reads: {0: 2048, 1: 2048}, int_out_reads: 4096, Out reads: 0
@@ -790,55 +792,55 @@ per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 0
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 0
 
-AFTER BYPASS of all operands:  FeatureMemory: in_reads: 6912, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 54, 1: 576}, int_out_reads: 630, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
+AFTER BYPASS of all operands:  FeatureMemory: in_reads: 768, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 6, 1: 576}, int_out_reads: 582, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
 
-After Spatials: Level: FeatureMemory: MOPs in_reads = 6912, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 54, 1: 576}, int_out_reads = 630, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
+After Spatials: Level: FeatureMemory: MOPs in_reads = 768, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 6, 1: 576}, int_out_reads = 582, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
 
 End MOPs with Bypasses for Level: FeatureMemory
 
 
 DEBUG updateStats pre scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 32}
-  per_layer_int_out_reads: {0: 54, 1: 576}
+  per_layer_int_out_reads: {0: 6, 1: 576}
   out_reads: 2048
   out_reads_factors: 1
 temporal_iterations_per_layer before update: {0: 1, 1: 1, 2: 7040}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
 scale per layer: {0: 1, 1: 1, 2: 7040}
-scaled in_reads: 6912
+scaled in_reads: 768
 scaled per_layer_w_reads before sum: {0: 0, 1: 0, 2: 0}
 scaled per_layer_int_in_reads before sum: {0: 288, 1: 225280}
-scaled per_layer_int_out_reads before sum: {0: 54, 1: 576}
+scaled per_layer_int_out_reads before sum: {0: 6, 1: 576}
 scaled out_reads: 14417920
 DEBUG updateStats post scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 225280}
   int_in_reads: 225568
-  per_layer_int_out_reads: {0: 54, 1: 576}
-  int_out_reads: 630
+  per_layer_int_out_reads: {0: 6, 1: 576}
+  int_out_reads: 582
   out_reads: 14417920
   out_reads_factors: 1
-Level FeatureMemory total_reads_per_layer[0]: 6966
+Level FeatureMemory total_reads_per_layer[0]: 774
 Level FeatureMemory total_reads_per_layer[1]: 864
 Level FeatureMemory total_reads_per_layer[2]: 14643200
-Level FeatureMemory total_WMOPs: 4079377946.52
-Level FeatureMemory real WMOPs: 117013069.24000001
+Level FeatureMemory total_WMOPs: 4079365147.7999997
+Level FeatureMemory real WMOPs: 117000464.44000001
 
 
 Questo mops è chiamato da update stats
 Level: WeightMemory, arch bypasses for the level: ['in', 'int', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -946,10 +948,10 @@ per_layer_w_reads after non-selective multicast: {0: 16, 1: 16, 2: 16}
 in_btwn: MOPs results: in_reads_bp: 0, per_layer_w_reads_bp: {0: 16, 1: 16, 2: 16}, w_reads_bp: 48, int_out_reads_bp: 0, int_in_reads_bp: 0, out_reads_bp: 0
 End inbtwn
 Now I will do MyLevel: WeightMemory: MOPs for per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, in_bp=0, per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, w_bp=48, out_bp=0, stationarity_to_address=True (bypass operand w)
-actual_dataflow_per_layer[0] = []
+actual_dataflow_per_layer[0] = ['R0', 'S0']
 actual_dataflow_per_layer[1] = []
 actual_dataflow_per_layer[2] = []
-per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 1
+per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 9
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 1
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 1
 
@@ -961,7 +963,7 @@ No levels in between for bypass operand out
 Level: WeightMemory: Operand = int
 No levels in between for bypass operand int
 
-AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 1, 1: 1, 2: 1}, w_reads: 3, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
+AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 9, 1: 1, 2: 1}, w_reads: 11, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
 
 spatial_level: SACols_2, spatial_level.dataflow: ['Q'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {2: 7}, Z2: {}}
 spatial_level: SARows_2, spatial_level.dataflow: ['Z2'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {2: 4}}
@@ -969,21 +971,21 @@ spatial_level: SACols_1, spatial_level.dataflow: ['X1'], spatial_level.factors: 
 spatial_level: SARows_1, spatial_level.dataflow: ['Z1'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {2: 4}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SACols_0, spatial_level.dataflow: ['X0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {2: 7}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SARows_0, spatial_level.dataflow: ['Z0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 4}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
-After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 1, 1: 1, 2: 1}, w_reads = 3, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 9, 1: 1, 2: 1}, w_reads = 11, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
 
 End MOPs with Bypasses for Level: WeightMemory
 
 
 DEBUG updateStats pre scaling: Level WeightMemory:
   in_reads: 0
-  per_layer_w_reads: {0: 1, 1: 1, 2: 1}
-  w_reads: 3
+  per_layer_w_reads: {0: 9, 1: 1, 2: 1}
+  w_reads: 11
   per_layer_int_in_reads: {0: 0, 1: 0}
   per_layer_int_out_reads: {0: 0, 1: 0}
   out_reads: 0
   out_reads_factors: 0
-temporal_iterations_per_layer before update: {0: 54, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
-scale per layer: {0: 54, 1: 576, 2: 225280}
+temporal_iterations_per_layer before update: {0: 6, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
+scale per layer: {0: 6, 1: 576, 2: 225280}
 scaled in_reads: 0
 scaled per_layer_w_reads before sum: {0: 54, 1: 576, 2: 225280}
 scaled per_layer_int_in_reads before sum: {0: 0, 1: 0}
@@ -1002,7 +1004,7 @@ DEBUG updateStats post scaling: Level WeightMemory:
 Level WeightMemory total_reads_per_layer[0]: 54
 Level WeightMemory total_reads_per_layer[1]: 576
 Level WeightMemory total_reads_per_layer[2]: 225280
-Level WeightMemory total_WMOPs: 4101738518.32
+Level WeightMemory total_WMOPs: 4101725719.6
 Level WeightMemory real WMOPs: 7757749.4
 Updated considering level: SACols_2, this dim: Q is considered in spatial_iterations_per_layer[2]
 Updated considering level: SARows_2, this dim: Z2 is considered in spatial_iterations_per_layer[2]
@@ -1132,12 +1134,12 @@ DEBUG updateStats post scaling: Level AccumulationOutRegister:
 Level AccumulationOutRegister total_reads_per_layer[0]: 110592
 Level AccumulationOutRegister total_reads_per_layer[1]: 2359296
 Level AccumulationOutRegister total_reads_per_layer[2]: 922746880
-Level AccumulationOutRegister total_WMOPs: 7433576053.8
-Level AccumulationOutRegister real WMOPs: 1937139491.2400002
+Level AccumulationOutRegister total_WMOPs: 7433563062.12
+Level AccumulationOutRegister real WMOPs: 1937139426.92
 Initial condition (Wart: 1.148e+00):
 DRAM ----------> Q: 10, P: 704
-FeatureMemory -> C2: 32, C1: 32, S1: 3, R1: 3, C0: 3, R0: 3, S0: 3, Z1: 2, Z0: 2
-WeightMemory --
+FeatureMemory -> C2: 32, C1: 32, S1: 3, R1: 3, C0: 3, Z1: 2, Z0: 2
+WeightMemory --> R0: 3, S0: 3
 SACols_2 ------> Q: 128
 SARows_2 ------> Z2: 16
 SACols_1 ------> X1: 128
@@ -1177,7 +1179,7 @@ input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 1170, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
-Level: DRAM, Layer 0: final Input in_reads = 1170
+Level: DRAM, Layer 0: final Input in_reads = 1,170
 
 
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
@@ -1189,7 +1191,7 @@ innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getIntermediateI
 self.tile_size[dim] for dim in dim_sum: [[32], [1, 3], [128, 3]]
 intermediate in layer 0 read after no next_spatials handling: 12480
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
-intermediate in layer 0 final read: 12480
+intermediate in layer 0 final read: 12,480
 
 Initialization Level: DRAM, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 12480, 1: 1}
 actual_dataflow_per_layer[2] = ['Q', 'P'], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
@@ -1202,7 +1204,7 @@ innermost_dim_sum: ['P', 'R2'], dim_sum: dim_sum in self.arch.coupling.getInterm
 self.tile_size[dim] for dim in dim_sum: [[32], [128, 1]]
 intermediate in layer 1 read after no next_spatials handling: 2883584
 intermediate in remaining dim in actual_dataflow_per_layer[2][:1]: ['Q']
-intermediate in layer 1 final read: 28835840
+intermediate in layer 1 final read: 28,835,840
 
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
@@ -1214,7 +1216,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 0 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 4096
+intermediate out layer 0 final read: 4,096
 
 Initialization Level: DRAM, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 4096, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -1226,7 +1228,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 1 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 4096
+intermediate out layer 1 final read: 4,096
 
 Initialization Level: DRAM, Layer 2: out_reads = 1, innermost_dim_sum = None, i = 1, actual_dataflow = ['Q', 'P']
 out layer read after innermost_dim_sum handling: 1
@@ -1238,7 +1240,7 @@ actual_dataflow_per_layer[1]: [], i = 1
 
 output layer 2 final read: 14417920, out_reads_factors (orthogonal to output) = 1
 
-BEFORE BYPASS: ignore_bypasses: False, In reads: 1170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
+BEFORE BYPASS: ignore_bypasses: False, In reads: 1,170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 12480, 1: 28835840}, int_in_reads: 28848320, Per Layer Intermediate Output reads: {0: 4096, 1: 4096}, int_out_reads: 8192, Out reads: 14417920
 ignore_bypasses: False, self.next_spatial.names: []
 I AM HANDLING BYPASS NOW
@@ -1252,13 +1254,13 @@ Level: DRAM: Operand = w
 Final level name before not bypassing: FeatureMemory
 I call MOPs on FeatureMemory
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -1267,16 +1269,16 @@ Stationarity calculation for Level: FeatureMemory: in_bp = False, w_bp = True, i
 
 
 Initialization Level: FeatureMemory: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1, 2: 1}
-actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
-tile size for each dim of actual_dataflow_per_layer[0]: [1, 1, 1, 16]
-Level: FeatureMemory: innermost_dim_sum = None, i = 3, actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0']
+actual_dataflow_per_layer[0] = ['C0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 16]
+Level: FeatureMemory: innermost_dim_sum = None, i = 1, actual_dataflow_per_layer[0] = ['C0', 'Z0']
 weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z0'], ['C0'], ['R0'], ['S0']]
-self.tile_size[dim] for dim in dim_sum: [[16], [1], [1], [1]]
-weight layer 0 read after no next_spatials handling: 16
-weight layer 0 read after next_spatials handling: 16
-weight remaining dim in actual_dataflow_per_layer[0][:4]: ['C0', 'R0', 'S0', 'Z0']
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0'], i = 3
+self.tile_size[dim] for dim in dim_sum: [[16], [1], [3], [3]]
+weight layer 0 read after no next_spatials handling: 144
+weight layer 0 read after next_spatials handling: 144
+weight remaining dim in actual_dataflow_per_layer[0][:2]: ['C0', 'Z0']
+actual_dataflow_per_layer[0]: ['C0', 'Z0'], i = 1
 
 Level: FeatureMemory, Layer 0: final Weight layer_read = 864
 actual_dataflow_per_layer[1] = ['C1', 'S1', 'R1', 'Z1'], flat_weight_coupling[1] = ['Z1', 'C1', 'R1', 'S1']
@@ -1290,7 +1292,7 @@ weight layer 1 read after next_spatials handling: 16
 weight remaining dim in actual_dataflow_per_layer[1][:4]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1'], i = 3
 
-Level: FeatureMemory, Layer 1: final Weight layer_read = 9216
+Level: FeatureMemory, Layer 1: final Weight layer_read = 9,216
 actual_dataflow_per_layer[2] = ['C2'], flat_weight_coupling[2] = ['Z2', 'C2', 'R2', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: [1]
 Level: FeatureMemory: innermost_dim_sum = None, i = 0, actual_dataflow_per_layer[2] = ['C2']
@@ -1374,13 +1376,13 @@ Level DRAM real WMOPs: 2344917700.0
 Questo mops è chiamato da update stats
 Level: FeatureMemory, arch bypasses for the level: ['w'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -1469,7 +1471,7 @@ in_btwn: MOPs results: in_reads_bp: 128, per_layer_w_reads_bp: {0: 0, 1: 0, 2: 0
 I'm going from the down (Compute) to the top
 Level: FeatureMemory: in_btwn = WeightMemory, stationarity_to_address = True, in_reads_bp = 128, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
 in_btwn name: WeightMemory, Handling Input Bypass with stationarity_to_address = False
-Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0', 'R0', 'S0']
+Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0']
 End inbtwn
 Now I will do MyLevel: FeatureMemory: MOPs for per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, in_bp=128, per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
 per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 0
@@ -1485,13 +1487,13 @@ Level: FeatureMemory: Operand = out
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -1533,13 +1535,13 @@ Level: FeatureMemory: Operand = int
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -1550,7 +1552,7 @@ Stationarity calculation for Level: WeightMemory: in_bp = False, w_bp = False, i
 Initialization Level: WeightMemory, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_input_coupling[1] = ['C1', 'Y1', 'R1', 'X1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C1': 1, 'Y1': 1, 'R1': 1, 'X1': 128, 'S1': 1}
  dims in dim_sum: [['C1'], ['Y1', 'R1'], ['X1', 'S1']]
@@ -1562,7 +1564,7 @@ intermediate in layer 0 final read: 128
 Initialization Level: WeightMemory, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 128, 1: 1}
 actual_dataflow_per_layer[2] = [], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C2': 1, 'P': 1, 'R2': 1, 'Q': 128, 'S2': 1}
  dims in dim_sum: [['C2'], ['P', 'R2'], ['Q', 'S2']]
@@ -1572,16 +1574,16 @@ intermediate in remaining dim in actual_dataflow_per_layer[2][:0]: []
 intermediate in layer 1 final read: 128
 
 Initialization Level: WeightMemory, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
-actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
-tile size for each dim of actual_dataflow_per_layer[0]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+actual_dataflow_per_layer[0] = ['R0', 'S0'], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 1]
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'Z0': 16, 'Y0': 1, 'X0': 128}
 tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 0 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 2048
+intermediate out layer 0 final read: 2,048
 
 Initialization Level: WeightMemory, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 2048, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -1593,7 +1595,7 @@ tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 1 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 2048
+intermediate out layer 1 final read: 2,048
 
 BEFORE BYPASS: ignore_bypasses: True, In reads: 0, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 128, 1: 128}, int_in_reads: 256, Per Layer Intermediate Output reads: {0: 2048, 1: 2048}, int_out_reads: 4096, Out reads: 0
@@ -1614,55 +1616,55 @@ per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 0
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 0
 
-AFTER BYPASS of all operands:  FeatureMemory: in_reads: 6912, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 54, 1: 576}, int_out_reads: 630, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
+AFTER BYPASS of all operands:  FeatureMemory: in_reads: 768, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 6, 1: 576}, int_out_reads: 582, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
 
-After Spatials: Level: FeatureMemory: MOPs in_reads = 6912, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 54, 1: 576}, int_out_reads = 630, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
+After Spatials: Level: FeatureMemory: MOPs in_reads = 768, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 6, 1: 576}, int_out_reads = 582, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
 
 End MOPs with Bypasses for Level: FeatureMemory
 
 
 DEBUG updateStats pre scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 32}
-  per_layer_int_out_reads: {0: 54, 1: 576}
+  per_layer_int_out_reads: {0: 6, 1: 576}
   out_reads: 2048
   out_reads_factors: 1
 temporal_iterations_per_layer before update: {0: 1, 1: 1, 2: 7040}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
 scale per layer: {0: 1, 1: 1, 2: 7040}
-scaled in_reads: 6912
+scaled in_reads: 768
 scaled per_layer_w_reads before sum: {0: 0, 1: 0, 2: 0}
 scaled per_layer_int_in_reads before sum: {0: 288, 1: 225280}
-scaled per_layer_int_out_reads before sum: {0: 54, 1: 576}
+scaled per_layer_int_out_reads before sum: {0: 6, 1: 576}
 scaled out_reads: 14417920
 DEBUG updateStats post scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 225280}
   int_in_reads: 225568
-  per_layer_int_out_reads: {0: 54, 1: 576}
-  int_out_reads: 630
+  per_layer_int_out_reads: {0: 6, 1: 576}
+  int_out_reads: 582
   out_reads: 14417920
   out_reads_factors: 1
-Level FeatureMemory total_reads_per_layer[0]: 6966
+Level FeatureMemory total_reads_per_layer[0]: 774
 Level FeatureMemory total_reads_per_layer[1]: 864
 Level FeatureMemory total_reads_per_layer[2]: 14643200
-Level FeatureMemory total_WMOPs: 4079377946.52
-Level FeatureMemory real WMOPs: 117013069.24000001
+Level FeatureMemory total_WMOPs: 4079365147.7999997
+Level FeatureMemory real WMOPs: 117000464.44000001
 
 
 Questo mops è chiamato da update stats
 Level: WeightMemory, arch bypasses for the level: ['in', 'int', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -1770,10 +1772,10 @@ per_layer_w_reads after non-selective multicast: {0: 16, 1: 16, 2: 16}
 in_btwn: MOPs results: in_reads_bp: 0, per_layer_w_reads_bp: {0: 16, 1: 16, 2: 16}, w_reads_bp: 48, int_out_reads_bp: 0, int_in_reads_bp: 0, out_reads_bp: 0
 End inbtwn
 Now I will do MyLevel: WeightMemory: MOPs for per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, in_bp=0, per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, w_bp=48, out_bp=0, stationarity_to_address=True (bypass operand w)
-actual_dataflow_per_layer[0] = []
+actual_dataflow_per_layer[0] = ['R0', 'S0']
 actual_dataflow_per_layer[1] = []
 actual_dataflow_per_layer[2] = []
-per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 1
+per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 9
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 1
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 1
 
@@ -1785,7 +1787,7 @@ No levels in between for bypass operand out
 Level: WeightMemory: Operand = int
 No levels in between for bypass operand int
 
-AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 1, 1: 1, 2: 1}, w_reads: 3, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
+AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 9, 1: 1, 2: 1}, w_reads: 11, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
 
 spatial_level: SACols_2, spatial_level.dataflow: ['Q'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {2: 7}, Z2: {}}
 spatial_level: SARows_2, spatial_level.dataflow: ['Z2'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {2: 4}}
@@ -1793,21 +1795,21 @@ spatial_level: SACols_1, spatial_level.dataflow: ['X1'], spatial_level.factors: 
 spatial_level: SARows_1, spatial_level.dataflow: ['Z1'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {2: 4}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SACols_0, spatial_level.dataflow: ['X0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {2: 7}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SARows_0, spatial_level.dataflow: ['Z0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 4}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
-After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 1, 1: 1, 2: 1}, w_reads = 3, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 9, 1: 1, 2: 1}, w_reads = 11, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
 
 End MOPs with Bypasses for Level: WeightMemory
 
 
 DEBUG updateStats pre scaling: Level WeightMemory:
   in_reads: 0
-  per_layer_w_reads: {0: 1, 1: 1, 2: 1}
-  w_reads: 3
+  per_layer_w_reads: {0: 9, 1: 1, 2: 1}
+  w_reads: 11
   per_layer_int_in_reads: {0: 0, 1: 0}
   per_layer_int_out_reads: {0: 0, 1: 0}
   out_reads: 0
   out_reads_factors: 0
-temporal_iterations_per_layer before update: {0: 54, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
-scale per layer: {0: 54, 1: 576, 2: 225280}
+temporal_iterations_per_layer before update: {0: 6, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
+scale per layer: {0: 6, 1: 576, 2: 225280}
 scaled in_reads: 0
 scaled per_layer_w_reads before sum: {0: 54, 1: 576, 2: 225280}
 scaled per_layer_int_in_reads before sum: {0: 0, 1: 0}
@@ -1826,7 +1828,7 @@ DEBUG updateStats post scaling: Level WeightMemory:
 Level WeightMemory total_reads_per_layer[0]: 54
 Level WeightMemory total_reads_per_layer[1]: 576
 Level WeightMemory total_reads_per_layer[2]: 225280
-Level WeightMemory total_WMOPs: 4101738518.32
+Level WeightMemory total_WMOPs: 4101725719.6
 Level WeightMemory real WMOPs: 7757749.4
 Updated considering level: SACols_2, this dim: Q is considered in spatial_iterations_per_layer[2]
 Updated considering level: SARows_2, this dim: Z2 is considered in spatial_iterations_per_layer[2]
@@ -1956,8 +1958,8 @@ DEBUG updateStats post scaling: Level AccumulationOutRegister:
 Level AccumulationOutRegister total_reads_per_layer[0]: 110592
 Level AccumulationOutRegister total_reads_per_layer[1]: 2359296
 Level AccumulationOutRegister total_reads_per_layer[2]: 922746880
-Level AccumulationOutRegister total_WMOPs: 7433576053.8
-Level AccumulationOutRegister real WMOPs: 1937139491.2400002
+Level AccumulationOutRegister total_WMOPs: 7433563062.12
+Level AccumulationOutRegister real WMOPs: 1937139426.92
 é stato chiamato update stats! 
 
 
@@ -1986,7 +1988,7 @@ input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 1170, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
-Level: DRAM, Layer 0: final Input in_reads = 1170
+Level: DRAM, Layer 0: final Input in_reads = 1,170
 
 
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
@@ -1998,7 +2000,7 @@ innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getIntermediateI
 self.tile_size[dim] for dim in dim_sum: [[32], [1, 3], [128, 3]]
 intermediate in layer 0 read after no next_spatials handling: 12480
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
-intermediate in layer 0 final read: 12480
+intermediate in layer 0 final read: 12,480
 
 Initialization Level: DRAM, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 12480, 1: 1}
 actual_dataflow_per_layer[2] = ['Q', 'P'], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
@@ -2011,7 +2013,7 @@ innermost_dim_sum: ['P', 'R2'], dim_sum: dim_sum in self.arch.coupling.getInterm
 self.tile_size[dim] for dim in dim_sum: [[32], [128, 1]]
 intermediate in layer 1 read after no next_spatials handling: 2883584
 intermediate in remaining dim in actual_dataflow_per_layer[2][:1]: ['Q']
-intermediate in layer 1 final read: 28835840
+intermediate in layer 1 final read: 28,835,840
 
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
@@ -2023,7 +2025,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 0 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 4096
+intermediate out layer 0 final read: 4,096
 
 Initialization Level: DRAM, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 4096, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -2035,7 +2037,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 1 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 4096
+intermediate out layer 1 final read: 4,096
 
 Initialization Level: DRAM, Layer 2: out_reads = 1, innermost_dim_sum = None, i = 1, actual_dataflow = ['Q', 'P']
 out layer read after innermost_dim_sum handling: 1
@@ -2047,7 +2049,7 @@ actual_dataflow_per_layer[1]: [], i = 1
 
 output layer 2 final read: 14417920, out_reads_factors (orthogonal to output) = 1
 
-BEFORE BYPASS: ignore_bypasses: False, In reads: 1170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
+BEFORE BYPASS: ignore_bypasses: False, In reads: 1,170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 12480, 1: 28835840}, int_in_reads: 28848320, Per Layer Intermediate Output reads: {0: 4096, 1: 4096}, int_out_reads: 8192, Out reads: 14417920
 ignore_bypasses: False, self.next_spatial.names: []
 I AM HANDLING BYPASS NOW
@@ -2061,13 +2063,13 @@ Level: DRAM: Operand = w
 Final level name before not bypassing: FeatureMemory
 I call MOPs on FeatureMemory
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -2076,16 +2078,16 @@ Stationarity calculation for Level: FeatureMemory: in_bp = False, w_bp = True, i
 
 
 Initialization Level: FeatureMemory: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1, 2: 1}
-actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
-tile size for each dim of actual_dataflow_per_layer[0]: [1, 1, 1, 16]
-Level: FeatureMemory: innermost_dim_sum = None, i = 3, actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0']
+actual_dataflow_per_layer[0] = ['C0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 16]
+Level: FeatureMemory: innermost_dim_sum = None, i = 1, actual_dataflow_per_layer[0] = ['C0', 'Z0']
 weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z0'], ['C0'], ['R0'], ['S0']]
-self.tile_size[dim] for dim in dim_sum: [[16], [1], [1], [1]]
-weight layer 0 read after no next_spatials handling: 16
-weight layer 0 read after next_spatials handling: 16
-weight remaining dim in actual_dataflow_per_layer[0][:4]: ['C0', 'R0', 'S0', 'Z0']
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0'], i = 3
+self.tile_size[dim] for dim in dim_sum: [[16], [1], [3], [3]]
+weight layer 0 read after no next_spatials handling: 144
+weight layer 0 read after next_spatials handling: 144
+weight remaining dim in actual_dataflow_per_layer[0][:2]: ['C0', 'Z0']
+actual_dataflow_per_layer[0]: ['C0', 'Z0'], i = 1
 
 Level: FeatureMemory, Layer 0: final Weight layer_read = 864
 actual_dataflow_per_layer[1] = ['C1', 'S1', 'R1', 'Z1'], flat_weight_coupling[1] = ['Z1', 'C1', 'R1', 'S1']
@@ -2099,7 +2101,7 @@ weight layer 1 read after next_spatials handling: 16
 weight remaining dim in actual_dataflow_per_layer[1][:4]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1'], i = 3
 
-Level: FeatureMemory, Layer 1: final Weight layer_read = 9216
+Level: FeatureMemory, Layer 1: final Weight layer_read = 9,216
 actual_dataflow_per_layer[2] = ['C2'], flat_weight_coupling[2] = ['Z2', 'C2', 'R2', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: [1]
 Level: FeatureMemory: innermost_dim_sum = None, i = 0, actual_dataflow_per_layer[2] = ['C2']
@@ -2183,13 +2185,13 @@ Level DRAM real WMOPs: 2344917700.0
 Questo mops è chiamato da update stats
 Level: FeatureMemory, arch bypasses for the level: ['w'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -2278,7 +2280,7 @@ in_btwn: MOPs results: in_reads_bp: 128, per_layer_w_reads_bp: {0: 0, 1: 0, 2: 0
 I'm going from the down (Compute) to the top
 Level: FeatureMemory: in_btwn = WeightMemory, stationarity_to_address = True, in_reads_bp = 128, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
 in_btwn name: WeightMemory, Handling Input Bypass with stationarity_to_address = False
-Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0', 'R0', 'S0']
+Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0']
 End inbtwn
 Now I will do MyLevel: FeatureMemory: MOPs for per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, in_bp=128, per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
 per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 0
@@ -2294,13 +2296,13 @@ Level: FeatureMemory: Operand = out
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -2342,13 +2344,13 @@ Level: FeatureMemory: Operand = int
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -2359,7 +2361,7 @@ Stationarity calculation for Level: WeightMemory: in_bp = False, w_bp = False, i
 Initialization Level: WeightMemory, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_input_coupling[1] = ['C1', 'Y1', 'R1', 'X1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C1': 1, 'Y1': 1, 'R1': 1, 'X1': 128, 'S1': 1}
  dims in dim_sum: [['C1'], ['Y1', 'R1'], ['X1', 'S1']]
@@ -2371,7 +2373,7 @@ intermediate in layer 0 final read: 128
 Initialization Level: WeightMemory, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 128, 1: 1}
 actual_dataflow_per_layer[2] = [], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C2': 1, 'P': 1, 'R2': 1, 'Q': 128, 'S2': 1}
  dims in dim_sum: [['C2'], ['P', 'R2'], ['Q', 'S2']]
@@ -2381,16 +2383,16 @@ intermediate in remaining dim in actual_dataflow_per_layer[2][:0]: []
 intermediate in layer 1 final read: 128
 
 Initialization Level: WeightMemory, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
-actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
-tile size for each dim of actual_dataflow_per_layer[0]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+actual_dataflow_per_layer[0] = ['R0', 'S0'], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 1]
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'Z0': 16, 'Y0': 1, 'X0': 128}
 tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 0 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 2048
+intermediate out layer 0 final read: 2,048
 
 Initialization Level: WeightMemory, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 2048, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -2402,7 +2404,7 @@ tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 1 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 2048
+intermediate out layer 1 final read: 2,048
 
 BEFORE BYPASS: ignore_bypasses: True, In reads: 0, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 128, 1: 128}, int_in_reads: 256, Per Layer Intermediate Output reads: {0: 2048, 1: 2048}, int_out_reads: 4096, Out reads: 0
@@ -2423,55 +2425,55 @@ per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 0
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 0
 
-AFTER BYPASS of all operands:  FeatureMemory: in_reads: 6912, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 54, 1: 576}, int_out_reads: 630, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
+AFTER BYPASS of all operands:  FeatureMemory: in_reads: 768, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 6, 1: 576}, int_out_reads: 582, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
 
-After Spatials: Level: FeatureMemory: MOPs in_reads = 6912, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 54, 1: 576}, int_out_reads = 630, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
+After Spatials: Level: FeatureMemory: MOPs in_reads = 768, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 6, 1: 576}, int_out_reads = 582, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
 
 End MOPs with Bypasses for Level: FeatureMemory
 
 
 DEBUG updateStats pre scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 32}
-  per_layer_int_out_reads: {0: 54, 1: 576}
+  per_layer_int_out_reads: {0: 6, 1: 576}
   out_reads: 2048
   out_reads_factors: 1
 temporal_iterations_per_layer before update: {0: 1, 1: 1, 2: 7040}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
 scale per layer: {0: 1, 1: 1, 2: 7040}
-scaled in_reads: 6912
+scaled in_reads: 768
 scaled per_layer_w_reads before sum: {0: 0, 1: 0, 2: 0}
 scaled per_layer_int_in_reads before sum: {0: 288, 1: 225280}
-scaled per_layer_int_out_reads before sum: {0: 54, 1: 576}
+scaled per_layer_int_out_reads before sum: {0: 6, 1: 576}
 scaled out_reads: 14417920
 DEBUG updateStats post scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 225280}
   int_in_reads: 225568
-  per_layer_int_out_reads: {0: 54, 1: 576}
-  int_out_reads: 630
+  per_layer_int_out_reads: {0: 6, 1: 576}
+  int_out_reads: 582
   out_reads: 14417920
   out_reads_factors: 1
-Level FeatureMemory total_reads_per_layer[0]: 6966
+Level FeatureMemory total_reads_per_layer[0]: 774
 Level FeatureMemory total_reads_per_layer[1]: 864
 Level FeatureMemory total_reads_per_layer[2]: 14643200
-Level FeatureMemory total_WMOPs: 4079377946.52
-Level FeatureMemory real WMOPs: 117013069.24000001
+Level FeatureMemory total_WMOPs: 4079365147.7999997
+Level FeatureMemory real WMOPs: 117000464.44000001
 
 
 Questo mops è chiamato da update stats
 Level: WeightMemory, arch bypasses for the level: ['in', 'int', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -2579,10 +2581,10 @@ per_layer_w_reads after non-selective multicast: {0: 16, 1: 16, 2: 16}
 in_btwn: MOPs results: in_reads_bp: 0, per_layer_w_reads_bp: {0: 16, 1: 16, 2: 16}, w_reads_bp: 48, int_out_reads_bp: 0, int_in_reads_bp: 0, out_reads_bp: 0
 End inbtwn
 Now I will do MyLevel: WeightMemory: MOPs for per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, in_bp=0, per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, w_bp=48, out_bp=0, stationarity_to_address=True (bypass operand w)
-actual_dataflow_per_layer[0] = []
+actual_dataflow_per_layer[0] = ['R0', 'S0']
 actual_dataflow_per_layer[1] = []
 actual_dataflow_per_layer[2] = []
-per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 1
+per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 9
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 1
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 1
 
@@ -2594,7 +2596,7 @@ No levels in between for bypass operand out
 Level: WeightMemory: Operand = int
 No levels in between for bypass operand int
 
-AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 1, 1: 1, 2: 1}, w_reads: 3, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
+AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 9, 1: 1, 2: 1}, w_reads: 11, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
 
 spatial_level: SACols_2, spatial_level.dataflow: ['Q'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {2: 7}, Z2: {}}
 spatial_level: SARows_2, spatial_level.dataflow: ['Z2'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {2: 4}}
@@ -2602,21 +2604,21 @@ spatial_level: SACols_1, spatial_level.dataflow: ['X1'], spatial_level.factors: 
 spatial_level: SARows_1, spatial_level.dataflow: ['Z1'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {2: 4}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SACols_0, spatial_level.dataflow: ['X0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {2: 7}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SARows_0, spatial_level.dataflow: ['Z0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 4}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
-After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 1, 1: 1, 2: 1}, w_reads = 3, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 9, 1: 1, 2: 1}, w_reads = 11, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
 
 End MOPs with Bypasses for Level: WeightMemory
 
 
 DEBUG updateStats pre scaling: Level WeightMemory:
   in_reads: 0
-  per_layer_w_reads: {0: 1, 1: 1, 2: 1}
-  w_reads: 3
+  per_layer_w_reads: {0: 9, 1: 1, 2: 1}
+  w_reads: 11
   per_layer_int_in_reads: {0: 0, 1: 0}
   per_layer_int_out_reads: {0: 0, 1: 0}
   out_reads: 0
   out_reads_factors: 0
-temporal_iterations_per_layer before update: {0: 54, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
-scale per layer: {0: 54, 1: 576, 2: 225280}
+temporal_iterations_per_layer before update: {0: 6, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
+scale per layer: {0: 6, 1: 576, 2: 225280}
 scaled in_reads: 0
 scaled per_layer_w_reads before sum: {0: 54, 1: 576, 2: 225280}
 scaled per_layer_int_in_reads before sum: {0: 0, 1: 0}
@@ -2635,7 +2637,7 @@ DEBUG updateStats post scaling: Level WeightMemory:
 Level WeightMemory total_reads_per_layer[0]: 54
 Level WeightMemory total_reads_per_layer[1]: 576
 Level WeightMemory total_reads_per_layer[2]: 225280
-Level WeightMemory total_WMOPs: 4101738518.32
+Level WeightMemory total_WMOPs: 4101725719.6
 Level WeightMemory real WMOPs: 7757749.4
 Updated considering level: SACols_2, this dim: Q is considered in spatial_iterations_per_layer[2]
 Updated considering level: SARows_2, this dim: Z2 is considered in spatial_iterations_per_layer[2]
@@ -2765,8 +2767,8 @@ DEBUG updateStats post scaling: Level AccumulationOutRegister:
 Level AccumulationOutRegister total_reads_per_layer[0]: 110592
 Level AccumulationOutRegister total_reads_per_layer[1]: 2359296
 Level AccumulationOutRegister total_reads_per_layer[2]: 922746880
-Level AccumulationOutRegister total_WMOPs: 7433576053.8
-Level AccumulationOutRegister real WMOPs: 1937139491.2400002
+Level AccumulationOutRegister total_WMOPs: 7433563062.12
+Level AccumulationOutRegister real WMOPs: 1937139426.92
 é stato chiamato update stats! 
 
 
@@ -2795,7 +2797,7 @@ input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 1170, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
-Level: DRAM, Layer 0: final Input in_reads = 1170
+Level: DRAM, Layer 0: final Input in_reads = 1,170
 
 
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
@@ -2807,7 +2809,7 @@ innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getIntermediateI
 self.tile_size[dim] for dim in dim_sum: [[32], [1, 3], [128, 3]]
 intermediate in layer 0 read after no next_spatials handling: 12480
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
-intermediate in layer 0 final read: 12480
+intermediate in layer 0 final read: 12,480
 
 Initialization Level: DRAM, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 12480, 1: 1}
 actual_dataflow_per_layer[2] = ['Q', 'P'], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
@@ -2820,7 +2822,7 @@ innermost_dim_sum: ['P', 'R2'], dim_sum: dim_sum in self.arch.coupling.getInterm
 self.tile_size[dim] for dim in dim_sum: [[32], [128, 1]]
 intermediate in layer 1 read after no next_spatials handling: 2883584
 intermediate in remaining dim in actual_dataflow_per_layer[2][:1]: ['Q']
-intermediate in layer 1 final read: 28835840
+intermediate in layer 1 final read: 28,835,840
 
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
@@ -2832,7 +2834,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 0 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 4096
+intermediate out layer 0 final read: 4,096
 
 Initialization Level: DRAM, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 4096, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -2844,7 +2846,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 1 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 4096
+intermediate out layer 1 final read: 4,096
 
 Initialization Level: DRAM, Layer 2: out_reads = 1, innermost_dim_sum = None, i = 1, actual_dataflow = ['Q', 'P']
 out layer read after innermost_dim_sum handling: 1
@@ -2856,7 +2858,7 @@ actual_dataflow_per_layer[1]: [], i = 1
 
 output layer 2 final read: 14417920, out_reads_factors (orthogonal to output) = 1
 
-BEFORE BYPASS: ignore_bypasses: False, In reads: 1170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
+BEFORE BYPASS: ignore_bypasses: False, In reads: 1,170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 12480, 1: 28835840}, int_in_reads: 28848320, Per Layer Intermediate Output reads: {0: 4096, 1: 4096}, int_out_reads: 8192, Out reads: 14417920
 ignore_bypasses: False, self.next_spatial.names: []
 I AM HANDLING BYPASS NOW
@@ -2870,13 +2872,13 @@ Level: DRAM: Operand = w
 Final level name before not bypassing: FeatureMemory
 I call MOPs on FeatureMemory
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -2885,16 +2887,16 @@ Stationarity calculation for Level: FeatureMemory: in_bp = False, w_bp = True, i
 
 
 Initialization Level: FeatureMemory: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1, 2: 1}
-actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
-tile size for each dim of actual_dataflow_per_layer[0]: [1, 1, 1, 16]
-Level: FeatureMemory: innermost_dim_sum = None, i = 3, actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0']
+actual_dataflow_per_layer[0] = ['C0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 16]
+Level: FeatureMemory: innermost_dim_sum = None, i = 1, actual_dataflow_per_layer[0] = ['C0', 'Z0']
 weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z0'], ['C0'], ['R0'], ['S0']]
-self.tile_size[dim] for dim in dim_sum: [[16], [1], [1], [1]]
-weight layer 0 read after no next_spatials handling: 16
-weight layer 0 read after next_spatials handling: 16
-weight remaining dim in actual_dataflow_per_layer[0][:4]: ['C0', 'R0', 'S0', 'Z0']
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0'], i = 3
+self.tile_size[dim] for dim in dim_sum: [[16], [1], [3], [3]]
+weight layer 0 read after no next_spatials handling: 144
+weight layer 0 read after next_spatials handling: 144
+weight remaining dim in actual_dataflow_per_layer[0][:2]: ['C0', 'Z0']
+actual_dataflow_per_layer[0]: ['C0', 'Z0'], i = 1
 
 Level: FeatureMemory, Layer 0: final Weight layer_read = 864
 actual_dataflow_per_layer[1] = ['C1', 'S1', 'R1', 'Z1'], flat_weight_coupling[1] = ['Z1', 'C1', 'R1', 'S1']
@@ -2908,7 +2910,7 @@ weight layer 1 read after next_spatials handling: 16
 weight remaining dim in actual_dataflow_per_layer[1][:4]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1'], i = 3
 
-Level: FeatureMemory, Layer 1: final Weight layer_read = 9216
+Level: FeatureMemory, Layer 1: final Weight layer_read = 9,216
 actual_dataflow_per_layer[2] = ['C2'], flat_weight_coupling[2] = ['Z2', 'C2', 'R2', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: [1]
 Level: FeatureMemory: innermost_dim_sum = None, i = 0, actual_dataflow_per_layer[2] = ['C2']
@@ -2992,13 +2994,13 @@ Level DRAM real WMOPs: 2344917700.0
 Questo mops è chiamato da update stats
 Level: FeatureMemory, arch bypasses for the level: ['w'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -3087,7 +3089,7 @@ in_btwn: MOPs results: in_reads_bp: 128, per_layer_w_reads_bp: {0: 0, 1: 0, 2: 0
 I'm going from the down (Compute) to the top
 Level: FeatureMemory: in_btwn = WeightMemory, stationarity_to_address = True, in_reads_bp = 128, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
 in_btwn name: WeightMemory, Handling Input Bypass with stationarity_to_address = False
-Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0', 'R0', 'S0']
+Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0']
 End inbtwn
 Now I will do MyLevel: FeatureMemory: MOPs for per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, in_bp=128, per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
 per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 0
@@ -3103,13 +3105,13 @@ Level: FeatureMemory: Operand = out
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -3151,13 +3153,13 @@ Level: FeatureMemory: Operand = int
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -3168,7 +3170,7 @@ Stationarity calculation for Level: WeightMemory: in_bp = False, w_bp = False, i
 Initialization Level: WeightMemory, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_input_coupling[1] = ['C1', 'Y1', 'R1', 'X1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C1': 1, 'Y1': 1, 'R1': 1, 'X1': 128, 'S1': 1}
  dims in dim_sum: [['C1'], ['Y1', 'R1'], ['X1', 'S1']]
@@ -3180,7 +3182,7 @@ intermediate in layer 0 final read: 128
 Initialization Level: WeightMemory, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 128, 1: 1}
 actual_dataflow_per_layer[2] = [], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C2': 1, 'P': 1, 'R2': 1, 'Q': 128, 'S2': 1}
  dims in dim_sum: [['C2'], ['P', 'R2'], ['Q', 'S2']]
@@ -3190,16 +3192,16 @@ intermediate in remaining dim in actual_dataflow_per_layer[2][:0]: []
 intermediate in layer 1 final read: 128
 
 Initialization Level: WeightMemory, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
-actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
-tile size for each dim of actual_dataflow_per_layer[0]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+actual_dataflow_per_layer[0] = ['R0', 'S0'], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 1]
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'Z0': 16, 'Y0': 1, 'X0': 128}
 tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 0 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 2048
+intermediate out layer 0 final read: 2,048
 
 Initialization Level: WeightMemory, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 2048, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -3211,7 +3213,7 @@ tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 1 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 2048
+intermediate out layer 1 final read: 2,048
 
 BEFORE BYPASS: ignore_bypasses: True, In reads: 0, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 128, 1: 128}, int_in_reads: 256, Per Layer Intermediate Output reads: {0: 2048, 1: 2048}, int_out_reads: 4096, Out reads: 0
@@ -3232,55 +3234,55 @@ per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 0
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 0
 
-AFTER BYPASS of all operands:  FeatureMemory: in_reads: 6912, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 54, 1: 576}, int_out_reads: 630, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
+AFTER BYPASS of all operands:  FeatureMemory: in_reads: 768, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 6, 1: 576}, int_out_reads: 582, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
 
-After Spatials: Level: FeatureMemory: MOPs in_reads = 6912, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 54, 1: 576}, int_out_reads = 630, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
+After Spatials: Level: FeatureMemory: MOPs in_reads = 768, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 6, 1: 576}, int_out_reads = 582, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
 
 End MOPs with Bypasses for Level: FeatureMemory
 
 
 DEBUG updateStats pre scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 32}
-  per_layer_int_out_reads: {0: 54, 1: 576}
+  per_layer_int_out_reads: {0: 6, 1: 576}
   out_reads: 2048
   out_reads_factors: 1
 temporal_iterations_per_layer before update: {0: 1, 1: 1, 2: 7040}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
 scale per layer: {0: 1, 1: 1, 2: 7040}
-scaled in_reads: 6912
+scaled in_reads: 768
 scaled per_layer_w_reads before sum: {0: 0, 1: 0, 2: 0}
 scaled per_layer_int_in_reads before sum: {0: 288, 1: 225280}
-scaled per_layer_int_out_reads before sum: {0: 54, 1: 576}
+scaled per_layer_int_out_reads before sum: {0: 6, 1: 576}
 scaled out_reads: 14417920
 DEBUG updateStats post scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 225280}
   int_in_reads: 225568
-  per_layer_int_out_reads: {0: 54, 1: 576}
-  int_out_reads: 630
+  per_layer_int_out_reads: {0: 6, 1: 576}
+  int_out_reads: 582
   out_reads: 14417920
   out_reads_factors: 1
-Level FeatureMemory total_reads_per_layer[0]: 6966
+Level FeatureMemory total_reads_per_layer[0]: 774
 Level FeatureMemory total_reads_per_layer[1]: 864
 Level FeatureMemory total_reads_per_layer[2]: 14643200
-Level FeatureMemory total_WMOPs: 4079377946.52
-Level FeatureMemory real WMOPs: 117013069.24000001
+Level FeatureMemory total_WMOPs: 4079365147.7999997
+Level FeatureMemory real WMOPs: 117000464.44000001
 
 
 Questo mops è chiamato da update stats
 Level: WeightMemory, arch bypasses for the level: ['in', 'int', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -3388,10 +3390,10 @@ per_layer_w_reads after non-selective multicast: {0: 16, 1: 16, 2: 16}
 in_btwn: MOPs results: in_reads_bp: 0, per_layer_w_reads_bp: {0: 16, 1: 16, 2: 16}, w_reads_bp: 48, int_out_reads_bp: 0, int_in_reads_bp: 0, out_reads_bp: 0
 End inbtwn
 Now I will do MyLevel: WeightMemory: MOPs for per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, in_bp=0, per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, w_bp=48, out_bp=0, stationarity_to_address=True (bypass operand w)
-actual_dataflow_per_layer[0] = []
+actual_dataflow_per_layer[0] = ['R0', 'S0']
 actual_dataflow_per_layer[1] = []
 actual_dataflow_per_layer[2] = []
-per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 1
+per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 9
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 1
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 1
 
@@ -3403,7 +3405,7 @@ No levels in between for bypass operand out
 Level: WeightMemory: Operand = int
 No levels in between for bypass operand int
 
-AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 1, 1: 1, 2: 1}, w_reads: 3, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
+AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 9, 1: 1, 2: 1}, w_reads: 11, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
 
 spatial_level: SACols_2, spatial_level.dataflow: ['Q'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {2: 7}, Z2: {}}
 spatial_level: SARows_2, spatial_level.dataflow: ['Z2'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {2: 4}}
@@ -3411,21 +3413,21 @@ spatial_level: SACols_1, spatial_level.dataflow: ['X1'], spatial_level.factors: 
 spatial_level: SARows_1, spatial_level.dataflow: ['Z1'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {2: 4}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SACols_0, spatial_level.dataflow: ['X0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {2: 7}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SARows_0, spatial_level.dataflow: ['Z0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 4}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
-After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 1, 1: 1, 2: 1}, w_reads = 3, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 9, 1: 1, 2: 1}, w_reads = 11, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
 
 End MOPs with Bypasses for Level: WeightMemory
 
 
 DEBUG updateStats pre scaling: Level WeightMemory:
   in_reads: 0
-  per_layer_w_reads: {0: 1, 1: 1, 2: 1}
-  w_reads: 3
+  per_layer_w_reads: {0: 9, 1: 1, 2: 1}
+  w_reads: 11
   per_layer_int_in_reads: {0: 0, 1: 0}
   per_layer_int_out_reads: {0: 0, 1: 0}
   out_reads: 0
   out_reads_factors: 0
-temporal_iterations_per_layer before update: {0: 54, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
-scale per layer: {0: 54, 1: 576, 2: 225280}
+temporal_iterations_per_layer before update: {0: 6, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
+scale per layer: {0: 6, 1: 576, 2: 225280}
 scaled in_reads: 0
 scaled per_layer_w_reads before sum: {0: 54, 1: 576, 2: 225280}
 scaled per_layer_int_in_reads before sum: {0: 0, 1: 0}
@@ -3444,7 +3446,7 @@ DEBUG updateStats post scaling: Level WeightMemory:
 Level WeightMemory total_reads_per_layer[0]: 54
 Level WeightMemory total_reads_per_layer[1]: 576
 Level WeightMemory total_reads_per_layer[2]: 225280
-Level WeightMemory total_WMOPs: 4101738518.32
+Level WeightMemory total_WMOPs: 4101725719.6
 Level WeightMemory real WMOPs: 7757749.4
 Updated considering level: SACols_2, this dim: Q is considered in spatial_iterations_per_layer[2]
 Updated considering level: SARows_2, this dim: Z2 is considered in spatial_iterations_per_layer[2]
@@ -3574,8 +3576,8 @@ DEBUG updateStats post scaling: Level AccumulationOutRegister:
 Level AccumulationOutRegister total_reads_per_layer[0]: 110592
 Level AccumulationOutRegister total_reads_per_layer[1]: 2359296
 Level AccumulationOutRegister total_reads_per_layer[2]: 922746880
-Level AccumulationOutRegister total_WMOPs: 7433576053.8
-Level AccumulationOutRegister real WMOPs: 1937139491.2400002
+Level AccumulationOutRegister total_WMOPs: 7433563062.12
+Level AccumulationOutRegister real WMOPs: 1937139426.92
 
 Final condition: 
 Wart: 1.148e+00
@@ -3610,7 +3612,7 @@ input read after innermost_dim_sum handling: 1
 Level: DRAM, Layer 0: after no Spatial, Input in_reads = 1170, i = -1, innermost_dim_sum = None
 input remaining dim in actual_dataflow_per_layer[0][:0]: []
 actual_dataflow_per_layer[0]: [], i = -1
-Level: DRAM, Layer 0: final Input in_reads = 1170
+Level: DRAM, Layer 0: final Input in_reads = 1,170
 
 
 Initialization Level: DRAM, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
@@ -3622,7 +3624,7 @@ innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getIntermediateI
 self.tile_size[dim] for dim in dim_sum: [[32], [1, 3], [128, 3]]
 intermediate in layer 0 read after no next_spatials handling: 12480
 intermediate in remaining dim in actual_dataflow_per_layer[1][:0]: []
-intermediate in layer 0 final read: 12480
+intermediate in layer 0 final read: 12,480
 
 Initialization Level: DRAM, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 12480, 1: 1}
 actual_dataflow_per_layer[2] = ['Q', 'P'], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
@@ -3635,7 +3637,7 @@ innermost_dim_sum: ['P', 'R2'], dim_sum: dim_sum in self.arch.coupling.getInterm
 self.tile_size[dim] for dim in dim_sum: [[32], [128, 1]]
 intermediate in layer 1 read after no next_spatials handling: 2883584
 intermediate in remaining dim in actual_dataflow_per_layer[2][:1]: ['Q']
-intermediate in layer 1 final read: 28835840
+intermediate in layer 1 final read: 28,835,840
 
 Initialization Level: DRAM, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
@@ -3647,7 +3649,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 0 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 4096
+intermediate out layer 0 final read: 4,096
 
 Initialization Level: DRAM, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 4096, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -3659,7 +3661,7 @@ self.tile_size[dim] for dim in dim_sum: [[32], [1], [128]]
 intermediate out layer 1 read after no next_spatials handling: 4096
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 4096
+intermediate out layer 1 final read: 4,096
 
 Initialization Level: DRAM, Layer 2: out_reads = 1, innermost_dim_sum = None, i = 1, actual_dataflow = ['Q', 'P']
 out layer read after innermost_dim_sum handling: 1
@@ -3671,7 +3673,7 @@ actual_dataflow_per_layer[1]: [], i = 1
 
 output layer 2 final read: 14417920, out_reads_factors (orthogonal to output) = 1
 
-BEFORE BYPASS: ignore_bypasses: False, In reads: 1170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
+BEFORE BYPASS: ignore_bypasses: False, In reads: 1,170, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 12480, 1: 28835840}, int_in_reads: 28848320, Per Layer Intermediate Output reads: {0: 4096, 1: 4096}, int_out_reads: 8192, Out reads: 14417920
 ignore_bypasses: False, self.next_spatial.names: []
 I AM HANDLING BYPASS NOW
@@ -3685,13 +3687,13 @@ Level: DRAM: Operand = w
 Final level name before not bypassing: FeatureMemory
 I call MOPs on FeatureMemory
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level (handling bypass): FeatureMemory: Starting MOPs calculation with in_bp: False, w_bp: True, out_bp: False, int_bp: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -3700,16 +3702,16 @@ Stationarity calculation for Level: FeatureMemory: in_bp = False, w_bp = True, i
 
 
 Initialization Level: FeatureMemory: w_reads = 1, per_layer_w_reads = {0: 1, 1: 1, 2: 1}
-actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
-tile size for each dim of actual_dataflow_per_layer[0]: [1, 1, 1, 16]
-Level: FeatureMemory: innermost_dim_sum = None, i = 3, actual_dataflow_per_layer[0] = ['C0', 'R0', 'S0', 'Z0']
+actual_dataflow_per_layer[0] = ['C0', 'Z0'], flat_weight_coupling[0] = ['Z0', 'C0', 'R0', 'S0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 16]
+Level: FeatureMemory: innermost_dim_sum = None, i = 1, actual_dataflow_per_layer[0] = ['C0', 'Z0']
 weight layer 0 read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, dim_sum: dim_sum in self.arch.coupling.getWeightCoupling(0) if dim_sum is not innermost_dim_sum: [['Z0'], ['C0'], ['R0'], ['S0']]
-self.tile_size[dim] for dim in dim_sum: [[16], [1], [1], [1]]
-weight layer 0 read after no next_spatials handling: 16
-weight layer 0 read after next_spatials handling: 16
-weight remaining dim in actual_dataflow_per_layer[0][:4]: ['C0', 'R0', 'S0', 'Z0']
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0'], i = 3
+self.tile_size[dim] for dim in dim_sum: [[16], [1], [3], [3]]
+weight layer 0 read after no next_spatials handling: 144
+weight layer 0 read after next_spatials handling: 144
+weight remaining dim in actual_dataflow_per_layer[0][:2]: ['C0', 'Z0']
+actual_dataflow_per_layer[0]: ['C0', 'Z0'], i = 1
 
 Level: FeatureMemory, Layer 0: final Weight layer_read = 864
 actual_dataflow_per_layer[1] = ['C1', 'S1', 'R1', 'Z1'], flat_weight_coupling[1] = ['Z1', 'C1', 'R1', 'S1']
@@ -3723,7 +3725,7 @@ weight layer 1 read after next_spatials handling: 16
 weight remaining dim in actual_dataflow_per_layer[1][:4]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1'], i = 3
 
-Level: FeatureMemory, Layer 1: final Weight layer_read = 9216
+Level: FeatureMemory, Layer 1: final Weight layer_read = 9,216
 actual_dataflow_per_layer[2] = ['C2'], flat_weight_coupling[2] = ['Z2', 'C2', 'R2', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: [1]
 Level: FeatureMemory: innermost_dim_sum = None, i = 0, actual_dataflow_per_layer[2] = ['C2']
@@ -3807,13 +3809,13 @@ Level DRAM real WMOPs: 2344917700.0
 Questo mops è chiamato da update stats
 Level: FeatureMemory, arch bypasses for the level: ['w'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: FeatureMemory
-Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 3, 'R0': 3, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: ['C0', 'R0', 'S0', 'Z0']
+Level: FeatureMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 3, S0: 3, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'Z2': 1, 'R2': 1, 'S2': 1, 'Q': 1, 'C2': 32, 'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3, 'X1': 1, 'S0': 1, 'R0': 1, 'Z0': 2, 'X0': 1, 'C0': 3}, bypasses: ['w'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['C0', 'Z0']
 actual_dataflow_per_layer[1]: ['C1', 'S1', 'R1', 'Z1']
 actual_dataflow_per_layer[2]: ['C2']
-Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'R0', 'S0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('R0', 1), ('S0', 1), ('Z1', 16), ('Z0', 16)]
-tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('R0', 1), ('S0', 1), ('Z0', 16)]
+Level: FeatureMemory: actual_dataflow: ['C2', 'C1', 'S1', 'R1', 'C0', 'Z1', 'Z0'], dataflow: ['C2', 'R2', 'S2', 'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 'Q', 'Z2', 'X1', 'Z1', 'X0', 'Z0', 'Y0', 'Y1', 'P'], actual_dataflow_per_layer: {0: ['C0', 'Z0'], 1: ['C1', 'S1', 'R1', 'Z1'], 2: ['C2']}, factors: {C0: {3: 1}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 1}, C1: {2: 5}, R1: {3: 1}, S1: {3: 1}, Y1: {}, X1: {}, Z1: {2: 1}, C2: {2: 5}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('C2', 1), ('C1', 1), ('S1', 1), ('R1', 1), ('C0', 1), ('Z1', 16), ('Z0', 16)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('C0', 1), ('Z0', 16)]
 tile size for each dim in actual_dataflow_per_layer[1]: [('C1', 1), ('S1', 1), ('R1', 1), ('Z1', 16)]
 tile size for each dim in actual_dataflow_per_layer[2]: [('C2', 1)]
 
@@ -3902,7 +3904,7 @@ in_btwn: MOPs results: in_reads_bp: 128, per_layer_w_reads_bp: {0: 0, 1: 0, 2: 0
 I'm going from the down (Compute) to the top
 Level: FeatureMemory: in_btwn = WeightMemory, stationarity_to_address = True, in_reads_bp = 128, w_reads_bp = 0, out_reads_bp = 0, ignore_bypasses = False
 in_btwn name: WeightMemory, Handling Input Bypass with stationarity_to_address = False
-Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0', 'R0', 'S0']
+Remaining dim: actual_dataflow_per_layer_bp[0][:i+1] = ['C0']
 End inbtwn
 Now I will do MyLevel: FeatureMemory: MOPs for per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, in_bp=128, per_layer_w_reads_bp={0: 0, 1: 0, 2: 0}, w_bp=0, out_bp=0, stationarity_to_address=False (bypass operand in)
 per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 0
@@ -3918,13 +3920,13 @@ Level: FeatureMemory: Operand = out
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: True, int_bp: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -3966,13 +3968,13 @@ Level: FeatureMemory: Operand = int
 Final level name before not bypassing: WeightMemory
 I call MOPs on WeightMemory
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level (handling bypass): WeightMemory: Starting MOPs calculation with in_bp: False, w_bp: False, out_bp: False, int_bp: True, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -3983,7 +3985,7 @@ Stationarity calculation for Level: WeightMemory: in_bp = False, w_bp = False, i
 Initialization Level: WeightMemory, Layer 0: int_in_reads = 1, per_layer_int_in_reads = {0: 1, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_input_coupling[1] = ['C1', 'Y1', 'R1', 'X1', 'S1']
 tile size for each dim of actual_dataflow_per_layer[1]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C1': 1, 'Y1': 1, 'R1': 1, 'X1': 128, 'S1': 1}
  dims in dim_sum: [['C1'], ['Y1', 'R1'], ['X1', 'S1']]
@@ -3995,7 +3997,7 @@ intermediate in layer 0 final read: 128
 Initialization Level: WeightMemory, Layer 1: int_in_reads = 1, per_layer_int_in_reads = {0: 128, 1: 1}
 actual_dataflow_per_layer[2] = [], flat_intermediate_input_coupling[2] = ['C2', 'P', 'R2', 'Q', 'S2']
 tile size for each dim of actual_dataflow_per_layer[2]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'C2': 1, 'P': 1, 'R2': 1, 'Q': 128, 'S2': 1}
  dims in dim_sum: [['C2'], ['P', 'R2'], ['Q', 'S2']]
@@ -4005,16 +4007,16 @@ intermediate in remaining dim in actual_dataflow_per_layer[2][:0]: []
 intermediate in layer 1 final read: 128
 
 Initialization Level: WeightMemory, Layer 0: int_out_reads = 1, per_layer_int_out_reads = {0: 1, 1: 1}
-actual_dataflow_per_layer[0] = [], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
-tile size for each dim of actual_dataflow_per_layer[0]: []
-Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = []
+actual_dataflow_per_layer[0] = ['R0', 'S0'], flat_intermediate_output_coupling[0] = ['Z0', 'Y0', 'X0']
+tile size for each dim of actual_dataflow_per_layer[0]: [1, 1]
+Level: WeightMemory: innermost_dim_sum = None, i = -1, actual_dataflow = ['R0', 'S0']
 layer read after innermost_dim_sum handling: 1
 innermost_dim_sum: None, next_spatial_unroll: {'Z0': 16, 'Y0': 1, 'X0': 128}
 tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 0 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[0][:0]: []
 
-intermediate out layer 0 final read: 2048
+intermediate out layer 0 final read: 2,048
 
 Initialization Level: WeightMemory, Layer 1: int_out_reads = 1, per_layer_int_out_reads = {0: 2048, 1: 1}
 actual_dataflow_per_layer[1] = [], flat_intermediate_output_coupling[1] = ['Z1', 'Y1', 'X1']
@@ -4026,7 +4028,7 @@ tile sizes[dim] for dim in dim_sum: [[16], [1], [128]]
 intermediate out layer 1 read after next_spatials handling: 2048
 intermediate out remaining dim in actual_dataflow_per_layer[1][:0]: []
 
-intermediate out layer 1 final read: 2048
+intermediate out layer 1 final read: 2,048
 
 BEFORE BYPASS: ignore_bypasses: True, In reads: 0, Per Layer W Reads: {0: 0, 1: 0, 2: 0}, w_reads: 0,
  Per Layer Intermediate Input reads: {0: 128, 1: 128}, int_in_reads: 256, Per Layer Intermediate Output reads: {0: 2048, 1: 2048}, int_out_reads: 4096, Out reads: 0
@@ -4047,55 +4049,55 @@ per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 0
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 0
 
-AFTER BYPASS of all operands:  FeatureMemory: in_reads: 6912, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 54, 1: 576}, int_out_reads: 630, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
+AFTER BYPASS of all operands:  FeatureMemory: in_reads: 768, per_layer_w_reads: {0: 0, 1: 0, 2: 0}, w_reads: 0, per_layer_int_in_reads: {0: 288, 1: 32}, int_in_reads: 320, per_layer_int_out_reads: {0: 6, 1: 576}, int_out_reads: 582, out_reads: 2048, out_writes: 2048, out_reads_factors: 1
 
-After Spatials: Level: FeatureMemory: MOPs in_reads = 6912, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 54, 1: 576}, int_out_reads = 630, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
+After Spatials: Level: FeatureMemory: MOPs in_reads = 768, per_layer_w_reads = {0: 0, 1: 0, 2: 0}, w_reads = 0, per_layer_int_in_reads = {0: 288, 1: 32}, int_in_reads = 320, per_layer_int_out_reads = {0: 6, 1: 576}, int_out_reads = 582, out_reads = 2048, out_writes = 2048, out_reads_factors = 1
 
 End MOPs with Bypasses for Level: FeatureMemory
 
 
 DEBUG updateStats pre scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 32}
-  per_layer_int_out_reads: {0: 54, 1: 576}
+  per_layer_int_out_reads: {0: 6, 1: 576}
   out_reads: 2048
   out_reads_factors: 1
 temporal_iterations_per_layer before update: {0: 1, 1: 1, 2: 7040}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
 scale per layer: {0: 1, 1: 1, 2: 7040}
-scaled in_reads: 6912
+scaled in_reads: 768
 scaled per_layer_w_reads before sum: {0: 0, 1: 0, 2: 0}
 scaled per_layer_int_in_reads before sum: {0: 288, 1: 225280}
-scaled per_layer_int_out_reads before sum: {0: 54, 1: 576}
+scaled per_layer_int_out_reads before sum: {0: 6, 1: 576}
 scaled out_reads: 14417920
 DEBUG updateStats post scaling: Level FeatureMemory:
-  in_reads: 6912
+  in_reads: 768
   per_layer_w_reads: {0: 0, 1: 0, 2: 0}
   w_reads: 0
   per_layer_int_in_reads: {0: 288, 1: 225280}
   int_in_reads: 225568
-  per_layer_int_out_reads: {0: 54, 1: 576}
-  int_out_reads: 630
+  per_layer_int_out_reads: {0: 6, 1: 576}
+  int_out_reads: 582
   out_reads: 14417920
   out_reads_factors: 1
-Level FeatureMemory total_reads_per_layer[0]: 6966
+Level FeatureMemory total_reads_per_layer[0]: 774
 Level FeatureMemory total_reads_per_layer[1]: 864
 Level FeatureMemory total_reads_per_layer[2]: 14643200
-Level FeatureMemory total_WMOPs: 4079377946.52
-Level FeatureMemory real WMOPs: 117013069.24000001
+Level FeatureMemory total_WMOPs: 4079365147.7999997
+Level FeatureMemory real WMOPs: 117000464.44000001
 
 
 Questo mops è chiamato da update stats
 Level: WeightMemory, arch bypasses for the level: ['in', 'int', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0
 arch.name: DepFiN Architecture, level.name: WeightMemory
-Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 1, 'S0': 1}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
-actual_dataflow_per_layer[0]: []
+Level: WeightMemory: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 0, int_bp: 0, ignore_bypasses: False, dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, tile_sizes: {C0: 1, Y0: 1, X0: 128, R0: 1, S0: 1, Z0: 16, C1: 1, R1: 1, S1: 1, Y1: 1, X1: 128, Z1: 16, C2: 1, R2: 1, S2: 1, P: 1, Q: 128, Z2: 16}, factors_constraints: {'R0': 3, 'S0': 3}, bypasses: ['in', 'int', 'out'], multiple_buffering: 1, multiple_reuses: True
+actual_dataflow_per_layer[0]: ['R0', 'S0']
 actual_dataflow_per_layer[1]: []
 actual_dataflow_per_layer[2]: []
-Level: WeightMemory: actual_dataflow: [], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: [], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
-tile size for each dim in actual_dataflow: []
-tile size for each dim in actual_dataflow_per_layer[0]: []
+Level: WeightMemory: actual_dataflow: ['R0', 'S0'], dataflow: ['R0', 'S0', 'C0', 'Y0', 'X0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'], actual_dataflow_per_layer: {0: ['R0', 'S0'], 1: [], 2: []}, factors: {C0: {}, Y0: {}, X0: {}, R0: {3: 1}, S0: {3: 1}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}, num layers: 3
+tile size for each dim in actual_dataflow: [('R0', 1), ('S0', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('R0', 1), ('S0', 1)]
 tile size for each dim in actual_dataflow_per_layer[1]: []
 tile size for each dim in actual_dataflow_per_layer[2]: []
 
@@ -4203,10 +4205,10 @@ per_layer_w_reads after non-selective multicast: {0: 16, 1: 16, 2: 16}
 in_btwn: MOPs results: in_reads_bp: 0, per_layer_w_reads_bp: {0: 16, 1: 16, 2: 16}, w_reads_bp: 48, int_out_reads_bp: 0, int_in_reads_bp: 0, out_reads_bp: 0
 End inbtwn
 Now I will do MyLevel: WeightMemory: MOPs for per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, in_bp=0, per_layer_w_reads_bp={0: 16, 1: 16, 2: 16}, w_bp=48, out_bp=0, stationarity_to_address=True (bypass operand w)
-actual_dataflow_per_layer[0] = []
+actual_dataflow_per_layer[0] = ['R0', 'S0']
 actual_dataflow_per_layer[1] = []
 actual_dataflow_per_layer[2] = []
-per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 1
+per_layer_w_reads_before_bypass_layer_idx[0]: 0, per_layer_w_reads_bp_layer_idx[0]: 9
 per_layer_w_reads_before_bypass_layer_idx[1]: 0, per_layer_w_reads_bp_layer_idx[1]: 1
 per_layer_w_reads_before_bypass_layer_idx[2]: 0, per_layer_w_reads_bp_layer_idx[2]: 1
 
@@ -4218,7 +4220,7 @@ No levels in between for bypass operand out
 Level: WeightMemory: Operand = int
 No levels in between for bypass operand int
 
-AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 1, 1: 1, 2: 1}, w_reads: 3, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
+AFTER BYPASS of all operands:  WeightMemory: in_reads: 0, per_layer_w_reads: {0: 9, 1: 1, 2: 1}, w_reads: 11, per_layer_int_in_reads: {0: 0, 1: 0}, int_in_reads: 0, per_layer_int_out_reads: {0: 0, 1: 0}, int_out_reads: 0, out_reads: 0, out_writes: 0, out_reads_factors: 0
 
 spatial_level: SACols_2, spatial_level.dataflow: ['Q'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {2: 7}, Z2: {}}
 spatial_level: SARows_2, spatial_level.dataflow: ['Z2'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {2: 4}}
@@ -4226,21 +4228,21 @@ spatial_level: SACols_1, spatial_level.dataflow: ['X1'], spatial_level.factors: 
 spatial_level: SARows_1, spatial_level.dataflow: ['Z1'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {2: 4}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SACols_0, spatial_level.dataflow: ['X0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {2: 7}, R0: {}, S0: {}, Z0: {}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
 spatial_level: SARows_0, spatial_level.dataflow: ['Z0'], spatial_level.factors: {C0: {}, Y0: {}, X0: {}, R0: {}, S0: {}, Z0: {2: 4}, C1: {}, R1: {}, S1: {}, Y1: {}, X1: {}, Z1: {}, C2: {}, R2: {}, S2: {}, P: {}, Q: {}, Z2: {}}
-After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 1, 1: 1, 2: 1}, w_reads = 3, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
+After Spatials: Level: WeightMemory: MOPs in_reads = 0, per_layer_w_reads = {0: 9, 1: 1, 2: 1}, w_reads = 11, per_layer_int_in_reads = {0: 0, 1: 0}, int_in_reads = 0, per_layer_int_out_reads = {0: 0, 1: 0}, int_out_reads = 0, out_reads = 0, out_writes = 0, out_reads_factors = 0
 
 End MOPs with Bypasses for Level: WeightMemory
 
 
 DEBUG updateStats pre scaling: Level WeightMemory:
   in_reads: 0
-  per_layer_w_reads: {0: 1, 1: 1, 2: 1}
-  w_reads: 3
+  per_layer_w_reads: {0: 9, 1: 1, 2: 1}
+  w_reads: 11
   per_layer_int_in_reads: {0: 0, 1: 0}
   per_layer_int_out_reads: {0: 0, 1: 0}
   out_reads: 0
   out_reads_factors: 0
-temporal_iterations_per_layer before update: {0: 54, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
-scale per layer: {0: 54, 1: 576, 2: 225280}
+temporal_iterations_per_layer before update: {0: 6, 1: 576, 2: 225280}, spatial_iterations_per_layer before update: {0: 1, 1: 1, 2: 1}
+scale per layer: {0: 6, 1: 576, 2: 225280}
 scaled in_reads: 0
 scaled per_layer_w_reads before sum: {0: 54, 1: 576, 2: 225280}
 scaled per_layer_int_in_reads before sum: {0: 0, 1: 0}
@@ -4259,7 +4261,7 @@ DEBUG updateStats post scaling: Level WeightMemory:
 Level WeightMemory total_reads_per_layer[0]: 54
 Level WeightMemory total_reads_per_layer[1]: 576
 Level WeightMemory total_reads_per_layer[2]: 225280
-Level WeightMemory total_WMOPs: 4101738518.32
+Level WeightMemory total_WMOPs: 4101725719.6
 Level WeightMemory real WMOPs: 7757749.4
 Updated considering level: SACols_2, this dim: Q is considered in spatial_iterations_per_layer[2]
 Updated considering level: SARows_2, this dim: Z2 is considered in spatial_iterations_per_layer[2]
@@ -4389,10 +4391,10 @@ DEBUG updateStats post scaling: Level AccumulationOutRegister:
 Level AccumulationOutRegister total_reads_per_layer[0]: 110592
 Level AccumulationOutRegister total_reads_per_layer[1]: 2359296
 Level AccumulationOutRegister total_reads_per_layer[2]: 922746880
-Level AccumulationOutRegister total_WMOPs: 7433576053.8
-Level AccumulationOutRegister real WMOPs: 1937139491.2400002
+Level AccumulationOutRegister total_WMOPs: 7433563062.12
+Level AccumulationOutRegister real WMOPs: 1937139426.92
 
-Finished in: 0.072s
+Finished in: 0.029s
 
 Best mapping found with:
 	Wart: 1.148e+00
@@ -4402,8 +4404,8 @@ Best mapping found with:
 
 Mapping:
 DRAM ----------> Q: 10, P: 704
-FeatureMemory -> C2: 32, C1: 32, S1: 3, R1: 3, C0: 3, R0: 3, S0: 3, Z1: 2, Z0: 2
-WeightMemory --
+FeatureMemory -> C2: 32, C1: 32, S1: 3, R1: 3, C0: 3, Z1: 2, Z0: 2
+WeightMemory --> R0: 3, S0: 3
 SACols_2 ------> Q: 128
 SARows_2 ------> Z2: 16
 SACols_1 ------> X1: 128
@@ -4423,12 +4425,12 @@ DRAM:		Per-Layer Int_Out_R: [L0: 4,096, L1: 4,096], Total: 8,192
 DRAM:		Per-Layer Int_Out_W: [L0: 4,096, L1: 4,096], Total: 8,192
 DRAM:		Total Reads = 32,472,242, Total Writes = 14,426,112
 FeatureMemory:	Output Reads = 0 (reads) + 14,417,920 (drains), Output Writes = 14,417,920 (updates) + 0 (fills)
-FeatureMemory:	Input Reads = 6,912 (reads), Input Writes = 0 (writes)
+FeatureMemory:	Input Reads = 768 (reads), Input Writes = 0 (writes)
 FeatureMemory:	Per-Layer W_R: [L0: 0, L1: 0, L2: 0], Total: 0
 FeatureMemory:	Per-Layer Int_In_R: [L0: 288, L1: 225,280], Total: 225,568
-FeatureMemory:	Per-Layer Int_Out_R: [L0: 54, L1: 576], Total: 630
-FeatureMemory:	Per-Layer Int_Out_W: [L0: 54, L1: 576], Total: 630
-FeatureMemory:	Total Reads = 14,651,030, Total Writes = 14,418,550
+FeatureMemory:	Per-Layer Int_Out_R: [L0: 6, L1: 576], Total: 582
+FeatureMemory:	Per-Layer Int_Out_W: [L0: 6, L1: 576], Total: 582
+FeatureMemory:	Total Reads = 14,644,838, Total Writes = 14,418,502
 WeightMemory:	Per-Layer W_R: [L0: 54, L1: 576, L2: 225,280], Total: 225,910
 WeightMemory:	Per-Layer Int_In_R: [L0: 0, L1: 0], Total: 0
 WeightMemory:	Per-Layer Int_Out_R: [L0: 0, L1: 0], Total: 0
@@ -4440,8 +4442,8 @@ AccumulationOutRegister:Per-Layer Int_In_R: [L0: 1,179,648, L1: 461,373,440], To
 AccumulationOutRegister:Per-Layer Int_Out_R: [L0: 110,592, L1: 1,179,648], Total: 1,290,240
 AccumulationOutRegister:Per-Layer Int_Out_W: [L0: 110,592, L1: 1,179,648], Total: 1,290,240
 AccumulationOutRegister:Total Reads = 925,216,768, Total Writes = 462,663,680
-Totals:		972,565,950 R, 491,508,342 W, 1,464,074,292 Tot
-Energy:		12,640,027,898,423.256 uJ
+Totals:		972,559,758 R, 491,508,294 W, 1,464,068,052 Tot
+Energy:		12,640,027,898,423.244 uJ
 
 Final Latency per level:
 DRAM:		7,007,109,120 cc RD and 7,007,109,120 cc FU Latency, 4.0 R and 4.0 W Bandwidth,
@@ -4449,7 +4451,7 @@ DRAM:		7,007,109,120 cc RD and 7,007,109,120 cc FU Latency, 4.0 R and 4.0 W Band
 		995,328 cc per Tile, 0 Stall Cycles
 FeatureMemory:	7,007,109,120 cc RD and 7,007,109,120 cc FU Latency, 64.0 R and 64.0 W Bandwidth,
 		0.000 R and 0.002 U and 0.000 F and 0.002 D Ideal Bandwidth,
-		1 cc per Tile, 0 Stall Cycles
+		9 cc per Tile, 0 Stall Cycles
 WeightMemory:	7,007,109,120 cc RD and 7,007,109,120 cc FU Latency, 8.0 R and 8.0 W Bandwidth,
 		0.000 R and 0.000 U and 0.000 F and 0.000 D Ideal Bandwidth,
 		1 cc per Tile, 0 Stall Cycles

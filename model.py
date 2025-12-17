@@ -54,6 +54,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
         else:
             dataflow_per_layer[0] = level.dataflow.copy()
 
+        # Results after scaling        
         if isinstance(level, MemLevel):
             # multiply by spatial_iterations too because memory is replicated spatially
             print("\n\nQuesto mops è chiamato da update stats")     
@@ -178,8 +179,10 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     layer_factors_product *= level.factors.dimProduct(dim)
 #                    print(f"Updated considering level: {level.name}, this dim: {dim} is considered in temporal_iterations_per_layer[{layer_idx}]")
                 temporal_iterations_per_layer[layer_idx] *= layer_factors_product
+            ## ATTENTION: this temporal_iterations don't consider the intermediate escamotage
             temporal_iterations *= level.factors.fullProduct()
             acc_out_reads_factors *= math.prod(level.factors.dimProduct(dim) for dim in dataflow_per_layer[num_layers-1] if dim not in level.arch.coupling.getFlatOutputCoupling())
+        # update of last reads
         elif isinstance(level, FanoutLevel):
             spatial_iterations *= level.factors.fullProduct()
             for layer_idx in range(num_layers):
@@ -219,6 +222,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         if dim not in arch.coupling.getFlatWeightCoupling(layer_idx):
                             last_w_reads *= layer_iterations                    
             print(f"Updated considering level: {level.name}, this dim: {dim} is considered in spatial_iterations_per_layer[{layer_idx}]")
+        # WMOPs
         elif isinstance(level, ComputeLevel):
             # TODO: remove cost of first output accumulate if bias_read is False!
             # => not needed because the cost of the add is << than the multiply!

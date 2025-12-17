@@ -70,6 +70,48 @@ conv_3layers_coupling = Coupling(
     out_coupling = ['Z2', 'P', 'Q']                                 # Out
 )
 
+conv_10layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3',
+            'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6',
+            'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],               # In
+    w_coupling= {
+        0: ['Z0', 'C0', 'R0', 'S0'],                                # W0
+        1: ['Z1', 'C1', 'R1', 'S1'],                                # W1
+        2: ['Z2', 'C2', 'R2', 'S2'],                                # W2
+        3: ['Z3', 'C3', 'R3', 'S3'],                                # W3
+        4: ['Z4', 'C4', 'R4', 'S4'],                                # W4
+        5: ['Z5', 'C5', 'R5', 'S5'],                                # W5
+        6: ['Z6', 'C6', 'R6', 'S6'],                                # W6
+        7: ['Z7', 'C7', 'R7', 'S7'],                                # W7
+        8: ['Z8', 'C8', 'R8', 'S8'],                                # W8
+        9: ['Z9', 'C9', 'R9', 'S9']                                 # W9
+    },
+    int_in_coupling = {
+        0: ['C1', ['Y1', 'R1'], ['X1', 'S1']],                      # Intermediate_In L1
+        1: ['C2', ['Y2', 'R2'], ['X2', 'S2']],                      # Intermediate_In L2
+        2: ['C3', ['Y3', 'R3'], ['X3', 'S3']],                      # Intermediate_In L3
+        3: ['C4', ['Y4', 'R4'], ['X4', 'S4']],                      # Intermediate_In L4
+        4: ['C5', ['Y5', 'R5'], ['X5', 'S5']],                      # Intermediate_In L5
+        5: ['C6', ['Y6', 'R6'], ['X6', 'S6']],                      # Intermediate_In L6
+        6: ['C7', ['Y7', 'R7'], ['X7', 'S7']],                      # Intermediate_In L7
+        7: ['C8', ['Y8', 'R8'], ['X8', 'S8']],                      # Intermediate_In L8
+        8: ['C9', ['P', 'R9'], ['Q', 'S9']]                         # Intermediate_In L9
+    },
+    int_out_coupling = {
+        0: ['Z0', 'Y0', 'X0'],                                      # Intermediate_Out L1
+        1: ['Z1', 'Y1', 'X1'],              
+        2: ['Z2', 'Y2', 'X2'],
+        3: ['Z3', 'Y3', 'X3'],
+        4: ['Z4', 'Y4', 'X4'],
+        5: ['Z5', 'Y5', 'X5'],
+        6: ['Z6', 'Y6', 'X6'],
+        7: ['Z7', 'Y7', 'X7'],
+        8: ['Z8', 'Y8', 'X8']
+    },
+    out_coupling = ['Z9', 'P', 'Q']
+)
+
 easy_conv_3layers_coupling = Coupling(
     dims = ['Q', 'Z2', 'C2', 'S2', 'X1', 'Z1', 'C1', 'S1', 'X0', 'Z0', 'S0', 'C0'],
     in_coupling = ['C0', ['X0', 'S0']],      # In
