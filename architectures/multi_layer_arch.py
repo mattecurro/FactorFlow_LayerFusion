@@ -101,10 +101,10 @@ arch = arch_depfin_10layers = Arch([
 
     MemLevel(
         name = "AccumulationOutRegister",
-        size = 10, 
+        size = 28, 
         value_access_energy = 1.34, 
         bandwidth = 1*2,
-        bypasses = ['in', 'w', 'int'],
+        bypasses = ['in', 'w'],
         dataflow_constraints = ['Q'],
         factors_constraints = {'Q': 10}
     ),

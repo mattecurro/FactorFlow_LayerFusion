@@ -112,7 +112,7 @@ class Settings(metaclass = MetaSettings):
     # above level, thus negating the need for a read to drain. As a result, drains also don't contribute
     # to the final latency and level stalls anymore.
     # NOTE: setting this to True is required to match Timeloop's results exactly.
-    FREE_DRAINS = False
+    FREE_DRAINS = True
     # If True, GEMM dimensions might get padded to reach the least larger-than-current size which can
     # be allocated to the entirety of a fanout's instances.
     # This is performed as part of the fanout maximization.
