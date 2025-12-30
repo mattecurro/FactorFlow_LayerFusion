@@ -22,8 +22,8 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'Q', 'Z9', 'C9', 'R0', 'S0', 'Y0', 'S9', 'R9', 'X0', 'C0', 'P'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9']
-INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'R5', 'Z2', 'Z4', 'S6', 'S3', 'Y6', 'Z5', 'R7', 'S7', 'X3', 'C2', 'X1', 'Z6', 'S4', 'C8', 'R6', 'S2', 'S8', 'Z1', 'Y5', 'C6', 'Z0', 'C4', 'X5', 'X2', 'S1', 'Z7', 'C3', 'R1', 'X6', 'Y2', 'R3', 'Y3', 'Y4', 'Y8', 'X8', 'X7', 'Z3', 'C1', 'C7', 'Z8', 'X4', 'C5', 'S5', 'R8', 'R4', 'Y1', 'R2', 'Y7'}
+final_layer_dims: {'Q', 'C9', 'C0', 'R0', 'R9', 'S9', 'S0', 'X0', 'Y0', 'Z9', 'P'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9']
+INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'Y8', 'Z3', 'C3', 'Y5', 'X2', 'X7', 'C4', 'R7', 'Z2', 'Y2', 'X5', 'X6', 'Z6', 'C8', 'C1', 'R2', 'X3', 'S6', 'C6', 'Z7', 'X8', 'Y6', 'X1', 'R6', 'Z1', 'Y3', 'C7', 'Z8', 'Y1', 'S1', 'S3', 'Z4', 'R8', 'Y4', 'C5', 'C2', 'S5', 'R1', 'S4', 'S2', 'R4', 'R3', 'Z5', 'S8', 'Y7', 'S7', 'R5', 'Z0', 'X4'}
 INFO: Added high constraint for intermediate dimension P in level AccumulationOutRegister
 INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutRegister
 Starting engine with mapper: breadthfirst_local
@@ -1866,6 +1866,8 @@ Scaling per layer[1]: 8,493,465,600
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 8,493,465,600
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
 level.getDrainPerLayer[1](): 0
@@ -2131,6 +2133,8 @@ Scaling per layer[1]: 4,147,200
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
@@ -2695,6 +2699,8 @@ Scaling per layer[1]: 1
 SINGLE TILE: cc_per_tile_per_layer[1]: 148032.0
 cc_per_all_tiles_per_layer[1]: 1065830400.0
 SCALED cc_per_all_tiles_per_layer[1]: 1,065,830,400
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 0.1181065955709276
 level.getDrainPerLayer[1](): 0
@@ -4755,6 +4761,8 @@ Scaling per layer[1]: 8,493,465,600
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 8,493,465,600
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
 level.getDrainPerLayer[1](): 0
@@ -5020,6 +5028,8 @@ Scaling per layer[1]: 4,147,200
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
@@ -5584,6 +5594,8 @@ Scaling per layer[1]: 1
 SINGLE TILE: cc_per_tile_per_layer[1]: 148032.0
 cc_per_all_tiles_per_layer[1]: 1065830400.0
 SCALED cc_per_all_tiles_per_layer[1]: 1,065,830,400
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 0.1181065955709276
 level.getDrainPerLayer[1](): 0
@@ -7615,6 +7627,8 @@ Scaling per layer[1]: 8,493,465,600
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 8,493,465,600
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
 level.getDrainPerLayer[1](): 0
@@ -7880,6 +7894,8 @@ Scaling per layer[1]: 4,147,200
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
@@ -8444,6 +8460,8 @@ Scaling per layer[1]: 1
 SINGLE TILE: cc_per_tile_per_layer[1]: 148032.0
 cc_per_all_tiles_per_layer[1]: 1065830400.0
 SCALED cc_per_all_tiles_per_layer[1]: 1,065,830,400
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 0.1181065955709276
 level.getDrainPerLayer[1](): 0
@@ -10475,6 +10493,8 @@ Scaling per layer[1]: 8,493,465,600
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 8,493,465,600
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
 level.getDrainPerLayer[1](): 0
@@ -10740,6 +10760,8 @@ Scaling per layer[1]: 4,147,200
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
@@ -11304,6 +11326,8 @@ Scaling per layer[1]: 1
 SINGLE TILE: cc_per_tile_per_layer[1]: 148032.0
 cc_per_all_tiles_per_layer[1]: 1065830400.0
 SCALED cc_per_all_tiles_per_layer[1]: 1,065,830,400
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 0.1181065955709276
 level.getDrainPerLayer[1](): 0
@@ -13341,6 +13365,8 @@ Scaling per layer[1]: 8,493,465,600
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 8,493,465,600
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=8,493,465,600, per_layer_w_reads=0, per_layer_int_out_reads=8,493,465,600, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
 level.getDrainPerLayer[1](): 0
@@ -13606,6 +13632,8 @@ Scaling per layer[1]: 4,147,200
 SINGLE TILE: cc_per_tile_per_layer[1]: 1
 cc_per_all_tiles_per_layer[1]: 1
 SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=0, per_layer_w_reads=4,147,200, per_layer_int_out_reads=0, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
@@ -14170,6 +14198,8 @@ Scaling per layer[1]: 1
 SINGLE TILE: cc_per_tile_per_layer[1]: 148032.0
 cc_per_all_tiles_per_layer[1]: 1065830400.0
 SCALED cc_per_all_tiles_per_layer[1]: 1,065,830,400
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
+DEBUG: layer_id=1, per_layer_int_in_reads=30,035,200, per_layer_w_reads=66,355,200, per_layer_int_out_reads=29,491,200, last_per_layer_int_out_writes=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 0.1181065955709276
 level.getDrainPerLayer[1](): 0
@@ -14428,7 +14458,7 @@ Compute Level Compute: powered_instances=1,
  latency=1, 
  max_latency=17061508160.0
 
-Finished in: 0.157s
+Finished in: 0.125s
 
 Best mapping found with:
 	Wart: 2.573e+75
