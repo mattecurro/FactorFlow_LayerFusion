@@ -462,9 +462,9 @@ class MemLevel(Level):
         if last_out_writes is not None:
             self.last_out_writes = last_out_writes
         if last_per_layer_int_out_reads is not None:
-            self.last_per_layer_int_out_reads = last_per_layer_int_out_reads
+            self.last_per_layer_int_out_reads = last_per_layer_int_out_reads.copy()
         if last_per_layer_int_out_writes is not None:
-            self.last_per_layer_int_out_writes = last_per_layer_int_out_writes
+            self.last_per_layer_int_out_writes = last_per_layer_int_out_writes.copy()
 
     ## Counters of W
     """
@@ -523,7 +523,8 @@ class MemLevel(Level):
                 return self.per_layer_int_in_reads[layer_id - 1] + (self.out_reads - self.last_out_writes) + self.per_layer_w_reads[layer_id]
             else:
                 #print(f"DEBUG: layer_id={layer_id}, per_layer_int_in_reads={self.per_layer_int_in_reads[layer_id - 1]:,.0f}, per_layer_w_reads={self.per_layer_w_reads[layer_id]:,.0f}, per_layer_int_out_reads={self.per_layer_int_out_reads[layer_id]:,.0f}, last_per_layer_int_out_writes={self.last_per_layer_int_out_writes[layer_id]:,.0f}")
-                return self.per_layer_int_in_reads[layer_id - 1] + self.per_layer_w_reads[layer_id] + (self.per_layer_int_out_reads[layer_id] - self.last_per_layer_int_out_writes[layer_id])
+                #return self.per_layer_int_in_reads[layer_id - 1] + self.per_layer_w_reads[layer_id] + (self.per_layer_int_out_reads[layer_id] - self.last_per_layer_int_out_writes[layer_id])
+                return self.per_layer_int_in_reads[layer_id - 1] + self.per_layer_w_reads[layer_id] + self.per_layer_int_out_reads[layer_id]
         else: 
             return self.getRead()
 

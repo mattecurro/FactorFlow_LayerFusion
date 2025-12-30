@@ -315,25 +315,26 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     ideal_bandwidth_read_per_layer[layer_id] = level.getReadPerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id] # original -more readable- formulation: (level.getRead()/scaling)/(cc_per_tile*level.factors.fullProduct())
                     print(f"level.getReadPerLayer[{layer_id}](): {level.getReadPerLayer(layer_id):,.0f}")
                     print(f"ideal_bandwidth_read_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id]}")
+                    ideal_bandwidth_drain_per_layer[layer_id] = level.getDrainPerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id] if not Settings.FREE_DRAINS else 0
+                    print(f"level.getDrainPerLayer[{layer_id}](): {level.getDrainPerLayer(layer_id):,.0f}")       
+                    print(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")             
                     ideal_bandwidth_update_per_layer[layer_id] = level.getUpdatePerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id]
                     print(f"level.getUpdatePerLayer[{layer_id}](): {level.getUpdatePerLayer(layer_id):,.0f}")
                     print(f"ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_update_per_layer[layer_id]}")
                     ideal_bandwidth_fill_per_layer[layer_id] = level.getFillPerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id]
                     print(f"level.getFillPerLayer[{layer_id}](): {level.getFillPerLayer(layer_id):,.0f}")
                     print(f"ideal_bandwidth_fill_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id]}")
-                    ideal_bandwidth_drain_per_layer[layer_id] = level.getDrainPerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id] if not Settings.FREE_DRAINS else 0
-                    print(f"level.getDrainPerLayer[{layer_id}](): {level.getDrainPerLayer(layer_id):,.0f}")       
-                    print(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")             
                 if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
                     print("\nStart of calculation of latency:")
                     for layer_id in range(num_layers):
                         if ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id] <= level.read_bandwidth:
+                            print("Sono dentro Standard: Compute Bound")
                             print(f"previous_fanout_pe_to_pe_warmup: {previous_fanout_pe_to_pe_warmup}")
                             latency_read_drain_per_layer[layer_id] = cc_per_all_tiles_per_layer[layer_id] + previous_fanout_pe_to_pe_warmup*cc_per_tile_per_layer[layer_id]
                             print(f"cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]}")
                             print(f"STANDARD CASE latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}")
                         else:
-                            print("Sono dentro Slowdown")
+                            print("Sono dentro Slowdown: Memory Bound")
                             print(f"ideal_bandwidth_read_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id]}")
                             print(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")
                             print(f"level.read_bandwidth: {level.read_bandwidth}")

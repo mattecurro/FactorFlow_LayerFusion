@@ -8,7 +8,7 @@ arch = arch_depfin_10layers = Arch([
         name = "DRAM",
         size = 2**64-1, 
         value_access_energy = 50.0, 
-        bandwidth = 8, 
+        bandwidth = 18, 
         bypasses = [],
         # Constraints for the outermost layer (Layer 9)
         dataflow_constraints = ['Q', 'P', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 
@@ -23,7 +23,7 @@ arch = arch_depfin_10layers = Arch([
         name = "FeatureMemory", # FMEM
         size = 1056 * 1024, 
         value_access_energy = 2.02, 
-        bandwidth = 128,
+        bandwidth = 132,
         bypasses = ['w'],
         dataflow_constraints = [
             'C9', 'R9', 'S9', 'C8', 'S8', 'R8', 'C7', 'S7', 'R7', 'C6', 'S6', 'R6', 
