@@ -103,7 +103,7 @@ class Settings(metaclass = MetaSettings):
     RIPPLES = 1
     
     # MODEL SETTINGS:
-    
+    SEQUENTIAL_LAYER_EXECUTION = True
     # If True, the Wart will be multiplied by the utilization of the fanouts in the spatial architecture,
     # punishing mappings which underutilize fanouts.
     UTILIZATION_IN_WART = True

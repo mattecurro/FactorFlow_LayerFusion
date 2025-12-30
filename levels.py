@@ -270,7 +270,8 @@ class MemLevel(Level):
     ## per-operand list of all immediately following levels that back-to-back bypass an operand
     #  not hereby (on this level) bypassed (initialized in setupBypasses)
     next_levels_with_bypass : dict[str, Optional[list[Level]]]
-
+#    num_layers = self.arch.coupling.getNumLayers()
+    num_layers : int
     # STATISTICS:
     active_instances_per_layer : dict[int, int]
     active_instances : int
@@ -286,8 +287,17 @@ class MemLevel(Level):
     int_in_writes = 0
     int_out_reads = 0
     int_out_writes = 0
-    last_out_reads = 0
-    last_out_writes = 0
+    last_out_reads = 0 
+    last_out_writes = 0 
+    per_layer_w_reads : dict[int, int]
+    per_layer_w_writes : dict[int, int]
+    per_layer_int_in_reads : dict[int, int]
+    per_layer_int_in_writes : dict[int, int]
+    per_layer_int_out_reads : dict[int, int]
+    per_layer_int_out_writes : dict[int, int]
+    last_per_layer_int_out_reads : dict[int, int]
+    last_per_layer_int_out_writes : dict[int, int]
+    stall_cycles_per_layer : dict[int, int]
     latency_read_drain = 0
     latency_fill_update = 0
     cc_per_tile = 0
@@ -296,7 +306,15 @@ class MemLevel(Level):
     ideal_bandwidth_update = 0
     ideal_bandwidth_fill = 0
     ideal_bandwidth_drain = 0
+    ideal_bandwidth_read_per_layer : dict[int,int]
+    ideal_bandwidth_update_per_layer : dict[int, int]
+    ideal_bandwidth_fill_per_layer : dict[int, int]
+    ideal_bandwidth_drain_per_layer : dict[int, int]
     #bp_stationarity_solved_here: dict[bool] # tracks if this level’s loops are the ones dictating the dataflow for a bypassed operand going over it
+
+    cc_per_tile_per_layer = 0
+    latency_read_drain_per_layer : dict[int, int]
+    latency_fill_update_per_layer : dict[int, int]
 
     def __init__(self, name : str, size : int, value_access_energy : Optional[float] = None, wordline_access_energy : Optional[float] = None, word_bits : Optional[int] = None, value_bits : Optional[int] = None, leakage_energy : float = 0, area : Optional[float] = None, bandwidth : Optional[float] = None, dataflow : Optional[list[str]] = None, factors : Optional[Factors] = None, tile_sizes : Optional[Shape] = None, factors_constraints : Optional[dict[str, int]] = None, dataflow_constraints : Optional[list[str]] = None, bypasses : Optional[list[str]] = None, multiple_buffering : int = 1, multiple_reuses : bool = True, read_value_access_energy : Optional[float] = None, write_value_access_energy : Optional[float] = None, read_wordline_access_energy : Optional[float] = None, write_wordline_access_energy : Optional[float] = None, read_bandwidth : Optional[float] = None, write_bandwidth : Optional[float] = None):
         self.name = name
@@ -408,13 +426,16 @@ class MemLevel(Level):
     Sets MOPs statistics for this level.
     Those must include both operations with the above and below level.
     """
-    def setMOPs(self, in_reads : int, per_layer_w_reads : dict[int, int], per_layer_int_in_reads : dict[int, int], per_layer_int_out_reads : dict[int, int], per_layer_int_out_writes : dict[int, int], out_reads : int, out_writes : int) -> None:
+    def setMOPs(self, in_reads : int, in_writes : int, per_layer_w_reads : dict[int, int], per_layer_w_writes : dict[int, int], per_layer_int_in_reads : dict[int, int], per_layer_int_in_writes : dict[int, int], per_layer_int_out_reads : dict[int, int], per_layer_int_out_writes : dict[int, int], out_reads : int, out_writes : int) -> None:
         # Store the input reads (single value, not per-layer)
         self.in_reads = in_reads
+        self.in_writes = in_writes
         # Store per-layer weight reads dictionary
         self.per_layer_w_reads = per_layer_w_reads
+        self.per_layer_w_writes = per_layer_w_writes
         # Store per-layer intermediate reads dictionaries
         self.per_layer_int_in_reads = per_layer_int_in_reads
+        self.per_layer_int_in_writes = per_layer_int_in_writes
         self.per_layer_int_out_reads = per_layer_int_out_reads
         self.per_layer_int_out_writes = per_layer_int_out_writes
         # Store output reads and writes (single values)
@@ -435,9 +456,15 @@ class MemLevel(Level):
     Sets MOPs statistics for the interations between this level and
     the MemLevel immediately above it.
     """
-    def setAboveMOPs(self, last_out_reads : int, last_out_writes : int) -> None:
-        self.last_out_reads = last_out_reads
-        self.last_out_writes = last_out_writes
+    def setAboveMOPs(self, last_out_reads : Optional[int] = None, last_out_writes : Optional[int] = None, last_per_layer_int_out_reads : dict[int, int] = None, last_per_layer_int_out_writes : dict[int, int] = None) -> None:
+        if last_out_reads is not None:
+            self.last_out_reads = last_out_reads
+        if last_out_writes is not None:
+            self.last_out_writes = last_out_writes
+        if last_per_layer_int_out_reads is not None:
+            self.last_per_layer_int_out_reads = last_per_layer_int_out_reads
+        if last_per_layer_int_out_writes is not None:
+            self.last_per_layer_int_out_writes = last_per_layer_int_out_writes
 
     ## Counters of W
     """
@@ -445,7 +472,21 @@ class MemLevel(Level):
     from an higher level.
     """
     def getFill(self) -> int:
-        return self.in_writes + self.w_writes + self.int_out_reads + self.last_out_reads #include fills for outputs
+        return self.in_writes + self.w_writes + self.last_out_reads #include fills for outputs
+    
+    def getFillPerLayer(self, layer_id) -> int:
+        if self.arch.coupling.getNumLayers() > 1:
+            if layer_id == 0:
+                #print(f"DEBUG getFill: layer_id={layer_id}, in_writes={self.in_writes:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
+                return self.in_writes + self.per_layer_w_writes[layer_id] + self.last_per_layer_int_out_reads[layer_id]
+            elif layer_id == self.arch.coupling.getNumLayers() - 1:
+                #print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_out_reads={self.last_out_reads:,.0f}")
+                return self.per_layer_int_in_writes[layer_id - 1] + self.per_layer_w_writes[layer_id] + self.last_out_reads
+            else:
+                #print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
+                return self.per_layer_int_in_writes[layer_id - 1] + self.per_layer_w_writes[layer_id] + self.last_per_layer_int_out_reads[layer_id]
+        else: 
+            return self.getFill()
 
     ## Counters of Output Writes (in order to free up the space)
     """
@@ -454,6 +495,15 @@ class MemLevel(Level):
     """
     def getDrain(self) -> int:
         return self.last_out_writes
+    
+    def getDrainPerLayer(self, layer_id) -> int:
+        if self.arch.coupling.getNumLayers() > 1:
+            if layer_id == self.arch.coupling.getNumLayers() - 1:
+                return self.last_out_writes
+            else:
+                return self.last_per_layer_int_out_writes[layer_id]
+        else: 
+            return self.getDrain()
 
     ## Counters of R, without the writes done to drain
     """
@@ -461,7 +511,21 @@ class MemLevel(Level):
     towards a lower level.
     """
     def getRead(self) -> int:
-        return self.in_reads + self.w_reads + self.int_in_reads + self.int_out_reads + (self.out_reads - self.last_out_writes) #ignore reads done to drain
+        return self.in_reads + self.w_reads + (self.out_reads - self.last_out_writes) #ignore reads done to drain
+
+    def getReadPerLayer(self, layer_id) -> int:
+        #print(f"\nDEBUG: getReadPerLayer called for layer_id={layer_id}")
+        if self.arch.coupling.getNumLayers() > 1:
+            if layer_id == 0:
+                return self.in_reads + self.per_layer_w_reads[layer_id] + self.per_layer_int_out_reads[layer_id]
+            elif layer_id == self.arch.coupling.getNumLayers() - 1:
+                #print(f"DEBUG: layer_id={layer_id}, per_layer_int_in_reads={self.per_layer_int_in_reads[layer_id - 1]:,.0f}, per_layer_w_reads={self.per_layer_w_reads[layer_id]:,.0f}, last_out_writes={self.last_out_writes:,.0f}, out_reads={self.out_reads:,.0f}")
+                return self.per_layer_int_in_reads[layer_id - 1] + (self.out_reads - self.last_out_writes) + self.per_layer_w_reads[layer_id]
+            else:
+                #print(f"DEBUG: layer_id={layer_id}, per_layer_int_in_reads={self.per_layer_int_in_reads[layer_id - 1]:,.0f}, per_layer_w_reads={self.per_layer_w_reads[layer_id]:,.0f}, per_layer_int_out_reads={self.per_layer_int_out_reads[layer_id]:,.0f}, last_per_layer_int_out_writes={self.last_per_layer_int_out_writes[layer_id]:,.0f}")
+                return self.per_layer_int_in_reads[layer_id - 1] + self.per_layer_w_reads[layer_id] + (self.per_layer_int_out_reads[layer_id] - self.last_per_layer_int_out_writes[layer_id])
+        else: 
+            return self.getRead()
 
     ## Counters of W of Outputs (without the updates coming from)
     """
@@ -470,6 +534,17 @@ class MemLevel(Level):
     """
     def getUpdate(self) -> int:
         return self.out_writes - self.last_out_reads #ignore updates coming from fills
+
+    def getUpdatePerLayer(self, layer_id) -> int:
+        if self.arch.coupling.getNumLayers() > 1:
+            if layer_id == 0:
+                return self.per_layer_int_out_writes[layer_id] - self.last_per_layer_int_out_reads[layer_id]
+            elif layer_id == self.arch.coupling.getNumLayers() - 1:
+                return self.out_writes - self.last_out_reads
+            else:
+                return self.per_layer_int_in_writes[layer_id - 1] + (self.per_layer_int_out_writes[layer_id] - self.last_per_layer_int_out_reads[layer_id])
+        else: 
+            return self.getUpdate()
 
     ## Modify getSettedMOPs
     """
@@ -492,12 +567,28 @@ class MemLevel(Level):
         self.ideal_bandwidth_fill = ideal_bandwidth_fill
         self.ideal_bandwidth_drain = ideal_bandwidth_drain
 
+        """
+    Sets Latency and related statistics for this level.
+    """
+    def setLatencyPerLayer(self, latency_read_drain_per_layer : dict[int, int], latency_fill_update_per_layer : dict[int, int], cc_per_tile_per_layer : dict[int, int], stall_cycles_per_layer : dict[int, int], ideal_bandwidth_read_per_layer : float, ideal_bandwidth_update_per_layer : float, ideal_bandwidth_fill_per_layer : float, ideal_bandwidth_drain_per_layer : float) -> None:
+        self.latency_read_drain_per_layer = latency_read_drain_per_layer
+        self.latency_fill_update_per_layer = latency_fill_update_per_layer
+        self.cc_per_tile_per_layer = cc_per_tile_per_layer
+        self.stall_cycles_per_layer = stall_cycles_per_layer
+        self.ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer
+        self.ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer
+        self.ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer
+        self.ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer
+
+
     """
     Returns the Latency previoulsy stored by setLatency().
     """
     def getSettedLatency(self) -> int:
         return max(self.latency_read_drain, self.latency_fill_update)
 
+    def getSettedLatencyPerLayer(self, layer_id) -> int:
+        return max(self.latency_read_drain_per_layer[layer_id], self.latency_fill_update_per_layer[layer_id])
     # Memory operation between this level and the one below it!
     #  Specifically: returns reads outgoing
     # (downward) from this level and writes incoming (upward) from the below level.
@@ -731,7 +822,6 @@ class MemLevel(Level):
             for dim in actual_dataflow_per_layer[0][:i+1]:
                 in_reads *= self.factors.dimProduct(dim)
             vprint(f"Level: {self.name}, Layer {0}: final Input in_reads = {in_reads:,.0f}\n")    
-
         # stationarity calculation for weights
         w_reads = int(w_bp)
         per_layer_w_reads: dict[int, int] = {}
@@ -777,7 +867,6 @@ class MemLevel(Level):
                 vprint(f"\nLevel: {self.name}, Layer {layer_idx}: final Weight layer_read = {layer_read:,.0f}")    
                 per_layer_w_reads[layer_idx] = layer_read
             w_reads = sum(per_layer_w_reads.values())
-
         ## ATTENTION: actual_dataflow_per_layer[layer_idx+1] is the one for intermediate_inputs
         # stationarity calculation for intermediates inputs
         int_in_reads = int(int_bp)
@@ -828,7 +917,6 @@ class MemLevel(Level):
                 vprint(f"intermediate in layer {layer_id} final read: {layer_read:,.0f}")
                 per_layer_int_in_reads[layer_id] = layer_read
             int_in_reads = sum(per_layer_int_in_reads.values())
-
         # stationarity calculation for intermediate outputs
         int_out_reads = int(int_bp)
         per_layer_int_out_reads: dict[int, int] = {}
@@ -878,7 +966,6 @@ class MemLevel(Level):
         # Intermediate output writes (same as reads for now)
         int_out_writes = int_out_reads
         per_layer_int_out_writes = per_layer_int_out_reads.copy()    
-
         # stationarity calculation for outputs        
         out_reads = int(out_bp)
         ## iterations orthogonal to the output, handle the presence/absence of the bias
@@ -1056,7 +1143,7 @@ class MemLevel(Level):
                                     vprint(f"Level: {self.name}: Handling Weight Bypass with stationarity_to_address = {stationarity_to_address}")
                                     for layer_idx in range(num_layers):
                                         per_layer_w_reads_bp[layer_idx] *= in_btwn_factors_full_per_layer[layer_idx]
-                                    w_reads_bp = sum(per_layer_w_reads_bp.values())
+                                    w_reads_bp = sum(per_layer_w_reads_bp.values())                           
                             # Handle Intermediate Input Bypasses
                             if int_in_reads_bp:
                                 if stationarity_to_address:
@@ -1076,10 +1163,10 @@ class MemLevel(Level):
                                         per_layer_int_in_reads_bp[layer_id] = layer_read
                                     int_in_reads_bp = sum(per_layer_int_in_reads_bp.values())
                                 else:
-                                    for layer_idx in range(num_layers):
+                                    for layer_idx in range(num_layers-1):
                                         per_layer_int_in_reads_bp[layer_idx] *= in_btwn_factors_full_per_layer[layer_idx]
                                     int_in_reads_bp = sum(per_layer_int_in_reads_bp.values())                            
-                            # Handle intermediate output bypasses
+                            # Handle intermediate output bypasses                         
                             if int_out_reads_bp:
                                 if stationarity_to_address:
                                     for layer_id in range(num_layers-1):
@@ -1107,7 +1194,7 @@ class MemLevel(Level):
                                     int_out_reads_bp = sum(per_layer_int_out_reads_bp.values())
                                     int_out_writes_bp = sum(per_layer_int_out_writes_bp.values())
                                 else:
-                                    for layer_id in range(num_layers):
+                                    for layer_id in range(num_layers-1):
                                         per_layer_int_out_reads_bp[layer_id] *= in_btwn_factors_full_per_layer[layer_id]
                                         per_layer_int_out_writes_bp[layer_id] *= in_btwn_factors_full_per_layer[layer_id]
                                     int_out_reads_bp = in_btwn_factors_full_per_layer[layer_id] * int_out_reads_bp
@@ -1236,7 +1323,7 @@ class MemLevel(Level):
                                 per_layer_int_in_reads_bp[layer_id] = layer_int_in_reads_bp
                             int_in_reads_bp = sum(per_layer_int_in_reads_bp.values())
                         else:
-                            for layer_id in range(num_layers):
+                            for layer_id in range(num_layers-1):
                                 per_layer_int_in_reads_bp[layer_id] *= factors_full_per_layer[layer_id]
                             int_in_reads_bp *= factors_full_per_layer[layer_id]
                     if int_out_reads_bp:
@@ -1266,7 +1353,7 @@ class MemLevel(Level):
                             int_out_reads_bp = sum(per_layer_int_out_reads_bp.values())
                             int_out_writes_bp = sum(per_layer_int_out_writes_bp.values())
                         else:
-                            for layer_id in per_layer_int_out_reads_bp.keys():
+                            for layer_id in range(num_layers-1):
                                 per_layer_int_out_reads_bp[layer_id] *= factors_full_per_layer[layer_id]
                                 per_layer_int_out_writes_bp[layer_id] *= factors_full_per_layer[layer_id]
                             int_out_reads_bp *= factors_full_per_layer[layer_id]
@@ -1346,6 +1433,7 @@ class MemLevel(Level):
         vprint(f"After Spatials: Level: {self.name}: MOPs in_reads = {in_reads}, per_layer_w_reads = {per_layer_w_reads}, w_reads = {w_reads}, per_layer_int_in_reads = {per_layer_int_in_reads}, int_in_reads = {int_in_reads}, per_layer_int_out_reads = {per_layer_int_out_reads}, int_out_reads = {int_out_reads}, out_reads = {out_reads}, out_writes = {out_writes}, out_reads_factors = {out_reads_factors}\n")
         if not ignore_bypasses:
             vprint("End MOPs with Bypasses for Level: " + self.name + "\n\n")
+        # Change the return in such a way I have also per_
         return in_reads, per_layer_w_reads, per_layer_int_in_reads, per_layer_int_out_reads, per_layer_int_out_writes, out_reads, out_writes, out_reads_factors
 
     """
@@ -1370,8 +1458,7 @@ class MemLevel(Level):
     """
     def checkFactorsConstraints(self) -> bool:
         # Existing memory footprint check
-        print(f"level: {self.name}")
-        base_check = self.factors.memFootprint(self.tile_sizes, self.arch, not self.bypasses or 'in' not in self.bypasses, not self.bypasses or 'w' not in self.bypasses, not self.bypasses or 'out' not in self.bypasses or 'int' not in self.bypasses) <= self.size/self.multiple_buffering and super().checkFactorsConstraints()
+        base_check = self.factors.memFootprint(self.tile_sizes, self.arch, not self.bypasses or 'in' not in self.bypasses, not self.bypasses or 'w' not in self.bypasses, not self.bypasses or 'out' not in self.bypasses, not self.bypasses or 'int' not in self.bypasses) <= self.size/self.multiple_buffering and super().checkFactorsConstraints()
         if not base_check:
             return False
         """    
@@ -1427,7 +1514,9 @@ class MemLevel(Level):
         if not super().checkFactorsConstraints():
             return super().logConstraintsViolation()
         elif not self.checkFactorsConstraints():
-            mem_footprint = self.factors.memFootprint(self.tile_sizes, self.arch, not self.bypasses or 'in' not in self.bypasses, not self.bypasses or 'w' not in self.bypasses, not self.bypasses or 'out' not in self.bypasses)
+            if self.name == "AccumulationOutRegister":
+                print(f"self.bypasses: {self.bypasses}")
+            mem_footprint = self.factors.memFootprint(self.tile_sizes, self.arch, not self.bypasses or 'in' not in self.bypasses, not self.bypasses or 'w' not in self.bypasses, not self.bypasses or 'out' not in self.bypasses or 'int' not in self.bypasses)
             ## CONSTRAINT on mem_footprint
             if mem_footprint > self.size/self.multiple_buffering:
                 return f"CONSTRAINTS VIOLATION: Arch: {self.arch.name} -> Level: {self.name}: memory footprint: {mem_footprint} VS memory available: {self.size/self.multiple_buffering:.0f}"
@@ -1873,6 +1962,7 @@ class ComputeLevel(SpatialLevel):
     """
     def latency(self) -> int:
         return self.cycles
+
 
     """
     Returns the energy required by this level to perform all MACs across its internal

@@ -11,8 +11,12 @@ arch = arch_depfin_10layers = Arch([
         bandwidth = 8, 
         bypasses = [],
         # Constraints for the outermost layer (Layer 9)
-        dataflow_constraints = ['C9', 'Z9', 'R9', 'S9', 'Q', 'P'], 
-        factors_constraints = {'C9': 1, 'Z9': 1, 'R9': 1, 'S9': 1, 'Q': 10, 'P': 704}
+        dataflow_constraints = ['Q', 'P', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 
+                                 'X5', 'Y5', 'X4', 'Y4', 'X3', 'Y3', 
+                                 'X2', 'Y2', 'X1', 'Y1', 'X0', 'Y0'], 
+        factors_constraints = {'Q': 1, 'P': 720, 'X8': 10, 'Y8': 720, 'X7': 10, 'Y7': 720, 'X6': 10, 'Y6': 720, 
+                               'X5': 10, 'Y5': 720, 'X4': 10, 'Y4': 720, 'X3': 10, 'Y3': 720, 
+                               'X2': 10, 'Y2': 720, 'X1': 10, 'Y1': 720, 'X0': 10, 'Y0': 720}
     ),
     
     MemLevel(
@@ -100,9 +104,9 @@ arch = arch_depfin_10layers = Arch([
         size = 10, 
         value_access_energy = 1.34, 
         bandwidth = 1,
-        bypasses = ['in', 'w'],
-        dataflow_constraints = ['X0'],
-        factors_constraints = {'X0': 1}
+        bypasses = ['in', 'w', 'int'],
+        dataflow_constraints = ['Q'],
+        factors_constraints = {'Q': 10}
     ),
 
     ComputeLevel(
