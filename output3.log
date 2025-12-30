@@ -22,8 +22,8 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'C9', 'C0', 'R9', 'R0', 'Q', 'Y0', 'S0', 'S9', 'Z9', 'P', 'X0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9']
-INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'Y8', 'X6', 'C6', 'R3', 'Y6', 'C4', 'Z5', 'S3', 'S5', 'S1', 'R5', 'S2', 'S4', 'Z1', 'X8', 'Y1', 'R6', 'Y4', 'X1', 'C3', 'R1', 'Y3', 'Z8', 'Z7', 'R2', 'Z0', 'C1', 'C5', 'S7', 'Z2', 'R7', 'Y7', 'Y2', 'X7', 'Z4', 'C2', 'X4', 'X5', 'C7', 'X3', 'R4', 'C8', 'S8', 'Z3', 'Y5', 'Z6', 'X2', 'S6', 'R8'}
+final_layer_dims: {'Q', 'Z9', 'C9', 'R0', 'S0', 'Y0', 'S9', 'R9', 'X0', 'C0', 'P'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9']
+INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'R5', 'Z2', 'Z4', 'S6', 'S3', 'Y6', 'Z5', 'R7', 'S7', 'X3', 'C2', 'X1', 'Z6', 'S4', 'C8', 'R6', 'S2', 'S8', 'Z1', 'Y5', 'C6', 'Z0', 'C4', 'X5', 'X2', 'S1', 'Z7', 'C3', 'R1', 'X6', 'Y2', 'R3', 'Y3', 'Y4', 'Y8', 'X8', 'X7', 'Z3', 'C1', 'C7', 'Z8', 'X4', 'C5', 'S5', 'R8', 'R4', 'Y1', 'R2', 'Y7'}
 INFO: Added high constraint for intermediate dimension P in level AccumulationOutRegister
 INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutRegister
 Starting engine with mapper: breadthfirst_local
@@ -2010,158 +2010,99 @@ cc_per_all_tiles_per_layer[0]: 1
 STANDARD CASE latency_read_drain_per_layer[0]: 1
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 1
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[1]: 2.0
-ideal_bandwidth_drain_per_layer[1]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[1]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[1]: 1.000244140625
-ideal_bandwidth_update_per_layer[1]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[1]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[2]: 2.0
-ideal_bandwidth_drain_per_layer[2]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[2]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[2]: 1.000244140625
-ideal_bandwidth_update_per_layer[2]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[2]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[3]: 2.0
-ideal_bandwidth_drain_per_layer[3]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[3]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[3]: 1.000244140625
-ideal_bandwidth_update_per_layer[3]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[3]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[4]: 2.0
-ideal_bandwidth_drain_per_layer[4]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[4]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[4]: 1.000244140625
-ideal_bandwidth_update_per_layer[4]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[4]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[5]: 2.0
-ideal_bandwidth_drain_per_layer[5]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[5]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[5]: 1.000244140625
-ideal_bandwidth_update_per_layer[5]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[5]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[6]: 2.0
-ideal_bandwidth_drain_per_layer[6]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[6]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[6]: 1.000244140625
-ideal_bandwidth_update_per_layer[6]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[6]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[7]: 2.0
-ideal_bandwidth_drain_per_layer[7]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[7]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[7]: 1.000244140625
-ideal_bandwidth_update_per_layer[7]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[7]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[8]: 2.0
-ideal_bandwidth_drain_per_layer[8]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[8]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[8]: 1.000002712673611
-ideal_bandwidth_update_per_layer[8]: 1.999997287326389
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[8]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 1.96875
-ideal_bandwidth_drain_per_layer[9]: 0
-level.read_bandwidth: 1.5
-total data: 928972800
-scaling_per_layer[9]: 47185920
-SLOWDOWN CASE latency_read_drain_per_layer[9]: 13.125
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[1]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[2]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[3]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[4]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[5]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[6]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[7]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[8]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 1, latency_fill_update_per_layer[0] = 1
 Final latency_per_layer[0]: 1
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 1
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1.3333333333333333, latency_fill_update_per_layer[1] = 2.0
-Final latency_per_layer[1]: 2
-Final stall_cycles_per_layer[1]: 1
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 1
+Final latency_per_layer[1]: 1
+Final stall_cycles_per_layer[1]: 0
 cc_per_all_tiles_per_layer[1]: 1
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1.3333333333333333, latency_fill_update_per_layer[2] = 2.0
-Final latency_per_layer[2]: 2
-Final stall_cycles_per_layer[2]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 1
+Final latency_per_layer[2]: 1
+Final stall_cycles_per_layer[2]: 0
 cc_per_all_tiles_per_layer[2]: 1
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1.3333333333333333, latency_fill_update_per_layer[3] = 2.0
-Final latency_per_layer[3]: 2
-Final stall_cycles_per_layer[3]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 1
+Final latency_per_layer[3]: 1
+Final stall_cycles_per_layer[3]: 0
 cc_per_all_tiles_per_layer[3]: 1
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1.3333333333333333, latency_fill_update_per_layer[4] = 2.0
-Final latency_per_layer[4]: 2
-Final stall_cycles_per_layer[4]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 1
+Final latency_per_layer[4]: 1
+Final stall_cycles_per_layer[4]: 0
 cc_per_all_tiles_per_layer[4]: 1
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1.3333333333333333, latency_fill_update_per_layer[5] = 2.0
-Final latency_per_layer[5]: 2
-Final stall_cycles_per_layer[5]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 1
+Final latency_per_layer[5]: 1
+Final stall_cycles_per_layer[5]: 0
 cc_per_all_tiles_per_layer[5]: 1
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1.3333333333333333, latency_fill_update_per_layer[6] = 2.0
-Final latency_per_layer[6]: 2
-Final stall_cycles_per_layer[6]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 1
+Final latency_per_layer[6]: 1
+Final stall_cycles_per_layer[6]: 0
 cc_per_all_tiles_per_layer[6]: 1
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1.3333333333333333, latency_fill_update_per_layer[7] = 2.0
-Final latency_per_layer[7]: 2
-Final stall_cycles_per_layer[7]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 1
+Final latency_per_layer[7]: 1
+Final stall_cycles_per_layer[7]: 0
 cc_per_all_tiles_per_layer[7]: 1
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1.3333333333333333, latency_fill_update_per_layer[8] = 2.0
-Final latency_per_layer[8]: 2
-Final stall_cycles_per_layer[8]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 1
+Final latency_per_layer[8]: 1
+Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 10
-Final latency_per_layer[9]: 13
-Final stall_cycles_per_layer[9]: 3
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
+Final stall_cycles_per_layer[9]: 0
 cc_per_all_tiles_per_layer[9]: 10
 
 
@@ -2187,145 +2128,145 @@ Latency for layer: 1 of Level: WeightMemory
 level.active_instances_per_layer[1]: 1
 level.temporal_iterations_per_layer[1]: 4147200
 Scaling per layer[1]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[1]: 2.0
-cc_per_all_tiles_per_layer[1]: 2.0
-SCALED cc_per_all_tiles_per_layer[1]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[1]: 1
+cc_per_all_tiles_per_layer[1]: 1
+SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
 level.getReadPerLayer[1](): 4,147,200
-ideal_bandwidth_read_per_layer[1]: 0.5
+ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 level.getUpdatePerLayer[1](): 8,493,465,600
-ideal_bandwidth_update_per_layer[1]: 1024.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.getFillPerLayer[1](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[1]: 1032.0
+ideal_bandwidth_fill_per_layer[1]: 2064.0
 
 Latency for layer: 2 of Level: WeightMemory
 level.active_instances_per_layer[2]: 1
 level.temporal_iterations_per_layer[2]: 4147200
 Scaling per layer[2]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[2]: 2.0
-cc_per_all_tiles_per_layer[2]: 2.0
-SCALED cc_per_all_tiles_per_layer[2]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[2]: 1
+cc_per_all_tiles_per_layer[2]: 1
+SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
-ideal_bandwidth_read_per_layer[2]: 0.5
+ideal_bandwidth_read_per_layer[2]: 1.0
 level.getDrainPerLayer[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
-ideal_bandwidth_update_per_layer[2]: 1024.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.getFillPerLayer[2](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[2]: 1032.0
+ideal_bandwidth_fill_per_layer[2]: 2064.0
 
 Latency for layer: 3 of Level: WeightMemory
 level.active_instances_per_layer[3]: 1
 level.temporal_iterations_per_layer[3]: 4147200
 Scaling per layer[3]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[3]: 2.0
-cc_per_all_tiles_per_layer[3]: 2.0
-SCALED cc_per_all_tiles_per_layer[3]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[3]: 1
+cc_per_all_tiles_per_layer[3]: 1
+SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
-ideal_bandwidth_read_per_layer[3]: 0.5
+ideal_bandwidth_read_per_layer[3]: 1.0
 level.getDrainPerLayer[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
-ideal_bandwidth_update_per_layer[3]: 1024.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.getFillPerLayer[3](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[3]: 1032.0
+ideal_bandwidth_fill_per_layer[3]: 2064.0
 
 Latency for layer: 4 of Level: WeightMemory
 level.active_instances_per_layer[4]: 1
 level.temporal_iterations_per_layer[4]: 4147200
 Scaling per layer[4]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[4]: 2.0
-cc_per_all_tiles_per_layer[4]: 2.0
-SCALED cc_per_all_tiles_per_layer[4]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[4]: 1
+cc_per_all_tiles_per_layer[4]: 1
+SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
-ideal_bandwidth_read_per_layer[4]: 0.5
+ideal_bandwidth_read_per_layer[4]: 1.0
 level.getDrainPerLayer[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
-ideal_bandwidth_update_per_layer[4]: 1024.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.getFillPerLayer[4](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[4]: 1032.0
+ideal_bandwidth_fill_per_layer[4]: 2064.0
 
 Latency for layer: 5 of Level: WeightMemory
 level.active_instances_per_layer[5]: 1
 level.temporal_iterations_per_layer[5]: 4147200
 Scaling per layer[5]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[5]: 2.0
-cc_per_all_tiles_per_layer[5]: 2.0
-SCALED cc_per_all_tiles_per_layer[5]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[5]: 1
+cc_per_all_tiles_per_layer[5]: 1
+SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
-ideal_bandwidth_read_per_layer[5]: 0.5
+ideal_bandwidth_read_per_layer[5]: 1.0
 level.getDrainPerLayer[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
-ideal_bandwidth_update_per_layer[5]: 1024.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.getFillPerLayer[5](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[5]: 1032.0
+ideal_bandwidth_fill_per_layer[5]: 2064.0
 
 Latency for layer: 6 of Level: WeightMemory
 level.active_instances_per_layer[6]: 1
 level.temporal_iterations_per_layer[6]: 4147200
 Scaling per layer[6]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[6]: 2.0
-cc_per_all_tiles_per_layer[6]: 2.0
-SCALED cc_per_all_tiles_per_layer[6]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[6]: 1
+cc_per_all_tiles_per_layer[6]: 1
+SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
-ideal_bandwidth_read_per_layer[6]: 0.5
+ideal_bandwidth_read_per_layer[6]: 1.0
 level.getDrainPerLayer[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
-ideal_bandwidth_update_per_layer[6]: 1024.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.getFillPerLayer[6](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[6]: 1032.0
+ideal_bandwidth_fill_per_layer[6]: 2064.0
 
 Latency for layer: 7 of Level: WeightMemory
 level.active_instances_per_layer[7]: 1
 level.temporal_iterations_per_layer[7]: 4147200
 Scaling per layer[7]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[7]: 2.0
-cc_per_all_tiles_per_layer[7]: 2.0
-SCALED cc_per_all_tiles_per_layer[7]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[7]: 1
+cc_per_all_tiles_per_layer[7]: 1
+SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
-ideal_bandwidth_read_per_layer[7]: 0.5
+ideal_bandwidth_read_per_layer[7]: 1.0
 level.getDrainPerLayer[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
-ideal_bandwidth_update_per_layer[7]: 1024.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.getFillPerLayer[7](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[7]: 1032.0
+ideal_bandwidth_fill_per_layer[7]: 2064.0
 
 Latency for layer: 8 of Level: WeightMemory
 level.active_instances_per_layer[8]: 1
 level.temporal_iterations_per_layer[8]: 4147200
 Scaling per layer[8]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[8]: 2.0
-cc_per_all_tiles_per_layer[8]: 2.0
-SCALED cc_per_all_tiles_per_layer[8]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[8]: 1
+cc_per_all_tiles_per_layer[8]: 1
+SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
-ideal_bandwidth_read_per_layer[8]: 0.5
+ideal_bandwidth_read_per_layer[8]: 1.0
 level.getDrainPerLayer[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
-ideal_bandwidth_update_per_layer[8]: 1024.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.getFillPerLayer[8](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[8]: 1032.0
+ideal_bandwidth_fill_per_layer[8]: 2064.0
 
 Latency for layer: 9 of Level: WeightMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 23040
 Scaling per layer[9]: 23,040
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 13.125
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 10
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -2336,130 +2277,130 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 9
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[1]: 2.0
-STANDARD CASE latency_read_drain_per_layer[1]: 2.0
-ideal_bandwidth_fill_per_layer[1]: 1032.0
-ideal_bandwidth_update_per_layer[1]: 1024.0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+ideal_bandwidth_fill_per_layer[1]: 2064.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[1]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[1]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[2]: 2.0
-STANDARD CASE latency_read_drain_per_layer[2]: 2.0
-ideal_bandwidth_fill_per_layer[2]: 1032.0
-ideal_bandwidth_update_per_layer[2]: 1024.0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+ideal_bandwidth_fill_per_layer[2]: 2064.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[2]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[2]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[3]: 2.0
-STANDARD CASE latency_read_drain_per_layer[3]: 2.0
-ideal_bandwidth_fill_per_layer[3]: 1032.0
-ideal_bandwidth_update_per_layer[3]: 1024.0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+ideal_bandwidth_fill_per_layer[3]: 2064.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[3]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[3]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[4]: 2.0
-STANDARD CASE latency_read_drain_per_layer[4]: 2.0
-ideal_bandwidth_fill_per_layer[4]: 1032.0
-ideal_bandwidth_update_per_layer[4]: 1024.0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+ideal_bandwidth_fill_per_layer[4]: 2064.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[4]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[4]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[5]: 2.0
-STANDARD CASE latency_read_drain_per_layer[5]: 2.0
-ideal_bandwidth_fill_per_layer[5]: 1032.0
-ideal_bandwidth_update_per_layer[5]: 1024.0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+ideal_bandwidth_fill_per_layer[5]: 2064.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[5]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[5]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[6]: 2.0
-STANDARD CASE latency_read_drain_per_layer[6]: 2.0
-ideal_bandwidth_fill_per_layer[6]: 1032.0
-ideal_bandwidth_update_per_layer[6]: 1024.0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+ideal_bandwidth_fill_per_layer[6]: 2064.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[6]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[6]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[7]: 2.0
-STANDARD CASE latency_read_drain_per_layer[7]: 2.0
-ideal_bandwidth_fill_per_layer[7]: 1032.0
-ideal_bandwidth_update_per_layer[7]: 1024.0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+ideal_bandwidth_fill_per_layer[7]: 2064.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[7]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[7]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[8]: 2.0
-STANDARD CASE latency_read_drain_per_layer[8]: 2.0
-ideal_bandwidth_fill_per_layer[8]: 1032.0
-ideal_bandwidth_update_per_layer[8]: 1024.0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+ideal_bandwidth_fill_per_layer[8]: 2064.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[8]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[8]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 13.125
-STANDARD CASE latency_read_drain_per_layer[9]: 13.125
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 13.125
+STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 9, latency_fill_update_per_layer[0] = 9
 Final latency_per_layer[0]: 9
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 9
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 2.0, latency_fill_update_per_layer[1] = 257.0
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 257.0
 Final latency_per_layer[1]: 257
-Final stall_cycles_per_layer[1]: 255
-cc_per_all_tiles_per_layer[1]: 2
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 2.0, latency_fill_update_per_layer[2] = 257.0
+Final stall_cycles_per_layer[1]: 256
+cc_per_all_tiles_per_layer[1]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 257.0
 Final latency_per_layer[2]: 257
-Final stall_cycles_per_layer[2]: 255
-cc_per_all_tiles_per_layer[2]: 2
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 2.0, latency_fill_update_per_layer[3] = 257.0
+Final stall_cycles_per_layer[2]: 256
+cc_per_all_tiles_per_layer[2]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 257.0
 Final latency_per_layer[3]: 257
-Final stall_cycles_per_layer[3]: 255
-cc_per_all_tiles_per_layer[3]: 2
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 2.0, latency_fill_update_per_layer[4] = 257.0
+Final stall_cycles_per_layer[3]: 256
+cc_per_all_tiles_per_layer[3]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 257.0
 Final latency_per_layer[4]: 257
-Final stall_cycles_per_layer[4]: 255
-cc_per_all_tiles_per_layer[4]: 2
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 2.0, latency_fill_update_per_layer[5] = 257.0
+Final stall_cycles_per_layer[4]: 256
+cc_per_all_tiles_per_layer[4]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 257.0
 Final latency_per_layer[5]: 257
-Final stall_cycles_per_layer[5]: 255
-cc_per_all_tiles_per_layer[5]: 2
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 2.0, latency_fill_update_per_layer[6] = 257.0
+Final stall_cycles_per_layer[5]: 256
+cc_per_all_tiles_per_layer[5]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 257.0
 Final latency_per_layer[6]: 257
-Final stall_cycles_per_layer[6]: 255
-cc_per_all_tiles_per_layer[6]: 2
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 2.0, latency_fill_update_per_layer[7] = 257.0
+Final stall_cycles_per_layer[6]: 256
+cc_per_all_tiles_per_layer[6]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 257.0
 Final latency_per_layer[7]: 257
-Final stall_cycles_per_layer[7]: 255
-cc_per_all_tiles_per_layer[7]: 2
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 2.0, latency_fill_update_per_layer[8] = 257.0
+Final stall_cycles_per_layer[7]: 256
+cc_per_all_tiles_per_layer[7]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 257.0
 Final latency_per_layer[8]: 257
-Final stall_cycles_per_layer[8]: 255
-cc_per_all_tiles_per_layer[8]: 2
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 13.125
-Final latency_per_layer[9]: 13
+Final stall_cycles_per_layer[8]: 256
+cc_per_all_tiles_per_layer[8]: 1
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 13
+cc_per_all_tiles_per_layer[9]: 10
 
 
 Calculating Latency for Level: FeatureMemory
@@ -2614,17 +2555,17 @@ Latency for layer: 9 of Level: FeatureMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 720
 Scaling per layer[9]: 720
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 420.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 320
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
-ideal_bandwidth_update_per_layer[9]: 0.06772486772486773
+ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -2683,10 +2624,10 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 148032.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 420.0
-STANDARD CASE latency_read_drain_per_layer[9]: 420.0
+cc_per_all_tiles_per_layer[9]: 320
+STANDARD CASE latency_read_drain_per_layer[9]: 320
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 420.0
+STANDARD CASE latency_fill_update_per_layer[9]: 320
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 54, latency_fill_update_per_layer[0] = 54
 Final latency_per_layer[0]: 54
 Final stall_cycles_per_layer[0]: 0
@@ -2723,10 +2664,10 @@ Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8]
 Final latency_per_layer[8]: 148,032
 Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 148,032
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 420.0, latency_fill_update_per_layer[9] = 420.0
-Final latency_per_layer[9]: 420
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 320, latency_fill_update_per_layer[9] = 320
+Final latency_per_layer[9]: 320
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 420
+cc_per_all_tiles_per_layer[9]: 320
 
 
 Calculating Latency for Level: DRAM
@@ -2879,15 +2820,15 @@ Latency for layer: 9 of Level: DRAM
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 1
 Scaling per layer[9]: 1
-SINGLE TILE: cc_per_tile_per_layer[9]: 420.0
-cc_per_all_tiles_per_layer[9]: 302400.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 320
+cc_per_all_tiles_per_layer[9]: 230400
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.getFillPerLayer[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
@@ -2954,14 +2895,14 @@ STANDARD CASE latency_read_drain_per_layer[8]: 1065830400.0
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 1065830400.0
 Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 ideal_bandwidth_drain_per_layer[9]: 0
 level.read_bandwidth: 18.0
 total data: 29859840
 scaling_per_layer[9]: 1
 SLOWDOWN CASE latency_read_drain_per_layer[9]: 1658880.0
 ideal_bandwidth_fill_per_layer[9]: 0.0
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.write_bandwidth: 18.0
 total data: 14745600
 scaling_per_layer[9]: 1
@@ -3004,8 +2945,8 @@ Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1,065,830,400
 Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 1658880.0, latency_fill_update_per_layer[9] = 819200.0
 Final latency_per_layer[9]: 1,658,880
-Final stall_cycles_per_layer[9]: 1,356,480
-cc_per_all_tiles_per_layer[9]: 302,400
+Final stall_cycles_per_layer[9]: 1,428,480
+cc_per_all_tiles_per_layer[9]: 230,400
 Compute level latency: 1
 temporal_iterations before compute level: 1
 Compute Level Compute: powered_instances=1, 
@@ -4958,158 +4899,99 @@ cc_per_all_tiles_per_layer[0]: 1
 STANDARD CASE latency_read_drain_per_layer[0]: 1
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 1
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[1]: 2.0
-ideal_bandwidth_drain_per_layer[1]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[1]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[1]: 1.000244140625
-ideal_bandwidth_update_per_layer[1]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[1]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[2]: 2.0
-ideal_bandwidth_drain_per_layer[2]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[2]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[2]: 1.000244140625
-ideal_bandwidth_update_per_layer[2]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[2]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[3]: 2.0
-ideal_bandwidth_drain_per_layer[3]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[3]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[3]: 1.000244140625
-ideal_bandwidth_update_per_layer[3]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[3]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[4]: 2.0
-ideal_bandwidth_drain_per_layer[4]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[4]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[4]: 1.000244140625
-ideal_bandwidth_update_per_layer[4]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[4]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[5]: 2.0
-ideal_bandwidth_drain_per_layer[5]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[5]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[5]: 1.000244140625
-ideal_bandwidth_update_per_layer[5]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[5]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[6]: 2.0
-ideal_bandwidth_drain_per_layer[6]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[6]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[6]: 1.000244140625
-ideal_bandwidth_update_per_layer[6]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[6]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[7]: 2.0
-ideal_bandwidth_drain_per_layer[7]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[7]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[7]: 1.000244140625
-ideal_bandwidth_update_per_layer[7]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[7]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[8]: 2.0
-ideal_bandwidth_drain_per_layer[8]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[8]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[8]: 1.000002712673611
-ideal_bandwidth_update_per_layer[8]: 1.999997287326389
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[8]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 1.96875
-ideal_bandwidth_drain_per_layer[9]: 0
-level.read_bandwidth: 1.5
-total data: 928972800
-scaling_per_layer[9]: 47185920
-SLOWDOWN CASE latency_read_drain_per_layer[9]: 13.125
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[1]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[2]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[3]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[4]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[5]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[6]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[7]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[8]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 1, latency_fill_update_per_layer[0] = 1
 Final latency_per_layer[0]: 1
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 1
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1.3333333333333333, latency_fill_update_per_layer[1] = 2.0
-Final latency_per_layer[1]: 2
-Final stall_cycles_per_layer[1]: 1
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 1
+Final latency_per_layer[1]: 1
+Final stall_cycles_per_layer[1]: 0
 cc_per_all_tiles_per_layer[1]: 1
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1.3333333333333333, latency_fill_update_per_layer[2] = 2.0
-Final latency_per_layer[2]: 2
-Final stall_cycles_per_layer[2]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 1
+Final latency_per_layer[2]: 1
+Final stall_cycles_per_layer[2]: 0
 cc_per_all_tiles_per_layer[2]: 1
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1.3333333333333333, latency_fill_update_per_layer[3] = 2.0
-Final latency_per_layer[3]: 2
-Final stall_cycles_per_layer[3]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 1
+Final latency_per_layer[3]: 1
+Final stall_cycles_per_layer[3]: 0
 cc_per_all_tiles_per_layer[3]: 1
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1.3333333333333333, latency_fill_update_per_layer[4] = 2.0
-Final latency_per_layer[4]: 2
-Final stall_cycles_per_layer[4]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 1
+Final latency_per_layer[4]: 1
+Final stall_cycles_per_layer[4]: 0
 cc_per_all_tiles_per_layer[4]: 1
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1.3333333333333333, latency_fill_update_per_layer[5] = 2.0
-Final latency_per_layer[5]: 2
-Final stall_cycles_per_layer[5]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 1
+Final latency_per_layer[5]: 1
+Final stall_cycles_per_layer[5]: 0
 cc_per_all_tiles_per_layer[5]: 1
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1.3333333333333333, latency_fill_update_per_layer[6] = 2.0
-Final latency_per_layer[6]: 2
-Final stall_cycles_per_layer[6]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 1
+Final latency_per_layer[6]: 1
+Final stall_cycles_per_layer[6]: 0
 cc_per_all_tiles_per_layer[6]: 1
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1.3333333333333333, latency_fill_update_per_layer[7] = 2.0
-Final latency_per_layer[7]: 2
-Final stall_cycles_per_layer[7]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 1
+Final latency_per_layer[7]: 1
+Final stall_cycles_per_layer[7]: 0
 cc_per_all_tiles_per_layer[7]: 1
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1.3333333333333333, latency_fill_update_per_layer[8] = 2.0
-Final latency_per_layer[8]: 2
-Final stall_cycles_per_layer[8]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 1
+Final latency_per_layer[8]: 1
+Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 10
-Final latency_per_layer[9]: 13
-Final stall_cycles_per_layer[9]: 3
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
+Final stall_cycles_per_layer[9]: 0
 cc_per_all_tiles_per_layer[9]: 10
 
 
@@ -5135,145 +5017,145 @@ Latency for layer: 1 of Level: WeightMemory
 level.active_instances_per_layer[1]: 1
 level.temporal_iterations_per_layer[1]: 4147200
 Scaling per layer[1]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[1]: 2.0
-cc_per_all_tiles_per_layer[1]: 2.0
-SCALED cc_per_all_tiles_per_layer[1]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[1]: 1
+cc_per_all_tiles_per_layer[1]: 1
+SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
 level.getReadPerLayer[1](): 4,147,200
-ideal_bandwidth_read_per_layer[1]: 0.5
+ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 level.getUpdatePerLayer[1](): 8,493,465,600
-ideal_bandwidth_update_per_layer[1]: 1024.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.getFillPerLayer[1](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[1]: 1032.0
+ideal_bandwidth_fill_per_layer[1]: 2064.0
 
 Latency for layer: 2 of Level: WeightMemory
 level.active_instances_per_layer[2]: 1
 level.temporal_iterations_per_layer[2]: 4147200
 Scaling per layer[2]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[2]: 2.0
-cc_per_all_tiles_per_layer[2]: 2.0
-SCALED cc_per_all_tiles_per_layer[2]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[2]: 1
+cc_per_all_tiles_per_layer[2]: 1
+SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
-ideal_bandwidth_read_per_layer[2]: 0.5
+ideal_bandwidth_read_per_layer[2]: 1.0
 level.getDrainPerLayer[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
-ideal_bandwidth_update_per_layer[2]: 1024.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.getFillPerLayer[2](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[2]: 1032.0
+ideal_bandwidth_fill_per_layer[2]: 2064.0
 
 Latency for layer: 3 of Level: WeightMemory
 level.active_instances_per_layer[3]: 1
 level.temporal_iterations_per_layer[3]: 4147200
 Scaling per layer[3]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[3]: 2.0
-cc_per_all_tiles_per_layer[3]: 2.0
-SCALED cc_per_all_tiles_per_layer[3]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[3]: 1
+cc_per_all_tiles_per_layer[3]: 1
+SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
-ideal_bandwidth_read_per_layer[3]: 0.5
+ideal_bandwidth_read_per_layer[3]: 1.0
 level.getDrainPerLayer[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
-ideal_bandwidth_update_per_layer[3]: 1024.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.getFillPerLayer[3](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[3]: 1032.0
+ideal_bandwidth_fill_per_layer[3]: 2064.0
 
 Latency for layer: 4 of Level: WeightMemory
 level.active_instances_per_layer[4]: 1
 level.temporal_iterations_per_layer[4]: 4147200
 Scaling per layer[4]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[4]: 2.0
-cc_per_all_tiles_per_layer[4]: 2.0
-SCALED cc_per_all_tiles_per_layer[4]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[4]: 1
+cc_per_all_tiles_per_layer[4]: 1
+SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
-ideal_bandwidth_read_per_layer[4]: 0.5
+ideal_bandwidth_read_per_layer[4]: 1.0
 level.getDrainPerLayer[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
-ideal_bandwidth_update_per_layer[4]: 1024.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.getFillPerLayer[4](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[4]: 1032.0
+ideal_bandwidth_fill_per_layer[4]: 2064.0
 
 Latency for layer: 5 of Level: WeightMemory
 level.active_instances_per_layer[5]: 1
 level.temporal_iterations_per_layer[5]: 4147200
 Scaling per layer[5]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[5]: 2.0
-cc_per_all_tiles_per_layer[5]: 2.0
-SCALED cc_per_all_tiles_per_layer[5]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[5]: 1
+cc_per_all_tiles_per_layer[5]: 1
+SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
-ideal_bandwidth_read_per_layer[5]: 0.5
+ideal_bandwidth_read_per_layer[5]: 1.0
 level.getDrainPerLayer[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
-ideal_bandwidth_update_per_layer[5]: 1024.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.getFillPerLayer[5](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[5]: 1032.0
+ideal_bandwidth_fill_per_layer[5]: 2064.0
 
 Latency for layer: 6 of Level: WeightMemory
 level.active_instances_per_layer[6]: 1
 level.temporal_iterations_per_layer[6]: 4147200
 Scaling per layer[6]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[6]: 2.0
-cc_per_all_tiles_per_layer[6]: 2.0
-SCALED cc_per_all_tiles_per_layer[6]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[6]: 1
+cc_per_all_tiles_per_layer[6]: 1
+SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
-ideal_bandwidth_read_per_layer[6]: 0.5
+ideal_bandwidth_read_per_layer[6]: 1.0
 level.getDrainPerLayer[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
-ideal_bandwidth_update_per_layer[6]: 1024.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.getFillPerLayer[6](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[6]: 1032.0
+ideal_bandwidth_fill_per_layer[6]: 2064.0
 
 Latency for layer: 7 of Level: WeightMemory
 level.active_instances_per_layer[7]: 1
 level.temporal_iterations_per_layer[7]: 4147200
 Scaling per layer[7]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[7]: 2.0
-cc_per_all_tiles_per_layer[7]: 2.0
-SCALED cc_per_all_tiles_per_layer[7]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[7]: 1
+cc_per_all_tiles_per_layer[7]: 1
+SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
-ideal_bandwidth_read_per_layer[7]: 0.5
+ideal_bandwidth_read_per_layer[7]: 1.0
 level.getDrainPerLayer[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
-ideal_bandwidth_update_per_layer[7]: 1024.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.getFillPerLayer[7](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[7]: 1032.0
+ideal_bandwidth_fill_per_layer[7]: 2064.0
 
 Latency for layer: 8 of Level: WeightMemory
 level.active_instances_per_layer[8]: 1
 level.temporal_iterations_per_layer[8]: 4147200
 Scaling per layer[8]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[8]: 2.0
-cc_per_all_tiles_per_layer[8]: 2.0
-SCALED cc_per_all_tiles_per_layer[8]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[8]: 1
+cc_per_all_tiles_per_layer[8]: 1
+SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
-ideal_bandwidth_read_per_layer[8]: 0.5
+ideal_bandwidth_read_per_layer[8]: 1.0
 level.getDrainPerLayer[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
-ideal_bandwidth_update_per_layer[8]: 1024.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.getFillPerLayer[8](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[8]: 1032.0
+ideal_bandwidth_fill_per_layer[8]: 2064.0
 
 Latency for layer: 9 of Level: WeightMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 23040
 Scaling per layer[9]: 23,040
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 13.125
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 10
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -5284,130 +5166,130 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 9
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[1]: 2.0
-STANDARD CASE latency_read_drain_per_layer[1]: 2.0
-ideal_bandwidth_fill_per_layer[1]: 1032.0
-ideal_bandwidth_update_per_layer[1]: 1024.0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+ideal_bandwidth_fill_per_layer[1]: 2064.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[1]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[1]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[2]: 2.0
-STANDARD CASE latency_read_drain_per_layer[2]: 2.0
-ideal_bandwidth_fill_per_layer[2]: 1032.0
-ideal_bandwidth_update_per_layer[2]: 1024.0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+ideal_bandwidth_fill_per_layer[2]: 2064.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[2]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[2]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[3]: 2.0
-STANDARD CASE latency_read_drain_per_layer[3]: 2.0
-ideal_bandwidth_fill_per_layer[3]: 1032.0
-ideal_bandwidth_update_per_layer[3]: 1024.0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+ideal_bandwidth_fill_per_layer[3]: 2064.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[3]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[3]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[4]: 2.0
-STANDARD CASE latency_read_drain_per_layer[4]: 2.0
-ideal_bandwidth_fill_per_layer[4]: 1032.0
-ideal_bandwidth_update_per_layer[4]: 1024.0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+ideal_bandwidth_fill_per_layer[4]: 2064.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[4]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[4]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[5]: 2.0
-STANDARD CASE latency_read_drain_per_layer[5]: 2.0
-ideal_bandwidth_fill_per_layer[5]: 1032.0
-ideal_bandwidth_update_per_layer[5]: 1024.0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+ideal_bandwidth_fill_per_layer[5]: 2064.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[5]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[5]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[6]: 2.0
-STANDARD CASE latency_read_drain_per_layer[6]: 2.0
-ideal_bandwidth_fill_per_layer[6]: 1032.0
-ideal_bandwidth_update_per_layer[6]: 1024.0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+ideal_bandwidth_fill_per_layer[6]: 2064.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[6]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[6]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[7]: 2.0
-STANDARD CASE latency_read_drain_per_layer[7]: 2.0
-ideal_bandwidth_fill_per_layer[7]: 1032.0
-ideal_bandwidth_update_per_layer[7]: 1024.0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+ideal_bandwidth_fill_per_layer[7]: 2064.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[7]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[7]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[8]: 2.0
-STANDARD CASE latency_read_drain_per_layer[8]: 2.0
-ideal_bandwidth_fill_per_layer[8]: 1032.0
-ideal_bandwidth_update_per_layer[8]: 1024.0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+ideal_bandwidth_fill_per_layer[8]: 2064.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[8]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[8]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 13.125
-STANDARD CASE latency_read_drain_per_layer[9]: 13.125
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 13.125
+STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 9, latency_fill_update_per_layer[0] = 9
 Final latency_per_layer[0]: 9
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 9
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 2.0, latency_fill_update_per_layer[1] = 257.0
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 257.0
 Final latency_per_layer[1]: 257
-Final stall_cycles_per_layer[1]: 255
-cc_per_all_tiles_per_layer[1]: 2
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 2.0, latency_fill_update_per_layer[2] = 257.0
+Final stall_cycles_per_layer[1]: 256
+cc_per_all_tiles_per_layer[1]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 257.0
 Final latency_per_layer[2]: 257
-Final stall_cycles_per_layer[2]: 255
-cc_per_all_tiles_per_layer[2]: 2
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 2.0, latency_fill_update_per_layer[3] = 257.0
+Final stall_cycles_per_layer[2]: 256
+cc_per_all_tiles_per_layer[2]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 257.0
 Final latency_per_layer[3]: 257
-Final stall_cycles_per_layer[3]: 255
-cc_per_all_tiles_per_layer[3]: 2
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 2.0, latency_fill_update_per_layer[4] = 257.0
+Final stall_cycles_per_layer[3]: 256
+cc_per_all_tiles_per_layer[3]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 257.0
 Final latency_per_layer[4]: 257
-Final stall_cycles_per_layer[4]: 255
-cc_per_all_tiles_per_layer[4]: 2
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 2.0, latency_fill_update_per_layer[5] = 257.0
+Final stall_cycles_per_layer[4]: 256
+cc_per_all_tiles_per_layer[4]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 257.0
 Final latency_per_layer[5]: 257
-Final stall_cycles_per_layer[5]: 255
-cc_per_all_tiles_per_layer[5]: 2
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 2.0, latency_fill_update_per_layer[6] = 257.0
+Final stall_cycles_per_layer[5]: 256
+cc_per_all_tiles_per_layer[5]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 257.0
 Final latency_per_layer[6]: 257
-Final stall_cycles_per_layer[6]: 255
-cc_per_all_tiles_per_layer[6]: 2
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 2.0, latency_fill_update_per_layer[7] = 257.0
+Final stall_cycles_per_layer[6]: 256
+cc_per_all_tiles_per_layer[6]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 257.0
 Final latency_per_layer[7]: 257
-Final stall_cycles_per_layer[7]: 255
-cc_per_all_tiles_per_layer[7]: 2
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 2.0, latency_fill_update_per_layer[8] = 257.0
+Final stall_cycles_per_layer[7]: 256
+cc_per_all_tiles_per_layer[7]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 257.0
 Final latency_per_layer[8]: 257
-Final stall_cycles_per_layer[8]: 255
-cc_per_all_tiles_per_layer[8]: 2
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 13.125
-Final latency_per_layer[9]: 13
+Final stall_cycles_per_layer[8]: 256
+cc_per_all_tiles_per_layer[8]: 1
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 13
+cc_per_all_tiles_per_layer[9]: 10
 
 
 Calculating Latency for Level: FeatureMemory
@@ -5562,17 +5444,17 @@ Latency for layer: 9 of Level: FeatureMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 720
 Scaling per layer[9]: 720
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 420.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 320
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
-ideal_bandwidth_update_per_layer[9]: 0.06772486772486773
+ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -5631,10 +5513,10 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 148032.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 420.0
-STANDARD CASE latency_read_drain_per_layer[9]: 420.0
+cc_per_all_tiles_per_layer[9]: 320
+STANDARD CASE latency_read_drain_per_layer[9]: 320
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 420.0
+STANDARD CASE latency_fill_update_per_layer[9]: 320
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 54, latency_fill_update_per_layer[0] = 54
 Final latency_per_layer[0]: 54
 Final stall_cycles_per_layer[0]: 0
@@ -5671,10 +5553,10 @@ Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8]
 Final latency_per_layer[8]: 148,032
 Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 148,032
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 420.0, latency_fill_update_per_layer[9] = 420.0
-Final latency_per_layer[9]: 420
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 320, latency_fill_update_per_layer[9] = 320
+Final latency_per_layer[9]: 320
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 420
+cc_per_all_tiles_per_layer[9]: 320
 
 
 Calculating Latency for Level: DRAM
@@ -5827,15 +5709,15 @@ Latency for layer: 9 of Level: DRAM
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 1
 Scaling per layer[9]: 1
-SINGLE TILE: cc_per_tile_per_layer[9]: 420.0
-cc_per_all_tiles_per_layer[9]: 302400.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 320
+cc_per_all_tiles_per_layer[9]: 230400
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.getFillPerLayer[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
@@ -5902,14 +5784,14 @@ STANDARD CASE latency_read_drain_per_layer[8]: 1065830400.0
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 1065830400.0
 Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 ideal_bandwidth_drain_per_layer[9]: 0
 level.read_bandwidth: 18.0
 total data: 29859840
 scaling_per_layer[9]: 1
 SLOWDOWN CASE latency_read_drain_per_layer[9]: 1658880.0
 ideal_bandwidth_fill_per_layer[9]: 0.0
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.write_bandwidth: 18.0
 total data: 14745600
 scaling_per_layer[9]: 1
@@ -5952,8 +5834,8 @@ Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1,065,830,400
 Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 1658880.0, latency_fill_update_per_layer[9] = 819200.0
 Final latency_per_layer[9]: 1,658,880
-Final stall_cycles_per_layer[9]: 1,356,480
-cc_per_all_tiles_per_layer[9]: 302,400
+Final stall_cycles_per_layer[9]: 1,428,480
+cc_per_all_tiles_per_layer[9]: 230,400
 Compute level latency: 1
 temporal_iterations before compute level: 1
 Compute Level Compute: powered_instances=1, 
@@ -7877,158 +7759,99 @@ cc_per_all_tiles_per_layer[0]: 1
 STANDARD CASE latency_read_drain_per_layer[0]: 1
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 1
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[1]: 2.0
-ideal_bandwidth_drain_per_layer[1]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[1]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[1]: 1.000244140625
-ideal_bandwidth_update_per_layer[1]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[1]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[2]: 2.0
-ideal_bandwidth_drain_per_layer[2]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[2]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[2]: 1.000244140625
-ideal_bandwidth_update_per_layer[2]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[2]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[3]: 2.0
-ideal_bandwidth_drain_per_layer[3]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[3]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[3]: 1.000244140625
-ideal_bandwidth_update_per_layer[3]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[3]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[4]: 2.0
-ideal_bandwidth_drain_per_layer[4]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[4]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[4]: 1.000244140625
-ideal_bandwidth_update_per_layer[4]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[4]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[5]: 2.0
-ideal_bandwidth_drain_per_layer[5]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[5]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[5]: 1.000244140625
-ideal_bandwidth_update_per_layer[5]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[5]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[6]: 2.0
-ideal_bandwidth_drain_per_layer[6]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[6]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[6]: 1.000244140625
-ideal_bandwidth_update_per_layer[6]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[6]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[7]: 2.0
-ideal_bandwidth_drain_per_layer[7]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[7]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[7]: 1.000244140625
-ideal_bandwidth_update_per_layer[7]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[7]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[8]: 2.0
-ideal_bandwidth_drain_per_layer[8]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[8]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[8]: 1.000002712673611
-ideal_bandwidth_update_per_layer[8]: 1.999997287326389
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[8]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 1.96875
-ideal_bandwidth_drain_per_layer[9]: 0
-level.read_bandwidth: 1.5
-total data: 928972800
-scaling_per_layer[9]: 47185920
-SLOWDOWN CASE latency_read_drain_per_layer[9]: 13.125
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[1]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[2]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[3]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[4]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[5]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[6]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[7]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[8]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 1, latency_fill_update_per_layer[0] = 1
 Final latency_per_layer[0]: 1
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 1
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1.3333333333333333, latency_fill_update_per_layer[1] = 2.0
-Final latency_per_layer[1]: 2
-Final stall_cycles_per_layer[1]: 1
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 1
+Final latency_per_layer[1]: 1
+Final stall_cycles_per_layer[1]: 0
 cc_per_all_tiles_per_layer[1]: 1
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1.3333333333333333, latency_fill_update_per_layer[2] = 2.0
-Final latency_per_layer[2]: 2
-Final stall_cycles_per_layer[2]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 1
+Final latency_per_layer[2]: 1
+Final stall_cycles_per_layer[2]: 0
 cc_per_all_tiles_per_layer[2]: 1
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1.3333333333333333, latency_fill_update_per_layer[3] = 2.0
-Final latency_per_layer[3]: 2
-Final stall_cycles_per_layer[3]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 1
+Final latency_per_layer[3]: 1
+Final stall_cycles_per_layer[3]: 0
 cc_per_all_tiles_per_layer[3]: 1
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1.3333333333333333, latency_fill_update_per_layer[4] = 2.0
-Final latency_per_layer[4]: 2
-Final stall_cycles_per_layer[4]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 1
+Final latency_per_layer[4]: 1
+Final stall_cycles_per_layer[4]: 0
 cc_per_all_tiles_per_layer[4]: 1
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1.3333333333333333, latency_fill_update_per_layer[5] = 2.0
-Final latency_per_layer[5]: 2
-Final stall_cycles_per_layer[5]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 1
+Final latency_per_layer[5]: 1
+Final stall_cycles_per_layer[5]: 0
 cc_per_all_tiles_per_layer[5]: 1
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1.3333333333333333, latency_fill_update_per_layer[6] = 2.0
-Final latency_per_layer[6]: 2
-Final stall_cycles_per_layer[6]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 1
+Final latency_per_layer[6]: 1
+Final stall_cycles_per_layer[6]: 0
 cc_per_all_tiles_per_layer[6]: 1
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1.3333333333333333, latency_fill_update_per_layer[7] = 2.0
-Final latency_per_layer[7]: 2
-Final stall_cycles_per_layer[7]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 1
+Final latency_per_layer[7]: 1
+Final stall_cycles_per_layer[7]: 0
 cc_per_all_tiles_per_layer[7]: 1
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1.3333333333333333, latency_fill_update_per_layer[8] = 2.0
-Final latency_per_layer[8]: 2
-Final stall_cycles_per_layer[8]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 1
+Final latency_per_layer[8]: 1
+Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 10
-Final latency_per_layer[9]: 13
-Final stall_cycles_per_layer[9]: 3
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
+Final stall_cycles_per_layer[9]: 0
 cc_per_all_tiles_per_layer[9]: 10
 
 
@@ -8054,145 +7877,145 @@ Latency for layer: 1 of Level: WeightMemory
 level.active_instances_per_layer[1]: 1
 level.temporal_iterations_per_layer[1]: 4147200
 Scaling per layer[1]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[1]: 2.0
-cc_per_all_tiles_per_layer[1]: 2.0
-SCALED cc_per_all_tiles_per_layer[1]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[1]: 1
+cc_per_all_tiles_per_layer[1]: 1
+SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
 level.getReadPerLayer[1](): 4,147,200
-ideal_bandwidth_read_per_layer[1]: 0.5
+ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 level.getUpdatePerLayer[1](): 8,493,465,600
-ideal_bandwidth_update_per_layer[1]: 1024.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.getFillPerLayer[1](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[1]: 1032.0
+ideal_bandwidth_fill_per_layer[1]: 2064.0
 
 Latency for layer: 2 of Level: WeightMemory
 level.active_instances_per_layer[2]: 1
 level.temporal_iterations_per_layer[2]: 4147200
 Scaling per layer[2]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[2]: 2.0
-cc_per_all_tiles_per_layer[2]: 2.0
-SCALED cc_per_all_tiles_per_layer[2]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[2]: 1
+cc_per_all_tiles_per_layer[2]: 1
+SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
-ideal_bandwidth_read_per_layer[2]: 0.5
+ideal_bandwidth_read_per_layer[2]: 1.0
 level.getDrainPerLayer[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
-ideal_bandwidth_update_per_layer[2]: 1024.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.getFillPerLayer[2](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[2]: 1032.0
+ideal_bandwidth_fill_per_layer[2]: 2064.0
 
 Latency for layer: 3 of Level: WeightMemory
 level.active_instances_per_layer[3]: 1
 level.temporal_iterations_per_layer[3]: 4147200
 Scaling per layer[3]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[3]: 2.0
-cc_per_all_tiles_per_layer[3]: 2.0
-SCALED cc_per_all_tiles_per_layer[3]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[3]: 1
+cc_per_all_tiles_per_layer[3]: 1
+SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
-ideal_bandwidth_read_per_layer[3]: 0.5
+ideal_bandwidth_read_per_layer[3]: 1.0
 level.getDrainPerLayer[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
-ideal_bandwidth_update_per_layer[3]: 1024.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.getFillPerLayer[3](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[3]: 1032.0
+ideal_bandwidth_fill_per_layer[3]: 2064.0
 
 Latency for layer: 4 of Level: WeightMemory
 level.active_instances_per_layer[4]: 1
 level.temporal_iterations_per_layer[4]: 4147200
 Scaling per layer[4]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[4]: 2.0
-cc_per_all_tiles_per_layer[4]: 2.0
-SCALED cc_per_all_tiles_per_layer[4]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[4]: 1
+cc_per_all_tiles_per_layer[4]: 1
+SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
-ideal_bandwidth_read_per_layer[4]: 0.5
+ideal_bandwidth_read_per_layer[4]: 1.0
 level.getDrainPerLayer[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
-ideal_bandwidth_update_per_layer[4]: 1024.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.getFillPerLayer[4](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[4]: 1032.0
+ideal_bandwidth_fill_per_layer[4]: 2064.0
 
 Latency for layer: 5 of Level: WeightMemory
 level.active_instances_per_layer[5]: 1
 level.temporal_iterations_per_layer[5]: 4147200
 Scaling per layer[5]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[5]: 2.0
-cc_per_all_tiles_per_layer[5]: 2.0
-SCALED cc_per_all_tiles_per_layer[5]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[5]: 1
+cc_per_all_tiles_per_layer[5]: 1
+SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
-ideal_bandwidth_read_per_layer[5]: 0.5
+ideal_bandwidth_read_per_layer[5]: 1.0
 level.getDrainPerLayer[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
-ideal_bandwidth_update_per_layer[5]: 1024.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.getFillPerLayer[5](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[5]: 1032.0
+ideal_bandwidth_fill_per_layer[5]: 2064.0
 
 Latency for layer: 6 of Level: WeightMemory
 level.active_instances_per_layer[6]: 1
 level.temporal_iterations_per_layer[6]: 4147200
 Scaling per layer[6]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[6]: 2.0
-cc_per_all_tiles_per_layer[6]: 2.0
-SCALED cc_per_all_tiles_per_layer[6]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[6]: 1
+cc_per_all_tiles_per_layer[6]: 1
+SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
-ideal_bandwidth_read_per_layer[6]: 0.5
+ideal_bandwidth_read_per_layer[6]: 1.0
 level.getDrainPerLayer[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
-ideal_bandwidth_update_per_layer[6]: 1024.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.getFillPerLayer[6](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[6]: 1032.0
+ideal_bandwidth_fill_per_layer[6]: 2064.0
 
 Latency for layer: 7 of Level: WeightMemory
 level.active_instances_per_layer[7]: 1
 level.temporal_iterations_per_layer[7]: 4147200
 Scaling per layer[7]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[7]: 2.0
-cc_per_all_tiles_per_layer[7]: 2.0
-SCALED cc_per_all_tiles_per_layer[7]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[7]: 1
+cc_per_all_tiles_per_layer[7]: 1
+SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
-ideal_bandwidth_read_per_layer[7]: 0.5
+ideal_bandwidth_read_per_layer[7]: 1.0
 level.getDrainPerLayer[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
-ideal_bandwidth_update_per_layer[7]: 1024.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.getFillPerLayer[7](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[7]: 1032.0
+ideal_bandwidth_fill_per_layer[7]: 2064.0
 
 Latency for layer: 8 of Level: WeightMemory
 level.active_instances_per_layer[8]: 1
 level.temporal_iterations_per_layer[8]: 4147200
 Scaling per layer[8]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[8]: 2.0
-cc_per_all_tiles_per_layer[8]: 2.0
-SCALED cc_per_all_tiles_per_layer[8]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[8]: 1
+cc_per_all_tiles_per_layer[8]: 1
+SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
-ideal_bandwidth_read_per_layer[8]: 0.5
+ideal_bandwidth_read_per_layer[8]: 1.0
 level.getDrainPerLayer[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
-ideal_bandwidth_update_per_layer[8]: 1024.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.getFillPerLayer[8](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[8]: 1032.0
+ideal_bandwidth_fill_per_layer[8]: 2064.0
 
 Latency for layer: 9 of Level: WeightMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 23040
 Scaling per layer[9]: 23,040
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 13.125
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 10
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -8203,130 +8026,130 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 9
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[1]: 2.0
-STANDARD CASE latency_read_drain_per_layer[1]: 2.0
-ideal_bandwidth_fill_per_layer[1]: 1032.0
-ideal_bandwidth_update_per_layer[1]: 1024.0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+ideal_bandwidth_fill_per_layer[1]: 2064.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[1]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[1]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[2]: 2.0
-STANDARD CASE latency_read_drain_per_layer[2]: 2.0
-ideal_bandwidth_fill_per_layer[2]: 1032.0
-ideal_bandwidth_update_per_layer[2]: 1024.0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+ideal_bandwidth_fill_per_layer[2]: 2064.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[2]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[2]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[3]: 2.0
-STANDARD CASE latency_read_drain_per_layer[3]: 2.0
-ideal_bandwidth_fill_per_layer[3]: 1032.0
-ideal_bandwidth_update_per_layer[3]: 1024.0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+ideal_bandwidth_fill_per_layer[3]: 2064.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[3]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[3]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[4]: 2.0
-STANDARD CASE latency_read_drain_per_layer[4]: 2.0
-ideal_bandwidth_fill_per_layer[4]: 1032.0
-ideal_bandwidth_update_per_layer[4]: 1024.0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+ideal_bandwidth_fill_per_layer[4]: 2064.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[4]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[4]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[5]: 2.0
-STANDARD CASE latency_read_drain_per_layer[5]: 2.0
-ideal_bandwidth_fill_per_layer[5]: 1032.0
-ideal_bandwidth_update_per_layer[5]: 1024.0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+ideal_bandwidth_fill_per_layer[5]: 2064.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[5]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[5]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[6]: 2.0
-STANDARD CASE latency_read_drain_per_layer[6]: 2.0
-ideal_bandwidth_fill_per_layer[6]: 1032.0
-ideal_bandwidth_update_per_layer[6]: 1024.0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+ideal_bandwidth_fill_per_layer[6]: 2064.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[6]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[6]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[7]: 2.0
-STANDARD CASE latency_read_drain_per_layer[7]: 2.0
-ideal_bandwidth_fill_per_layer[7]: 1032.0
-ideal_bandwidth_update_per_layer[7]: 1024.0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+ideal_bandwidth_fill_per_layer[7]: 2064.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[7]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[7]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[8]: 2.0
-STANDARD CASE latency_read_drain_per_layer[8]: 2.0
-ideal_bandwidth_fill_per_layer[8]: 1032.0
-ideal_bandwidth_update_per_layer[8]: 1024.0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+ideal_bandwidth_fill_per_layer[8]: 2064.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[8]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[8]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 13.125
-STANDARD CASE latency_read_drain_per_layer[9]: 13.125
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 13.125
+STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 9, latency_fill_update_per_layer[0] = 9
 Final latency_per_layer[0]: 9
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 9
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 2.0, latency_fill_update_per_layer[1] = 257.0
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 257.0
 Final latency_per_layer[1]: 257
-Final stall_cycles_per_layer[1]: 255
-cc_per_all_tiles_per_layer[1]: 2
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 2.0, latency_fill_update_per_layer[2] = 257.0
+Final stall_cycles_per_layer[1]: 256
+cc_per_all_tiles_per_layer[1]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 257.0
 Final latency_per_layer[2]: 257
-Final stall_cycles_per_layer[2]: 255
-cc_per_all_tiles_per_layer[2]: 2
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 2.0, latency_fill_update_per_layer[3] = 257.0
+Final stall_cycles_per_layer[2]: 256
+cc_per_all_tiles_per_layer[2]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 257.0
 Final latency_per_layer[3]: 257
-Final stall_cycles_per_layer[3]: 255
-cc_per_all_tiles_per_layer[3]: 2
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 2.0, latency_fill_update_per_layer[4] = 257.0
+Final stall_cycles_per_layer[3]: 256
+cc_per_all_tiles_per_layer[3]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 257.0
 Final latency_per_layer[4]: 257
-Final stall_cycles_per_layer[4]: 255
-cc_per_all_tiles_per_layer[4]: 2
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 2.0, latency_fill_update_per_layer[5] = 257.0
+Final stall_cycles_per_layer[4]: 256
+cc_per_all_tiles_per_layer[4]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 257.0
 Final latency_per_layer[5]: 257
-Final stall_cycles_per_layer[5]: 255
-cc_per_all_tiles_per_layer[5]: 2
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 2.0, latency_fill_update_per_layer[6] = 257.0
+Final stall_cycles_per_layer[5]: 256
+cc_per_all_tiles_per_layer[5]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 257.0
 Final latency_per_layer[6]: 257
-Final stall_cycles_per_layer[6]: 255
-cc_per_all_tiles_per_layer[6]: 2
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 2.0, latency_fill_update_per_layer[7] = 257.0
+Final stall_cycles_per_layer[6]: 256
+cc_per_all_tiles_per_layer[6]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 257.0
 Final latency_per_layer[7]: 257
-Final stall_cycles_per_layer[7]: 255
-cc_per_all_tiles_per_layer[7]: 2
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 2.0, latency_fill_update_per_layer[8] = 257.0
+Final stall_cycles_per_layer[7]: 256
+cc_per_all_tiles_per_layer[7]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 257.0
 Final latency_per_layer[8]: 257
-Final stall_cycles_per_layer[8]: 255
-cc_per_all_tiles_per_layer[8]: 2
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 13.125
-Final latency_per_layer[9]: 13
+Final stall_cycles_per_layer[8]: 256
+cc_per_all_tiles_per_layer[8]: 1
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 13
+cc_per_all_tiles_per_layer[9]: 10
 
 
 Calculating Latency for Level: FeatureMemory
@@ -8481,17 +8304,17 @@ Latency for layer: 9 of Level: FeatureMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 720
 Scaling per layer[9]: 720
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 420.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 320
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
-ideal_bandwidth_update_per_layer[9]: 0.06772486772486773
+ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -8550,10 +8373,10 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 148032.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 420.0
-STANDARD CASE latency_read_drain_per_layer[9]: 420.0
+cc_per_all_tiles_per_layer[9]: 320
+STANDARD CASE latency_read_drain_per_layer[9]: 320
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 420.0
+STANDARD CASE latency_fill_update_per_layer[9]: 320
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 54, latency_fill_update_per_layer[0] = 54
 Final latency_per_layer[0]: 54
 Final stall_cycles_per_layer[0]: 0
@@ -8590,10 +8413,10 @@ Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8]
 Final latency_per_layer[8]: 148,032
 Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 148,032
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 420.0, latency_fill_update_per_layer[9] = 420.0
-Final latency_per_layer[9]: 420
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 320, latency_fill_update_per_layer[9] = 320
+Final latency_per_layer[9]: 320
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 420
+cc_per_all_tiles_per_layer[9]: 320
 
 
 Calculating Latency for Level: DRAM
@@ -8746,15 +8569,15 @@ Latency for layer: 9 of Level: DRAM
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 1
 Scaling per layer[9]: 1
-SINGLE TILE: cc_per_tile_per_layer[9]: 420.0
-cc_per_all_tiles_per_layer[9]: 302400.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 320
+cc_per_all_tiles_per_layer[9]: 230400
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.getFillPerLayer[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
@@ -8821,14 +8644,14 @@ STANDARD CASE latency_read_drain_per_layer[8]: 1065830400.0
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 1065830400.0
 Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 ideal_bandwidth_drain_per_layer[9]: 0
 level.read_bandwidth: 18.0
 total data: 29859840
 scaling_per_layer[9]: 1
 SLOWDOWN CASE latency_read_drain_per_layer[9]: 1658880.0
 ideal_bandwidth_fill_per_layer[9]: 0.0
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.write_bandwidth: 18.0
 total data: 14745600
 scaling_per_layer[9]: 1
@@ -8871,8 +8694,8 @@ Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1,065,830,400
 Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 1658880.0, latency_fill_update_per_layer[9] = 819200.0
 Final latency_per_layer[9]: 1,658,880
-Final stall_cycles_per_layer[9]: 1,356,480
-cc_per_all_tiles_per_layer[9]: 302,400
+Final stall_cycles_per_layer[9]: 1,428,480
+cc_per_all_tiles_per_layer[9]: 230,400
 Compute level latency: 1
 temporal_iterations before compute level: 1
 Compute Level Compute: powered_instances=1, 
@@ -10796,158 +10619,99 @@ cc_per_all_tiles_per_layer[0]: 1
 STANDARD CASE latency_read_drain_per_layer[0]: 1
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 1
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[1]: 2.0
-ideal_bandwidth_drain_per_layer[1]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[1]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[1]: 1.000244140625
-ideal_bandwidth_update_per_layer[1]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[1]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[2]: 2.0
-ideal_bandwidth_drain_per_layer[2]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[2]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[2]: 1.000244140625
-ideal_bandwidth_update_per_layer[2]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[2]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[3]: 2.0
-ideal_bandwidth_drain_per_layer[3]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[3]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[3]: 1.000244140625
-ideal_bandwidth_update_per_layer[3]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[3]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[4]: 2.0
-ideal_bandwidth_drain_per_layer[4]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[4]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[4]: 1.000244140625
-ideal_bandwidth_update_per_layer[4]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[4]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[5]: 2.0
-ideal_bandwidth_drain_per_layer[5]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[5]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[5]: 1.000244140625
-ideal_bandwidth_update_per_layer[5]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[5]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[6]: 2.0
-ideal_bandwidth_drain_per_layer[6]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[6]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[6]: 1.000244140625
-ideal_bandwidth_update_per_layer[6]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[6]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[7]: 2.0
-ideal_bandwidth_drain_per_layer[7]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[7]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[7]: 1.000244140625
-ideal_bandwidth_update_per_layer[7]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[7]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[8]: 2.0
-ideal_bandwidth_drain_per_layer[8]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[8]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[8]: 1.000002712673611
-ideal_bandwidth_update_per_layer[8]: 1.999997287326389
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[8]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 1.96875
-ideal_bandwidth_drain_per_layer[9]: 0
-level.read_bandwidth: 1.5
-total data: 928972800
-scaling_per_layer[9]: 47185920
-SLOWDOWN CASE latency_read_drain_per_layer[9]: 13.125
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[1]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[2]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[3]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[4]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[5]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[6]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[7]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[8]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 1, latency_fill_update_per_layer[0] = 1
 Final latency_per_layer[0]: 1
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 1
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1.3333333333333333, latency_fill_update_per_layer[1] = 2.0
-Final latency_per_layer[1]: 2
-Final stall_cycles_per_layer[1]: 1
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 1
+Final latency_per_layer[1]: 1
+Final stall_cycles_per_layer[1]: 0
 cc_per_all_tiles_per_layer[1]: 1
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1.3333333333333333, latency_fill_update_per_layer[2] = 2.0
-Final latency_per_layer[2]: 2
-Final stall_cycles_per_layer[2]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 1
+Final latency_per_layer[2]: 1
+Final stall_cycles_per_layer[2]: 0
 cc_per_all_tiles_per_layer[2]: 1
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1.3333333333333333, latency_fill_update_per_layer[3] = 2.0
-Final latency_per_layer[3]: 2
-Final stall_cycles_per_layer[3]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 1
+Final latency_per_layer[3]: 1
+Final stall_cycles_per_layer[3]: 0
 cc_per_all_tiles_per_layer[3]: 1
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1.3333333333333333, latency_fill_update_per_layer[4] = 2.0
-Final latency_per_layer[4]: 2
-Final stall_cycles_per_layer[4]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 1
+Final latency_per_layer[4]: 1
+Final stall_cycles_per_layer[4]: 0
 cc_per_all_tiles_per_layer[4]: 1
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1.3333333333333333, latency_fill_update_per_layer[5] = 2.0
-Final latency_per_layer[5]: 2
-Final stall_cycles_per_layer[5]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 1
+Final latency_per_layer[5]: 1
+Final stall_cycles_per_layer[5]: 0
 cc_per_all_tiles_per_layer[5]: 1
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1.3333333333333333, latency_fill_update_per_layer[6] = 2.0
-Final latency_per_layer[6]: 2
-Final stall_cycles_per_layer[6]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 1
+Final latency_per_layer[6]: 1
+Final stall_cycles_per_layer[6]: 0
 cc_per_all_tiles_per_layer[6]: 1
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1.3333333333333333, latency_fill_update_per_layer[7] = 2.0
-Final latency_per_layer[7]: 2
-Final stall_cycles_per_layer[7]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 1
+Final latency_per_layer[7]: 1
+Final stall_cycles_per_layer[7]: 0
 cc_per_all_tiles_per_layer[7]: 1
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1.3333333333333333, latency_fill_update_per_layer[8] = 2.0
-Final latency_per_layer[8]: 2
-Final stall_cycles_per_layer[8]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 1
+Final latency_per_layer[8]: 1
+Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 10
-Final latency_per_layer[9]: 13
-Final stall_cycles_per_layer[9]: 3
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
+Final stall_cycles_per_layer[9]: 0
 cc_per_all_tiles_per_layer[9]: 10
 
 
@@ -10973,145 +10737,145 @@ Latency for layer: 1 of Level: WeightMemory
 level.active_instances_per_layer[1]: 1
 level.temporal_iterations_per_layer[1]: 4147200
 Scaling per layer[1]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[1]: 2.0
-cc_per_all_tiles_per_layer[1]: 2.0
-SCALED cc_per_all_tiles_per_layer[1]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[1]: 1
+cc_per_all_tiles_per_layer[1]: 1
+SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
 level.getReadPerLayer[1](): 4,147,200
-ideal_bandwidth_read_per_layer[1]: 0.5
+ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 level.getUpdatePerLayer[1](): 8,493,465,600
-ideal_bandwidth_update_per_layer[1]: 1024.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.getFillPerLayer[1](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[1]: 1032.0
+ideal_bandwidth_fill_per_layer[1]: 2064.0
 
 Latency for layer: 2 of Level: WeightMemory
 level.active_instances_per_layer[2]: 1
 level.temporal_iterations_per_layer[2]: 4147200
 Scaling per layer[2]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[2]: 2.0
-cc_per_all_tiles_per_layer[2]: 2.0
-SCALED cc_per_all_tiles_per_layer[2]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[2]: 1
+cc_per_all_tiles_per_layer[2]: 1
+SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
-ideal_bandwidth_read_per_layer[2]: 0.5
+ideal_bandwidth_read_per_layer[2]: 1.0
 level.getDrainPerLayer[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
-ideal_bandwidth_update_per_layer[2]: 1024.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.getFillPerLayer[2](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[2]: 1032.0
+ideal_bandwidth_fill_per_layer[2]: 2064.0
 
 Latency for layer: 3 of Level: WeightMemory
 level.active_instances_per_layer[3]: 1
 level.temporal_iterations_per_layer[3]: 4147200
 Scaling per layer[3]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[3]: 2.0
-cc_per_all_tiles_per_layer[3]: 2.0
-SCALED cc_per_all_tiles_per_layer[3]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[3]: 1
+cc_per_all_tiles_per_layer[3]: 1
+SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
-ideal_bandwidth_read_per_layer[3]: 0.5
+ideal_bandwidth_read_per_layer[3]: 1.0
 level.getDrainPerLayer[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
-ideal_bandwidth_update_per_layer[3]: 1024.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.getFillPerLayer[3](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[3]: 1032.0
+ideal_bandwidth_fill_per_layer[3]: 2064.0
 
 Latency for layer: 4 of Level: WeightMemory
 level.active_instances_per_layer[4]: 1
 level.temporal_iterations_per_layer[4]: 4147200
 Scaling per layer[4]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[4]: 2.0
-cc_per_all_tiles_per_layer[4]: 2.0
-SCALED cc_per_all_tiles_per_layer[4]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[4]: 1
+cc_per_all_tiles_per_layer[4]: 1
+SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
-ideal_bandwidth_read_per_layer[4]: 0.5
+ideal_bandwidth_read_per_layer[4]: 1.0
 level.getDrainPerLayer[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
-ideal_bandwidth_update_per_layer[4]: 1024.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.getFillPerLayer[4](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[4]: 1032.0
+ideal_bandwidth_fill_per_layer[4]: 2064.0
 
 Latency for layer: 5 of Level: WeightMemory
 level.active_instances_per_layer[5]: 1
 level.temporal_iterations_per_layer[5]: 4147200
 Scaling per layer[5]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[5]: 2.0
-cc_per_all_tiles_per_layer[5]: 2.0
-SCALED cc_per_all_tiles_per_layer[5]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[5]: 1
+cc_per_all_tiles_per_layer[5]: 1
+SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
-ideal_bandwidth_read_per_layer[5]: 0.5
+ideal_bandwidth_read_per_layer[5]: 1.0
 level.getDrainPerLayer[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
-ideal_bandwidth_update_per_layer[5]: 1024.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.getFillPerLayer[5](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[5]: 1032.0
+ideal_bandwidth_fill_per_layer[5]: 2064.0
 
 Latency for layer: 6 of Level: WeightMemory
 level.active_instances_per_layer[6]: 1
 level.temporal_iterations_per_layer[6]: 4147200
 Scaling per layer[6]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[6]: 2.0
-cc_per_all_tiles_per_layer[6]: 2.0
-SCALED cc_per_all_tiles_per_layer[6]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[6]: 1
+cc_per_all_tiles_per_layer[6]: 1
+SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
-ideal_bandwidth_read_per_layer[6]: 0.5
+ideal_bandwidth_read_per_layer[6]: 1.0
 level.getDrainPerLayer[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
-ideal_bandwidth_update_per_layer[6]: 1024.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.getFillPerLayer[6](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[6]: 1032.0
+ideal_bandwidth_fill_per_layer[6]: 2064.0
 
 Latency for layer: 7 of Level: WeightMemory
 level.active_instances_per_layer[7]: 1
 level.temporal_iterations_per_layer[7]: 4147200
 Scaling per layer[7]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[7]: 2.0
-cc_per_all_tiles_per_layer[7]: 2.0
-SCALED cc_per_all_tiles_per_layer[7]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[7]: 1
+cc_per_all_tiles_per_layer[7]: 1
+SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
-ideal_bandwidth_read_per_layer[7]: 0.5
+ideal_bandwidth_read_per_layer[7]: 1.0
 level.getDrainPerLayer[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
-ideal_bandwidth_update_per_layer[7]: 1024.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.getFillPerLayer[7](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[7]: 1032.0
+ideal_bandwidth_fill_per_layer[7]: 2064.0
 
 Latency for layer: 8 of Level: WeightMemory
 level.active_instances_per_layer[8]: 1
 level.temporal_iterations_per_layer[8]: 4147200
 Scaling per layer[8]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[8]: 2.0
-cc_per_all_tiles_per_layer[8]: 2.0
-SCALED cc_per_all_tiles_per_layer[8]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[8]: 1
+cc_per_all_tiles_per_layer[8]: 1
+SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
-ideal_bandwidth_read_per_layer[8]: 0.5
+ideal_bandwidth_read_per_layer[8]: 1.0
 level.getDrainPerLayer[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
-ideal_bandwidth_update_per_layer[8]: 1024.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.getFillPerLayer[8](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[8]: 1032.0
+ideal_bandwidth_fill_per_layer[8]: 2064.0
 
 Latency for layer: 9 of Level: WeightMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 23040
 Scaling per layer[9]: 23,040
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 13.125
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 10
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -11122,130 +10886,130 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 9
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[1]: 2.0
-STANDARD CASE latency_read_drain_per_layer[1]: 2.0
-ideal_bandwidth_fill_per_layer[1]: 1032.0
-ideal_bandwidth_update_per_layer[1]: 1024.0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+ideal_bandwidth_fill_per_layer[1]: 2064.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[1]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[1]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[2]: 2.0
-STANDARD CASE latency_read_drain_per_layer[2]: 2.0
-ideal_bandwidth_fill_per_layer[2]: 1032.0
-ideal_bandwidth_update_per_layer[2]: 1024.0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+ideal_bandwidth_fill_per_layer[2]: 2064.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[2]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[2]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[3]: 2.0
-STANDARD CASE latency_read_drain_per_layer[3]: 2.0
-ideal_bandwidth_fill_per_layer[3]: 1032.0
-ideal_bandwidth_update_per_layer[3]: 1024.0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+ideal_bandwidth_fill_per_layer[3]: 2064.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[3]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[3]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[4]: 2.0
-STANDARD CASE latency_read_drain_per_layer[4]: 2.0
-ideal_bandwidth_fill_per_layer[4]: 1032.0
-ideal_bandwidth_update_per_layer[4]: 1024.0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+ideal_bandwidth_fill_per_layer[4]: 2064.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[4]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[4]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[5]: 2.0
-STANDARD CASE latency_read_drain_per_layer[5]: 2.0
-ideal_bandwidth_fill_per_layer[5]: 1032.0
-ideal_bandwidth_update_per_layer[5]: 1024.0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+ideal_bandwidth_fill_per_layer[5]: 2064.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[5]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[5]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[6]: 2.0
-STANDARD CASE latency_read_drain_per_layer[6]: 2.0
-ideal_bandwidth_fill_per_layer[6]: 1032.0
-ideal_bandwidth_update_per_layer[6]: 1024.0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+ideal_bandwidth_fill_per_layer[6]: 2064.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[6]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[6]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[7]: 2.0
-STANDARD CASE latency_read_drain_per_layer[7]: 2.0
-ideal_bandwidth_fill_per_layer[7]: 1032.0
-ideal_bandwidth_update_per_layer[7]: 1024.0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+ideal_bandwidth_fill_per_layer[7]: 2064.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[7]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[7]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[8]: 2.0
-STANDARD CASE latency_read_drain_per_layer[8]: 2.0
-ideal_bandwidth_fill_per_layer[8]: 1032.0
-ideal_bandwidth_update_per_layer[8]: 1024.0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+ideal_bandwidth_fill_per_layer[8]: 2064.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[8]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[8]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 13.125
-STANDARD CASE latency_read_drain_per_layer[9]: 13.125
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 13.125
+STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 9, latency_fill_update_per_layer[0] = 9
 Final latency_per_layer[0]: 9
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 9
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 2.0, latency_fill_update_per_layer[1] = 257.0
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 257.0
 Final latency_per_layer[1]: 257
-Final stall_cycles_per_layer[1]: 255
-cc_per_all_tiles_per_layer[1]: 2
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 2.0, latency_fill_update_per_layer[2] = 257.0
+Final stall_cycles_per_layer[1]: 256
+cc_per_all_tiles_per_layer[1]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 257.0
 Final latency_per_layer[2]: 257
-Final stall_cycles_per_layer[2]: 255
-cc_per_all_tiles_per_layer[2]: 2
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 2.0, latency_fill_update_per_layer[3] = 257.0
+Final stall_cycles_per_layer[2]: 256
+cc_per_all_tiles_per_layer[2]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 257.0
 Final latency_per_layer[3]: 257
-Final stall_cycles_per_layer[3]: 255
-cc_per_all_tiles_per_layer[3]: 2
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 2.0, latency_fill_update_per_layer[4] = 257.0
+Final stall_cycles_per_layer[3]: 256
+cc_per_all_tiles_per_layer[3]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 257.0
 Final latency_per_layer[4]: 257
-Final stall_cycles_per_layer[4]: 255
-cc_per_all_tiles_per_layer[4]: 2
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 2.0, latency_fill_update_per_layer[5] = 257.0
+Final stall_cycles_per_layer[4]: 256
+cc_per_all_tiles_per_layer[4]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 257.0
 Final latency_per_layer[5]: 257
-Final stall_cycles_per_layer[5]: 255
-cc_per_all_tiles_per_layer[5]: 2
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 2.0, latency_fill_update_per_layer[6] = 257.0
+Final stall_cycles_per_layer[5]: 256
+cc_per_all_tiles_per_layer[5]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 257.0
 Final latency_per_layer[6]: 257
-Final stall_cycles_per_layer[6]: 255
-cc_per_all_tiles_per_layer[6]: 2
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 2.0, latency_fill_update_per_layer[7] = 257.0
+Final stall_cycles_per_layer[6]: 256
+cc_per_all_tiles_per_layer[6]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 257.0
 Final latency_per_layer[7]: 257
-Final stall_cycles_per_layer[7]: 255
-cc_per_all_tiles_per_layer[7]: 2
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 2.0, latency_fill_update_per_layer[8] = 257.0
+Final stall_cycles_per_layer[7]: 256
+cc_per_all_tiles_per_layer[7]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 257.0
 Final latency_per_layer[8]: 257
-Final stall_cycles_per_layer[8]: 255
-cc_per_all_tiles_per_layer[8]: 2
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 13.125
-Final latency_per_layer[9]: 13
+Final stall_cycles_per_layer[8]: 256
+cc_per_all_tiles_per_layer[8]: 1
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 13
+cc_per_all_tiles_per_layer[9]: 10
 
 
 Calculating Latency for Level: FeatureMemory
@@ -11400,17 +11164,17 @@ Latency for layer: 9 of Level: FeatureMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 720
 Scaling per layer[9]: 720
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 420.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 320
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
-ideal_bandwidth_update_per_layer[9]: 0.06772486772486773
+ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -11469,10 +11233,10 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 148032.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 420.0
-STANDARD CASE latency_read_drain_per_layer[9]: 420.0
+cc_per_all_tiles_per_layer[9]: 320
+STANDARD CASE latency_read_drain_per_layer[9]: 320
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 420.0
+STANDARD CASE latency_fill_update_per_layer[9]: 320
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 54, latency_fill_update_per_layer[0] = 54
 Final latency_per_layer[0]: 54
 Final stall_cycles_per_layer[0]: 0
@@ -11509,10 +11273,10 @@ Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8]
 Final latency_per_layer[8]: 148,032
 Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 148,032
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 420.0, latency_fill_update_per_layer[9] = 420.0
-Final latency_per_layer[9]: 420
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 320, latency_fill_update_per_layer[9] = 320
+Final latency_per_layer[9]: 320
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 420
+cc_per_all_tiles_per_layer[9]: 320
 
 
 Calculating Latency for Level: DRAM
@@ -11665,15 +11429,15 @@ Latency for layer: 9 of Level: DRAM
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 1
 Scaling per layer[9]: 1
-SINGLE TILE: cc_per_tile_per_layer[9]: 420.0
-cc_per_all_tiles_per_layer[9]: 302400.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 320
+cc_per_all_tiles_per_layer[9]: 230400
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.getFillPerLayer[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
@@ -11740,14 +11504,14 @@ STANDARD CASE latency_read_drain_per_layer[8]: 1065830400.0
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 1065830400.0
 Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 ideal_bandwidth_drain_per_layer[9]: 0
 level.read_bandwidth: 18.0
 total data: 29859840
 scaling_per_layer[9]: 1
 SLOWDOWN CASE latency_read_drain_per_layer[9]: 1658880.0
 ideal_bandwidth_fill_per_layer[9]: 0.0
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.write_bandwidth: 18.0
 total data: 14745600
 scaling_per_layer[9]: 1
@@ -11790,8 +11554,8 @@ Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1,065,830,400
 Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 1658880.0, latency_fill_update_per_layer[9] = 819200.0
 Final latency_per_layer[9]: 1,658,880
-Final stall_cycles_per_layer[9]: 1,356,480
-cc_per_all_tiles_per_layer[9]: 302,400
+Final stall_cycles_per_layer[9]: 1,428,480
+cc_per_all_tiles_per_layer[9]: 230,400
 Compute level latency: 1
 temporal_iterations before compute level: 1
 Compute Level Compute: powered_instances=1, 
@@ -13721,158 +13485,99 @@ cc_per_all_tiles_per_layer[0]: 1
 STANDARD CASE latency_read_drain_per_layer[0]: 1
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 1
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[1]: 2.0
-ideal_bandwidth_drain_per_layer[1]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[1]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[1]: 1.000244140625
-ideal_bandwidth_update_per_layer[1]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[1]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[1]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[2]: 2.0
-ideal_bandwidth_drain_per_layer[2]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[2]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[2]: 1.000244140625
-ideal_bandwidth_update_per_layer[2]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[2]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[2]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[3]: 2.0
-ideal_bandwidth_drain_per_layer[3]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[3]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[3]: 1.000244140625
-ideal_bandwidth_update_per_layer[3]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[3]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[3]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[4]: 2.0
-ideal_bandwidth_drain_per_layer[4]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[4]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[4]: 1.000244140625
-ideal_bandwidth_update_per_layer[4]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[4]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[4]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[5]: 2.0
-ideal_bandwidth_drain_per_layer[5]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[5]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[5]: 1.000244140625
-ideal_bandwidth_update_per_layer[5]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[5]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[5]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[6]: 2.0
-ideal_bandwidth_drain_per_layer[6]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[6]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[6]: 1.000244140625
-ideal_bandwidth_update_per_layer[6]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[6]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[6]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[7]: 2.0
-ideal_bandwidth_drain_per_layer[7]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[7]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[7]: 1.000244140625
-ideal_bandwidth_update_per_layer[7]: 1.999755859375
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[7]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[7]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[8]: 2.0
-ideal_bandwidth_drain_per_layer[8]: 0
-level.read_bandwidth: 1.5
-total data: 16986931200
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_read_drain_per_layer[8]: 1.3333333333333333
-ideal_bandwidth_fill_per_layer[8]: 1.000002712673611
-ideal_bandwidth_update_per_layer[8]: 1.999997287326389
-level.write_bandwidth: 1.5
-total data: 25480396800
-scaling_per_layer[8]: 8493465600
-SLOWDOWN CASE latency_fill_update_per_layer[8]: 2.0
-Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 1.96875
-ideal_bandwidth_drain_per_layer[9]: 0
-level.read_bandwidth: 1.5
-total data: 928972800
-scaling_per_layer[9]: 47185920
-SLOWDOWN CASE latency_read_drain_per_layer[9]: 13.125
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[1]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[2]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[3]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[4]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[5]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[6]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[7]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+previous_fanout_pe_to_pe_warmup: 0
+STANDARD CASE latency_fill_update_per_layer[8]: 1
+Sono dentro Standard: Compute Bound
+previous_fanout_pe_to_pe_warmup: 0
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 1, latency_fill_update_per_layer[0] = 1
 Final latency_per_layer[0]: 1
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 1
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1.3333333333333333, latency_fill_update_per_layer[1] = 2.0
-Final latency_per_layer[1]: 2
-Final stall_cycles_per_layer[1]: 1
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 1
+Final latency_per_layer[1]: 1
+Final stall_cycles_per_layer[1]: 0
 cc_per_all_tiles_per_layer[1]: 1
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1.3333333333333333, latency_fill_update_per_layer[2] = 2.0
-Final latency_per_layer[2]: 2
-Final stall_cycles_per_layer[2]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 1
+Final latency_per_layer[2]: 1
+Final stall_cycles_per_layer[2]: 0
 cc_per_all_tiles_per_layer[2]: 1
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1.3333333333333333, latency_fill_update_per_layer[3] = 2.0
-Final latency_per_layer[3]: 2
-Final stall_cycles_per_layer[3]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 1
+Final latency_per_layer[3]: 1
+Final stall_cycles_per_layer[3]: 0
 cc_per_all_tiles_per_layer[3]: 1
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1.3333333333333333, latency_fill_update_per_layer[4] = 2.0
-Final latency_per_layer[4]: 2
-Final stall_cycles_per_layer[4]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 1
+Final latency_per_layer[4]: 1
+Final stall_cycles_per_layer[4]: 0
 cc_per_all_tiles_per_layer[4]: 1
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1.3333333333333333, latency_fill_update_per_layer[5] = 2.0
-Final latency_per_layer[5]: 2
-Final stall_cycles_per_layer[5]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 1
+Final latency_per_layer[5]: 1
+Final stall_cycles_per_layer[5]: 0
 cc_per_all_tiles_per_layer[5]: 1
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1.3333333333333333, latency_fill_update_per_layer[6] = 2.0
-Final latency_per_layer[6]: 2
-Final stall_cycles_per_layer[6]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 1
+Final latency_per_layer[6]: 1
+Final stall_cycles_per_layer[6]: 0
 cc_per_all_tiles_per_layer[6]: 1
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1.3333333333333333, latency_fill_update_per_layer[7] = 2.0
-Final latency_per_layer[7]: 2
-Final stall_cycles_per_layer[7]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 1
+Final latency_per_layer[7]: 1
+Final stall_cycles_per_layer[7]: 0
 cc_per_all_tiles_per_layer[7]: 1
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1.3333333333333333, latency_fill_update_per_layer[8] = 2.0
-Final latency_per_layer[8]: 2
-Final stall_cycles_per_layer[8]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 1
+Final latency_per_layer[8]: 1
+Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 10
-Final latency_per_layer[9]: 13
-Final stall_cycles_per_layer[9]: 3
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
+Final stall_cycles_per_layer[9]: 0
 cc_per_all_tiles_per_layer[9]: 10
 
 
@@ -13898,145 +13603,145 @@ Latency for layer: 1 of Level: WeightMemory
 level.active_instances_per_layer[1]: 1
 level.temporal_iterations_per_layer[1]: 4147200
 Scaling per layer[1]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[1]: 2.0
-cc_per_all_tiles_per_layer[1]: 2.0
-SCALED cc_per_all_tiles_per_layer[1]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[1]: 1
+cc_per_all_tiles_per_layer[1]: 1
+SCALED cc_per_all_tiles_per_layer[1]: 4,147,200
 level.getReadPerLayer[1](): 4,147,200
-ideal_bandwidth_read_per_layer[1]: 0.5
+ideal_bandwidth_read_per_layer[1]: 1.0
 level.getDrainPerLayer[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 level.getUpdatePerLayer[1](): 8,493,465,600
-ideal_bandwidth_update_per_layer[1]: 1024.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.getFillPerLayer[1](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[1]: 1032.0
+ideal_bandwidth_fill_per_layer[1]: 2064.0
 
 Latency for layer: 2 of Level: WeightMemory
 level.active_instances_per_layer[2]: 1
 level.temporal_iterations_per_layer[2]: 4147200
 Scaling per layer[2]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[2]: 2.0
-cc_per_all_tiles_per_layer[2]: 2.0
-SCALED cc_per_all_tiles_per_layer[2]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[2]: 1
+cc_per_all_tiles_per_layer[2]: 1
+SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
-ideal_bandwidth_read_per_layer[2]: 0.5
+ideal_bandwidth_read_per_layer[2]: 1.0
 level.getDrainPerLayer[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
-ideal_bandwidth_update_per_layer[2]: 1024.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.getFillPerLayer[2](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[2]: 1032.0
+ideal_bandwidth_fill_per_layer[2]: 2064.0
 
 Latency for layer: 3 of Level: WeightMemory
 level.active_instances_per_layer[3]: 1
 level.temporal_iterations_per_layer[3]: 4147200
 Scaling per layer[3]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[3]: 2.0
-cc_per_all_tiles_per_layer[3]: 2.0
-SCALED cc_per_all_tiles_per_layer[3]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[3]: 1
+cc_per_all_tiles_per_layer[3]: 1
+SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
-ideal_bandwidth_read_per_layer[3]: 0.5
+ideal_bandwidth_read_per_layer[3]: 1.0
 level.getDrainPerLayer[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
-ideal_bandwidth_update_per_layer[3]: 1024.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.getFillPerLayer[3](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[3]: 1032.0
+ideal_bandwidth_fill_per_layer[3]: 2064.0
 
 Latency for layer: 4 of Level: WeightMemory
 level.active_instances_per_layer[4]: 1
 level.temporal_iterations_per_layer[4]: 4147200
 Scaling per layer[4]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[4]: 2.0
-cc_per_all_tiles_per_layer[4]: 2.0
-SCALED cc_per_all_tiles_per_layer[4]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[4]: 1
+cc_per_all_tiles_per_layer[4]: 1
+SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
-ideal_bandwidth_read_per_layer[4]: 0.5
+ideal_bandwidth_read_per_layer[4]: 1.0
 level.getDrainPerLayer[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
-ideal_bandwidth_update_per_layer[4]: 1024.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.getFillPerLayer[4](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[4]: 1032.0
+ideal_bandwidth_fill_per_layer[4]: 2064.0
 
 Latency for layer: 5 of Level: WeightMemory
 level.active_instances_per_layer[5]: 1
 level.temporal_iterations_per_layer[5]: 4147200
 Scaling per layer[5]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[5]: 2.0
-cc_per_all_tiles_per_layer[5]: 2.0
-SCALED cc_per_all_tiles_per_layer[5]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[5]: 1
+cc_per_all_tiles_per_layer[5]: 1
+SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
-ideal_bandwidth_read_per_layer[5]: 0.5
+ideal_bandwidth_read_per_layer[5]: 1.0
 level.getDrainPerLayer[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
-ideal_bandwidth_update_per_layer[5]: 1024.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.getFillPerLayer[5](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[5]: 1032.0
+ideal_bandwidth_fill_per_layer[5]: 2064.0
 
 Latency for layer: 6 of Level: WeightMemory
 level.active_instances_per_layer[6]: 1
 level.temporal_iterations_per_layer[6]: 4147200
 Scaling per layer[6]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[6]: 2.0
-cc_per_all_tiles_per_layer[6]: 2.0
-SCALED cc_per_all_tiles_per_layer[6]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[6]: 1
+cc_per_all_tiles_per_layer[6]: 1
+SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
-ideal_bandwidth_read_per_layer[6]: 0.5
+ideal_bandwidth_read_per_layer[6]: 1.0
 level.getDrainPerLayer[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
-ideal_bandwidth_update_per_layer[6]: 1024.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.getFillPerLayer[6](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[6]: 1032.0
+ideal_bandwidth_fill_per_layer[6]: 2064.0
 
 Latency for layer: 7 of Level: WeightMemory
 level.active_instances_per_layer[7]: 1
 level.temporal_iterations_per_layer[7]: 4147200
 Scaling per layer[7]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[7]: 2.0
-cc_per_all_tiles_per_layer[7]: 2.0
-SCALED cc_per_all_tiles_per_layer[7]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[7]: 1
+cc_per_all_tiles_per_layer[7]: 1
+SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
-ideal_bandwidth_read_per_layer[7]: 0.5
+ideal_bandwidth_read_per_layer[7]: 1.0
 level.getDrainPerLayer[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
-ideal_bandwidth_update_per_layer[7]: 1024.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.getFillPerLayer[7](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[7]: 1032.0
+ideal_bandwidth_fill_per_layer[7]: 2064.0
 
 Latency for layer: 8 of Level: WeightMemory
 level.active_instances_per_layer[8]: 1
 level.temporal_iterations_per_layer[8]: 4147200
 Scaling per layer[8]: 4,147,200
-SINGLE TILE: cc_per_tile_per_layer[8]: 2.0
-cc_per_all_tiles_per_layer[8]: 2.0
-SCALED cc_per_all_tiles_per_layer[8]: 8,294,400
+SINGLE TILE: cc_per_tile_per_layer[8]: 1
+cc_per_all_tiles_per_layer[8]: 1
+SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
-ideal_bandwidth_read_per_layer[8]: 0.5
+ideal_bandwidth_read_per_layer[8]: 1.0
 level.getDrainPerLayer[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
-ideal_bandwidth_update_per_layer[8]: 1024.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.getFillPerLayer[8](): 8,559,820,800
-ideal_bandwidth_fill_per_layer[8]: 1032.0
+ideal_bandwidth_fill_per_layer[8]: 2064.0
 
 Latency for layer: 9 of Level: WeightMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 23040
 Scaling per layer[9]: 23,040
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 13.125
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 10
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -14047,130 +13752,130 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[0]: 9
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[1]: 2.0
-STANDARD CASE latency_read_drain_per_layer[1]: 2.0
-ideal_bandwidth_fill_per_layer[1]: 1032.0
-ideal_bandwidth_update_per_layer[1]: 1024.0
+cc_per_all_tiles_per_layer[1]: 1
+STANDARD CASE latency_read_drain_per_layer[1]: 1
+ideal_bandwidth_fill_per_layer[1]: 2064.0
+ideal_bandwidth_update_per_layer[1]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[1]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[1]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[2]: 2.0
-STANDARD CASE latency_read_drain_per_layer[2]: 2.0
-ideal_bandwidth_fill_per_layer[2]: 1032.0
-ideal_bandwidth_update_per_layer[2]: 1024.0
+cc_per_all_tiles_per_layer[2]: 1
+STANDARD CASE latency_read_drain_per_layer[2]: 1
+ideal_bandwidth_fill_per_layer[2]: 2064.0
+ideal_bandwidth_update_per_layer[2]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[2]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[2]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[3]: 2.0
-STANDARD CASE latency_read_drain_per_layer[3]: 2.0
-ideal_bandwidth_fill_per_layer[3]: 1032.0
-ideal_bandwidth_update_per_layer[3]: 1024.0
+cc_per_all_tiles_per_layer[3]: 1
+STANDARD CASE latency_read_drain_per_layer[3]: 1
+ideal_bandwidth_fill_per_layer[3]: 2064.0
+ideal_bandwidth_update_per_layer[3]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[3]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[3]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[4]: 2.0
-STANDARD CASE latency_read_drain_per_layer[4]: 2.0
-ideal_bandwidth_fill_per_layer[4]: 1032.0
-ideal_bandwidth_update_per_layer[4]: 1024.0
+cc_per_all_tiles_per_layer[4]: 1
+STANDARD CASE latency_read_drain_per_layer[4]: 1
+ideal_bandwidth_fill_per_layer[4]: 2064.0
+ideal_bandwidth_update_per_layer[4]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[4]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[4]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[5]: 2.0
-STANDARD CASE latency_read_drain_per_layer[5]: 2.0
-ideal_bandwidth_fill_per_layer[5]: 1032.0
-ideal_bandwidth_update_per_layer[5]: 1024.0
+cc_per_all_tiles_per_layer[5]: 1
+STANDARD CASE latency_read_drain_per_layer[5]: 1
+ideal_bandwidth_fill_per_layer[5]: 2064.0
+ideal_bandwidth_update_per_layer[5]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[5]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[5]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[6]: 2.0
-STANDARD CASE latency_read_drain_per_layer[6]: 2.0
-ideal_bandwidth_fill_per_layer[6]: 1032.0
-ideal_bandwidth_update_per_layer[6]: 1024.0
+cc_per_all_tiles_per_layer[6]: 1
+STANDARD CASE latency_read_drain_per_layer[6]: 1
+ideal_bandwidth_fill_per_layer[6]: 2064.0
+ideal_bandwidth_update_per_layer[6]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[6]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[6]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[7]: 2.0
-STANDARD CASE latency_read_drain_per_layer[7]: 2.0
-ideal_bandwidth_fill_per_layer[7]: 1032.0
-ideal_bandwidth_update_per_layer[7]: 1024.0
+cc_per_all_tiles_per_layer[7]: 1
+STANDARD CASE latency_read_drain_per_layer[7]: 1
+ideal_bandwidth_fill_per_layer[7]: 2064.0
+ideal_bandwidth_update_per_layer[7]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[7]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[7]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[8]: 2.0
-STANDARD CASE latency_read_drain_per_layer[8]: 2.0
-ideal_bandwidth_fill_per_layer[8]: 1032.0
-ideal_bandwidth_update_per_layer[8]: 1024.0
+cc_per_all_tiles_per_layer[8]: 1
+STANDARD CASE latency_read_drain_per_layer[8]: 1
+ideal_bandwidth_fill_per_layer[8]: 2064.0
+ideal_bandwidth_update_per_layer[8]: 2048.0
 level.write_bandwidth: 16.0
 total data: 17053286400
 scaling_per_layer[8]: 4147200
 SLOWDOWN CASE latency_fill_update_per_layer[8]: 257.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 13.125
-STANDARD CASE latency_read_drain_per_layer[9]: 13.125
+cc_per_all_tiles_per_layer[9]: 10
+STANDARD CASE latency_read_drain_per_layer[9]: 10
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 13.125
+STANDARD CASE latency_fill_update_per_layer[9]: 10
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 9, latency_fill_update_per_layer[0] = 9
 Final latency_per_layer[0]: 9
 Final stall_cycles_per_layer[0]: 0
 cc_per_all_tiles_per_layer[0]: 9
-Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 2.0, latency_fill_update_per_layer[1] = 257.0
+Calculating final latency and stall for layer 1: latency_read_drain_per_layer[1] = 1, latency_fill_update_per_layer[1] = 257.0
 Final latency_per_layer[1]: 257
-Final stall_cycles_per_layer[1]: 255
-cc_per_all_tiles_per_layer[1]: 2
-Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 2.0, latency_fill_update_per_layer[2] = 257.0
+Final stall_cycles_per_layer[1]: 256
+cc_per_all_tiles_per_layer[1]: 1
+Calculating final latency and stall for layer 2: latency_read_drain_per_layer[2] = 1, latency_fill_update_per_layer[2] = 257.0
 Final latency_per_layer[2]: 257
-Final stall_cycles_per_layer[2]: 255
-cc_per_all_tiles_per_layer[2]: 2
-Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 2.0, latency_fill_update_per_layer[3] = 257.0
+Final stall_cycles_per_layer[2]: 256
+cc_per_all_tiles_per_layer[2]: 1
+Calculating final latency and stall for layer 3: latency_read_drain_per_layer[3] = 1, latency_fill_update_per_layer[3] = 257.0
 Final latency_per_layer[3]: 257
-Final stall_cycles_per_layer[3]: 255
-cc_per_all_tiles_per_layer[3]: 2
-Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 2.0, latency_fill_update_per_layer[4] = 257.0
+Final stall_cycles_per_layer[3]: 256
+cc_per_all_tiles_per_layer[3]: 1
+Calculating final latency and stall for layer 4: latency_read_drain_per_layer[4] = 1, latency_fill_update_per_layer[4] = 257.0
 Final latency_per_layer[4]: 257
-Final stall_cycles_per_layer[4]: 255
-cc_per_all_tiles_per_layer[4]: 2
-Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 2.0, latency_fill_update_per_layer[5] = 257.0
+Final stall_cycles_per_layer[4]: 256
+cc_per_all_tiles_per_layer[4]: 1
+Calculating final latency and stall for layer 5: latency_read_drain_per_layer[5] = 1, latency_fill_update_per_layer[5] = 257.0
 Final latency_per_layer[5]: 257
-Final stall_cycles_per_layer[5]: 255
-cc_per_all_tiles_per_layer[5]: 2
-Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 2.0, latency_fill_update_per_layer[6] = 257.0
+Final stall_cycles_per_layer[5]: 256
+cc_per_all_tiles_per_layer[5]: 1
+Calculating final latency and stall for layer 6: latency_read_drain_per_layer[6] = 1, latency_fill_update_per_layer[6] = 257.0
 Final latency_per_layer[6]: 257
-Final stall_cycles_per_layer[6]: 255
-cc_per_all_tiles_per_layer[6]: 2
-Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 2.0, latency_fill_update_per_layer[7] = 257.0
+Final stall_cycles_per_layer[6]: 256
+cc_per_all_tiles_per_layer[6]: 1
+Calculating final latency and stall for layer 7: latency_read_drain_per_layer[7] = 1, latency_fill_update_per_layer[7] = 257.0
 Final latency_per_layer[7]: 257
-Final stall_cycles_per_layer[7]: 255
-cc_per_all_tiles_per_layer[7]: 2
-Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 2.0, latency_fill_update_per_layer[8] = 257.0
+Final stall_cycles_per_layer[7]: 256
+cc_per_all_tiles_per_layer[7]: 1
+Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8] = 1, latency_fill_update_per_layer[8] = 257.0
 Final latency_per_layer[8]: 257
-Final stall_cycles_per_layer[8]: 255
-cc_per_all_tiles_per_layer[8]: 2
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 13.125, latency_fill_update_per_layer[9] = 13.125
-Final latency_per_layer[9]: 13
+Final stall_cycles_per_layer[8]: 256
+cc_per_all_tiles_per_layer[8]: 1
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 10, latency_fill_update_per_layer[9] = 10
+Final latency_per_layer[9]: 10
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 13
+cc_per_all_tiles_per_layer[9]: 10
 
 
 Calculating Latency for Level: FeatureMemory
@@ -14325,17 +14030,17 @@ Latency for layer: 9 of Level: FeatureMemory
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 720
 Scaling per layer[9]: 720
-SINGLE TILE: cc_per_tile_per_layer[9]: 13.125
-cc_per_all_tiles_per_layer[9]: 420.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 10
+cc_per_all_tiles_per_layer[9]: 320
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
-ideal_bandwidth_read_per_layer[9]: 0.0761904761904762
+ideal_bandwidth_read_per_layer[9]: 0.1
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
-ideal_bandwidth_update_per_layer[9]: 0.06772486772486773
+ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
 level.getFillPerLayer[9](): 368,640
-ideal_bandwidth_fill_per_layer[9]: 1.2190476190476192
+ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
 Sono dentro Standard: Compute Bound
@@ -14394,10 +14099,10 @@ previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 148032.0
 Sono dentro Standard: Compute Bound
 previous_fanout_pe_to_pe_warmup: 0
-cc_per_all_tiles_per_layer[9]: 420.0
-STANDARD CASE latency_read_drain_per_layer[9]: 420.0
+cc_per_all_tiles_per_layer[9]: 320
+STANDARD CASE latency_read_drain_per_layer[9]: 320
 previous_fanout_pe_to_pe_warmup: 0
-STANDARD CASE latency_fill_update_per_layer[9]: 420.0
+STANDARD CASE latency_fill_update_per_layer[9]: 320
 Calculating final latency and stall for layer 0: latency_read_drain_per_layer[0] = 54, latency_fill_update_per_layer[0] = 54
 Final latency_per_layer[0]: 54
 Final stall_cycles_per_layer[0]: 0
@@ -14434,10 +14139,10 @@ Calculating final latency and stall for layer 8: latency_read_drain_per_layer[8]
 Final latency_per_layer[8]: 148,032
 Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 148,032
-Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 420.0, latency_fill_update_per_layer[9] = 420.0
-Final latency_per_layer[9]: 420
+Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 320, latency_fill_update_per_layer[9] = 320
+Final latency_per_layer[9]: 320
 Final stall_cycles_per_layer[9]: 0
-cc_per_all_tiles_per_layer[9]: 420
+cc_per_all_tiles_per_layer[9]: 320
 
 
 Calculating Latency for Level: DRAM
@@ -14590,15 +14295,15 @@ Latency for layer: 9 of Level: DRAM
 level.active_instances_per_layer[9]: 1
 level.temporal_iterations_per_layer[9]: 1
 Scaling per layer[9]: 1
-SINGLE TILE: cc_per_tile_per_layer[9]: 420.0
-cc_per_all_tiles_per_layer[9]: 302400.0
-SCALED cc_per_all_tiles_per_layer[9]: 302,400
+SINGLE TILE: cc_per_tile_per_layer[9]: 320
+cc_per_all_tiles_per_layer[9]: 230400
+SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 level.getDrainPerLayer[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.getFillPerLayer[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
@@ -14665,14 +14370,14 @@ STANDARD CASE latency_read_drain_per_layer[8]: 1065830400.0
 previous_fanout_pe_to_pe_warmup: 0
 STANDARD CASE latency_fill_update_per_layer[8]: 1065830400.0
 Sono dentro Slowdown: Memory Bound
-ideal_bandwidth_read_per_layer[9]: 98.74285714285715
+ideal_bandwidth_read_per_layer[9]: 129.6
 ideal_bandwidth_drain_per_layer[9]: 0
 level.read_bandwidth: 18.0
 total data: 29859840
 scaling_per_layer[9]: 1
 SLOWDOWN CASE latency_read_drain_per_layer[9]: 1658880.0
 ideal_bandwidth_fill_per_layer[9]: 0.0
-ideal_bandwidth_update_per_layer[9]: 48.76190476190476
+ideal_bandwidth_update_per_layer[9]: 64.0
 level.write_bandwidth: 18.0
 total data: 14745600
 scaling_per_layer[9]: 1
@@ -14715,15 +14420,15 @@ Final stall_cycles_per_layer[8]: 0
 cc_per_all_tiles_per_layer[8]: 1,065,830,400
 Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9] = 1658880.0, latency_fill_update_per_layer[9] = 819200.0
 Final latency_per_layer[9]: 1,658,880
-Final stall_cycles_per_layer[9]: 1,356,480
-cc_per_all_tiles_per_layer[9]: 302,400
+Final stall_cycles_per_layer[9]: 1,428,480
+cc_per_all_tiles_per_layer[9]: 230,400
 Compute level latency: 1
 temporal_iterations before compute level: 1
 Compute Level Compute: powered_instances=1, 
  latency=1, 
  max_latency=17061508160.0
 
-Finished in: 0.149s
+Finished in: 0.157s
 
 Best mapping found with:
 	Wart: 2.573e+75
@@ -14798,7 +14503,7 @@ FeatureMemory:	0 cc RD and 0 cc FU Latency, 132.0 R and 132.0 W Bandwidth,
 WeightMemory:	0 cc RD and 0 cc FU Latency, 16.0 R and 16.0 W Bandwidth,
 		0.000 R and 0.000 U and 0.000 F and 0.000 D Ideal Bandwidth,
 		0 cc per Tile, 0 Stall Cycles
-AccumulationOutRegister:0 cc RD and 0 cc FU Latency, 1.5 R and 1.5 W Bandwidth,
+AccumulationOutRegister:0 cc RD and 0 cc FU Latency, 3.0 R and 3.0 W Bandwidth,
 		0.000 R and 0.000 U and 0.000 F and 0.000 D Ideal Bandwidth,
 		0 cc per Tile, 0 Stall Cycles
 Max Latency:	0 cc of level AccumulationOutRegister
