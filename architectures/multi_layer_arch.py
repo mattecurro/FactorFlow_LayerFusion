@@ -8,7 +8,7 @@ arch = arch_depfin_10layers = Arch([
         name = "DRAM",
         size = 2**64-1, 
         value_access_energy = 50.0, 
-        bandwidth = 18, 
+        bandwidth = 18*2,                           # 17GB/s / 930MHz = 18 B per s
         bypasses = [],
         # Constraints for the outermost layer (Layer 9)
         dataflow_constraints = ['Q', 'P', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 
@@ -23,7 +23,7 @@ arch = arch_depfin_10layers = Arch([
         name = "FeatureMemory", # FMEM
         size = 1056 * 1024, 
         value_access_energy = 2.02, 
-        bandwidth = 132,
+        bandwidth = 132*2,
         bypasses = ['w'],
         dataflow_constraints = [
             'C9', 'R9', 'S9', 'C8', 'S8', 'R8', 'C7', 'S7', 'R7', 'C6', 'S6', 'R6', 
@@ -50,9 +50,9 @@ arch = arch_depfin_10layers = Arch([
         name = "WeightMemory", # WMEM
         size = 524 * 1024, 
         value_access_energy = 2.02, 
-        bandwidth = 16, 
+        bandwidth = 2*16,                 #read_bandwidth = 16, write_bandwidth = 16
         bypasses = ['in', 'int', 'out'],
-        dataflow_constraints = ['R0','S0'], # Typically just innermost weights
+        dataflow_constraints = ['R0','S0'], # Just innermost weights
         # Constraints for all weights
         factors_constraints = {
             'R0': 3, 'S0': 3
@@ -103,7 +103,7 @@ arch = arch_depfin_10layers = Arch([
         name = "AccumulationOutRegister",
         size = 10, 
         value_access_energy = 1.34, 
-        bandwidth = 1,
+        bandwidth = 1*2,
         bypasses = ['in', 'w', 'int'],
         dataflow_constraints = ['Q'],
         factors_constraints = {'Q': 10}
