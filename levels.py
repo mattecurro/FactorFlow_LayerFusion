@@ -1044,38 +1044,38 @@ class MemLevel(Level):
                     for in_btwn in in_between[::-1]:
                         vprint(f"I'm going from the down (Compute) to the top")
                         vprint(f"Level: {self.name}: in_btwn = {in_btwn.name}, stationarity_to_address = {stationarity_to_address}, in_reads_bp = {in_reads_bp}, w_reads_bp = {w_reads_bp}, out_reads_bp = {out_reads_bp}, ignore_bypasses = {ignore_bypasses}")
+                        actual_dataflow_bp = list(filter(lambda dim : in_btwn.factors.dimProduct(dim) > 1, in_btwn.dataflow))
+                        actual_dataflow_per_layer_bp: dict[int, list[str]] = {}
+                        if self.arch.coupling.getNumLayers() > 1:        
+                            for layer_id in range(self.arch.coupling.getNumLayers()):
+                                # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
+                                if layer_id == 0:
+                                    layer_relevant_dims = (
+                                        set(self.arch.coupling.getFlatInputCoupling()) |
+                                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                                    )
+                                elif layer_id == self.arch.coupling.getNumLayers() - 1:
+                                    layer_relevant_dims = (
+                                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                                        set(self.arch.coupling.getFlatOutputCoupling()) |
+                                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
+                                    )
+                                else:
+                                    layer_relevant_dims = (
+                                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
+                                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) |
+                                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                                    )
+                                actual_dataflow_per_layer_bp[layer_id] = [
+                                    dim for dim in actual_dataflow 
+                                    if dim in layer_relevant_dims
+                                ]
+                        else:
+                            actual_dataflow_per_layer_bp[0] = actual_dataflow_bp
                         if isinstance(in_btwn, MemLevel):
                             ## actual_dataflow_bp for the in_btwn level
                             # ignore loops at one
-                            actual_dataflow_bp = list(filter(lambda dim : in_btwn.factors.dimProduct(dim) > 1, in_btwn.dataflow))
-                            actual_dataflow_per_layer_bp: dict[int, list[str]] = {}
-                            if self.arch.coupling.getNumLayers() > 1:        
-                                for layer_id in range(self.arch.coupling.getNumLayers()):
-                                    # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
-                                    if layer_id == 0:
-                                        layer_relevant_dims = (
-                                            set(self.arch.coupling.getFlatInputCoupling()) |
-                                            set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                                            set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                                        )
-                                    elif layer_id == self.arch.coupling.getNumLayers() - 1:
-                                        layer_relevant_dims = (
-                                            set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                                            set(self.arch.coupling.getFlatOutputCoupling()) |
-                                            set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
-                                        )
-                                    else:
-                                        layer_relevant_dims = (
-                                            set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                                            set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) |
-                                            set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                                        )
-                                    actual_dataflow_per_layer_bp[layer_id] = [
-                                        dim for dim in actual_dataflow 
-                                        if dim in layer_relevant_dims
-                                    ]
-                            else:
-                                actual_dataflow_per_layer_bp[0] = actual_dataflow_bp
                             # precompute the full factors product per layer for the in_btwn level
                             in_btwn_factors_full_per_layer: dict[int, int] = {}
                             for layer_id in range(num_layers):
