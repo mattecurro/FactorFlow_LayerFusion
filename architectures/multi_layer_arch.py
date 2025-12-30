@@ -103,7 +103,7 @@ arch = arch_depfin_10layers = Arch([
         name = "AccumulationOutRegister",
         size = 28, 
         value_access_energy = 1.34, 
-        bandwidth = 1*2,
+        bandwidth = 1*3,
         bypasses = ['in', 'w'],
         dataflow_constraints = ['Q'],
         factors_constraints = {'Q': 10}
