@@ -18,19 +18,6 @@ arch = arch_depfin_10layers = Arch([
                                'X5': 10, 'Y5': 720, 'X4': 10, 'Y4': 720, 'X3': 10, 'Y3': 720, 
                                'X2': 10, 'Y2': 720, 'X1': 10, 'Y1': 720, 'X0': 10, 'Y0': 720}
     ),
-        
-    MemLevel(
-        name = "WeightMemory", # WMEM
-        size = 524 * 1024, 
-        value_access_energy = 2.02, 
-        bandwidth = 2*16,                 #read_bandwidth = 16, write_bandwidth = 16
-        bypasses = ['in', 'int', 'out'],
-        dataflow_constraints = ['R0','S0'], # Just innermost weights
-        # Constraints for all weights
-        factors_constraints = {
-            'R0': 3, 'S0': 3
-        }
-    ),
 
     MemLevel(
         name = "FeatureMemory", # FMEM
@@ -56,6 +43,20 @@ arch = arch_depfin_10layers = Arch([
             'C2': 32, 'Z2': 2, 'S2': 3, 'R2': 3,
             'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3,
             'Z0': 2, 'C0': 3
+        }
+    ),
+
+
+    MemLevel(
+        name = "WeightMemory", # WMEM
+        size = 524 * 1024, 
+        value_access_energy = 2.02, 
+        bandwidth = 2*16,                 #read_bandwidth = 16, write_bandwidth = 16
+        bypasses = ['in', 'int', 'out'],
+        dataflow_constraints = ['R0','S0'], # Just innermost weights
+        # Constraints for all weights
+        factors_constraints = {
+            'R0': 3, 'S0': 3
         }
     ),
 
@@ -105,7 +106,7 @@ arch = arch_depfin_10layers = Arch([
         size = 38, 
         value_access_energy = 1.34, 
         bandwidth = 1*6,
-        bypasses = ['in'],
+        bypasses = ['in', 'w'],
         dataflow_constraints = ['Q'],
         factors_constraints = {'Q': 10}
     ),
