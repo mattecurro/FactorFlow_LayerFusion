@@ -134,14 +134,14 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     last_out_writes = out_writes
             else:
                 level.setAboveMOPs(0, 0)
-            if 'int' not in level.bypasses:
+            if 'int' not in level.bypasses:            
                 #level.setAboveMOPs(last_int_out_reads=last_per_layer_int_out_reads, last_int_out_writes=last_per_layer_int_out_writes)
                 level.setAboveMOPs(last_per_layer_int_out_reads=last_per_layer_int_out_reads, last_per_layer_int_out_writes=last_per_layer_int_out_writes)                    
                 for layer_id in range(num_layers - 1):
-                    per_layer_int_in_writes[layer_id-1] = last_per_layer_int_out_reads.get(layer_id-1, 0) # reads of the above level are written here
+                    per_layer_int_in_writes[layer_id-1] = last_per_layer_int_in_reads.get(layer_id-1, 0) # reads of the above level are written here
                     last_per_layer_int_in_reads[layer_id-1] = per_layer_int_in_reads.get(layer_id-1, 0)
-                    per_layer_int_out_writes[layer_id] += last_per_layer_int_out_writes.get(layer_id, 0) # reads above are written here
-                    last_per_layer_int_out_reads[layer_id] = per_layer_int_in_reads.get(layer_id, 0)
+                    per_layer_int_out_reads[layer_id] += last_per_layer_int_out_writes.get(layer_id, 0) # writes above are read here
+                    last_per_layer_int_out_writes[layer_id] = per_layer_int_out_writes.get(layer_id, 0)
                     if not Settings.FREE_DRAINS:
                         per_layer_int_out_reads[layer_id] += last_per_layer_int_out_writes.get(layer_id, 0) # writes above are read here
                         last_per_layer_int_out_writes[layer_id] = per_layer_int_out_writes.get(layer_id, 0)
