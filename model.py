@@ -377,22 +377,22 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     print(f"Final stall_cycles_per_layer[{layer_id}]: {stall_cycles_per_layer[layer_id]:,.0f}")
                     print(f"cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]:,.0f}")
                     ## TODO: Update latency for the above level
-                    latency_read_drain_per_layer[layer_id] += latency_read_drain_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
-                    latency_fill_update_per_layer[layer_id] += latency_fill_update_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
+                    latency_read_drain_per_layer[layer_id] = latency_read_drain_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
+                    latency_fill_update_per_layer[layer_id] = latency_fill_update_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
 #                cc_per_all_tiles = sum(cc_per_all_tiles_per_layer.values())
                 ideal_bandwidth_read = max(ideal_bandwidth_read_per_layer.values())
                 ideal_bandwidth_update = max(ideal_bandwidth_update_per_layer.values())
                 ideal_bandwidth_drain = max(ideal_bandwidth_drain_per_layer.values())
                 ideal_bandwidth_fill = max(ideal_bandwidth_fill_per_layer.values())
                 level.setLatencyPerLayer(
-                    latency_read_drain_per_layer = latency_read_drain_per_layer,
-                    latency_fill_update_per_layer = latency_fill_update_per_layer,
+                    latency_read_drain_per_layer = latency_read_drain_per_layer.copy(),
+                    latency_fill_update_per_layer = latency_fill_update_per_layer.copy(),
                     cc_per_tile_per_layer = cc_per_tile_per_layer,
                     stall_cycles_per_layer = stall_cycles_per_layer,
-                    ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer,
-                    ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer,
-                    ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer,
-                    ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer
+                    ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer.copy(),
+                    ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer.copy(),
+                    ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer.copy(),
+                    ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer.copy()
                 )
                 previous_fanout_pe_to_pe_warmup = 0
                 cc_per_tile_per_layer = {layer_id: latency_per_layer[layer_id] for layer_id in range(num_layers)}
@@ -432,15 +432,18 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     max_latency_per_layer = {layer_id: 0 for layer_id in range(num_layers)}
     for i in range(len(arch)):
         level = arch[i]
+        print(f"\n\nFinal WMOPs and Latency calculation for Level: {level.name}")
         if isinstance(level, MemLevel):
                 if num_layers > 1:
                     for layer_id in range(num_layers):
                         #powered_instances_per_layer[layer_id] *= level.factors.fullLayerProduct(layer_id, arch)
+                        print(f"Level: {level.name}, layer_id: {layer_id}, max_latency_per_layer before: {max_latency_per_layer[layer_id]:,.0f}, \n level.getSettedLatencyPerLayer{layer_id}: {level.getSettedLatencyPerLayer(layer_id):,.0f}")
                         max_latency_per_layer[layer_id] = max(max_latency_per_layer[layer_id], level.getSettedLatencyPerLayer(layer_id))
                         WMOPs_per_layer[layer_id] += level.Leakage(level.getSettedLatencyPerLayer(layer_id)) * powered_instances_per_layer[layer_id]
                         temporal_iterations_per_layer[layer_id] *= level.factors.fullLayerProduct(layer_id, arch) 
                     if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
                         max_latency = sum(max_latency_per_layer.values())
+                        print(f"Level.name: {arch.name}, max_latency (sequential layers): {max_latency:,.0f}")
                     else:
                         max_latency = max(max_latency_per_layer.values())                        
                     WMOPs = sum(WMOPs_per_layer.values())
@@ -460,41 +463,19 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 # For latency, use the maximum temporal iterations across all layers
                 max_temporal = max(temporal_iterations_per_layer.values())
                 max_latency = max(max_latency, level.latency() * max_temporal)
+                print(f"max_latency after fanout_level: {max_latency}")
             else:
                 ## TODO: Problem of latency calculation with multiple layers
     #            if num_layers > 1:
                 max_latency = max(max_latency, level.latency() * temporal_iterations)
                 if level.power_gating_support:
                     powered_instances *= level.factors.fullProduct()
-
                 else:
                     powered_instances *= level.mesh
         elif isinstance(level, ComputeLevel):
-            """ elif isinstance(level, ComputeLevel):
-            print(f"Compute level latency: {level.latency()}")
-            if num_layers > 1:
-                print(f"temporal_iterations_per_layer before compute level: {temporal_iterations_per_layer}")
-                # For multi-layer, latency depends on execution mode
-                if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
-                    compute_latency = sum(level.latency() * temporal_iterations_per_layer[layer_id] for layer_id in range(num_layers))
-                else:
-                    compute_latency = level.latency() * max(temporal_iterations_per_layer.values())
-                max_latency = max(max_latency, compute_latency)
-                
-                # Add leakage for each layer
-                for layer_id in range(num_layers):
-                    WMOPs_per_layer[layer_id] += level.Leakage(level.latency()) * powered_instances_per_layer[layer_id]
-                WMOPs = sum(WMOPs_per_layer.values())
-            else:
-                print(f"temporal_iterations before compute level: {temporal_iterations}")
-                max_latency = max(max_latency, level.latency() * temporal_iterations)
-                WMOPs += level.Leakage(level.latency()) * powered_instances
-            print(f"Compute Level {level.name}: powered_instances={powered_instances if num_layers == 1 else powered_instances_per_layer}, \n latency={level.latency()*temporal_iterations if num_layers == 1 else compute_latency}, \n max_latency={max_latency}")
-            break"""
             ## TODO: Problem of latency calculation with multiple layers
             ## TODO: Ideal compute latency per layer and then sum or max according to execution mode: 
-            ## 
-            print(f"Compute level latency: {level.latency()}")
+            print(f"Compute level latency: {level.latency():,.0f}")
             if num_layers > 1: 
                 compute_latencies = []
                 for layer_id in range(num_layers):
@@ -504,11 +485,14 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     compute_latency = sum(compute_latencies)
                 else:
                     compute_latency = max(compute_latencies)
-                final_latency = max(final_latency, compute_latency)
+                print(f"max_latency initially: {max_latency}")
+                print(f"compute_latency from compute level: {compute_latency}")    
+                max_latency = max(max_latency, compute_latency)
+                print(f"max_latency after compute: {max_latency}, before fanout_level")
             else:
-                final_latency = max(final_latency, level.latency() * temporal_iterations)
+                max_latency = max(max_latency, level.latency() * temporal_iterations)
             break
-    return WMOPs, final_latency
+    return WMOPs, max_latency
 
 """
 Weighted Arithmetic Intensity (WART)

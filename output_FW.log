@@ -22,8 +22,8 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'S0', 'Z9', 'R0', 'P', 'Q', 'S9', 'Y0', 'X0', 'R9', 'C9', 'C0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9']
-INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'R3', 'S8', 'Z0', 'Y2', 'X2', 'Z2', 'S1', 'R4', 'C1', 'X4', 'Y8', 'X1', 'X8', 'Z7', 'C8', 'R7', 'Y6', 'S5', 'Y7', 'X7', 'R8', 'C6', 'X3', 'R6', 'S6', 'X5', 'C3', 'Z3', 'C4', 'Y1', 'S7', 'C5', 'Z4', 'R1', 'R2', 'Y4', 'C2', 'S4', 'Z8', 'Z5', 'C7', 'S2', 'Y3', 'X6', 'Z6', 'Z1', 'R5', 'S3', 'Y5'}
+final_layer_dims: {'C9', 'Q', 'R9', 'Z9', 'P', 'S0', 'X0', 'Y0', 'S9', 'R0', 'C0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'P', 'Q', 'Z9']
+INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'X7', 'Y5', 'X6', 'C8', 'Y6', 'R8', 'X3', 'C7', 'S8', 'Z0', 'R1', 'X1', 'S2', 'Z6', 'S1', 'S7', 'Y3', 'X4', 'Z1', 'Z5', 'Z2', 'C3', 'R7', 'S5', 'C1', 'C6', 'R6', 'Y7', 'X8', 'Z7', 'C2', 'C5', 'Y8', 'S4', 'Z4', 'Y4', 'S3', 'S6', 'Z8', 'R3', 'Y2', 'R5', 'X2', 'R4', 'Y1', 'Z3', 'C4', 'X5', 'R2'}
 INFO: Added high constraint for intermediate dimension P in level AccumulationOutRegister
 INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutRegister
 Starting engine with mapper: breadthfirst_local
@@ -2982,13 +2982,190 @@ Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9]
 Final latency_per_layer[9]: 1,658,880
 Final stall_cycles_per_layer[9]: 1,428,480
 cc_per_all_tiles_per_layer[9]: 230,400
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+Level: DRAM, layer_id: 0, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer0: 2,452,000
+Level: DRAM, layer_id: 1, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer1: 6,993,422
+Level: DRAM, layer_id: 2, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer2: 6,993,422
+Level: DRAM, layer_id: 3, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer3: 6,993,422
+Level: DRAM, layer_id: 4, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer4: 6,993,422
+Level: DRAM, layer_id: 5, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer5: 6,993,422
+Level: DRAM, layer_id: 6, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer6: 6,993,422
+Level: DRAM, layer_id: 7, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer7: 6,993,422
+Level: DRAM, layer_id: 8, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer8: 6,993,422
+Level: DRAM, layer_id: 9, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer9: 1,658,880
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: FeatureMemory
+Level: FeatureMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: FeatureMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: FeatureMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: FeatureMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: FeatureMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: FeatureMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: FeatureMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: FeatureMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: FeatureMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: FeatureMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: WeightMemory
+Level: WeightMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: WeightMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: WeightMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: WeightMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: WeightMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: WeightMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: WeightMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: WeightMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: WeightMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: WeightMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: SACols_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: AccumulationOutRegister
+Level: AccumulationOutRegister, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: AccumulationOutRegister, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: AccumulationOutRegister, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: AccumulationOutRegister, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: AccumulationOutRegister, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: AccumulationOutRegister, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: AccumulationOutRegister, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: AccumulationOutRegister, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: AccumulationOutRegister, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: AccumulationOutRegister, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: Compute
 Compute level latency: 1
-TOTALLY IDEAL: Compute level compute_latency: 1
-temporal_iterations before compute level: 1
-Compute Level Compute: powered_instances=1, 
- latency=1, 
- max_latency=120116515.55555557
-Initial condition (Wart: 4.682e+77):
+max_latency initially: 60058257.77777778
+compute_latency from compute level: 33796800
+max_latency after compute: 60058257.77777778, before fanout_level
+Initial condition (Wart: 9.363e+77):
 DRAM ----------> P: 720, X8: 10, Y8: 720, X7: 10, Y7: 720, X6: 10, Y6: 720, X5: 10, Y5: 720, X4: 10, Y4: 720, X3: 10, Y3: 720, X2: 10, Y2: 720, X1: 10, Y1: 720, X0: 10, Y0: 720
 FeatureMemory -> C9: 32, C8: 32, S8: 3, R8: 3, C7: 32, S7: 3, R7: 3, C6: 32, S6: 3, R6: 3, C5: 32, S5: 3, R5: 3, C4: 32, S4: 3, R4: 3, C3: 32, S3: 3, R3: 3, C2: 32, S2: 3, R2: 3, C1: 32, S1: 3, R1: 3, C0: 3, Z8: 2, Z7: 2, Z6: 2, Z5: 2, Z4: 2, Z3: 2, Z2: 2, Z1: 2, Z0: 2
 WeightMemory --> R0: 3, S0: 3
@@ -5907,12 +6084,189 @@ Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9]
 Final latency_per_layer[9]: 1,658,880
 Final stall_cycles_per_layer[9]: 1,428,480
 cc_per_all_tiles_per_layer[9]: 230,400
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+Level: DRAM, layer_id: 0, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer0: 2,452,000
+Level: DRAM, layer_id: 1, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer1: 6,993,422
+Level: DRAM, layer_id: 2, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer2: 6,993,422
+Level: DRAM, layer_id: 3, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer3: 6,993,422
+Level: DRAM, layer_id: 4, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer4: 6,993,422
+Level: DRAM, layer_id: 5, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer5: 6,993,422
+Level: DRAM, layer_id: 6, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer6: 6,993,422
+Level: DRAM, layer_id: 7, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer7: 6,993,422
+Level: DRAM, layer_id: 8, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer8: 6,993,422
+Level: DRAM, layer_id: 9, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer9: 1,658,880
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: FeatureMemory
+Level: FeatureMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: FeatureMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: FeatureMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: FeatureMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: FeatureMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: FeatureMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: FeatureMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: FeatureMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: FeatureMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: FeatureMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: WeightMemory
+Level: WeightMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: WeightMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: WeightMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: WeightMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: WeightMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: WeightMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: WeightMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: WeightMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: WeightMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: WeightMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: SACols_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: AccumulationOutRegister
+Level: AccumulationOutRegister, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: AccumulationOutRegister, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: AccumulationOutRegister, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: AccumulationOutRegister, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: AccumulationOutRegister, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: AccumulationOutRegister, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: AccumulationOutRegister, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: AccumulationOutRegister, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: AccumulationOutRegister, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: AccumulationOutRegister, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: Compute
 Compute level latency: 1
-TOTALLY IDEAL: Compute level compute_latency: 1
-temporal_iterations before compute level: 1
-Compute Level Compute: powered_instances=1, 
- latency=1, 
- max_latency=120116515.55555557
+max_latency initially: 60058257.77777778
+compute_latency from compute level: 33796800
+max_latency after compute: 60058257.77777778, before fanout_level
 é stato chiamato update stats! 
 
 
@@ -8803,12 +9157,189 @@ Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9]
 Final latency_per_layer[9]: 1,658,880
 Final stall_cycles_per_layer[9]: 1,428,480
 cc_per_all_tiles_per_layer[9]: 230,400
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+Level: DRAM, layer_id: 0, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer0: 2,452,000
+Level: DRAM, layer_id: 1, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer1: 6,993,422
+Level: DRAM, layer_id: 2, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer2: 6,993,422
+Level: DRAM, layer_id: 3, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer3: 6,993,422
+Level: DRAM, layer_id: 4, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer4: 6,993,422
+Level: DRAM, layer_id: 5, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer5: 6,993,422
+Level: DRAM, layer_id: 6, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer6: 6,993,422
+Level: DRAM, layer_id: 7, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer7: 6,993,422
+Level: DRAM, layer_id: 8, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer8: 6,993,422
+Level: DRAM, layer_id: 9, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer9: 1,658,880
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: FeatureMemory
+Level: FeatureMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: FeatureMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: FeatureMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: FeatureMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: FeatureMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: FeatureMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: FeatureMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: FeatureMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: FeatureMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: FeatureMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: WeightMemory
+Level: WeightMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: WeightMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: WeightMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: WeightMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: WeightMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: WeightMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: WeightMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: WeightMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: WeightMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: WeightMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: SACols_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: AccumulationOutRegister
+Level: AccumulationOutRegister, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: AccumulationOutRegister, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: AccumulationOutRegister, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: AccumulationOutRegister, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: AccumulationOutRegister, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: AccumulationOutRegister, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: AccumulationOutRegister, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: AccumulationOutRegister, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: AccumulationOutRegister, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: AccumulationOutRegister, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: Compute
 Compute level latency: 1
-TOTALLY IDEAL: Compute level compute_latency: 1
-temporal_iterations before compute level: 1
-Compute Level Compute: powered_instances=1, 
- latency=1, 
- max_latency=120116515.55555557
+max_latency initially: 60058257.77777778
+compute_latency from compute level: 33796800
+max_latency after compute: 60058257.77777778, before fanout_level
 é stato chiamato update stats! 
 
 
@@ -11699,16 +12230,193 @@ Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9]
 Final latency_per_layer[9]: 1,658,880
 Final stall_cycles_per_layer[9]: 1,428,480
 cc_per_all_tiles_per_layer[9]: 230,400
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+Level: DRAM, layer_id: 0, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer0: 2,452,000
+Level: DRAM, layer_id: 1, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer1: 6,993,422
+Level: DRAM, layer_id: 2, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer2: 6,993,422
+Level: DRAM, layer_id: 3, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer3: 6,993,422
+Level: DRAM, layer_id: 4, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer4: 6,993,422
+Level: DRAM, layer_id: 5, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer5: 6,993,422
+Level: DRAM, layer_id: 6, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer6: 6,993,422
+Level: DRAM, layer_id: 7, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer7: 6,993,422
+Level: DRAM, layer_id: 8, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer8: 6,993,422
+Level: DRAM, layer_id: 9, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer9: 1,658,880
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: FeatureMemory
+Level: FeatureMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: FeatureMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: FeatureMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: FeatureMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: FeatureMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: FeatureMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: FeatureMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: FeatureMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: FeatureMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: FeatureMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: WeightMemory
+Level: WeightMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: WeightMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: WeightMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: WeightMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: WeightMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: WeightMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: WeightMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: WeightMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: WeightMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: WeightMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: SACols_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: AccumulationOutRegister
+Level: AccumulationOutRegister, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: AccumulationOutRegister, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: AccumulationOutRegister, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: AccumulationOutRegister, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: AccumulationOutRegister, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: AccumulationOutRegister, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: AccumulationOutRegister, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: AccumulationOutRegister, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: AccumulationOutRegister, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: AccumulationOutRegister, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: Compute
 Compute level latency: 1
-TOTALLY IDEAL: Compute level compute_latency: 1
-temporal_iterations before compute level: 1
-Compute Level Compute: powered_instances=1, 
- latency=1, 
- max_latency=120116515.55555557
+max_latency initially: 60058257.77777778
+compute_latency from compute level: 33796800
+max_latency after compute: 60058257.77777778, before fanout_level
 
 Final condition: 
-Wart: 4.682e+77
-EDP: 4.347e+07 (J*cycle)
+Wart: 9.363e+77
+EDP: 2.173e+07 (J*cycle)
 
 Performed moves: 0
 é stato chiamato update stats! 
@@ -14601,18 +15309,195 @@ Calculating final latency and stall for layer 9: latency_read_drain_per_layer[9]
 Final latency_per_layer[9]: 1,658,880
 Final stall_cycles_per_layer[9]: 1,428,480
 cc_per_all_tiles_per_layer[9]: 230,400
-Compute level latency: 1
-TOTALLY IDEAL: Compute level compute_latency: 1
-temporal_iterations before compute level: 1
-Compute Level Compute: powered_instances=1, 
- latency=1, 
- max_latency=120116515.55555557
 
-Finished in: 0.107s
+
+Final WMOPs and Latency calculation for Level: DRAM
+Level: DRAM, layer_id: 0, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer0: 2,452,000
+Level: DRAM, layer_id: 1, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer1: 6,993,422
+Level: DRAM, layer_id: 2, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer2: 6,993,422
+Level: DRAM, layer_id: 3, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer3: 6,993,422
+Level: DRAM, layer_id: 4, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer4: 6,993,422
+Level: DRAM, layer_id: 5, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer5: 6,993,422
+Level: DRAM, layer_id: 6, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer6: 6,993,422
+Level: DRAM, layer_id: 7, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer7: 6,993,422
+Level: DRAM, layer_id: 8, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer8: 6,993,422
+Level: DRAM, layer_id: 9, max_latency_per_layer before: 0, 
+ level.getSettedLatencyPerLayer9: 1,658,880
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: FeatureMemory
+Level: FeatureMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: FeatureMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: FeatureMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: FeatureMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: FeatureMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: FeatureMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: FeatureMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: FeatureMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: FeatureMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: FeatureMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: WeightMemory
+Level: WeightMemory, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: WeightMemory, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: WeightMemory, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: WeightMemory, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: WeightMemory, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: WeightMemory, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: WeightMemory, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: WeightMemory, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: WeightMemory, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: WeightMemory, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: SACols_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_9
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_8
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_7
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_6
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_5
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_4
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_3
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_2
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_1
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SACols_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: SARows_0
+max_latency after fanout_level: 60058257.77777778
+
+
+Final WMOPs and Latency calculation for Level: AccumulationOutRegister
+Level: AccumulationOutRegister, layer_id: 0, max_latency_per_layer before: 2,452,000, 
+ level.getSettedLatencyPerLayer0: 388,800
+Level: AccumulationOutRegister, layer_id: 1, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer1: 4,147,200
+Level: AccumulationOutRegister, layer_id: 2, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer2: 4,147,200
+Level: AccumulationOutRegister, layer_id: 3, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer3: 4,147,200
+Level: AccumulationOutRegister, layer_id: 4, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer4: 4,147,200
+Level: AccumulationOutRegister, layer_id: 5, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer5: 4,147,200
+Level: AccumulationOutRegister, layer_id: 6, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer6: 4,147,200
+Level: AccumulationOutRegister, layer_id: 7, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer7: 4,147,200
+Level: AccumulationOutRegister, layer_id: 8, max_latency_per_layer before: 6,993,422, 
+ level.getSettedLatencyPerLayer8: 4,147,200
+Level: AccumulationOutRegister, layer_id: 9, max_latency_per_layer before: 1,658,880, 
+ level.getSettedLatencyPerLayer9: 230,400
+Level.name: DepFiN 10-Layer Architecture, max_latency (sequential layers): 60,058,258
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency initially: 60058257.77777778
+compute_latency from compute level: 33796800
+max_latency after compute: 60058257.77777778, before fanout_level
+
+Finished in: 0.253s
 
 Best mapping found with:
-	Wart: 4.682e+77
-	EDP: 4.347e+07 (J*cycle)
+	Wart: 9.363e+77
+	EDP: 2.173e+07 (J*cycle)
 	Energy: 3.600e+05 (uJ)
 	Latency: 0.000e+00 (cc)
 
