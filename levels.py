@@ -477,14 +477,14 @@ class MemLevel(Level):
     def getFillPerLayer(self, layer_id) -> int:
         if self.arch.coupling.getNumLayers() > 1:
             if layer_id == 0:
-                print(f"DEBUG getFill: layer_id={layer_id}, in_writes={self.in_writes:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
+                print(f"DEBUG getFill: layer_id={layer_id}, in_writes={self.in_writes:,.0f}, per_layer_w_writes[{layer_id}]={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads[{layer_id}]={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
                 return self.in_writes + self.per_layer_w_writes[layer_id] + self.last_per_layer_int_out_reads[layer_id]
             elif layer_id == self.arch.coupling.getNumLayers() - 1:
                 #print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_out_reads={self.last_out_reads:,.0f}")
                 return self.per_layer_int_in_writes[layer_id - 1] + self.per_layer_w_writes[layer_id] + self.last_out_reads
             else:
-                if layer_id == 1:
-                    print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
+                if layer_id == 1 or layer_id == 9:
+                    print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes[{layer_id - 1}]={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes[{layer_id}]={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads[{layer_id}]={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
                 return self.per_layer_int_in_writes[layer_id - 1] + self.per_layer_w_writes[layer_id] + self.last_per_layer_int_out_reads[layer_id]
         else: 
             return self.getFill()
@@ -524,8 +524,8 @@ class MemLevel(Level):
 #                    print(f"DEBUG: layer_id={layer_id}, per_layer_int_in_reads={self.per_layer_int_in_reads[layer_id - 1]:,.0f}, per_layer_w_reads={self.per_layer_w_reads[layer_id]:,.0f}, last_out_writes={self.last_out_writes:,.0f}, out_reads={self.out_reads:,.0f}")
                 return self.per_layer_int_in_reads[layer_id - 1] + (self.out_reads - self.last_out_writes) + self.per_layer_w_reads[layer_id]
             else:
-                if (layer_id == 1):
-                    print(f"DEBUG: layer_id={layer_id}, per_layer_int_in_reads={self.per_layer_int_in_reads[layer_id - 1]:,.0f}, per_layer_w_reads={self.per_layer_w_reads[layer_id]:,.0f}, per_layer_int_out_reads={self.per_layer_int_out_reads[layer_id]:,.0f}, last_per_layer_int_out_writes={self.last_per_layer_int_out_writes[layer_id]:,.0f}")
+                if (layer_id == 1) or layer_id == 9:
+                    print(f"DEBUG: layer_id={layer_id}, per_layer_int_in_reads[{layer_id - 1}]={self.per_layer_int_in_reads[layer_id - 1]:,.0f}, per_layer_w_reads[{layer_id}]={self.per_layer_w_reads[layer_id]:,.0f}, per_layer_int_out_reads[{layer_id}]={self.per_layer_int_out_reads[layer_id]:,.0f}, last_per_layer_int_out_writes[{layer_id}]={self.last_per_layer_int_out_writes[layer_id]:,.0f}")
                 #return self.per_layer_int_in_reads[layer_id - 1] + self.per_layer_w_reads[layer_id] + (self.per_layer_int_out_reads[layer_id] - self.last_per_layer_int_out_writes[layer_id])
                 return self.per_layer_int_in_reads[layer_id - 1] + self.per_layer_w_reads[layer_id] + (self.per_layer_int_out_reads[layer_id] - self.last_per_layer_int_out_writes[layer_id])
         else: 
@@ -541,15 +541,12 @@ class MemLevel(Level):
 
     def getUpdatePerLayer(self, layer_id) -> int:
         if self.arch.coupling.getNumLayers() > 1:
-            if layer_id == 0:
-                print(f"UpdatePerLayer: self.per_layer_int_out_writes[{layer_id}]: {self.per_layer_int_out_writes[layer_id]}, self.last_per_layer_int_out_reads[{layer_id}]: {self.last_per_layer_int_out_reads[layer_id]}")
-                return self.per_layer_int_out_writes[layer_id] - self.last_per_layer_int_out_reads[layer_id]
-            elif layer_id == self.arch.coupling.getNumLayers() - 1:
+            if layer_id == self.arch.coupling.getNumLayers() - 1:
                 return self.out_writes - self.last_out_reads
             else:
-                if layer_id == 1:
-                    print(f"UpdatePerLayer: self.per_layer_int_in_writes[{layer_id - 1}]: {self.per_layer_int_in_writes[layer_id-1]}, self.per_layer_int_out_writes[1]: {self.per_layer_int_out_writes[layer_id]} - self.last_per_layer_int_out_reads[1]: {self.last_per_layer_int_out_reads[layer_id]}")
-                return self.per_layer_int_in_writes[layer_id - 1] + (self.per_layer_int_out_writes[layer_id] - self.last_per_layer_int_out_reads[layer_id])
+                if layer_id == 1 or layer_id == 9:
+                    print(f"UpdatePerLayer: self.per_layer_int_out_writes[{layer_id}]: {self.per_layer_int_out_writes[layer_id]} - self.last_per_layer_int_out_reads[{layer_id}]: {self.last_per_layer_int_out_reads[layer_id]}")
+                return self.per_layer_int_out_writes[layer_id] - self.last_per_layer_int_out_reads[layer_id]
         else: 
             return self.getUpdate()
 

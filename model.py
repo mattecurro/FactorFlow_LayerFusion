@@ -492,14 +492,23 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             print(f"Compute Level {level.name}: powered_instances={powered_instances if num_layers == 1 else powered_instances_per_layer}, \n latency={level.latency()*temporal_iterations if num_layers == 1 else compute_latency}, \n max_latency={max_latency}")
             break"""
             ## TODO: Problem of latency calculation with multiple layers
+            ## TODO: Ideal compute latency per layer and then sum or max according to execution mode: 
+            ## 
             print(f"Compute level latency: {level.latency()}")
-            compute_latency = level.latency()*temporal_iterations
-            print(f"temporal_iterations before compute level: {temporal_iterations}")
-            max_latency = max(max_latency, compute_latency)
-            print(f"Compute Level {level.name}: powered_instances={powered_instances}, \n latency={level.latency()*temporal_iterations}, \n max_latency={max_latency}")
-            WMOPs += level.Leakage(level.latency()) * powered_instances
+            if num_layers > 1: 
+                compute_latencies = []
+                for layer_id in range(num_layers):
+                    latency = level.latency() * temporal_iterations_per_layer[layer_id]
+                    compute_latencies.append(latency)
+                if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
+                    compute_latency = sum(compute_latencies)
+                else:
+                    compute_latency = max(compute_latencies)
+                final_latency = max(final_latency, compute_latency)
+            else:
+                final_latency = max(final_latency, level.latency() * temporal_iterations)
             break
-    return WMOPs, max_latency
+    return WMOPs, final_latency
 
 """
 Weighted Arithmetic Intensity (WART)
