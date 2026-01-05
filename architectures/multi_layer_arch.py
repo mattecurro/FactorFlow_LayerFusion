@@ -2,9 +2,8 @@ from computations import *
 from levels import *
 from arch import *
 
-
-arch = arch_depfin_10layers = Arch([
-    MemLevel(
+arch_depfin_10layers_without_intermediate_but_I_think_it_is_wrong = Arch([
+        MemLevel(
         name = "DRAM",
         size = 2**64-1, 
         value_access_energy = 50.0, 
@@ -14,10 +13,9 @@ arch = arch_depfin_10layers = Arch([
         dataflow_constraints = ['Q', 'P', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 
                                  'X5', 'Y5', 'X4', 'Y4', 'X3', 'Y3', 
                                  'X2', 'Y2', 'X1', 'Y1', 'X0', 'Y0'], 
-        factors_constraints = {'Q': 1, 'P': 720, 'X8': 10, 'Y8': 720, 'X7': 10, 'Y7': 720, 'X6': 10, 'Y6': 720, 
-                               'X5': 10, 'Y5': 720, 'X4': 10, 'Y4': 720, 'X3': 10, 'Y3': 720, 
-                               'X2': 10, 'Y2': 720, 'X1': 10, 'Y1': 720, 'X0': 10, 'Y0': 720}
+        factors_constraints = {'Q': 1, 'P': 720}
     ),
+
 
     MemLevel(
         name = "FeatureMemory", # FMEM
@@ -34,24 +32,24 @@ arch = arch_depfin_10layers = Arch([
         ],
         factors_constraints = {
             'C9': 32,
-            'C8': 32, 'Z8': 2, 'S8': 3, 'R8': 3, 
-            'C7': 32, 'Z7': 2, 'S7': 3, 'R7': 3,
-            'C6': 32, 'Z6': 2, 'S6': 3, 'R6': 3,
-            'C5': 32, 'Z5': 2, 'S5': 3, 'R5': 3,
-            'C4': 32, 'Z4': 2, 'S4': 3, 'R4': 3,
-            'C3': 32, 'Z3': 2, 'S3': 3, 'R3': 3,
-            'C2': 32, 'Z2': 2, 'S2': 3, 'R2': 3,
-            'C1': 32, 'Z1': 2, 'S1': 3, 'R1': 3,
-            'Z0': 2, 'C0': 3
+            'C8': 32, 'Z8': 2,
+            'C7': 32, 'Z7': 2,
+            'C6': 32, 'Z6': 2,
+            'C5': 32, 'Z5': 2,
+            'C4': 32, 'Z4': 2,
+            'C3': 32, 'Z3': 2,
+            'C2': 32, 'Z2': 2,
+            'C1': 32, 'Z1': 2,
+            'Z0': 2, 'C0': 3,'S8': 3, 'R8': 3, 'S7': 3, 'R7': 3, 'S6': 3, 'R6': 3, 'S5': 3, 'R5': 3,
+            'S4': 3, 'R4': 3, 'S3': 3, 'R3': 3, 'S2': 3, 'R2': 3, 'S1': 3, 'R1': 3
         }
     ),
-
 
     MemLevel(
         name = "WeightMemory", # WMEM
         size = 524 * 1024, 
         value_access_energy = 2.02, 
-        bandwidth = 2*24,                 #FORZATURA read_bandwidth = 16, write_bandwidth = 16
+        bandwidth = 2*16,                 #FORZATURA read_bandwidth = 16, write_bandwidth = 16
         bypasses = ['in', 'int', 'out'],
         dataflow_constraints = ['R0','S0'], # Just innermost weights
         # Constraints for all weights
@@ -105,7 +103,126 @@ arch = arch_depfin_10layers = Arch([
         name = "AccumulationOutRegister",
         size = 28,                  # FORZATURA "Accumulation REGF (28x32b)"      
         value_access_energy = 1.34, 
-        bandwidth = 1*6,
+        bandwidth = 2*2,
+        bypasses = ['in', 'w'],
+        dataflow_constraints = ['Q'],
+        factors_constraints = {'Q': 10}
+    ),
+
+    ComputeLevel(
+        name = "Compute",
+        mesh = 1, 
+        compute_energy = 0.21, 
+        cycles = 1,
+        factors_constraints = {}
+    )
+], coupling=conv_10layers_coupling, name="DepFiN 10-Layer Architecture")
+
+
+arch = arch_depfin_10layers = Arch([
+    MemLevel(
+        name = "DRAM",
+        size = 2**64-1, 
+        value_access_energy = 50.0, 
+        bandwidth = 25,                           # 17GB/s / 930MHz = 18 B per s
+        bypasses = ['int'],
+        # Constraints for the outermost layer (Layer 9)
+        dataflow_constraints = ['Q', 'P', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 
+                                 'X5', 'Y5', 'X4', 'Y4', 'X3', 'Y3', 
+                                 'X2', 'Y2', 'X1', 'Y1', 'X0', 'Y0'], 
+        factors_constraints = {'Q': 1, 'P': 720, 'X8': 10, 'Y8': 720, 'X7': 10, 'Y7': 720, 'X6': 10, 'Y6': 720, 
+                               'X5': 10, 'Y5': 720, 'X4': 10, 'Y4': 720, 'X3': 10, 'Y3': 720, 
+                               'X2': 10, 'Y2': 720, 'X1': 10, 'Y1': 720, 'X0': 10,  'Y0': 720}
+    ),
+
+
+    MemLevel(
+        name = "FeatureMemory", # FMEM
+        size = 1056 * 1024, 
+        value_access_energy = 2.02, 
+        bandwidth = 132*2,
+        bypasses = ['w'],
+        dataflow_constraints = [
+            'C9', 'R9', 'S9', 'C8', 'S8', 'R8', 'C7', 'S7', 'R7', 'C6', 'S6', 'R6', 
+            'C5', 'S5', 'R5', 'C4', 'S4', 'R4', 'C3', 'S3', 'R3', 'C2', 'S2', 'R2', 
+            'C1', 'S1', 'R1', 'C0', 'R0', 'S0', 
+            'Q', 'Z9', 'X8', 'Z8', 'X7', 'Z7', 'X6', 'Z6', 'X5', 'Z5', 
+            'X4', 'Z4', 'X3', 'Z3', 'X2', 'Z2', 'X1', 'Z1', 'X0', 'Z0'
+        ],
+        factors_constraints = {
+            'C9': 32,
+            'C8': 32, 'Z8': 2,
+            'C7': 32, 'Z7': 2,
+            'C6': 32, 'Z6': 2,
+            'C5': 32, 'Z5': 2,
+            'C4': 32, 'Z4': 2,
+            'C3': 32, 'Z3': 2,
+            'C2': 32, 'Z2': 2,
+            'C1': 32, 'Z1': 2,
+            'Z0': 2, 'C0': 3,'S8': 3, 'R8': 3, 'S7': 3, 'R7': 3, 'S6': 3, 'R6': 3, 'S5': 3, 'R5': 3,
+            'S4': 3, 'R4': 3, 'S3': 3, 'R3': 3, 'S2': 3, 'R2': 3, 'S1': 3, 'R1': 3
+        }
+    ),
+
+    MemLevel(
+        name = "WeightMemory", # WMEM
+        size = 524 * 1024, 
+        value_access_energy = 2.02, 
+        bandwidth = 2*16,                 #FORZATURA read_bandwidth = 16, write_bandwidth = 16
+        bypasses = ['in', 'int', 'out'],
+        dataflow_constraints = ['R0','S0'], # Just innermost weights
+        # Constraints for all weights
+        factors_constraints = {
+            'R0': 3, 'S0': 3
+        }
+    ),
+
+
+    # --- Layer 9  ---
+    FanoutLevel(name = "SACols_9", mesh = 128, dims = ['Q'], factors_constraints = {'Q': 128}),
+    FanoutLevel(name = "SARows_9", mesh = 16, dims = ['Z9'], factors_constraints = {'Z9': 16}), 
+
+    # --- Layer 8 ---
+    FanoutLevel(name = "SACols_8", mesh = 128, dims = ['X8'], factors_constraints = {'X8': 128}),
+    FanoutLevel(name = "SARows_8", mesh = 16, dims = ['Z8'], factors_constraints = {'Z8': 16}),
+
+    # --- Layer 7 ---
+    FanoutLevel(name = "SACols_7", mesh = 128, dims = ['X7'], factors_constraints = {'X7': 128}),
+    FanoutLevel(name = "SARows_7", mesh = 16, dims = ['Z7'], factors_constraints = {'Z7': 16}),
+
+    # --- Layer 6 ---
+    FanoutLevel(name = "SACols_6", mesh = 128, dims = ['X6'], factors_constraints = {'X6': 128}),
+    FanoutLevel(name = "SARows_6", mesh = 16, dims = ['Z6'], factors_constraints = {'Z6': 16}),
+
+    # --- Layer 5 ---
+    FanoutLevel(name = "SACols_5", mesh = 128, dims = ['X5'], factors_constraints = {'X5': 128}),
+    FanoutLevel(name = "SARows_5", mesh = 16, dims = ['Z5'], factors_constraints = {'Z5': 16}),
+
+    # --- Layer 4 ---
+    FanoutLevel(name = "SACols_4", mesh = 128, dims = ['X4'], factors_constraints = {'X4': 128}),
+    FanoutLevel(name = "SARows_4", mesh = 16, dims = ['Z4'], factors_constraints = {'Z4': 16}),
+
+    # --- Layer 3 ---
+    FanoutLevel(name = "SACols_3", mesh = 128, dims = ['X3'], factors_constraints = {'X3': 128}),
+    FanoutLevel(name = "SARows_3", mesh = 16, dims = ['Z3'], factors_constraints = {'Z3': 16}),
+
+    # --- Layer 2 ---
+    FanoutLevel(name = "SACols_2", mesh = 128, dims = ['X2'], factors_constraints = {'X2': 128}),
+    FanoutLevel(name = "SARows_2", mesh = 16, dims = ['Z2'], factors_constraints = {'Z2': 16}),
+
+    # --- Layer 1 ---
+    FanoutLevel(name = "SACols_1", mesh = 128, dims = ['X1'], factors_constraints = {'X1': 128}),
+    FanoutLevel(name = "SARows_1", mesh = 16, dims = ['Z1'], factors_constraints = {'Z1': 16}),
+
+    # --- Layer 0 (Input) ---
+    FanoutLevel(name = "SACols_0", mesh = 128, dims = ['X0'], factors_constraints = {'X0': 128}),
+    FanoutLevel(name = "SARows_0", mesh = 16, dims = ['Z0'], factors_constraints = {'Z0': 16}),
+
+    MemLevel(
+        name = "AccumulationOutRegister",
+        size = 28,                  # FORZATURA "Accumulation REGF (28x32b)"      
+        value_access_energy = 1.34, 
+        bandwidth = 2*2,
         bypasses = ['in', 'w'],
         dataflow_constraints = ['Q'],
         factors_constraints = {'Q': 10}

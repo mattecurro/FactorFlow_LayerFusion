@@ -431,13 +431,13 @@ class MemLevel(Level):
         self.in_reads = in_reads
         self.in_writes = in_writes
         # Store per-layer weight reads dictionary
-        self.per_layer_w_reads = per_layer_w_reads
-        self.per_layer_w_writes = per_layer_w_writes
+        self.per_layer_w_reads = per_layer_w_reads.copy()
+        self.per_layer_w_writes = per_layer_w_writes.copy()
         # Store per-layer intermediate reads dictionaries
-        self.per_layer_int_in_reads = per_layer_int_in_reads
-        self.per_layer_int_in_writes = per_layer_int_in_writes
-        self.per_layer_int_out_reads = per_layer_int_out_reads
-        self.per_layer_int_out_writes = per_layer_int_out_writes
+        self.per_layer_int_in_reads = per_layer_int_in_reads.copy()
+        self.per_layer_int_in_writes = per_layer_int_in_writes.copy()
+        self.per_layer_int_out_reads = per_layer_int_out_reads.copy()
+        self.per_layer_int_out_writes = per_layer_int_out_writes.copy()
         # Store output reads and writes (single values)
         self.out_reads = out_reads
         self.out_writes = out_writes    
@@ -483,7 +483,7 @@ class MemLevel(Level):
                 #print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes={self.per_layer_w_writes[layer_id]:,.0f}, last_out_reads={self.last_out_reads:,.0f}")
                 return self.per_layer_int_in_writes[layer_id - 1] + self.per_layer_w_writes[layer_id] + self.last_out_reads
             else:
-                if layer_id == 1 or layer_id == 9:
+                if layer_id == 1 or layer_id == 2 or layer_id == 9:
                     print(f"DEBUG getFill: layer_id={layer_id}, per_layer_int_in_writes[{layer_id - 1}]={self.per_layer_int_in_writes[layer_id - 1]:,.0f}, per_layer_w_writes[{layer_id}]={self.per_layer_w_writes[layer_id]:,.0f}, last_per_layer_int_out_reads[{layer_id}]={self.last_per_layer_int_out_reads[layer_id]:,.0f}")
                 return self.per_layer_int_in_writes[layer_id - 1] + self.per_layer_w_writes[layer_id] + self.last_per_layer_int_out_reads[layer_id]
         else: 
@@ -593,6 +593,7 @@ class MemLevel(Level):
 
     def getSettedLatencyPerLayer(self, layer_id) -> int:
         return max(self.latency_read_drain_per_layer[layer_id], self.latency_fill_update_per_layer[layer_id])
+ 
     # Memory operation between this level and the one below it!
     #  Specifically: returns reads outgoing
     # (downward) from this level and writes incoming (upward) from the below level.

@@ -30,6 +30,88 @@ coupling = conv_10layers_coupling
 # C2: Filter1 num/Out depth
 # MAC1: Intermediate_Out[z][y] += W0[z][c0] * In[c0][y]
 # MAC2: Out[c2][p] += W1[c2][c1] * Intermediate_In[c1][p]
+comp_2 = Shape(
+    # --- Layer 9 (Output) ---
+    P = 720,            
+    Q = 1280,
+    Z9 = 16,
+    C9 = 32,
+    R9 = 1,
+    S9 = 1,
+
+    # --- Layer 8 ---
+    Y8 = 1,
+    X8 = 128,
+    Z8 = 32,
+    C8 = 32,
+    R8 = 3,
+    S8 = 3,
+
+    # --- Layer 7 ---
+    Y7 = 1,
+    X7 = 128,
+    Z7 = 32,
+    C7 = 32,
+    R7 = 3,
+    S7 = 3,
+
+    # --- Layer 6 ---
+    Y6 = 1,
+    X6 = 128,
+    Z6 = 32,
+    C6 = 32,
+    R6 = 3,
+    S6 = 3,
+
+    # --- Layer 5 ---
+    Y5 = 1,
+    X5 = 128,
+    Z5 = 32,
+    C5 = 32,
+    R5 = 3,
+    S5 = 3,
+
+    # --- Layer 4 ---
+    Y4 = 1,
+    X4 = 128,
+    Z4 = 32,
+    C4 = 32,
+    R4 = 3,
+    S4 = 3,
+
+    # --- Layer 3 ---
+    Y3 = 1,
+    X3 = 128,
+    Z3 = 32,
+    C3 = 32,
+    R3 = 3,
+    S3 = 3,
+
+    # --- Layer 2 ---
+    Y2 = 1,
+    X2 = 128,
+    Z2 = 32,
+    C2 = 32,
+    R2 = 3,
+    S2 = 3,
+
+    # --- Layer 1 ---
+    Y1 = 1,
+    X1 = 128,
+    Z1 = 32,
+    C1 = 32,
+    R1 = 3,
+    S1 = 3,
+
+    # --- Layer 0 (Input) ---
+    Y0 = 1,
+    X0 = 128,
+    Z0 = 32,
+    R0 = 3,
+    S0 = 3,
+    C0 = 3
+)
+
 comp = Shape(
     # --- Layer 9 (Output) ---
     P = 720,            
