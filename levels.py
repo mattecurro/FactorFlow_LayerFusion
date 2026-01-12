@@ -575,14 +575,14 @@ class MemLevel(Level):
     Sets Latency and related statistics for this level.
     """
     def setLatencyPerLayer(self, latency_read_drain_per_layer : dict[int, int], latency_fill_update_per_layer : dict[int, int], cc_per_tile_per_layer : dict[int, int], stall_cycles_per_layer : dict[int, int], ideal_bandwidth_read_per_layer : float, ideal_bandwidth_update_per_layer : float, ideal_bandwidth_fill_per_layer : float, ideal_bandwidth_drain_per_layer : float) -> None:
-        self.latency_read_drain_per_layer = latency_read_drain_per_layer
-        self.latency_fill_update_per_layer = latency_fill_update_per_layer
-        self.cc_per_tile_per_layer = cc_per_tile_per_layer
-        self.stall_cycles_per_layer = stall_cycles_per_layer
-        self.ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer
-        self.ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer
-        self.ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer
-        self.ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer
+        self.latency_read_drain_per_layer = latency_read_drain_per_layer.copy()
+        self.latency_fill_update_per_layer = latency_fill_update_per_layer.copy()
+        self.cc_per_tile_per_layer = cc_per_tile_per_layer.copy()
+        self.stall_cycles_per_layer = stall_cycles_per_layer.copy()
+        self.ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer.copy()
+        self.ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer.copy()
+        self.ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer.copy()
+        self.ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer.copy()
 
 
     """

@@ -75,7 +75,7 @@ class ConvolutionScheduleValidator:
         for i, loop in enumerate(loop_order):
             #print(f"i: {i}, loop: {loop}")
             base, level = self.parse_loop_name(loop)
-            if base == 'x':
+            if base == 'x' or base == 'y':
                 x_positions.append((i, loop, level))
 
 

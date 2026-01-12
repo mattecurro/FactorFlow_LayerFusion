@@ -245,15 +245,32 @@ in the architecture, broken down per operation. A few notes:
   required to move data which exceed those required by the computation, thus
   forcing the latter to wait/stall.
 """
-
 def printLatency(arch : Arch) -> None:
     max_latency, max_latency_level_name = 0, "<<Unavailable>>"
+    num_layers = arch.coupling.getNumLayers()
     for level in arch:
         if isinstance(level, MemLevel):
-            if max_latency <= level.getSettedLatency():
-                max_latency = level.getSettedLatency()
-                max_latency_level_name = level.name
-            print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.latency_read_drain:,.0f} cc RD and {level.latency_fill_update:,.0f} cc FU Latency, {level.read_bandwidth:,.1f} R and {level.write_bandwidth:,.1f} W Bandwidth,\n\t\t{level.ideal_bandwidth_read:,.3f} R and {level.ideal_bandwidth_update:,.3f} U and {level.ideal_bandwidth_fill:,.3f} F and {level.ideal_bandwidth_drain:,.3f} D Ideal Bandwidth,\n\t\t{level.cc_per_tile:,.0f} cc per Tile, {level.stall_cycles:,.0f} Stall Cycles")
+            if num_layers > 1:
+                tot_rd_drain = sum(level.latency_read_drain_per_layer.values())
+                tot_fill_update = sum(level.latency_fill_update_per_layer.values())
+                tot_stalls = sum(level.stall_cycles_per_layer.values())
+                max_ideal_rd = max(level.ideal_bandwidth_read_per_layer.values())
+                max_ideal_upd = max(level.ideal_bandwidth_update_per_layer.values())
+                max_ideal_f = max(level.ideal_bandwidth_fill_per_layer.values())
+                max_ideal_d = max(level.ideal_bandwidth_drain_per_layer.values())
+                # Determine max latency across layers
+                level_max_latency = 0
+                for layer_id in range(num_layers):
+                    level_max_latency = max(level_max_latency, level.getSettedLatencyPerLayer(layer_id))
+                if max_latency <= level_max_latency:
+                    max_latency = level_max_latency
+                    max_latency_level_name = level.name
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{tot_rd_drain:,.0f} cc Read Drain , {tot_fill_update:,.0f} cc Fill Update (Total across {num_layers} layers), {level.read_bandwidth:,.1f} Read Bandwidth , {level.write_bandwidth:,.1f} Write Bandwidth,\n\t\t{max_ideal_rd:,.3f} Max Ideal Read , {max_ideal_d:,.3f} Max Ideal Drain , {max_ideal_upd:,.3f} Max Ideal Update , {max_ideal_f:,.3f} Max Ideal Fill , \n\t\t{tot_stalls:,.0f} Total Stall Cycles")            
+            else:
+                if max_latency <= level.getSettedLatency():
+                    max_latency = level.getSettedLatency()
+                    max_latency_level_name = level.name
+                print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}{level.latency_read_drain:,.0f} cc Read Drain and {level.latency_fill_update:,.0f} cc Fill Update Latency, {level.read_bandwidth:,.1f} Read Bandwidth and {level.write_bandwidth:,.1f} Write Bandwidth,\n\t\t{level.ideal_bandwidth_read:,.3f} R and {level.ideal_bandwidth_update:,.3f} U and {level.ideal_bandwidth_fill:,.3f} F and {level.ideal_bandwidth_drain:,.3f} D Ideal Bandwidth,\n\t\t{level.cc_per_tile:,.0f} cc per Tile, {level.stall_cycles:,.0f} Stall Cycles")
         elif isinstance(level, FanoutLevel):
             continue
         elif isinstance(level, ComputeLevel):
@@ -264,7 +281,6 @@ def printLatency(arch : Arch) -> None:
 Print to stdout the total amount of padding required by the different dimensions
 of the computation. This is non-zero iif the PADDED_MAPPINGS is True.
 """
-
 def printPadding(arch : Arch, comp : Shape) -> None:
     total_iterations = {dim: 1 for dim in arch.coupling.dims}
     for level in arch:

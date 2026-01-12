@@ -330,6 +330,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
                     print("\nStart of calculation of latency:")
                     for layer_id in range(num_layers):
+                        print(f"\n\nLayer_id: {layer_id}\n")
                         print(f"ideal_bandwidth_read_per_layer[{layer_id}] + ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id]} vs level.read_bandwidth: {level.read_bandwidth}")
                         if ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id] <= level.read_bandwidth:
                             print("Sono dentro Standard: Compute Bound")
@@ -361,6 +362,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                             print(f"total data: {total_data}")
                             print(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")                        
                             print(f"SLOWDOWN CASE latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
+                    print("\nEnd of calculation of latency.\n")
                 else:
                     total_read_bandwidth_demand = sum(ideal_bandwidth_read_per_layer.values()) + sum(ideal_bandwidth_drain_per_layer.values())
                     total_write_bandwidth_demand = sum(ideal_bandwidth_fill_per_layer.values()) + sum(ideal_bandwidth_update_per_layer.values())
@@ -390,14 +392,14 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 ideal_bandwidth_drain = max(ideal_bandwidth_drain_per_layer.values())
                 ideal_bandwidth_fill = max(ideal_bandwidth_fill_per_layer.values())
                 level.setLatencyPerLayer(
-                    latency_read_drain_per_layer = latency_read_drain_per_layer.copy(),
-                    latency_fill_update_per_layer = latency_fill_update_per_layer.copy(),
+                    latency_read_drain_per_layer = latency_read_drain_per_layer,
+                    latency_fill_update_per_layer = latency_fill_update_per_layer,
                     cc_per_tile_per_layer = cc_per_tile_per_layer,
                     stall_cycles_per_layer = stall_cycles_per_layer,
-                    ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer.copy(),
-                    ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer.copy(),
-                    ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer.copy(),
-                    ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer.copy()
+                    ideal_bandwidth_read_per_layer = ideal_bandwidth_read_per_layer,
+                    ideal_bandwidth_update_per_layer = ideal_bandwidth_update_per_layer,
+                    ideal_bandwidth_fill_per_layer = ideal_bandwidth_fill_per_layer,
+                    ideal_bandwidth_drain_per_layer = ideal_bandwidth_drain_per_layer
                 )
                 previous_fanout_pe_to_pe_warmup = 0
                 cc_per_tile_per_layer = {layer_id: latency_per_layer[layer_id] for layer_id in range(num_layers)}

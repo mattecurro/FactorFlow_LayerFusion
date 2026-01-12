@@ -14,6 +14,7 @@ from prints import *
 from model import *
 from utils import *
 from arch import *
+from heuristic_check import ConvolutionScheduleValidator
 
 # TODO: put me in an inner scope!!!
 candidate_perms_per_mem_level : list[list[str]] = []
@@ -318,12 +319,16 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Tru
         ## THIS IS A PROBLEM FOR THE CONSTRAINT
         arch.initFactors(comp)
         arch.enforceFactorsConstraints(Settings.PADDED_MAPPINGS, verbose)
+        ## ADD a skip_heuristic_check in factorFlow
+#        if not arch.validate_mapping_heuristic():
+#            assert False, f"Initial mapping is invalid for the provided model and architecture."
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
     if verbose: print(f"Initial condition (Wart: {Wart(arch, comp, bias_read):.3e}):")
     if verbose: printFactors(arch)
     
     if verbose: print("\nStarting FactorFlow tiling optimization:\n")
     
+
     # never re-visit the same mapping (unless you reach it with fewer moves)
     already_seen = {arch.hashFromFactors(ignore_dataflows = True, return_string = True): 0} # mapping hash -> moves to reach it
     # one-factor-steps greedy optimization

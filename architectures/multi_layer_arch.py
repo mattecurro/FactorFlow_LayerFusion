@@ -118,19 +118,25 @@ arch_depfin_10layers_without_intermediate_but_I_think_it_is_wrong = Arch([
     )
 ], coupling=conv_10layers_coupling, name="DepFiN 10-Layer Architecture")
 
-
+"""
+DRAM BandwidthCode: 
+External IO bandwidth of 17 GB/s (LPDDR4)
+Frequency: The core runs at 930 MHz per clock cycle == 930 M cycles/s 
+"""
 arch = arch_depfin_10layers = Arch([
     MemLevel(
         name = "DRAM",
         size = 2**64-1, 
         value_access_energy = 50.0, 
-        bandwidth = 25,                           # 17GB/s / 930MHz = 18 B per s
+        #bandwidth = 18*2,                           # 17GB/s / 930MHz = 18 B per cycle
+        read_bandwidth = 17,
+        write_bandwidth = 1,
         bypasses = ['int'],
         # Constraints for the outermost layer (Layer 9)
         dataflow_constraints = ['Q', 'P', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 
                                  'X5', 'Y5', 'X4', 'Y4', 'X3', 'Y3', 
                                  'X2', 'Y2', 'X1', 'Y1', 'X0', 'Y0'], 
-        factors_constraints = {'Q': 1, 'P': 720, 'X8': 10, 'Y8': 720, 'X7': 10, 'Y7': 720, 'X6': 10, 'Y6': 720, 
+        factors_constraints = {'Q': 10, 'P': 720, 'X8': 10, 'Y8': 720, 'X7': 10, 'Y7': 720, 'X6': 10, 'Y6': 720, 
                                'X5': 10, 'Y5': 720, 'X4': 10, 'Y4': 720, 'X3': 10, 'Y3': 720, 
                                'X2': 10, 'Y2': 720, 'X1': 10, 'Y1': 720, 'X0': 10,  'Y0': 720}
     ),
@@ -159,7 +165,7 @@ arch = arch_depfin_10layers = Arch([
             'C3': 32, 'Z3': 2,
             'C2': 32, 'Z2': 2,
             'C1': 32, 'Z1': 2,
-            'Z0': 2, 'C0': 3,'S8': 3, 'R8': 3, 'S7': 3, 'R7': 3, 'S6': 3, 'R6': 3, 'S5': 3, 'R5': 3,
+            'Z0': 2, 'C0': 3, 'S8': 3, 'R8': 3, 'S7': 3, 'R7': 3, 'S6': 3, 'R6': 3, 'S5': 3, 'R5': 3,
             'S4': 3, 'R4': 3, 'S3': 3, 'R3': 3, 'S2': 3, 'R2': 3, 'S1': 3, 'R1': 3
         }
     ),
@@ -218,15 +224,15 @@ arch = arch_depfin_10layers = Arch([
     FanoutLevel(name = "SACols_0", mesh = 128, dims = ['X0'], factors_constraints = {'X0': 128}),
     FanoutLevel(name = "SARows_0", mesh = 16, dims = ['Z0'], factors_constraints = {'Z0': 16}),
 
-    MemLevel(
-        name = "AccumulationOutRegister",
-        size = 28,                  # FORZATURA "Accumulation REGF (28x32b)"      
-        value_access_energy = 1.34, 
-        bandwidth = 2*2,
-        bypasses = ['in', 'w'],
-        dataflow_constraints = ['Q'],
-        factors_constraints = {'Q': 10}
-    ),
+#    MemLevel(
+#        name = "AccumulationOutRegister",
+#        size = 28,                  # FORZATURA "Accumulation REGF (28x32b)"      128/8 
+#        value_access_energy = 1.34, 
+#        bandwidth = 2*2,
+#        bypasses = ['in', 'w', ],
+#        dataflow_constraints = ['X0'],
+#        factors_constraints = {'X0': 10}
+#    ),
 
     ComputeLevel(
         name = "Compute",
