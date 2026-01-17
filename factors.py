@@ -317,18 +317,29 @@ class Coupling:
     Returns the flat coupling list for the provided operand.
     Valid operand names are: 'in', 'w', and 'out'.
     """
-    def flatCouplingByOperand(self, operand : str, layer_index: int = 0) -> list[str]:
+    def flatCouplingByOperand(self, operand : str, layer_index: Optional[int] = None) -> list[str]:
         if operand == 'in':
             return self.flat_in_coupling
         elif operand == 'w':
-            if layer_index in self.flat_w_coupling:
+            print(f"Getting flat weight coupling for layer {layer_index}")
+            if layer_index is not None and layer_index in self.flat_w_coupling:
                 return self.flat_w_coupling[layer_index]
+            if layer_index is None:
+                flat_w_coupling_entire = []
+                for layer_id in range(self.getNumLayers()):
+                    flat_w_coupling_entire.extend(self.flat_w_coupling[layer_id])
+                return flat_w_coupling_entire
             raise IndexError(f"Layer index {layer_index} not found in flat weight coupling.")
         elif operand == 'out':
             return self.flat_out_coupling
         elif operand == 'int':
-            if layer_index in self.flat_int_in_coupling:
+            if layer_index is not None and layer_index in self.flat_int_in_coupling:
                 return self.flat_int_in_coupling[layer_index]
+            if layer_index is None:
+                flat_int_coupling_entire = []
+                for layer_id in range(self.getNumLayers()-1):
+                    flat_int_coupling_entire.extend(self.flat_int_in_coupling[layer_id])
+                return flat_int_coupling_entire
             raise IndexError(f"Layer index {layer_index} not found in flat intermediate input/output coupling.")
         else:
             raise Exception(f"Unrecognized operand ({operand}) in coupling.")
@@ -342,15 +353,25 @@ class Coupling:
         return self.flat_in_coupling
 
     """Returns the weight coupling for a specific layer."""
-    def getWeightCoupling(self, layer_index: int) -> list[list[str]]:
+    def getWeightCoupling(self, layer_index: Optional[int] = None) -> list[list[str]]:
         if layer_index in self.w_coupling:
             return self.w_coupling[layer_index]
+        if layer_index is None:
+            w_coupling_entire = []
+            for layer_id in range(self.getNumLayers()):
+                w_coupling_entire.extend(self.w_coupling[layer_id])
+            return w_coupling_entire
         raise IndexError(f"Layer index {layer_index} not found in weight coupling.")
 
     """Returns the flat weight coupling for a specific layer."""           
-    def getFlatWeightCoupling(self, layer_index: int) -> list[str]:
+    def getFlatWeightCoupling(self, layer_index: Optional[int] = None) -> list[str]:
         if layer_index in self.flat_w_coupling:
             return self.flat_w_coupling[layer_index]
+        if layer_index is None:
+            flat_w_coupling_entire = []
+            for layer_id in range(self.getNumLayers()):
+                flat_w_coupling_entire.extend(self.flat_w_coupling[layer_id])
+            return flat_w_coupling_entire
         raise IndexError(f"Layer index {layer_index} not found in flat weight coupling.")
 
     """Returns the weight strides for a specific layer."""
@@ -360,27 +381,47 @@ class Coupling:
         raise IndexError(f"Layer index {layer_index} not found in weight strides.")
 
     """Returns the intermediate output coupling for a specific layer."""
-    def getIntermediateOutputCoupling(self, layer_index: int) -> list[list[str]]:
+    def getIntermediateOutputCoupling(self, layer_index: Optional[int] = None) -> list[list[str]]:
         if layer_index in self.int_out_coupling:
             return self.int_out_coupling[layer_index]
+        if layer_index is None:
+            int_out_coupling_entire = []
+            for layer_id in range(self.getNumLayers()-1):
+                int_out_coupling_entire.extend(self.int_out_coupling[layer_id])
+            return int_out_coupling_entire
         raise IndexError(f"Layer index {layer_index} not found in intermediate output coupling.")
 
     """Returns the flat intermediate output coupling for a specific layer."""
-    def getFlatIntermediateOutputCoupling(self, layer_index: int) -> list[str]:
+    def getFlatIntermediateOutputCoupling(self, layer_index: Optional[int] = None) -> list[str]:
         if layer_index in self.flat_int_out_coupling:
             return self.flat_int_out_coupling[layer_index]
+        if layer_index is None:
+            flat_int_out_coupling_entire = []
+            for layer_id in range(self.getNumLayers()-1):
+                flat_int_out_coupling_entire.extend(self.flat_int_out_coupling[layer_id])
+            return flat_int_out_coupling_entire
         raise IndexError(f"Layer index {layer_index} not found in flat intermediate output coupling.")
 
     """Returns the intermediate input coupling for a specific layer."""
-    def getIntermediateInputCoupling(self, layer_index: int) -> list[list[str]]:
+    def getIntermediateInputCoupling(self, layer_index: Optional[int] = None) -> list[list[str]]:
         if layer_index in self.int_in_coupling:
             return self.int_in_coupling[layer_index]
+        if layer_index is None:
+            int_in_coupling_entire = []
+            for layer_id in range(self.getNumLayers()-1):
+                int_in_coupling_entire.extend(self.int_in_coupling[layer_id])
+            return int_in_coupling_entire
         raise IndexError(f"Layer index {layer_index} not found in intermediate input coupling.")
     
     """Returns the flat intermediate input coupling for a specific layer."""
-    def getFlatIntermediateInputCoupling(self, layer_index: int) -> list[str]:
+    def getFlatIntermediateInputCoupling(self, layer_index: Optional[int] = None) -> list[str]:
         if layer_index in self.flat_int_in_coupling:
             return self.flat_int_in_coupling[layer_index]
+        if layer_index is None:
+            flat_int_in_coupling_entire = []
+            for layer_id in range(self.getNumLayers()-1):
+                flat_int_in_coupling_entire.extend(self.flat_int_in_coupling[layer_id])
+            return flat_int_in_coupling_entire
         raise IndexError(f"Layer index {layer_index} not found in flat intermediate input coupling.")
 
     """Returns the output coupling."""
@@ -635,6 +676,37 @@ class Factors(dict[str, dict[int, int]]):
     iterations unfolding over it)
     """
     def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1, int_bp: bool = 1) -> int:
+        ## TODO: General case: Fully Cached must be managed by the innermost dim sum (Q in DepFin), but for DepFiN is fixed
+        if Settings.FULLY_CACHED:
+            input_FC_size = 1
+            intermediate_input_FC_size = 1    
+            if arch.name == "DepFiN 10-Layer Architecture":
+                input_FC_size = tile_sizes['X0']*(tile_sizes['S0'] - arch.getInStride('S0')) * (self._dim_products['X0']-1) * tile_sizes['C0']
+                print(f"Input FC size: {input_FC_size}\n")
+                for layer_id in range(arch.coupling.getNumLayers() - 1):
+                    for dim_sum in arch.coupling.getIntermediateInputCoupling(layer_id):
+                        x_dim = 'X' + str(layer_id)
+                        s_dim = 'S' + str(layer_id)
+                        intermediate_input_FC_size += tile_sizes[x_dim]*(tile_sizes[s_dim] - (arch.getWStride(s_dim, layer_id)))* (self._dim_products[x_dim]-1) * tile_sizes['C' + str(layer_id)]
+                print(f"Intermediate Input FC size: {intermediate_input_FC_size}\n")
+            else:
+                # In case of Fully Cached, I need to store an entire row of input*(W_h-Stride_h)*C_input
+                for dim_sum in arch.coupling.in_coupling:
+
+                    if 'X0' in dim_sum: 
+                        print(f"tile_sizes[dim]: {[tile_sizes[dim] for dim in dim_sum]}, self._dim_products[dim]: {[self._dim_products[dim] for dim in dim_sum]}")
+                        input_FC_size *= distinct_values([tile_sizes[dim] for dim in dim_sum], [arch.getInStride(dim) for dim in dim_sum])
+                        input_FC_size *= prod(self._dim_products[dim] for dim in dim_sum)
+                        print(f"input_FC_size distinct: {input_FC_size}")
+                    if 'Y0' in dim_sum:
+                        for dim in dim_sum:
+                            if dim == 'R0':
+                                input_FC_size *= tile_sizes[dim] - arch.getInStride(dim)
+                    if 'C0' in dim_sum:
+                        input_FC_size *= tile_sizes['C0']     
+                print(f"Input FC size: {input_FC_size}\n")
+        input_FC_size *= in_bp
+        intermediate_input_FC_size *= int_bp 
         input_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.in_coupling)*in_bp
         print(f"Input size: {input_size}\n")
         output_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.out_coupling)*out_bp
@@ -645,12 +717,11 @@ class Factors(dict[str, dict[int, int]]):
         print(f"Intermediate input size: {intermediate_input_size}")
 #        intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
 #        intermediate_size = (intermediate_input_size + intermediate_output_size)*int_bp
-        print(f"int_bp: {int_bp}")
         intermediate_size = intermediate_input_size*int_bp
         print(f"Total intermediate size (input + output): {intermediate_size}\n")
         print(f"input_size: {input_size}, output_size: {output_size}, weight_size: {weight_size}, intermediate_size: {intermediate_size}")
-        print(f"Total mem footprint: {input_size + output_size + weight_size + intermediate_size}\n\n\n")
-        return input_size + output_size + weight_size + intermediate_size
+        print(f"Total mem footprint: {input_size + output_size + weight_size + intermediate_size + input_FC_size + intermediate_input_FC_size}\n\n\n")
+        return input_size + output_size + weight_size + intermediate_size + input_FC_size + intermediate_input_FC_size
         # TODO: uncomment me to fix invalid mappings!
         #return (prod(distinct_values([tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum], [arch.getInStride(dim) for dim in dim_sum]) for dim_sum in arch.coupling.in_coupling)*in_bp +
         #        prod(distinct_values([tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum], [arch.getWStride(dim) for dim in dim_sum]) for dim_sum in arch.coupling.w_coupling)*w_bp +

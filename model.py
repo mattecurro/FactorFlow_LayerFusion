@@ -48,6 +48,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     stall_cycles_per_layer = {layer_id: 0 for layer_id in range(num_layers)}
     latency_per_layer = {layer_id: 0 for layer_id in range(num_layers)}
     
+    WMOPs_another_check = 0
     # NOTE: here we compute total MOPs, not per-instance
     # Starting from Top (DRAM) to Bottom (Compute)
     for i in range(len(arch)):
@@ -82,6 +83,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             # multiply by spatial_iterations too, because memory is replicated spatially
             print("\n\nQuesto mops è chiamato da update stats")     
             print(f"Level: {level.name}, arch bypasses for the level: {level.bypasses}, in_bp: {level.in_bp}, w_bp: {level.w_bp}, out_bp: {level.out_bp}, int_bp: {level.int_bp}")      
+            #regime_mops = level.MOPs_Regime()
             level_mops = level.MOPs()
             in_reads, per_layer_w_reads, per_layer_int_in_reads, per_layer_int_out_reads, per_layer_int_out_writes, out_reads, out_writes, out_reads_factors = level_mops[:8]
             print(f"DEBUG updateStats pre scaling: Level {level.name}:"
@@ -89,8 +91,11 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                   f"\n  per_layer_w_reads: {per_layer_w_reads}"
                   f"\n  per_layer_int_in_reads: {per_layer_int_in_reads}"
                   f"\n  per_layer_int_out_reads: {per_layer_int_out_reads}"
+                  f"\n  per_layer_int_out_writes: {per_layer_int_out_writes}"
                   f"\n  out_reads: {out_reads}"
-                  f"\n  out_reads_factors: {out_reads_factors}")
+                  f"\n  out_writes: {out_writes}"
+                  f"\n  out_reads_factors: {out_reads_factors}"
+                  )
             scale_per_layer = {layer_id: temporal_iterations_per_layer[layer_id]*spatial_iterations_per_layer[layer_id] for layer_id in range(num_layers)}
             in_reads = in_reads * scale_per_layer[0]
             for layer_id, w_read in per_layer_w_reads.items():
@@ -105,13 +110,15 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             for layer_id, int_out_write in per_layer_int_out_writes.items():
                 per_layer_int_out_writes[layer_id] = int_out_write * scale_per_layer[layer_id]
             int_out_writes = sum(per_layer_int_out_writes.values())
+            out_writes = out_writes * scale_per_layer[num_layers - 1]
             out_reads = out_reads * scale_per_layer[num_layers - 1]
             out_reads_factors = level_mops[7]* acc_out_reads_factors
             ## TODO: check if there is a per_layer_int_out_reads_factors    
-            print(f"DEBUG: results after scaling: Level {level.name}: in_reads={in_reads}, w_reads={w_reads}, int_in_reads={int_in_reads}, int_out_reads={int_out_reads}, out_reads={out_reads}, out_reads_factors={out_reads_factors}")            
+            print(f"DEBUG: results after scaling: Level {level.name}: in_reads={in_reads}, w_reads={w_reads}, int_in_reads={int_in_reads}, int_out_reads={int_out_reads}, int_out_writes={int_out_writes}, out_writes={out_writes}, out_reads={out_reads}, out_reads_factors={out_reads_factors}")            
             # Adjust for bias read if needed, update writes, DRAINS management
             if not bias_read and out_reads_factors != 0:
                 out_reads = (out_reads*(out_reads_factors - 1))//out_reads_factors
+                print(f"DEBUG: Level {level.name} adjusted out_reads for no bias read: {out_reads}")
             ## TODO: possible add of bias read for intermediate outputs? I think so
             if 'in' not in level.bypasses:
                 in_writes = last_in_reads # reads of the above level are written here
@@ -139,8 +146,10 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 #level.setAboveMOPs(last_int_out_reads=last_per_layer_int_out_reads, last_int_out_writes=last_per_layer_int_out_writes)
                 level.setAboveMOPs(last_per_layer_int_out_reads=last_per_layer_int_out_reads, last_per_layer_int_out_writes=last_per_layer_int_out_writes)                    
                 for layer_id in range(num_layers - 1):
-                    per_layer_int_in_writes[layer_id-1] = last_per_layer_int_in_reads.get(layer_id-1, 0) # reads of the above level are written here
-                    last_per_layer_int_in_reads[layer_id-1] = per_layer_int_in_reads.get(layer_id-1, 0)
+                    ## Potential BUG
+                    per_layer_int_in_writes[layer_id] = last_per_layer_int_in_reads.get(layer_id, 0) # reads of the above level are written here
+                    last_per_layer_int_in_reads[layer_id] = per_layer_int_in_reads.get(layer_id, 0)
+                    
                     per_layer_int_out_reads[layer_id] += last_per_layer_int_out_writes.get(layer_id, 0) # writes above are read here
                     last_per_layer_int_out_writes[layer_id] = per_layer_int_out_writes.get(layer_id, 0)
                     if not Settings.FREE_DRAINS:
@@ -151,15 +160,17 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 level.setAboveMOPs(last_per_layer_int_out_reads={layer_id: 0 for layer_id in range(num_layers - 1)}, last_per_layer_int_out_writes={layer_id: 0 for layer_id in range(num_layers - 1)})
                 per_layer_int_in_writes = {layer_id: 0 for layer_id in range(num_layers - 1)}
             print(f"DEBUG updateStats post scaling: Level {level.name}:"
-                  f"\n  in_reads: {in_reads}"
+                  f"\n  in_reads: {in_reads:,.0f}"
                   f"\n  per_layer_w_reads: {per_layer_w_reads}"
-                  f"\n  w_reads: {w_reads}"
+                  f"\n  w_reads: {w_reads:,.0f}"
                   f"\n  per_layer_int_in_reads: {per_layer_int_in_reads}"
                   f"\n  per_layer_int_in_writes: {per_layer_int_in_writes}"
-                  f"\n  int_in_reads: {int_in_reads}"
+                  f"\n  int_in_reads: {int_in_reads:,.0f}"
                   f"\n  per_layer_int_out_reads: {per_layer_int_out_reads}"
-                  f"\n  int_out_reads: {int_out_reads}"
-                  f"\n  out_reads: {out_reads}"
+                  f"\n  per_layer_int_out_writes: {per_layer_int_out_writes}"
+                  f"\n  int_out_reads: {int_out_reads:,.0f}"
+                  f"\n  out_reads: {out_reads:,.0f}"
+                  f"\n  out_writes: {out_writes:,.0f}"
                   f"\n  out_reads_factors: {out_reads_factors}")
             ## Update level MOPs
             level.setMOPs(
@@ -177,27 +188,43 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             level.temporal_iterations_per_layer = temporal_iterations_per_layer.copy()
             level.temporal_iterations = temporal_iterations
             # Calculate total reads and writes for energy calculation
+            #if level.name == "DRAM":
+            #    in_reads = 2760960+12870
+            #    w_reads = 84320            
             total_reads = in_reads + w_reads + int_in_reads + int_out_reads + out_reads
             total_writes = in_writes + sum(per_layer_w_writes.values()) + sum(per_layer_int_in_writes.values()) + int_out_writes + out_writes
             print(f"in_writes: {in_writes}, w_writes: {sum(per_layer_w_writes.values())}, int_in_writes: {sum(per_layer_int_in_writes.values())}, int_out_writes: {int_out_writes}, out_writes: {out_writes}")
             level.active_instances_per_layer = spatial_iterations_per_layer.copy()
             level.active_instances = spatial_iterations
             # Calculate WMOPs per layer
-            if num_layers > 1:
+            if num_layers > 1:    
                 for layer_id in range(num_layers):
+                    print(f"WMOPs_per_layer[{layer_id}]: {WMOPs_per_layer[layer_id]:,.3f} before adding level {level.name} contribution")
                     if layer_id == 0:
                         layer_total_reads = in_reads + per_layer_w_reads[layer_id] + per_layer_int_out_reads[layer_id]
                         layer_total_writes = in_writes + per_layer_w_writes[layer_id] + per_layer_int_out_writes[layer_id]
                     elif layer_id == num_layers - 1:
                         layer_total_reads = per_layer_int_in_reads[layer_id - 1] + per_layer_w_reads[layer_id] + out_reads
+                        print(f"DEBUG: Level {level.name}, Layer {layer_id}, per_layer_int_in_reads{layer_id - 1}: {per_layer_int_in_reads[layer_id - 1]}, per_layer_w_reads{layer_id}: {per_layer_w_reads[layer_id]}, out_reads: {out_reads}")
                         layer_total_writes = per_layer_int_in_writes[layer_id - 1] + per_layer_w_writes[layer_id] + out_writes
                     else:
                         layer_total_reads = per_layer_int_in_reads[layer_id-1] + per_layer_w_reads[layer_id] + per_layer_int_out_reads[layer_id]
                         layer_total_writes = per_layer_int_in_writes[layer_id-1] + per_layer_w_writes[layer_id] + per_layer_int_out_writes[layer_id]
                     total_reads_per_layer[layer_id] = layer_total_reads
                     total_writes_per_layer[layer_id] = layer_total_writes
+                    print(f"Level {level.name}, Layer {layer_id}: total_reads = {layer_total_reads}, total_writes = {layer_total_writes}")
                     WMOPs_per_layer[layer_id] += level.WMOPs(layer_total_reads, layer_total_writes)
+                    print(f"Level {level.name} WMOPs_per_layer[{layer_id}]: {level.WMOPs(layer_total_reads, layer_total_writes):,.3f}")
+                    print(f"Level {level.name} Accumulated WMOPs_per_layer: {WMOPs_per_layer[layer_id]:,.3f}")
                 WMOPs = sum(WMOPs_per_layer.values())
+                print(f"WMOPs_another_check before: {WMOPs_another_check:,.3f}")
+                WMOPs_another_check += level.WMOPs(total_reads, total_writes)
+                print(f"Total_read: {total_reads}: in_reads={in_reads}, w_reads={w_reads}, int_in_reads={int_in_reads}, int_out_reads={int_out_reads}, out_reads={out_reads}")
+                print(f"Per Layer Total reads: {total_reads_per_layer}, total: {sum(total_reads_per_layer.values())}")  
+                print(f"Total_writes: {total_writes}: in_writes={in_writes}, w_writes={sum(per_layer_w_writes.values())}, int_in_writes={sum(per_layer_int_in_writes.values())}, int_out_writes={int_out_writes}, out_writes={out_writes}")
+                print(f"Per Layer Total writes: {total_writes_per_layer}, \n total: {sum(total_writes_per_layer.values())}")          
+                print(f"Level {level.name} total WMOPs from per layer sum: {WMOPs:,.3f}")
+                print(f"Level {level.name} total WMOPs from total reads/writes: {WMOPs_another_check:,.3f}")
             else:
                 total_reads = in_reads + w_reads + out_reads
                 WMOPs += level.WMOPs(total_reads, total_writes)            
@@ -223,6 +250,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     # Update last_operand_reads accordingly
                     for dim in level.dataflow_per_layer[layer_id]:
                         layer_iterations = level.factors.dimProduct(dim)
+                        print(f"Fanout Level {level.name}, Layer {layer_id}, dim {dim}, layer_iterations: {layer_iterations}")
                         # Layer 0: has input and intermediate output
                         if layer_id == 0:
                             if dim not in arch.coupling.getFlatInputCoupling():
@@ -262,6 +290,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         last_w_reads *= layer_iterations
             print(f"Updated considering level: {level.name}")
         elif isinstance(level, ComputeLevel):
+            print("\n\nCalculating WMOPs for Compute Level")
             # TODO: remove cost of first output accumulate if bias_read is False!
             # => not needed because the cost of the add is << than the multiply!
             level.temporal_iterations_per_layer = temporal_iterations_per_layer.copy()
@@ -272,12 +301,14 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 WMOPs_per_layer[layer_id] += level.computeCostPerLayer(layer_id, temporal_iterations_per_layer[layer_id]*level.active_instances_per_layer[layer_id])
             print(f"Compute Level {level.name} WMOPs_per_layer: {WMOPs_per_layer}")
             ## TODO Comparison check
+            print(f"WMOPs_till_now before compute level: {WMOPs:,.3f}")
             sum_WMOPS = sum(WMOPs_per_layer.values())
             print(f"Compute Level {level.name} total WMOPs from per layer sum: {sum_WMOPS}")
-            WMOPs += level.computeCost(temporal_iterations*spatial_iterations)
-            print(f"Compute Level {level.name} total WMOPs: {WMOPs}")
+            standard_WMOPs = level.computeCost(temporal_iterations*spatial_iterations)
+            print(f"Compute Level {level.name} total WMOPs: {standard_WMOPs}")
             ## TODO check if this is the correect one, I think so
-            WMOPs = sum_WMOPS
+            WMOPs += sum_WMOPS
+            print(f"Total WMOPs after adding compute level: {WMOPs}")
             # compute is meant to be the innermost level
             break
     print("END FIRST PART OF UPDATE STATS\n\n")
@@ -469,10 +500,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 ## TODO: big big big doubt, max latency===??????
                 # For latency, use the maximum temporal iterations across all layers
                 max_temporal = max(temporal_iterations_per_layer.values())
-                print(f"level.latency(): {level.latency():,.0f}")
-                print(f"alternative: {level.latency()*max_temporal}")
                 max_latency = max(max_latency, level.latency() * max_temporal)
-                print(f"max_latency after fanout_level: {max_latency}")
             else:
                 ## TODO: Problem of latency calculation with multiple layers
     #            if num_layers > 1:
@@ -574,7 +602,13 @@ def Energy(arch : Arch, pJ_to_uJ : bool = False) -> float:
     WMOPs = 0
     for level in arch:
         if isinstance(level, MemLevel):
+            num_layers = arch.coupling.getNumLayers()
+            if level.name == "DRAM":
+                level.in_reads = 2760960+12870
+                level.w_reads = 84320            
             reads = level.in_reads + level.w_reads + level.out_reads + level.int_in_reads + level.int_out_reads
+            if level.name == "DRAM":
+                print(f"DRAM Reads: {reads}: in:{level.in_reads}, w:{level.w_reads}, out:{level.out_reads}, int_in:{level.int_in_reads}, int_out:{level.int_out_reads}")
             writes = level.in_writes + level.w_writes + level.out_writes + level.int_in_writes + level.int_out_writes
             WMOPs += level.WMOPs(reads, writes)
         elif isinstance(level, FanoutLevel):

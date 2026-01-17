@@ -222,12 +222,22 @@ def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
             tot_reads += reads
             tot_writes += writes
             ## to fix
+            print(f"DEBUG: Calculating WMOPs for level {level.name} with reads={reads}, writes={writes}")
             WMOPs += level.WMOPs(reads, writes)
+            print(f"DEBUG: WMOPs for level {level.name} = {WMOPs:,.3f}, {WMOPs:,.3e} pJ")
+            """
+            # WMOPs per layer
+            for layer_id in range(num_layers):
+                layer_reads = level.getReadPerLayer(layer_id)
+                layer_writes = level.getUpdatePerLayer(layer_id)
+                WMOPs_per_layer[layer_id] += level.WMOPs(layer_reads, layer_writes)
+                print(f"DEBUG: Layer {layer_id} - Reads: {layer_reads}, Writes: {layer_writes}, WMOPs so far: {WMOPs_per_layer[layer_id]}")
+            """
         elif isinstance(level, FanoutLevel):
             continue
         elif isinstance(level, ComputeLevel):
-            ## to fix
-            WMOPs += level.computeCost(level.temporal_iterations*level.active_instances)
+            for layer_id in range(arch.coupling.getNumLayers()):
+                WMOPs += level.computeCostPerLayer(layer_id, level.temporal_iterations_per_layer[layer_id] * level.active_instances_per_layer[layer_id])
             break
     print(f"Totals:\t\t{tot_reads:,.0f} R, {tot_writes:,.0f} W, {tot_reads+tot_writes:,.0f} Tot")
     print(f"Energy:\t\t{WMOPs*10**-6:,.3f} uJ")

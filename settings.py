@@ -15,8 +15,9 @@ class Settings(metaclass = MetaSettings):
     # section of the program, set to False for accurate timing results.
     VERBOSE = True
     
-    # MAPPER SETTINGS:
     
+    # MAPPER SETTINGS:
+    FULLY_CACHED = True
     # If False, FF only searches for better solutions at a one-factor distance from the current one,
     # if True, FF searches for solutions at a distance of multiple factors, all be it only arity is
     # varied, with the tried factor being just one. (tries different multiplicities)
