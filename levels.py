@@ -1757,7 +1757,7 @@ class MemLevel(Level):
                                 vprint(f"Stationarity to address from above w_reads_bp: {stationarity_to_address}")
                                 if stationarity_to_address:
                                     for layer_idx in range(num_layers):
-                                        layer_read = 1
+                                        layer_read = per_layer_w_reads_bp[layer_idx]
                                         i = len(actual_dataflow_per_layer_bp[layer_idx]) - 1
                                         while i >= 0 and (actual_dataflow_per_layer_bp[layer_idx][i] not in self.arch.coupling.getFlatWeightCoupling(layer_idx)):
                                             i -= 1
@@ -1784,7 +1784,7 @@ class MemLevel(Level):
                             if int_in_reads_bp:
                                 if stationarity_to_address:
                                     for layer_id in range(num_layers-1):
-                                        layer_read = 1
+                                        layer_read = per_layer_int_in_reads_bp[layer_id]
                                         i = len(actual_dataflow_per_layer_bp[layer_id + 1]) - 1
                                         while i >= 0 and (actual_dataflow_per_layer_bp[layer_id + 1][i] not in self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)):
                                             i -= 1
@@ -1804,10 +1804,11 @@ class MemLevel(Level):
                                     int_in_reads_bp = sum(per_layer_int_in_reads_bp.values())                            
                             # Handle intermediate output bypasses                         
                             if int_out_reads_bp:
+                                print(f"per_layer_int_out_reads_bp before handling bypass: {per_layer_int_out_reads_bp}, per_layer_int_out_writes_bp before handling bypass: {per_layer_int_out_writes_bp}")
                                 if stationarity_to_address:
                                     for layer_id in range(num_layers-1):
-                                        layer_read = 1
-                                        layer_write = 1
+                                        layer_read = per_layer_int_out_reads_bp[layer_id]
+                                        layer_write = per_layer_int_out_writes_bp[layer_id]
                                         i = len(actual_dataflow_per_layer_bp[layer_id]) - 1
                                         while i >= 0 and (actual_dataflow_per_layer_bp[layer_id][i] not in self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id)):
                                             i -= 1

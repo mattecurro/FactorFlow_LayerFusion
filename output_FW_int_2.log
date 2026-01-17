@@ -22,8 +22,8 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'R0', 'Z10', 'Y0', 'R10', 'X0', 'C0', 'S10', 'C10', 'P', 'Q', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'P', 'Q', 'Z10']
-INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'Z6', 'Z4', 'S7', 'C9', 'R5', 'C1', 'Y8', 'Z9', 'X2', 'S5', 'R7', 'Z0', 'S9', 'X5', 'Z8', 'Y2', 'S4', 'R6', 'X6', 'Y3', 'S2', 'C3', 'R3', 'Z7', 'C6', 'C4', 'S6', 'Z2', 'R2', 'X9', 'C8', 'Z1', 'R1', 'R8', 'Y5', 'X7', 'Y1', 'X1', 'Z3', 'S3', 'X4', 'R9', 'Y4', 'Z5', 'C7', 'C5', 'Y7', 'C2', 'X8', 'Y9', 'X3', 'R4', 'S1', 'S8', 'Y6'}
+final_layer_dims: {'C0', 'C10', 'Z10', 'Q', 'S0', 'R10', 'P', 'S10', 'R0', 'X0', 'Y0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'P', 'Q', 'Z10']
+INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'C2', 'R1', 'Y6', 'Y3', 'X9', 'C4', 'Z2', 'Z4', 'R5', 'Y1', 'Y4', 'Z5', 'X4', 'X8', 'S2', 'Z1', 'C6', 'Y8', 'S7', 'Z3', 'C7', 'Z9', 'S8', 'X6', 'S3', 'R4', 'X5', 'Z8', 'R9', 'R3', 'S1', 'C9', 'C5', 'R7', 'Z6', 'C8', 'Y9', 'X2', 'Z0', 'S5', 'R6', 'Y7', 'X7', 'R2', 'S9', 'Y2', 'C3', 'X1', 'Y5', 'R8', 'X3', 'S6', 'C1', 'Z7', 'S4'}
 Starting engine with mapper: breadthfirst_local
 
 WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.
@@ -13336,7 +13336,7 @@ max_latency after compute: 625,389,382, before fanout_level
 DRAM Reads: 2858150: in:2773830, w:84320, out:0, int_in:0, int_out:0
 self.read_access_energy: 2, self.write_access_energy: 2, reads: 82551398400, writes: 77717736000
 
-Finished in: 0.224s
+Finished in: 0.108s
 
 Best mapping found with:
 	Wart: 7.929e+86
