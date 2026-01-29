@@ -657,7 +657,7 @@ class Arch(list[Level]):
     """
     def setupBypasses(self) -> None:
         # bypasses at the initial level simply skip the cost of operands
-        for bypass in ['in', 'w', 'out', 'int']:
+        for bypass in ['in', 'w', 'out', 'int_in', 'int_out']:
             # if the first MemLevel has a bypass, no need to initialize it, just let it
             # affect its internal MOPs computation and that's it!
             last_before_bypass = 0

@@ -11,7 +11,7 @@ from settings import *
 from factors import *
 from levels import *
 from prints import *
-from model import *
+from cost_model import *
 from utils import *
 from arch import *
 from heuristic_check import ConvolutionScheduleValidator
@@ -216,7 +216,7 @@ def pickBestPermsIteratively(arch : Arch) -> None:
     # Once the level handling the dataflow has been found, the amount of reuse is still ONLY determined by the tile sizes at THAT level and
     # the iterations across which the reuse occurs. HENCE it is only a question of determining which of the three operands whe should consider
     # when computing reuse on a level, then the reuse calculations can be made locally to the level.
-    levels_handling_bypass_dataflows = {'in': None, 'w': None, 'out': None, 'int': None} # operand->level_idx, for a bypassed operand, indicates the first level iterating on a dimension coupled to it, that is, the level solving the bypass's dataflow
+    levels_handling_bypass_dataflows = {'in': None, 'w': None, 'out': None, 'int_in': None, 'int_out': None} # operand->level_idx, for a bypassed operand, indicates the first level iterating on a dimension coupled to it, that is, the level solving the bypass's dataflow
     mem_levels = list(filter(lambda l : isinstance(l, MemLevel), arch))
     for i in range(len(mem_levels)):
         level = mem_levels[i]
@@ -231,9 +231,8 @@ def pickBestPermsIteratively(arch : Arch) -> None:
         in_matters = 'in' not in level.bypasses or levels_handling_bypass_dataflows['in'] == i
         w_matters = 'w' not in level.bypasses or levels_handling_bypass_dataflows['w'] == i
         out_matters = 'out' not in level.bypasses or levels_handling_bypass_dataflows['out'] == i
-        int_matters = 'int' not in level.bypasses or levels_handling_bypass_dataflows['int'] == i
-        int_in_matters = int_matters
-        int_out_matters = int_matters
+        int_in_matters = 'int_in' not in level.bypasses or levels_handling_bypass_dataflows['int_in'] == i
+        int_out_matters = 'int_out' not in level.bypasses or levels_handling_bypass_dataflows['int_out'] == i
         ## DEBUG!! THIS IS AN ERROR NOW!!
         if len(dims_not_at_one) == 2: # two dimension iterated, pick the best order between them
             dims_at_one = [dim for dim in arch.coupling.dims if level.factors.dimProduct(dim) == 1]
@@ -313,7 +312,7 @@ Adjacency: two mappings are adjacent if one can be constructed from the other
            same dimension.
 """
 def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = True) -> tuple[Arch, float, int]:
-    if verbose: print("-------- factorFlow --------")
+    if verbose: print("-------- factorFlow -------- CIAO")
     already_initialized = arch.initialized
     if not already_initialized:
         ## THIS IS A PROBLEM FOR THE CONSTRAINT
@@ -322,6 +321,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Tru
         ## ADD a skip_heuristic_check in factorFlow
 #        if not arch.validate_mapping_heuristic():
 #            assert False, f"Initial mapping is invalid for the provided model and architecture."
+    print("Arch after initialization:")
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
     if verbose: print(f"Initial condition (Wart: {Wart(arch, comp, bias_read):.3e}):")
     if verbose: printFactors(arch)
@@ -333,6 +333,7 @@ def factorFlow(arch : Arch, comp : Shape, bias_read : bool, verbose : bool = Tru
     already_seen = {arch.hashFromFactors(ignore_dataflows = True, return_string = True): 0} # mapping hash -> moves to reach it
     # one-factor-steps greedy optimization
     best_wart = Wart(arch, comp, bias_read)
+    print("CIAO!")
     updateStats(arch, bias_read)
     if verbose: print(f"\nFinal condition: \nWart: {best_wart:.3e}\nEDP: {EDP(arch, bias_read, True):.3e} (J*cycle)")
 
@@ -628,7 +629,7 @@ def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : 
                 )
                 # considering skipped dimensions and halo reuse, for each operand changing order of loops before and after the innermost iterated dimension coupled to the operand doesn't impact reuse, while such innermost dimension dictates the halo reuse (if a dimsum is present)
                 # => remove permutations with a different order of loops inside those determining the dataflow or outside them for each operand
-                dimsums_flags = [int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.getInputCoupling()), int(w_has_dimsum), int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.getFlatOutCoupling())))]
+                dimsums_flags = [int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.getInputCoupling()), int(w_has_dimsum), int(any(isinstance(dimsum, list) and len(dimsum) > 1 for dimsum in arch.coupling.getFlatOutputCoupling())))]
                 candidate_perms = filter_equivalent_perms(candidate_perms, coupling_sets, dimsums_flags)
             else:
                 # same as above, but we don't have halo reuse

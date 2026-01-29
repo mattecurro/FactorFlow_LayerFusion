@@ -329,34 +329,44 @@ from at least one combination of valid x_i-s.
 Here 'Xs' and 'x_consts' are lists containing the above n values.
 """
 def distinct_values(Xs : list[int], x_consts : list[int]) -> int:
-    if len(Xs) == 1: # trivial case
-        return Xs[0]
-    elif (cnt := Xs.count(1)) == len(Xs): # all x_i ranges contain only 0
-        return 1
-    elif not Settings.OVERESTIMATE_DISTINCT_VALUES and cnt == len(Xs) - 1: # all but one x_i ranges contain only 0
-        return next((X for X in Xs if X != 1), 1)
-    elif all(x_const == 1 for x_const in x_consts): # all coefficients are 1
-        return sum(Xs) - len(Xs) + 1
+    if Settings.FULLY_CACHED == True:
+        product = 1
+        # I extract only the first because of the order of dim_sum list
+        for X in Xs:
+            product *= X
+            #exit from the loop
+            break
+        print(f"CIAO disti: {product}")
+        return product
     else:
-        g = math.gcd(*x_consts)
-        # remove any common denominator
-        x_consts = list(map(lambda cst : cst//g, x_consts))
-        if len(Xs) == 2:
-            if Settings.OVERESTIMATE_DISTINCT_VALUES: # simpler formula which slightly overestimates the count of distinct values (this is used by Timeloop)
-                return (x_consts[0]*(Xs[0] - 1) + x_consts[1]*(Xs[1] - 1)) + 1
-            elif Xs[0] >= x_consts[1] and Xs[1] >= x_consts[0]: # Frobenius coin problem approach - case of negative-y lattice box fully contained in the valid box
-                return (Xs[0]-1)*x_consts[0]+(Xs[1]-1)*x_consts[1]+1 - (x_consts[0]-1)*(x_consts[1]-1) #+1 is because we count 0 too
-            else: # Frobenius coin problem approach - case of all valid lattice point being distinct values (x_costs vector can't fit in the valid box)
-                return Xs[0]*Xs[1]
-        else: # general case, count all distinct values with dynamic programming
-            step_0 = x_consts[0]
-            current_values = set(range(0, step_0*Xs[0], step_0))
-            for i in range(1, len(x_consts)):
-                step = x_consts[i]
-                X = Xs[i]
-                additions = {v + step*x for v in current_values for x in range(X)}
-                current_values.update(additions)
-            return len(current_values)
+        if len(Xs) == 1: # trivial case
+            return Xs[0]
+        elif (cnt := Xs.count(1)) == len(Xs): # all x_i ranges contain only 0
+            return 1
+        elif not Settings.OVERESTIMATE_DISTINCT_VALUES and cnt == len(Xs) - 1: # all but one x_i ranges contain only 0
+            return next((X for X in Xs if X != 1), 1)
+        elif all(x_const == 1 for x_const in x_consts): # all coefficients are 1
+            return sum(Xs) - len(Xs) + 1
+        else:
+            g = math.gcd(*x_consts)
+            # remove any common denominator
+            x_consts = list(map(lambda cst : cst//g, x_consts))
+            if len(Xs) == 2:
+                if Settings.OVERESTIMATE_DISTINCT_VALUES: # simpler formula which slightly overestimates the count of distinct values (this is used by Timeloop)
+                    return (x_consts[0]*(Xs[0] - 1) + x_consts[1]*(Xs[1] - 1)) + 1
+                elif Xs[0] >= x_consts[1] and Xs[1] >= x_consts[0]: # Frobenius coin problem approach - case of negative-y lattice box fully contained in the valid box
+                    return (Xs[0]-1)*x_consts[0]+(Xs[1]-1)*x_consts[1]+1 - (x_consts[0]-1)*(x_consts[1]-1) #+1 is because we count 0 too
+                else: # Frobenius coin problem approach - case of all valid lattice point being distinct values (x_costs vector can't fit in the valid box)
+                    return Xs[0]*Xs[1]
+            else: # general case, count all distinct values with dynamic programming
+                step_0 = x_consts[0]
+                current_values = set(range(0, step_0*Xs[0], step_0))
+                for i in range(1, len(x_consts)):
+                    step = x_consts[i]
+                    X = Xs[i]
+                    additions = {v + step*x for v in current_values for x in range(X)}
+                    current_values.update(additions)
+                return len(current_values)
 
 
 # >>> Miscellaneus support data structures and classes

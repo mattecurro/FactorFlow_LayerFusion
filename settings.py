@@ -16,6 +16,7 @@ class Settings(metaclass = MetaSettings):
     VERBOSE = True
     
     
+    
     # MAPPER SETTINGS:
     FULLY_CACHED = True
     # If False, FF only searches for better solutions at a one-factor distance from the current one,
@@ -129,9 +130,7 @@ class Settings(metaclass = MetaSettings):
     # "/home/<username>/.local/lib/python3.X/site-packages/"
     # FactorFlow has been tested with commit 'd1d199e571e621ce11168efe1af2583dec0c2c49' of Accelergy.
     # NOTE: this is NOT required if you have installed Accelergy as a python package and can import it.
-    ACCELERGY_PATH = "\\\\wsl.localhost/Ubuntu-22.04/home/zero/.local/lib/python3.10/site-packages"
-    
-    # ENGINE SETTINGS:
+    ACCELERGY_PATH = "/home/matteo/.local/lib/python3.10/site-packages"
     
     # The mapper to import as part of the map-space exploration engine. Alternative mappers can
     # be found in the folder "./mappers", use the name of the python file for this setting.

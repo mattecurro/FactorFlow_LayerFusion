@@ -1862,13 +1862,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]:
 self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 796305600
 level.getReadPerLayer[0](): 796,305,600
 ideal_bandwidth_read_per_layer[0]: 1.0000542534722223
-level.getDrainPerLayer[0](): 43,200
+level.getDrainPerLayerTotal[0](): 43,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 796,262,400
 ideal_bandwidth_update_per_layer[0]: 1.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: AccumulationOutRegister
@@ -1882,7 +1882,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=8,497,612,800, last_per_layer_int_out_writes[1]=4,147,200
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
-level.getDrainPerLayer[1](): 4,147,200
+level.getDrainPerLayerTotal[1](): 4,147,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
@@ -1890,7 +1890,7 @@ level.getUpdatePerLayer[1](): 8,493,465,600
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 33,177,600
+level.getFillPerLayerTotal[1](): 33,177,600
 ideal_bandwidth_fill_per_layer[1]: 0.00390625
 
 Latency for layer: 2 of Level: AccumulationOutRegister
@@ -1902,13 +1902,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 8,493,465,600
 level.getReadPerLayer[2](): 16,986,931,200
 ideal_bandwidth_read_per_layer[2]: 2.0
-level.getDrainPerLayer[2](): 4,147,200
+level.getDrainPerLayerTotal[2](): 4,147,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 33,177,600
+level.getFillPerLayerTotal[2](): 33,177,600
 ideal_bandwidth_fill_per_layer[2]: 0.00390625
 
 Latency for layer: 3 of Level: AccumulationOutRegister
@@ -1920,11 +1920,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 8,493,465,600
 level.getReadPerLayer[3](): 16,986,931,200
 ideal_bandwidth_read_per_layer[3]: 2.0
-level.getDrainPerLayer[3](): 4,147,200
+level.getDrainPerLayerTotal[3](): 4,147,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 33,177,600
+level.getFillPerLayerTotal[3](): 33,177,600
 ideal_bandwidth_fill_per_layer[3]: 0.00390625
 
 Latency for layer: 4 of Level: AccumulationOutRegister
@@ -1936,11 +1936,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 8,493,465,600
 level.getReadPerLayer[4](): 16,986,931,200
 ideal_bandwidth_read_per_layer[4]: 2.0
-level.getDrainPerLayer[4](): 4,147,200
+level.getDrainPerLayerTotal[4](): 4,147,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 33,177,600
+level.getFillPerLayerTotal[4](): 33,177,600
 ideal_bandwidth_fill_per_layer[4]: 0.00390625
 
 Latency for layer: 5 of Level: AccumulationOutRegister
@@ -1952,11 +1952,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 8,493,465,600
 level.getReadPerLayer[5](): 16,986,931,200
 ideal_bandwidth_read_per_layer[5]: 2.0
-level.getDrainPerLayer[5](): 4,147,200
+level.getDrainPerLayerTotal[5](): 4,147,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 33,177,600
+level.getFillPerLayerTotal[5](): 33,177,600
 ideal_bandwidth_fill_per_layer[5]: 0.00390625
 
 Latency for layer: 6 of Level: AccumulationOutRegister
@@ -1968,11 +1968,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 8,493,465,600
 level.getReadPerLayer[6](): 16,986,931,200
 ideal_bandwidth_read_per_layer[6]: 2.0
-level.getDrainPerLayer[6](): 4,147,200
+level.getDrainPerLayerTotal[6](): 4,147,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 33,177,600
+level.getFillPerLayerTotal[6](): 33,177,600
 ideal_bandwidth_fill_per_layer[6]: 0.00390625
 
 Latency for layer: 7 of Level: AccumulationOutRegister
@@ -1984,11 +1984,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 8,493,465,600
 level.getReadPerLayer[7](): 16,986,931,200
 ideal_bandwidth_read_per_layer[7]: 2.0
-level.getDrainPerLayer[7](): 4,147,200
+level.getDrainPerLayerTotal[7](): 4,147,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 33,177,600
+level.getFillPerLayerTotal[7](): 33,177,600
 ideal_bandwidth_fill_per_layer[7]: 0.00390625
 
 Latency for layer: 8 of Level: AccumulationOutRegister
@@ -2000,11 +2000,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 8,493,465,600
 level.getReadPerLayer[8](): 16,986,931,200
 ideal_bandwidth_read_per_layer[8]: 2.0
-level.getDrainPerLayer[8](): 4,147,200
+level.getDrainPerLayerTotal[8](): 4,147,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 33,177,600
+level.getFillPerLayerTotal[8](): 33,177,600
 ideal_bandwidth_fill_per_layer[8]: 0.00390625
 
 Latency for layer: 9 of Level: AccumulationOutRegister
@@ -2016,11 +2016,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 471,859,200
 level.getReadPerLayer[9](): 928,972,800
 ideal_bandwidth_read_per_layer[9]: 1.96875
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 10
 ideal_bandwidth_update_per_layer[9]: 2.1192762586805556e-08
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -2169,13 +2169,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_read
 self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_reads[0]: 0
 level.getReadPerLayer[0](): 388,800
 ideal_bandwidth_read_per_layer[0]: 1.0
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 0
 ideal_bandwidth_update_per_layer[0]: 0.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 6,220,800
+level.getFillPerLayerTotal[0](): 6,220,800
 ideal_bandwidth_fill_per_layer[0]: 16.0
 
 Latency for layer: 1 of Level: WeightMemory
@@ -2189,7 +2189,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, per_layer_int_out_reads[1]=0, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
@@ -2197,7 +2197,7 @@ level.getUpdatePerLayer[1](): 0
 ideal_bandwidth_update_per_layer[1]: 0.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 66,355,200
+level.getFillPerLayerTotal[1](): 66,355,200
 ideal_bandwidth_fill_per_layer[1]: 16.0
 
 Latency for layer: 2 of Level: WeightMemory
@@ -2209,13 +2209,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
 ideal_bandwidth_read_per_layer[2]: 1.0
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 0
 ideal_bandwidth_update_per_layer[2]: 0.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 66,355,200
+level.getFillPerLayerTotal[2](): 66,355,200
 ideal_bandwidth_fill_per_layer[2]: 16.0
 
 Latency for layer: 3 of Level: WeightMemory
@@ -2227,11 +2227,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
 ideal_bandwidth_read_per_layer[3]: 1.0
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 0
 ideal_bandwidth_update_per_layer[3]: 0.0
-level.getFillPerLayer[3](): 66,355,200
+level.getFillPerLayerTotal[3](): 66,355,200
 ideal_bandwidth_fill_per_layer[3]: 16.0
 
 Latency for layer: 4 of Level: WeightMemory
@@ -2243,11 +2243,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
 ideal_bandwidth_read_per_layer[4]: 1.0
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 0
 ideal_bandwidth_update_per_layer[4]: 0.0
-level.getFillPerLayer[4](): 66,355,200
+level.getFillPerLayerTotal[4](): 66,355,200
 ideal_bandwidth_fill_per_layer[4]: 16.0
 
 Latency for layer: 5 of Level: WeightMemory
@@ -2259,11 +2259,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
 ideal_bandwidth_read_per_layer[5]: 1.0
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 0
 ideal_bandwidth_update_per_layer[5]: 0.0
-level.getFillPerLayer[5](): 66,355,200
+level.getFillPerLayerTotal[5](): 66,355,200
 ideal_bandwidth_fill_per_layer[5]: 16.0
 
 Latency for layer: 6 of Level: WeightMemory
@@ -2275,11 +2275,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
 ideal_bandwidth_read_per_layer[6]: 1.0
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 0
 ideal_bandwidth_update_per_layer[6]: 0.0
-level.getFillPerLayer[6](): 66,355,200
+level.getFillPerLayerTotal[6](): 66,355,200
 ideal_bandwidth_fill_per_layer[6]: 16.0
 
 Latency for layer: 7 of Level: WeightMemory
@@ -2291,11 +2291,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
 ideal_bandwidth_read_per_layer[7]: 1.0
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 0
 ideal_bandwidth_update_per_layer[7]: 0.0
-level.getFillPerLayer[7](): 66,355,200
+level.getFillPerLayerTotal[7](): 66,355,200
 ideal_bandwidth_fill_per_layer[7]: 16.0
 
 Latency for layer: 8 of Level: WeightMemory
@@ -2307,11 +2307,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
 ideal_bandwidth_read_per_layer[8]: 1.0
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 0
 ideal_bandwidth_update_per_layer[8]: 0.0
-level.getFillPerLayer[8](): 66,355,200
+level.getFillPerLayerTotal[8](): 66,355,200
 ideal_bandwidth_fill_per_layer[8]: 16.0
 
 Latency for layer: 9 of Level: WeightMemory
@@ -2323,11 +2323,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
-level.getFillPerLayer[9](): 368,640
+level.getFillPerLayerTotal[9](): 368,640
 ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
@@ -2476,13 +2476,13 @@ self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_rea
 self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 29534400
 level.getReadPerLayer[0](): 35,064,000
 ideal_bandwidth_read_per_layer[0]: 90.18518518518519
-level.getDrainPerLayer[0](): 29,491,200
+level.getDrainPerLayerTotal[0](): 29,491,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 43,200
 ideal_bandwidth_update_per_layer[0]: 0.1111111111111111
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 8,424,000
+level.getFillPerLayerTotal[0](): 8,424,000
 ideal_bandwidth_fill_per_layer[0]: 21.666666666666668
 
 Latency for layer: 1 of Level: FeatureMemory
@@ -2496,7 +2496,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=33,638,400, last_per_layer_int_out_writes[1]=29,491,200
 level.getReadPerLayer[1](): 6,220,800
 ideal_bandwidth_read_per_layer[1]: 1.5
-level.getDrainPerLayer[1](): 29,491,200
+level.getDrainPerLayerTotal[1](): 29,491,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
@@ -2504,7 +2504,7 @@ level.getUpdatePerLayer[1](): 4,147,200
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 30,035,200
+level.getFillPerLayerTotal[1](): 30,035,200
 ideal_bandwidth_fill_per_layer[1]: 7.242283950617284
 
 Latency for layer: 2 of Level: FeatureMemory
@@ -2516,13 +2516,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 6,220,800
 ideal_bandwidth_read_per_layer[2]: 1.5
-level.getDrainPerLayer[2](): 29,491,200
+level.getDrainPerLayerTotal[2](): 29,491,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 4,147,200
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 30,035,200
+level.getFillPerLayerTotal[2](): 30,035,200
 ideal_bandwidth_fill_per_layer[2]: 7.242283950617284
 
 Latency for layer: 3 of Level: FeatureMemory
@@ -2534,11 +2534,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 6,220,800
 ideal_bandwidth_read_per_layer[3]: 1.5
-level.getDrainPerLayer[3](): 29,491,200
+level.getDrainPerLayerTotal[3](): 29,491,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 4,147,200
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 30,035,200
+level.getFillPerLayerTotal[3](): 30,035,200
 ideal_bandwidth_fill_per_layer[3]: 7.242283950617284
 
 Latency for layer: 4 of Level: FeatureMemory
@@ -2550,11 +2550,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 6,220,800
 ideal_bandwidth_read_per_layer[4]: 1.5
-level.getDrainPerLayer[4](): 29,491,200
+level.getDrainPerLayerTotal[4](): 29,491,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 4,147,200
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 30,035,200
+level.getFillPerLayerTotal[4](): 30,035,200
 ideal_bandwidth_fill_per_layer[4]: 7.242283950617284
 
 Latency for layer: 5 of Level: FeatureMemory
@@ -2566,11 +2566,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 6,220,800
 ideal_bandwidth_read_per_layer[5]: 1.5
-level.getDrainPerLayer[5](): 29,491,200
+level.getDrainPerLayerTotal[5](): 29,491,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 4,147,200
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 30,035,200
+level.getFillPerLayerTotal[5](): 30,035,200
 ideal_bandwidth_fill_per_layer[5]: 7.242283950617284
 
 Latency for layer: 6 of Level: FeatureMemory
@@ -2582,11 +2582,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 6,220,800
 ideal_bandwidth_read_per_layer[6]: 1.5
-level.getDrainPerLayer[6](): 29,491,200
+level.getDrainPerLayerTotal[6](): 29,491,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 4,147,200
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 30,035,200
+level.getFillPerLayerTotal[6](): 30,035,200
 ideal_bandwidth_fill_per_layer[6]: 7.242283950617284
 
 Latency for layer: 7 of Level: FeatureMemory
@@ -2598,11 +2598,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 6,220,800
 ideal_bandwidth_read_per_layer[7]: 1.5
-level.getDrainPerLayer[7](): 29,491,200
+level.getDrainPerLayerTotal[7](): 29,491,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 4,147,200
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 30,035,200
+level.getFillPerLayerTotal[7](): 30,035,200
 ideal_bandwidth_fill_per_layer[7]: 7.242283950617284
 
 Latency for layer: 8 of Level: FeatureMemory
@@ -2614,11 +2614,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 6,220,800
 ideal_bandwidth_read_per_layer[8]: 1.5
-level.getDrainPerLayer[8](): 29,491,200
+level.getDrainPerLayerTotal[8](): 29,491,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 4,147,200
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 30,035,200
+level.getFillPerLayerTotal[8](): 30,035,200
 ideal_bandwidth_fill_per_layer[8]: 7.242283950617284
 
 Latency for layer: 9 of Level: FeatureMemory
@@ -2630,11 +2630,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
 ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -2783,13 +2783,13 @@ self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_o
 self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_out_reads[0]: 29491200
 level.getReadPerLayer[0](): 44,136,000
 ideal_bandwidth_read_per_layer[0]: 113.51851851851852
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 29,491,200
 ideal_bandwidth_update_per_layer[0]: 75.85185185185185
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: DRAM
@@ -2803,7 +2803,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66,355,200, per_layer_int_out_reads[1]=29,491,200, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 30.353395061728396
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
@@ -2811,7 +2811,7 @@ level.getUpdatePerLayer[1](): 29,491,200
 ideal_bandwidth_update_per_layer[1]: 7.111111111111111
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 0
+level.getFillPerLayerTotal[1](): 0
 ideal_bandwidth_fill_per_layer[1]: 0.0
 
 Latency for layer: 2 of Level: DRAM
@@ -2823,13 +2823,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 125,881,600
 ideal_bandwidth_read_per_layer[2]: 30.353395061728396
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 29,491,200
 ideal_bandwidth_update_per_layer[2]: 7.111111111111111
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 0
+level.getFillPerLayerTotal[2](): 0
 ideal_bandwidth_fill_per_layer[2]: 0.0
 
 Latency for layer: 3 of Level: DRAM
@@ -2841,11 +2841,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 125,881,600
 ideal_bandwidth_read_per_layer[3]: 30.353395061728396
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 29,491,200
 ideal_bandwidth_update_per_layer[3]: 7.111111111111111
-level.getFillPerLayer[3](): 0
+level.getFillPerLayerTotal[3](): 0
 ideal_bandwidth_fill_per_layer[3]: 0.0
 
 Latency for layer: 4 of Level: DRAM
@@ -2857,11 +2857,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 125,881,600
 ideal_bandwidth_read_per_layer[4]: 30.353395061728396
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 29,491,200
 ideal_bandwidth_update_per_layer[4]: 7.111111111111111
-level.getFillPerLayer[4](): 0
+level.getFillPerLayerTotal[4](): 0
 ideal_bandwidth_fill_per_layer[4]: 0.0
 
 Latency for layer: 5 of Level: DRAM
@@ -2873,11 +2873,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 125,881,600
 ideal_bandwidth_read_per_layer[5]: 30.353395061728396
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 29,491,200
 ideal_bandwidth_update_per_layer[5]: 7.111111111111111
-level.getFillPerLayer[5](): 0
+level.getFillPerLayerTotal[5](): 0
 ideal_bandwidth_fill_per_layer[5]: 0.0
 
 Latency for layer: 6 of Level: DRAM
@@ -2889,11 +2889,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 125,881,600
 ideal_bandwidth_read_per_layer[6]: 30.353395061728396
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 29,491,200
 ideal_bandwidth_update_per_layer[6]: 7.111111111111111
-level.getFillPerLayer[6](): 0
+level.getFillPerLayerTotal[6](): 0
 ideal_bandwidth_fill_per_layer[6]: 0.0
 
 Latency for layer: 7 of Level: DRAM
@@ -2905,11 +2905,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 125,881,600
 ideal_bandwidth_read_per_layer[7]: 30.353395061728396
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 29,491,200
 ideal_bandwidth_update_per_layer[7]: 7.111111111111111
-level.getFillPerLayer[7](): 0
+level.getFillPerLayerTotal[7](): 0
 ideal_bandwidth_fill_per_layer[7]: 0.0
 
 Latency for layer: 8 of Level: DRAM
@@ -2921,11 +2921,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 125,881,600
 ideal_bandwidth_read_per_layer[8]: 30.353395061728396
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 29,491,200
 ideal_bandwidth_update_per_layer[8]: 7.111111111111111
-level.getFillPerLayer[8](): 0
+level.getFillPerLayerTotal[8](): 0
 ideal_bandwidth_fill_per_layer[8]: 0.0
 
 Latency for layer: 9 of Level: DRAM
@@ -2937,11 +2937,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
 ideal_bandwidth_read_per_layer[9]: 129.6
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
 ideal_bandwidth_update_per_layer[9]: 64.0
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -5150,13 +5150,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]:
 self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 796305600
 level.getReadPerLayer[0](): 796,305,600
 ideal_bandwidth_read_per_layer[0]: 1.0000542534722223
-level.getDrainPerLayer[0](): 43,200
+level.getDrainPerLayerTotal[0](): 43,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 796,262,400
 ideal_bandwidth_update_per_layer[0]: 1.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: AccumulationOutRegister
@@ -5170,7 +5170,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=8,497,612,800, last_per_layer_int_out_writes[1]=4,147,200
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
-level.getDrainPerLayer[1](): 4,147,200
+level.getDrainPerLayerTotal[1](): 4,147,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
@@ -5178,7 +5178,7 @@ level.getUpdatePerLayer[1](): 8,493,465,600
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 33,177,600
+level.getFillPerLayerTotal[1](): 33,177,600
 ideal_bandwidth_fill_per_layer[1]: 0.00390625
 
 Latency for layer: 2 of Level: AccumulationOutRegister
@@ -5190,13 +5190,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 8,493,465,600
 level.getReadPerLayer[2](): 16,986,931,200
 ideal_bandwidth_read_per_layer[2]: 2.0
-level.getDrainPerLayer[2](): 4,147,200
+level.getDrainPerLayerTotal[2](): 4,147,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 33,177,600
+level.getFillPerLayerTotal[2](): 33,177,600
 ideal_bandwidth_fill_per_layer[2]: 0.00390625
 
 Latency for layer: 3 of Level: AccumulationOutRegister
@@ -5208,11 +5208,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 8,493,465,600
 level.getReadPerLayer[3](): 16,986,931,200
 ideal_bandwidth_read_per_layer[3]: 2.0
-level.getDrainPerLayer[3](): 4,147,200
+level.getDrainPerLayerTotal[3](): 4,147,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 33,177,600
+level.getFillPerLayerTotal[3](): 33,177,600
 ideal_bandwidth_fill_per_layer[3]: 0.00390625
 
 Latency for layer: 4 of Level: AccumulationOutRegister
@@ -5224,11 +5224,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 8,493,465,600
 level.getReadPerLayer[4](): 16,986,931,200
 ideal_bandwidth_read_per_layer[4]: 2.0
-level.getDrainPerLayer[4](): 4,147,200
+level.getDrainPerLayerTotal[4](): 4,147,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 33,177,600
+level.getFillPerLayerTotal[4](): 33,177,600
 ideal_bandwidth_fill_per_layer[4]: 0.00390625
 
 Latency for layer: 5 of Level: AccumulationOutRegister
@@ -5240,11 +5240,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 8,493,465,600
 level.getReadPerLayer[5](): 16,986,931,200
 ideal_bandwidth_read_per_layer[5]: 2.0
-level.getDrainPerLayer[5](): 4,147,200
+level.getDrainPerLayerTotal[5](): 4,147,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 33,177,600
+level.getFillPerLayerTotal[5](): 33,177,600
 ideal_bandwidth_fill_per_layer[5]: 0.00390625
 
 Latency for layer: 6 of Level: AccumulationOutRegister
@@ -5256,11 +5256,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 8,493,465,600
 level.getReadPerLayer[6](): 16,986,931,200
 ideal_bandwidth_read_per_layer[6]: 2.0
-level.getDrainPerLayer[6](): 4,147,200
+level.getDrainPerLayerTotal[6](): 4,147,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 33,177,600
+level.getFillPerLayerTotal[6](): 33,177,600
 ideal_bandwidth_fill_per_layer[6]: 0.00390625
 
 Latency for layer: 7 of Level: AccumulationOutRegister
@@ -5272,11 +5272,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 8,493,465,600
 level.getReadPerLayer[7](): 16,986,931,200
 ideal_bandwidth_read_per_layer[7]: 2.0
-level.getDrainPerLayer[7](): 4,147,200
+level.getDrainPerLayerTotal[7](): 4,147,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 33,177,600
+level.getFillPerLayerTotal[7](): 33,177,600
 ideal_bandwidth_fill_per_layer[7]: 0.00390625
 
 Latency for layer: 8 of Level: AccumulationOutRegister
@@ -5288,11 +5288,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 8,493,465,600
 level.getReadPerLayer[8](): 16,986,931,200
 ideal_bandwidth_read_per_layer[8]: 2.0
-level.getDrainPerLayer[8](): 4,147,200
+level.getDrainPerLayerTotal[8](): 4,147,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 33,177,600
+level.getFillPerLayerTotal[8](): 33,177,600
 ideal_bandwidth_fill_per_layer[8]: 0.00390625
 
 Latency for layer: 9 of Level: AccumulationOutRegister
@@ -5304,11 +5304,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 471,859,200
 level.getReadPerLayer[9](): 928,972,800
 ideal_bandwidth_read_per_layer[9]: 1.96875
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 10
 ideal_bandwidth_update_per_layer[9]: 2.1192762586805556e-08
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -5457,13 +5457,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_read
 self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_reads[0]: 0
 level.getReadPerLayer[0](): 388,800
 ideal_bandwidth_read_per_layer[0]: 1.0
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 0
 ideal_bandwidth_update_per_layer[0]: 0.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 6,220,800
+level.getFillPerLayerTotal[0](): 6,220,800
 ideal_bandwidth_fill_per_layer[0]: 16.0
 
 Latency for layer: 1 of Level: WeightMemory
@@ -5477,7 +5477,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, per_layer_int_out_reads[1]=0, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
@@ -5485,7 +5485,7 @@ level.getUpdatePerLayer[1](): 0
 ideal_bandwidth_update_per_layer[1]: 0.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 66,355,200
+level.getFillPerLayerTotal[1](): 66,355,200
 ideal_bandwidth_fill_per_layer[1]: 16.0
 
 Latency for layer: 2 of Level: WeightMemory
@@ -5497,13 +5497,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
 ideal_bandwidth_read_per_layer[2]: 1.0
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 0
 ideal_bandwidth_update_per_layer[2]: 0.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 66,355,200
+level.getFillPerLayerTotal[2](): 66,355,200
 ideal_bandwidth_fill_per_layer[2]: 16.0
 
 Latency for layer: 3 of Level: WeightMemory
@@ -5515,11 +5515,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
 ideal_bandwidth_read_per_layer[3]: 1.0
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 0
 ideal_bandwidth_update_per_layer[3]: 0.0
-level.getFillPerLayer[3](): 66,355,200
+level.getFillPerLayerTotal[3](): 66,355,200
 ideal_bandwidth_fill_per_layer[3]: 16.0
 
 Latency for layer: 4 of Level: WeightMemory
@@ -5531,11 +5531,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
 ideal_bandwidth_read_per_layer[4]: 1.0
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 0
 ideal_bandwidth_update_per_layer[4]: 0.0
-level.getFillPerLayer[4](): 66,355,200
+level.getFillPerLayerTotal[4](): 66,355,200
 ideal_bandwidth_fill_per_layer[4]: 16.0
 
 Latency for layer: 5 of Level: WeightMemory
@@ -5547,11 +5547,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
 ideal_bandwidth_read_per_layer[5]: 1.0
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 0
 ideal_bandwidth_update_per_layer[5]: 0.0
-level.getFillPerLayer[5](): 66,355,200
+level.getFillPerLayerTotal[5](): 66,355,200
 ideal_bandwidth_fill_per_layer[5]: 16.0
 
 Latency for layer: 6 of Level: WeightMemory
@@ -5563,11 +5563,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
 ideal_bandwidth_read_per_layer[6]: 1.0
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 0
 ideal_bandwidth_update_per_layer[6]: 0.0
-level.getFillPerLayer[6](): 66,355,200
+level.getFillPerLayerTotal[6](): 66,355,200
 ideal_bandwidth_fill_per_layer[6]: 16.0
 
 Latency for layer: 7 of Level: WeightMemory
@@ -5579,11 +5579,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
 ideal_bandwidth_read_per_layer[7]: 1.0
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 0
 ideal_bandwidth_update_per_layer[7]: 0.0
-level.getFillPerLayer[7](): 66,355,200
+level.getFillPerLayerTotal[7](): 66,355,200
 ideal_bandwidth_fill_per_layer[7]: 16.0
 
 Latency for layer: 8 of Level: WeightMemory
@@ -5595,11 +5595,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
 ideal_bandwidth_read_per_layer[8]: 1.0
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 0
 ideal_bandwidth_update_per_layer[8]: 0.0
-level.getFillPerLayer[8](): 66,355,200
+level.getFillPerLayerTotal[8](): 66,355,200
 ideal_bandwidth_fill_per_layer[8]: 16.0
 
 Latency for layer: 9 of Level: WeightMemory
@@ -5611,11 +5611,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
-level.getFillPerLayer[9](): 368,640
+level.getFillPerLayerTotal[9](): 368,640
 ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
@@ -5764,13 +5764,13 @@ self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_rea
 self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 29534400
 level.getReadPerLayer[0](): 35,064,000
 ideal_bandwidth_read_per_layer[0]: 90.18518518518519
-level.getDrainPerLayer[0](): 29,491,200
+level.getDrainPerLayerTotal[0](): 29,491,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 43,200
 ideal_bandwidth_update_per_layer[0]: 0.1111111111111111
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 8,424,000
+level.getFillPerLayerTotal[0](): 8,424,000
 ideal_bandwidth_fill_per_layer[0]: 21.666666666666668
 
 Latency for layer: 1 of Level: FeatureMemory
@@ -5784,7 +5784,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=33,638,400, last_per_layer_int_out_writes[1]=29,491,200
 level.getReadPerLayer[1](): 6,220,800
 ideal_bandwidth_read_per_layer[1]: 1.5
-level.getDrainPerLayer[1](): 29,491,200
+level.getDrainPerLayerTotal[1](): 29,491,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
@@ -5792,7 +5792,7 @@ level.getUpdatePerLayer[1](): 4,147,200
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 30,035,200
+level.getFillPerLayerTotal[1](): 30,035,200
 ideal_bandwidth_fill_per_layer[1]: 7.242283950617284
 
 Latency for layer: 2 of Level: FeatureMemory
@@ -5804,13 +5804,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 6,220,800
 ideal_bandwidth_read_per_layer[2]: 1.5
-level.getDrainPerLayer[2](): 29,491,200
+level.getDrainPerLayerTotal[2](): 29,491,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 4,147,200
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 30,035,200
+level.getFillPerLayerTotal[2](): 30,035,200
 ideal_bandwidth_fill_per_layer[2]: 7.242283950617284
 
 Latency for layer: 3 of Level: FeatureMemory
@@ -5822,11 +5822,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 6,220,800
 ideal_bandwidth_read_per_layer[3]: 1.5
-level.getDrainPerLayer[3](): 29,491,200
+level.getDrainPerLayerTotal[3](): 29,491,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 4,147,200
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 30,035,200
+level.getFillPerLayerTotal[3](): 30,035,200
 ideal_bandwidth_fill_per_layer[3]: 7.242283950617284
 
 Latency for layer: 4 of Level: FeatureMemory
@@ -5838,11 +5838,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 6,220,800
 ideal_bandwidth_read_per_layer[4]: 1.5
-level.getDrainPerLayer[4](): 29,491,200
+level.getDrainPerLayerTotal[4](): 29,491,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 4,147,200
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 30,035,200
+level.getFillPerLayerTotal[4](): 30,035,200
 ideal_bandwidth_fill_per_layer[4]: 7.242283950617284
 
 Latency for layer: 5 of Level: FeatureMemory
@@ -5854,11 +5854,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 6,220,800
 ideal_bandwidth_read_per_layer[5]: 1.5
-level.getDrainPerLayer[5](): 29,491,200
+level.getDrainPerLayerTotal[5](): 29,491,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 4,147,200
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 30,035,200
+level.getFillPerLayerTotal[5](): 30,035,200
 ideal_bandwidth_fill_per_layer[5]: 7.242283950617284
 
 Latency for layer: 6 of Level: FeatureMemory
@@ -5870,11 +5870,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 6,220,800
 ideal_bandwidth_read_per_layer[6]: 1.5
-level.getDrainPerLayer[6](): 29,491,200
+level.getDrainPerLayerTotal[6](): 29,491,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 4,147,200
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 30,035,200
+level.getFillPerLayerTotal[6](): 30,035,200
 ideal_bandwidth_fill_per_layer[6]: 7.242283950617284
 
 Latency for layer: 7 of Level: FeatureMemory
@@ -5886,11 +5886,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 6,220,800
 ideal_bandwidth_read_per_layer[7]: 1.5
-level.getDrainPerLayer[7](): 29,491,200
+level.getDrainPerLayerTotal[7](): 29,491,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 4,147,200
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 30,035,200
+level.getFillPerLayerTotal[7](): 30,035,200
 ideal_bandwidth_fill_per_layer[7]: 7.242283950617284
 
 Latency for layer: 8 of Level: FeatureMemory
@@ -5902,11 +5902,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 6,220,800
 ideal_bandwidth_read_per_layer[8]: 1.5
-level.getDrainPerLayer[8](): 29,491,200
+level.getDrainPerLayerTotal[8](): 29,491,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 4,147,200
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 30,035,200
+level.getFillPerLayerTotal[8](): 30,035,200
 ideal_bandwidth_fill_per_layer[8]: 7.242283950617284
 
 Latency for layer: 9 of Level: FeatureMemory
@@ -5918,11 +5918,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
 ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -6071,13 +6071,13 @@ self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_o
 self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_out_reads[0]: 29491200
 level.getReadPerLayer[0](): 44,136,000
 ideal_bandwidth_read_per_layer[0]: 113.51851851851852
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 29,491,200
 ideal_bandwidth_update_per_layer[0]: 75.85185185185185
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: DRAM
@@ -6091,7 +6091,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66,355,200, per_layer_int_out_reads[1]=29,491,200, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 30.353395061728396
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
@@ -6099,7 +6099,7 @@ level.getUpdatePerLayer[1](): 29,491,200
 ideal_bandwidth_update_per_layer[1]: 7.111111111111111
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 0
+level.getFillPerLayerTotal[1](): 0
 ideal_bandwidth_fill_per_layer[1]: 0.0
 
 Latency for layer: 2 of Level: DRAM
@@ -6111,13 +6111,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 125,881,600
 ideal_bandwidth_read_per_layer[2]: 30.353395061728396
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 29,491,200
 ideal_bandwidth_update_per_layer[2]: 7.111111111111111
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 0
+level.getFillPerLayerTotal[2](): 0
 ideal_bandwidth_fill_per_layer[2]: 0.0
 
 Latency for layer: 3 of Level: DRAM
@@ -6129,11 +6129,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 125,881,600
 ideal_bandwidth_read_per_layer[3]: 30.353395061728396
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 29,491,200
 ideal_bandwidth_update_per_layer[3]: 7.111111111111111
-level.getFillPerLayer[3](): 0
+level.getFillPerLayerTotal[3](): 0
 ideal_bandwidth_fill_per_layer[3]: 0.0
 
 Latency for layer: 4 of Level: DRAM
@@ -6145,11 +6145,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 125,881,600
 ideal_bandwidth_read_per_layer[4]: 30.353395061728396
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 29,491,200
 ideal_bandwidth_update_per_layer[4]: 7.111111111111111
-level.getFillPerLayer[4](): 0
+level.getFillPerLayerTotal[4](): 0
 ideal_bandwidth_fill_per_layer[4]: 0.0
 
 Latency for layer: 5 of Level: DRAM
@@ -6161,11 +6161,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 125,881,600
 ideal_bandwidth_read_per_layer[5]: 30.353395061728396
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 29,491,200
 ideal_bandwidth_update_per_layer[5]: 7.111111111111111
-level.getFillPerLayer[5](): 0
+level.getFillPerLayerTotal[5](): 0
 ideal_bandwidth_fill_per_layer[5]: 0.0
 
 Latency for layer: 6 of Level: DRAM
@@ -6177,11 +6177,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 125,881,600
 ideal_bandwidth_read_per_layer[6]: 30.353395061728396
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 29,491,200
 ideal_bandwidth_update_per_layer[6]: 7.111111111111111
-level.getFillPerLayer[6](): 0
+level.getFillPerLayerTotal[6](): 0
 ideal_bandwidth_fill_per_layer[6]: 0.0
 
 Latency for layer: 7 of Level: DRAM
@@ -6193,11 +6193,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 125,881,600
 ideal_bandwidth_read_per_layer[7]: 30.353395061728396
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 29,491,200
 ideal_bandwidth_update_per_layer[7]: 7.111111111111111
-level.getFillPerLayer[7](): 0
+level.getFillPerLayerTotal[7](): 0
 ideal_bandwidth_fill_per_layer[7]: 0.0
 
 Latency for layer: 8 of Level: DRAM
@@ -6209,11 +6209,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 125,881,600
 ideal_bandwidth_read_per_layer[8]: 30.353395061728396
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 29,491,200
 ideal_bandwidth_update_per_layer[8]: 7.111111111111111
-level.getFillPerLayer[8](): 0
+level.getFillPerLayerTotal[8](): 0
 ideal_bandwidth_fill_per_layer[8]: 0.0
 
 Latency for layer: 9 of Level: DRAM
@@ -6225,11 +6225,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
 ideal_bandwidth_read_per_layer[9]: 129.6
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
 ideal_bandwidth_update_per_layer[9]: 64.0
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -8409,13 +8409,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]:
 self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 796305600
 level.getReadPerLayer[0](): 796,305,600
 ideal_bandwidth_read_per_layer[0]: 1.0000542534722223
-level.getDrainPerLayer[0](): 43,200
+level.getDrainPerLayerTotal[0](): 43,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 796,262,400
 ideal_bandwidth_update_per_layer[0]: 1.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: AccumulationOutRegister
@@ -8429,7 +8429,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=8,497,612,800, last_per_layer_int_out_writes[1]=4,147,200
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
-level.getDrainPerLayer[1](): 4,147,200
+level.getDrainPerLayerTotal[1](): 4,147,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
@@ -8437,7 +8437,7 @@ level.getUpdatePerLayer[1](): 8,493,465,600
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 33,177,600
+level.getFillPerLayerTotal[1](): 33,177,600
 ideal_bandwidth_fill_per_layer[1]: 0.00390625
 
 Latency for layer: 2 of Level: AccumulationOutRegister
@@ -8449,13 +8449,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 8,493,465,600
 level.getReadPerLayer[2](): 16,986,931,200
 ideal_bandwidth_read_per_layer[2]: 2.0
-level.getDrainPerLayer[2](): 4,147,200
+level.getDrainPerLayerTotal[2](): 4,147,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 33,177,600
+level.getFillPerLayerTotal[2](): 33,177,600
 ideal_bandwidth_fill_per_layer[2]: 0.00390625
 
 Latency for layer: 3 of Level: AccumulationOutRegister
@@ -8467,11 +8467,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 8,493,465,600
 level.getReadPerLayer[3](): 16,986,931,200
 ideal_bandwidth_read_per_layer[3]: 2.0
-level.getDrainPerLayer[3](): 4,147,200
+level.getDrainPerLayerTotal[3](): 4,147,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 33,177,600
+level.getFillPerLayerTotal[3](): 33,177,600
 ideal_bandwidth_fill_per_layer[3]: 0.00390625
 
 Latency for layer: 4 of Level: AccumulationOutRegister
@@ -8483,11 +8483,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 8,493,465,600
 level.getReadPerLayer[4](): 16,986,931,200
 ideal_bandwidth_read_per_layer[4]: 2.0
-level.getDrainPerLayer[4](): 4,147,200
+level.getDrainPerLayerTotal[4](): 4,147,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 33,177,600
+level.getFillPerLayerTotal[4](): 33,177,600
 ideal_bandwidth_fill_per_layer[4]: 0.00390625
 
 Latency for layer: 5 of Level: AccumulationOutRegister
@@ -8499,11 +8499,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 8,493,465,600
 level.getReadPerLayer[5](): 16,986,931,200
 ideal_bandwidth_read_per_layer[5]: 2.0
-level.getDrainPerLayer[5](): 4,147,200
+level.getDrainPerLayerTotal[5](): 4,147,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 33,177,600
+level.getFillPerLayerTotal[5](): 33,177,600
 ideal_bandwidth_fill_per_layer[5]: 0.00390625
 
 Latency for layer: 6 of Level: AccumulationOutRegister
@@ -8515,11 +8515,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 8,493,465,600
 level.getReadPerLayer[6](): 16,986,931,200
 ideal_bandwidth_read_per_layer[6]: 2.0
-level.getDrainPerLayer[6](): 4,147,200
+level.getDrainPerLayerTotal[6](): 4,147,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 33,177,600
+level.getFillPerLayerTotal[6](): 33,177,600
 ideal_bandwidth_fill_per_layer[6]: 0.00390625
 
 Latency for layer: 7 of Level: AccumulationOutRegister
@@ -8531,11 +8531,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 8,493,465,600
 level.getReadPerLayer[7](): 16,986,931,200
 ideal_bandwidth_read_per_layer[7]: 2.0
-level.getDrainPerLayer[7](): 4,147,200
+level.getDrainPerLayerTotal[7](): 4,147,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 33,177,600
+level.getFillPerLayerTotal[7](): 33,177,600
 ideal_bandwidth_fill_per_layer[7]: 0.00390625
 
 Latency for layer: 8 of Level: AccumulationOutRegister
@@ -8547,11 +8547,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 8,493,465,600
 level.getReadPerLayer[8](): 16,986,931,200
 ideal_bandwidth_read_per_layer[8]: 2.0
-level.getDrainPerLayer[8](): 4,147,200
+level.getDrainPerLayerTotal[8](): 4,147,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 33,177,600
+level.getFillPerLayerTotal[8](): 33,177,600
 ideal_bandwidth_fill_per_layer[8]: 0.00390625
 
 Latency for layer: 9 of Level: AccumulationOutRegister
@@ -8563,11 +8563,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 471,859,200
 level.getReadPerLayer[9](): 928,972,800
 ideal_bandwidth_read_per_layer[9]: 1.96875
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 10
 ideal_bandwidth_update_per_layer[9]: 2.1192762586805556e-08
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -8716,13 +8716,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_read
 self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_reads[0]: 0
 level.getReadPerLayer[0](): 388,800
 ideal_bandwidth_read_per_layer[0]: 1.0
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 0
 ideal_bandwidth_update_per_layer[0]: 0.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 6,220,800
+level.getFillPerLayerTotal[0](): 6,220,800
 ideal_bandwidth_fill_per_layer[0]: 16.0
 
 Latency for layer: 1 of Level: WeightMemory
@@ -8736,7 +8736,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, per_layer_int_out_reads[1]=0, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
@@ -8744,7 +8744,7 @@ level.getUpdatePerLayer[1](): 0
 ideal_bandwidth_update_per_layer[1]: 0.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 66,355,200
+level.getFillPerLayerTotal[1](): 66,355,200
 ideal_bandwidth_fill_per_layer[1]: 16.0
 
 Latency for layer: 2 of Level: WeightMemory
@@ -8756,13 +8756,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
 ideal_bandwidth_read_per_layer[2]: 1.0
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 0
 ideal_bandwidth_update_per_layer[2]: 0.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 66,355,200
+level.getFillPerLayerTotal[2](): 66,355,200
 ideal_bandwidth_fill_per_layer[2]: 16.0
 
 Latency for layer: 3 of Level: WeightMemory
@@ -8774,11 +8774,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
 ideal_bandwidth_read_per_layer[3]: 1.0
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 0
 ideal_bandwidth_update_per_layer[3]: 0.0
-level.getFillPerLayer[3](): 66,355,200
+level.getFillPerLayerTotal[3](): 66,355,200
 ideal_bandwidth_fill_per_layer[3]: 16.0
 
 Latency for layer: 4 of Level: WeightMemory
@@ -8790,11 +8790,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
 ideal_bandwidth_read_per_layer[4]: 1.0
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 0
 ideal_bandwidth_update_per_layer[4]: 0.0
-level.getFillPerLayer[4](): 66,355,200
+level.getFillPerLayerTotal[4](): 66,355,200
 ideal_bandwidth_fill_per_layer[4]: 16.0
 
 Latency for layer: 5 of Level: WeightMemory
@@ -8806,11 +8806,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
 ideal_bandwidth_read_per_layer[5]: 1.0
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 0
 ideal_bandwidth_update_per_layer[5]: 0.0
-level.getFillPerLayer[5](): 66,355,200
+level.getFillPerLayerTotal[5](): 66,355,200
 ideal_bandwidth_fill_per_layer[5]: 16.0
 
 Latency for layer: 6 of Level: WeightMemory
@@ -8822,11 +8822,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
 ideal_bandwidth_read_per_layer[6]: 1.0
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 0
 ideal_bandwidth_update_per_layer[6]: 0.0
-level.getFillPerLayer[6](): 66,355,200
+level.getFillPerLayerTotal[6](): 66,355,200
 ideal_bandwidth_fill_per_layer[6]: 16.0
 
 Latency for layer: 7 of Level: WeightMemory
@@ -8838,11 +8838,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
 ideal_bandwidth_read_per_layer[7]: 1.0
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 0
 ideal_bandwidth_update_per_layer[7]: 0.0
-level.getFillPerLayer[7](): 66,355,200
+level.getFillPerLayerTotal[7](): 66,355,200
 ideal_bandwidth_fill_per_layer[7]: 16.0
 
 Latency for layer: 8 of Level: WeightMemory
@@ -8854,11 +8854,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
 ideal_bandwidth_read_per_layer[8]: 1.0
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 0
 ideal_bandwidth_update_per_layer[8]: 0.0
-level.getFillPerLayer[8](): 66,355,200
+level.getFillPerLayerTotal[8](): 66,355,200
 ideal_bandwidth_fill_per_layer[8]: 16.0
 
 Latency for layer: 9 of Level: WeightMemory
@@ -8870,11 +8870,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
-level.getFillPerLayer[9](): 368,640
+level.getFillPerLayerTotal[9](): 368,640
 ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
@@ -9023,13 +9023,13 @@ self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_rea
 self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 29534400
 level.getReadPerLayer[0](): 35,064,000
 ideal_bandwidth_read_per_layer[0]: 90.18518518518519
-level.getDrainPerLayer[0](): 29,491,200
+level.getDrainPerLayerTotal[0](): 29,491,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 43,200
 ideal_bandwidth_update_per_layer[0]: 0.1111111111111111
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 8,424,000
+level.getFillPerLayerTotal[0](): 8,424,000
 ideal_bandwidth_fill_per_layer[0]: 21.666666666666668
 
 Latency for layer: 1 of Level: FeatureMemory
@@ -9043,7 +9043,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=33,638,400, last_per_layer_int_out_writes[1]=29,491,200
 level.getReadPerLayer[1](): 6,220,800
 ideal_bandwidth_read_per_layer[1]: 1.5
-level.getDrainPerLayer[1](): 29,491,200
+level.getDrainPerLayerTotal[1](): 29,491,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
@@ -9051,7 +9051,7 @@ level.getUpdatePerLayer[1](): 4,147,200
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 30,035,200
+level.getFillPerLayerTotal[1](): 30,035,200
 ideal_bandwidth_fill_per_layer[1]: 7.242283950617284
 
 Latency for layer: 2 of Level: FeatureMemory
@@ -9063,13 +9063,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 6,220,800
 ideal_bandwidth_read_per_layer[2]: 1.5
-level.getDrainPerLayer[2](): 29,491,200
+level.getDrainPerLayerTotal[2](): 29,491,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 4,147,200
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 30,035,200
+level.getFillPerLayerTotal[2](): 30,035,200
 ideal_bandwidth_fill_per_layer[2]: 7.242283950617284
 
 Latency for layer: 3 of Level: FeatureMemory
@@ -9081,11 +9081,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 6,220,800
 ideal_bandwidth_read_per_layer[3]: 1.5
-level.getDrainPerLayer[3](): 29,491,200
+level.getDrainPerLayerTotal[3](): 29,491,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 4,147,200
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 30,035,200
+level.getFillPerLayerTotal[3](): 30,035,200
 ideal_bandwidth_fill_per_layer[3]: 7.242283950617284
 
 Latency for layer: 4 of Level: FeatureMemory
@@ -9097,11 +9097,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 6,220,800
 ideal_bandwidth_read_per_layer[4]: 1.5
-level.getDrainPerLayer[4](): 29,491,200
+level.getDrainPerLayerTotal[4](): 29,491,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 4,147,200
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 30,035,200
+level.getFillPerLayerTotal[4](): 30,035,200
 ideal_bandwidth_fill_per_layer[4]: 7.242283950617284
 
 Latency for layer: 5 of Level: FeatureMemory
@@ -9113,11 +9113,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 6,220,800
 ideal_bandwidth_read_per_layer[5]: 1.5
-level.getDrainPerLayer[5](): 29,491,200
+level.getDrainPerLayerTotal[5](): 29,491,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 4,147,200
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 30,035,200
+level.getFillPerLayerTotal[5](): 30,035,200
 ideal_bandwidth_fill_per_layer[5]: 7.242283950617284
 
 Latency for layer: 6 of Level: FeatureMemory
@@ -9129,11 +9129,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 6,220,800
 ideal_bandwidth_read_per_layer[6]: 1.5
-level.getDrainPerLayer[6](): 29,491,200
+level.getDrainPerLayerTotal[6](): 29,491,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 4,147,200
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 30,035,200
+level.getFillPerLayerTotal[6](): 30,035,200
 ideal_bandwidth_fill_per_layer[6]: 7.242283950617284
 
 Latency for layer: 7 of Level: FeatureMemory
@@ -9145,11 +9145,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 6,220,800
 ideal_bandwidth_read_per_layer[7]: 1.5
-level.getDrainPerLayer[7](): 29,491,200
+level.getDrainPerLayerTotal[7](): 29,491,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 4,147,200
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 30,035,200
+level.getFillPerLayerTotal[7](): 30,035,200
 ideal_bandwidth_fill_per_layer[7]: 7.242283950617284
 
 Latency for layer: 8 of Level: FeatureMemory
@@ -9161,11 +9161,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 6,220,800
 ideal_bandwidth_read_per_layer[8]: 1.5
-level.getDrainPerLayer[8](): 29,491,200
+level.getDrainPerLayerTotal[8](): 29,491,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 4,147,200
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 30,035,200
+level.getFillPerLayerTotal[8](): 30,035,200
 ideal_bandwidth_fill_per_layer[8]: 7.242283950617284
 
 Latency for layer: 9 of Level: FeatureMemory
@@ -9177,11 +9177,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
 ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -9330,13 +9330,13 @@ self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_o
 self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_out_reads[0]: 29491200
 level.getReadPerLayer[0](): 44,136,000
 ideal_bandwidth_read_per_layer[0]: 113.51851851851852
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 29,491,200
 ideal_bandwidth_update_per_layer[0]: 75.85185185185185
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: DRAM
@@ -9350,7 +9350,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66,355,200, per_layer_int_out_reads[1]=29,491,200, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 30.353395061728396
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
@@ -9358,7 +9358,7 @@ level.getUpdatePerLayer[1](): 29,491,200
 ideal_bandwidth_update_per_layer[1]: 7.111111111111111
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 0
+level.getFillPerLayerTotal[1](): 0
 ideal_bandwidth_fill_per_layer[1]: 0.0
 
 Latency for layer: 2 of Level: DRAM
@@ -9370,13 +9370,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 125,881,600
 ideal_bandwidth_read_per_layer[2]: 30.353395061728396
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 29,491,200
 ideal_bandwidth_update_per_layer[2]: 7.111111111111111
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 0
+level.getFillPerLayerTotal[2](): 0
 ideal_bandwidth_fill_per_layer[2]: 0.0
 
 Latency for layer: 3 of Level: DRAM
@@ -9388,11 +9388,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 125,881,600
 ideal_bandwidth_read_per_layer[3]: 30.353395061728396
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 29,491,200
 ideal_bandwidth_update_per_layer[3]: 7.111111111111111
-level.getFillPerLayer[3](): 0
+level.getFillPerLayerTotal[3](): 0
 ideal_bandwidth_fill_per_layer[3]: 0.0
 
 Latency for layer: 4 of Level: DRAM
@@ -9404,11 +9404,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 125,881,600
 ideal_bandwidth_read_per_layer[4]: 30.353395061728396
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 29,491,200
 ideal_bandwidth_update_per_layer[4]: 7.111111111111111
-level.getFillPerLayer[4](): 0
+level.getFillPerLayerTotal[4](): 0
 ideal_bandwidth_fill_per_layer[4]: 0.0
 
 Latency for layer: 5 of Level: DRAM
@@ -9420,11 +9420,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 125,881,600
 ideal_bandwidth_read_per_layer[5]: 30.353395061728396
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 29,491,200
 ideal_bandwidth_update_per_layer[5]: 7.111111111111111
-level.getFillPerLayer[5](): 0
+level.getFillPerLayerTotal[5](): 0
 ideal_bandwidth_fill_per_layer[5]: 0.0
 
 Latency for layer: 6 of Level: DRAM
@@ -9436,11 +9436,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 125,881,600
 ideal_bandwidth_read_per_layer[6]: 30.353395061728396
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 29,491,200
 ideal_bandwidth_update_per_layer[6]: 7.111111111111111
-level.getFillPerLayer[6](): 0
+level.getFillPerLayerTotal[6](): 0
 ideal_bandwidth_fill_per_layer[6]: 0.0
 
 Latency for layer: 7 of Level: DRAM
@@ -9452,11 +9452,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 125,881,600
 ideal_bandwidth_read_per_layer[7]: 30.353395061728396
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 29,491,200
 ideal_bandwidth_update_per_layer[7]: 7.111111111111111
-level.getFillPerLayer[7](): 0
+level.getFillPerLayerTotal[7](): 0
 ideal_bandwidth_fill_per_layer[7]: 0.0
 
 Latency for layer: 8 of Level: DRAM
@@ -9468,11 +9468,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 125,881,600
 ideal_bandwidth_read_per_layer[8]: 30.353395061728396
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 29,491,200
 ideal_bandwidth_update_per_layer[8]: 7.111111111111111
-level.getFillPerLayer[8](): 0
+level.getFillPerLayerTotal[8](): 0
 ideal_bandwidth_fill_per_layer[8]: 0.0
 
 Latency for layer: 9 of Level: DRAM
@@ -9484,11 +9484,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
 ideal_bandwidth_read_per_layer[9]: 129.6
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
 ideal_bandwidth_update_per_layer[9]: 64.0
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -11668,13 +11668,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]:
 self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 796305600
 level.getReadPerLayer[0](): 796,305,600
 ideal_bandwidth_read_per_layer[0]: 1.0000542534722223
-level.getDrainPerLayer[0](): 43,200
+level.getDrainPerLayerTotal[0](): 43,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 796,262,400
 ideal_bandwidth_update_per_layer[0]: 1.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: AccumulationOutRegister
@@ -11688,7 +11688,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=8,497,612,800, last_per_layer_int_out_writes[1]=4,147,200
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
-level.getDrainPerLayer[1](): 4,147,200
+level.getDrainPerLayerTotal[1](): 4,147,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
@@ -11696,7 +11696,7 @@ level.getUpdatePerLayer[1](): 8,493,465,600
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 33,177,600
+level.getFillPerLayerTotal[1](): 33,177,600
 ideal_bandwidth_fill_per_layer[1]: 0.00390625
 
 Latency for layer: 2 of Level: AccumulationOutRegister
@@ -11708,13 +11708,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 8,493,465,600
 level.getReadPerLayer[2](): 16,986,931,200
 ideal_bandwidth_read_per_layer[2]: 2.0
-level.getDrainPerLayer[2](): 4,147,200
+level.getDrainPerLayerTotal[2](): 4,147,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 33,177,600
+level.getFillPerLayerTotal[2](): 33,177,600
 ideal_bandwidth_fill_per_layer[2]: 0.00390625
 
 Latency for layer: 3 of Level: AccumulationOutRegister
@@ -11726,11 +11726,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 8,493,465,600
 level.getReadPerLayer[3](): 16,986,931,200
 ideal_bandwidth_read_per_layer[3]: 2.0
-level.getDrainPerLayer[3](): 4,147,200
+level.getDrainPerLayerTotal[3](): 4,147,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 33,177,600
+level.getFillPerLayerTotal[3](): 33,177,600
 ideal_bandwidth_fill_per_layer[3]: 0.00390625
 
 Latency for layer: 4 of Level: AccumulationOutRegister
@@ -11742,11 +11742,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 8,493,465,600
 level.getReadPerLayer[4](): 16,986,931,200
 ideal_bandwidth_read_per_layer[4]: 2.0
-level.getDrainPerLayer[4](): 4,147,200
+level.getDrainPerLayerTotal[4](): 4,147,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 33,177,600
+level.getFillPerLayerTotal[4](): 33,177,600
 ideal_bandwidth_fill_per_layer[4]: 0.00390625
 
 Latency for layer: 5 of Level: AccumulationOutRegister
@@ -11758,11 +11758,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 8,493,465,600
 level.getReadPerLayer[5](): 16,986,931,200
 ideal_bandwidth_read_per_layer[5]: 2.0
-level.getDrainPerLayer[5](): 4,147,200
+level.getDrainPerLayerTotal[5](): 4,147,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 33,177,600
+level.getFillPerLayerTotal[5](): 33,177,600
 ideal_bandwidth_fill_per_layer[5]: 0.00390625
 
 Latency for layer: 6 of Level: AccumulationOutRegister
@@ -11774,11 +11774,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 8,493,465,600
 level.getReadPerLayer[6](): 16,986,931,200
 ideal_bandwidth_read_per_layer[6]: 2.0
-level.getDrainPerLayer[6](): 4,147,200
+level.getDrainPerLayerTotal[6](): 4,147,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 33,177,600
+level.getFillPerLayerTotal[6](): 33,177,600
 ideal_bandwidth_fill_per_layer[6]: 0.00390625
 
 Latency for layer: 7 of Level: AccumulationOutRegister
@@ -11790,11 +11790,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 8,493,465,600
 level.getReadPerLayer[7](): 16,986,931,200
 ideal_bandwidth_read_per_layer[7]: 2.0
-level.getDrainPerLayer[7](): 4,147,200
+level.getDrainPerLayerTotal[7](): 4,147,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 33,177,600
+level.getFillPerLayerTotal[7](): 33,177,600
 ideal_bandwidth_fill_per_layer[7]: 0.00390625
 
 Latency for layer: 8 of Level: AccumulationOutRegister
@@ -11806,11 +11806,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 8,493,465,600
 level.getReadPerLayer[8](): 16,986,931,200
 ideal_bandwidth_read_per_layer[8]: 2.0
-level.getDrainPerLayer[8](): 4,147,200
+level.getDrainPerLayerTotal[8](): 4,147,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 33,177,600
+level.getFillPerLayerTotal[8](): 33,177,600
 ideal_bandwidth_fill_per_layer[8]: 0.00390625
 
 Latency for layer: 9 of Level: AccumulationOutRegister
@@ -11822,11 +11822,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 471,859,200
 level.getReadPerLayer[9](): 928,972,800
 ideal_bandwidth_read_per_layer[9]: 1.96875
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 10
 ideal_bandwidth_update_per_layer[9]: 2.1192762586805556e-08
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -11975,13 +11975,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_read
 self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_reads[0]: 0
 level.getReadPerLayer[0](): 388,800
 ideal_bandwidth_read_per_layer[0]: 1.0
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 0
 ideal_bandwidth_update_per_layer[0]: 0.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 6,220,800
+level.getFillPerLayerTotal[0](): 6,220,800
 ideal_bandwidth_fill_per_layer[0]: 16.0
 
 Latency for layer: 1 of Level: WeightMemory
@@ -11995,7 +11995,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, per_layer_int_out_reads[1]=0, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
@@ -12003,7 +12003,7 @@ level.getUpdatePerLayer[1](): 0
 ideal_bandwidth_update_per_layer[1]: 0.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 66,355,200
+level.getFillPerLayerTotal[1](): 66,355,200
 ideal_bandwidth_fill_per_layer[1]: 16.0
 
 Latency for layer: 2 of Level: WeightMemory
@@ -12015,13 +12015,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
 ideal_bandwidth_read_per_layer[2]: 1.0
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 0
 ideal_bandwidth_update_per_layer[2]: 0.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 66,355,200
+level.getFillPerLayerTotal[2](): 66,355,200
 ideal_bandwidth_fill_per_layer[2]: 16.0
 
 Latency for layer: 3 of Level: WeightMemory
@@ -12033,11 +12033,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
 ideal_bandwidth_read_per_layer[3]: 1.0
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 0
 ideal_bandwidth_update_per_layer[3]: 0.0
-level.getFillPerLayer[3](): 66,355,200
+level.getFillPerLayerTotal[3](): 66,355,200
 ideal_bandwidth_fill_per_layer[3]: 16.0
 
 Latency for layer: 4 of Level: WeightMemory
@@ -12049,11 +12049,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
 ideal_bandwidth_read_per_layer[4]: 1.0
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 0
 ideal_bandwidth_update_per_layer[4]: 0.0
-level.getFillPerLayer[4](): 66,355,200
+level.getFillPerLayerTotal[4](): 66,355,200
 ideal_bandwidth_fill_per_layer[4]: 16.0
 
 Latency for layer: 5 of Level: WeightMemory
@@ -12065,11 +12065,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
 ideal_bandwidth_read_per_layer[5]: 1.0
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 0
 ideal_bandwidth_update_per_layer[5]: 0.0
-level.getFillPerLayer[5](): 66,355,200
+level.getFillPerLayerTotal[5](): 66,355,200
 ideal_bandwidth_fill_per_layer[5]: 16.0
 
 Latency for layer: 6 of Level: WeightMemory
@@ -12081,11 +12081,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
 ideal_bandwidth_read_per_layer[6]: 1.0
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 0
 ideal_bandwidth_update_per_layer[6]: 0.0
-level.getFillPerLayer[6](): 66,355,200
+level.getFillPerLayerTotal[6](): 66,355,200
 ideal_bandwidth_fill_per_layer[6]: 16.0
 
 Latency for layer: 7 of Level: WeightMemory
@@ -12097,11 +12097,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
 ideal_bandwidth_read_per_layer[7]: 1.0
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 0
 ideal_bandwidth_update_per_layer[7]: 0.0
-level.getFillPerLayer[7](): 66,355,200
+level.getFillPerLayerTotal[7](): 66,355,200
 ideal_bandwidth_fill_per_layer[7]: 16.0
 
 Latency for layer: 8 of Level: WeightMemory
@@ -12113,11 +12113,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
 ideal_bandwidth_read_per_layer[8]: 1.0
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 0
 ideal_bandwidth_update_per_layer[8]: 0.0
-level.getFillPerLayer[8](): 66,355,200
+level.getFillPerLayerTotal[8](): 66,355,200
 ideal_bandwidth_fill_per_layer[8]: 16.0
 
 Latency for layer: 9 of Level: WeightMemory
@@ -12129,11 +12129,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
-level.getFillPerLayer[9](): 368,640
+level.getFillPerLayerTotal[9](): 368,640
 ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
@@ -12282,13 +12282,13 @@ self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_rea
 self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 29534400
 level.getReadPerLayer[0](): 35,064,000
 ideal_bandwidth_read_per_layer[0]: 90.18518518518519
-level.getDrainPerLayer[0](): 29,491,200
+level.getDrainPerLayerTotal[0](): 29,491,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 43,200
 ideal_bandwidth_update_per_layer[0]: 0.1111111111111111
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 8,424,000
+level.getFillPerLayerTotal[0](): 8,424,000
 ideal_bandwidth_fill_per_layer[0]: 21.666666666666668
 
 Latency for layer: 1 of Level: FeatureMemory
@@ -12302,7 +12302,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=33,638,400, last_per_layer_int_out_writes[1]=29,491,200
 level.getReadPerLayer[1](): 6,220,800
 ideal_bandwidth_read_per_layer[1]: 1.5
-level.getDrainPerLayer[1](): 29,491,200
+level.getDrainPerLayerTotal[1](): 29,491,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
@@ -12310,7 +12310,7 @@ level.getUpdatePerLayer[1](): 4,147,200
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 30,035,200
+level.getFillPerLayerTotal[1](): 30,035,200
 ideal_bandwidth_fill_per_layer[1]: 7.242283950617284
 
 Latency for layer: 2 of Level: FeatureMemory
@@ -12322,13 +12322,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 6,220,800
 ideal_bandwidth_read_per_layer[2]: 1.5
-level.getDrainPerLayer[2](): 29,491,200
+level.getDrainPerLayerTotal[2](): 29,491,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 4,147,200
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 30,035,200
+level.getFillPerLayerTotal[2](): 30,035,200
 ideal_bandwidth_fill_per_layer[2]: 7.242283950617284
 
 Latency for layer: 3 of Level: FeatureMemory
@@ -12340,11 +12340,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 6,220,800
 ideal_bandwidth_read_per_layer[3]: 1.5
-level.getDrainPerLayer[3](): 29,491,200
+level.getDrainPerLayerTotal[3](): 29,491,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 4,147,200
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 30,035,200
+level.getFillPerLayerTotal[3](): 30,035,200
 ideal_bandwidth_fill_per_layer[3]: 7.242283950617284
 
 Latency for layer: 4 of Level: FeatureMemory
@@ -12356,11 +12356,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 6,220,800
 ideal_bandwidth_read_per_layer[4]: 1.5
-level.getDrainPerLayer[4](): 29,491,200
+level.getDrainPerLayerTotal[4](): 29,491,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 4,147,200
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 30,035,200
+level.getFillPerLayerTotal[4](): 30,035,200
 ideal_bandwidth_fill_per_layer[4]: 7.242283950617284
 
 Latency for layer: 5 of Level: FeatureMemory
@@ -12372,11 +12372,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 6,220,800
 ideal_bandwidth_read_per_layer[5]: 1.5
-level.getDrainPerLayer[5](): 29,491,200
+level.getDrainPerLayerTotal[5](): 29,491,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 4,147,200
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 30,035,200
+level.getFillPerLayerTotal[5](): 30,035,200
 ideal_bandwidth_fill_per_layer[5]: 7.242283950617284
 
 Latency for layer: 6 of Level: FeatureMemory
@@ -12388,11 +12388,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 6,220,800
 ideal_bandwidth_read_per_layer[6]: 1.5
-level.getDrainPerLayer[6](): 29,491,200
+level.getDrainPerLayerTotal[6](): 29,491,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 4,147,200
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 30,035,200
+level.getFillPerLayerTotal[6](): 30,035,200
 ideal_bandwidth_fill_per_layer[6]: 7.242283950617284
 
 Latency for layer: 7 of Level: FeatureMemory
@@ -12404,11 +12404,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 6,220,800
 ideal_bandwidth_read_per_layer[7]: 1.5
-level.getDrainPerLayer[7](): 29,491,200
+level.getDrainPerLayerTotal[7](): 29,491,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 4,147,200
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 30,035,200
+level.getFillPerLayerTotal[7](): 30,035,200
 ideal_bandwidth_fill_per_layer[7]: 7.242283950617284
 
 Latency for layer: 8 of Level: FeatureMemory
@@ -12420,11 +12420,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 6,220,800
 ideal_bandwidth_read_per_layer[8]: 1.5
-level.getDrainPerLayer[8](): 29,491,200
+level.getDrainPerLayerTotal[8](): 29,491,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 4,147,200
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 30,035,200
+level.getFillPerLayerTotal[8](): 30,035,200
 ideal_bandwidth_fill_per_layer[8]: 7.242283950617284
 
 Latency for layer: 9 of Level: FeatureMemory
@@ -12436,11 +12436,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
 ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -12589,13 +12589,13 @@ self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_o
 self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_out_reads[0]: 29491200
 level.getReadPerLayer[0](): 44,136,000
 ideal_bandwidth_read_per_layer[0]: 113.51851851851852
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 29,491,200
 ideal_bandwidth_update_per_layer[0]: 75.85185185185185
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: DRAM
@@ -12609,7 +12609,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66,355,200, per_layer_int_out_reads[1]=29,491,200, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 30.353395061728396
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
@@ -12617,7 +12617,7 @@ level.getUpdatePerLayer[1](): 29,491,200
 ideal_bandwidth_update_per_layer[1]: 7.111111111111111
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 0
+level.getFillPerLayerTotal[1](): 0
 ideal_bandwidth_fill_per_layer[1]: 0.0
 
 Latency for layer: 2 of Level: DRAM
@@ -12629,13 +12629,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 125,881,600
 ideal_bandwidth_read_per_layer[2]: 30.353395061728396
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 29,491,200
 ideal_bandwidth_update_per_layer[2]: 7.111111111111111
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 0
+level.getFillPerLayerTotal[2](): 0
 ideal_bandwidth_fill_per_layer[2]: 0.0
 
 Latency for layer: 3 of Level: DRAM
@@ -12647,11 +12647,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 125,881,600
 ideal_bandwidth_read_per_layer[3]: 30.353395061728396
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 29,491,200
 ideal_bandwidth_update_per_layer[3]: 7.111111111111111
-level.getFillPerLayer[3](): 0
+level.getFillPerLayerTotal[3](): 0
 ideal_bandwidth_fill_per_layer[3]: 0.0
 
 Latency for layer: 4 of Level: DRAM
@@ -12663,11 +12663,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 125,881,600
 ideal_bandwidth_read_per_layer[4]: 30.353395061728396
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 29,491,200
 ideal_bandwidth_update_per_layer[4]: 7.111111111111111
-level.getFillPerLayer[4](): 0
+level.getFillPerLayerTotal[4](): 0
 ideal_bandwidth_fill_per_layer[4]: 0.0
 
 Latency for layer: 5 of Level: DRAM
@@ -12679,11 +12679,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 125,881,600
 ideal_bandwidth_read_per_layer[5]: 30.353395061728396
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 29,491,200
 ideal_bandwidth_update_per_layer[5]: 7.111111111111111
-level.getFillPerLayer[5](): 0
+level.getFillPerLayerTotal[5](): 0
 ideal_bandwidth_fill_per_layer[5]: 0.0
 
 Latency for layer: 6 of Level: DRAM
@@ -12695,11 +12695,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 125,881,600
 ideal_bandwidth_read_per_layer[6]: 30.353395061728396
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 29,491,200
 ideal_bandwidth_update_per_layer[6]: 7.111111111111111
-level.getFillPerLayer[6](): 0
+level.getFillPerLayerTotal[6](): 0
 ideal_bandwidth_fill_per_layer[6]: 0.0
 
 Latency for layer: 7 of Level: DRAM
@@ -12711,11 +12711,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 125,881,600
 ideal_bandwidth_read_per_layer[7]: 30.353395061728396
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 29,491,200
 ideal_bandwidth_update_per_layer[7]: 7.111111111111111
-level.getFillPerLayer[7](): 0
+level.getFillPerLayerTotal[7](): 0
 ideal_bandwidth_fill_per_layer[7]: 0.0
 
 Latency for layer: 8 of Level: DRAM
@@ -12727,11 +12727,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 125,881,600
 ideal_bandwidth_read_per_layer[8]: 30.353395061728396
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 29,491,200
 ideal_bandwidth_update_per_layer[8]: 7.111111111111111
-level.getFillPerLayer[8](): 0
+level.getFillPerLayerTotal[8](): 0
 ideal_bandwidth_fill_per_layer[8]: 0.0
 
 Latency for layer: 9 of Level: DRAM
@@ -12743,11 +12743,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
 ideal_bandwidth_read_per_layer[9]: 129.6
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
 ideal_bandwidth_update_per_layer[9]: 64.0
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -14933,13 +14933,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]:
 self.in_reads: 0, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 796305600
 level.getReadPerLayer[0](): 796,305,600
 ideal_bandwidth_read_per_layer[0]: 1.0000542534722223
-level.getDrainPerLayer[0](): 43,200
+level.getDrainPerLayerTotal[0](): 43,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 796,262,400
 ideal_bandwidth_update_per_layer[0]: 1.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: AccumulationOutRegister
@@ -14953,7 +14953,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=8,493,465,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=8,497,612,800, last_per_layer_int_out_writes[1]=4,147,200
 level.getReadPerLayer[1](): 16,986,931,200
 ideal_bandwidth_read_per_layer[1]: 2.0
-level.getDrainPerLayer[1](): 4,147,200
+level.getDrainPerLayerTotal[1](): 4,147,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 8493465600 - self.last_per_layer_int_out_reads[1]: 0
@@ -14961,7 +14961,7 @@ level.getUpdatePerLayer[1](): 8,493,465,600
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=33,177,600, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 33,177,600
+level.getFillPerLayerTotal[1](): 33,177,600
 ideal_bandwidth_fill_per_layer[1]: 0.00390625
 
 Latency for layer: 2 of Level: AccumulationOutRegister
@@ -14973,13 +14973,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 8,493,465,600
 level.getReadPerLayer[2](): 16,986,931,200
 ideal_bandwidth_read_per_layer[2]: 2.0
-level.getDrainPerLayer[2](): 4,147,200
+level.getDrainPerLayerTotal[2](): 4,147,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 8,493,465,600
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=33,177,600, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 33,177,600
+level.getFillPerLayerTotal[2](): 33,177,600
 ideal_bandwidth_fill_per_layer[2]: 0.00390625
 
 Latency for layer: 3 of Level: AccumulationOutRegister
@@ -14991,11 +14991,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 8,493,465,600
 level.getReadPerLayer[3](): 16,986,931,200
 ideal_bandwidth_read_per_layer[3]: 2.0
-level.getDrainPerLayer[3](): 4,147,200
+level.getDrainPerLayerTotal[3](): 4,147,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 8,493,465,600
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 33,177,600
+level.getFillPerLayerTotal[3](): 33,177,600
 ideal_bandwidth_fill_per_layer[3]: 0.00390625
 
 Latency for layer: 4 of Level: AccumulationOutRegister
@@ -15007,11 +15007,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 8,493,465,600
 level.getReadPerLayer[4](): 16,986,931,200
 ideal_bandwidth_read_per_layer[4]: 2.0
-level.getDrainPerLayer[4](): 4,147,200
+level.getDrainPerLayerTotal[4](): 4,147,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 8,493,465,600
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 33,177,600
+level.getFillPerLayerTotal[4](): 33,177,600
 ideal_bandwidth_fill_per_layer[4]: 0.00390625
 
 Latency for layer: 5 of Level: AccumulationOutRegister
@@ -15023,11 +15023,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 8,493,465,600
 level.getReadPerLayer[5](): 16,986,931,200
 ideal_bandwidth_read_per_layer[5]: 2.0
-level.getDrainPerLayer[5](): 4,147,200
+level.getDrainPerLayerTotal[5](): 4,147,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 8,493,465,600
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 33,177,600
+level.getFillPerLayerTotal[5](): 33,177,600
 ideal_bandwidth_fill_per_layer[5]: 0.00390625
 
 Latency for layer: 6 of Level: AccumulationOutRegister
@@ -15039,11 +15039,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 8,493,465,600
 level.getReadPerLayer[6](): 16,986,931,200
 ideal_bandwidth_read_per_layer[6]: 2.0
-level.getDrainPerLayer[6](): 4,147,200
+level.getDrainPerLayerTotal[6](): 4,147,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 8,493,465,600
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 33,177,600
+level.getFillPerLayerTotal[6](): 33,177,600
 ideal_bandwidth_fill_per_layer[6]: 0.00390625
 
 Latency for layer: 7 of Level: AccumulationOutRegister
@@ -15055,11 +15055,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 8,493,465,600
 level.getReadPerLayer[7](): 16,986,931,200
 ideal_bandwidth_read_per_layer[7]: 2.0
-level.getDrainPerLayer[7](): 4,147,200
+level.getDrainPerLayerTotal[7](): 4,147,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 8,493,465,600
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 33,177,600
+level.getFillPerLayerTotal[7](): 33,177,600
 ideal_bandwidth_fill_per_layer[7]: 0.00390625
 
 Latency for layer: 8 of Level: AccumulationOutRegister
@@ -15071,11 +15071,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 8,493,465,600
 level.getReadPerLayer[8](): 16,986,931,200
 ideal_bandwidth_read_per_layer[8]: 2.0
-level.getDrainPerLayer[8](): 4,147,200
+level.getDrainPerLayerTotal[8](): 4,147,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 8,493,465,600
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 33,177,600
+level.getFillPerLayerTotal[8](): 33,177,600
 ideal_bandwidth_fill_per_layer[8]: 0.00390625
 
 Latency for layer: 9 of Level: AccumulationOutRegister
@@ -15087,11 +15087,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 471,859,200
 level.getReadPerLayer[9](): 928,972,800
 ideal_bandwidth_read_per_layer[9]: 1.96875
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 10
 ideal_bandwidth_update_per_layer[9]: 2.1192762586805556e-08
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -15240,13 +15240,13 @@ self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_read
 self.in_reads: 0, self.per_layer_w_reads[0]: 388800, self.per_layer_int_out_reads[0]: 0
 level.getReadPerLayer[0](): 388,800
 ideal_bandwidth_read_per_layer[0]: 1.0
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 0
 ideal_bandwidth_update_per_layer[0]: 0.0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=6,220,800, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 6,220,800
+level.getFillPerLayerTotal[0](): 6,220,800
 ideal_bandwidth_fill_per_layer[0]: 16.0
 
 Latency for layer: 1 of Level: WeightMemory
@@ -15260,7 +15260,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=0, per_layer_w_reads[1]=4,147,200, per_layer_int_out_reads[1]=0, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 4,147,200
 ideal_bandwidth_read_per_layer[1]: 1.0
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 0 - self.last_per_layer_int_out_reads[1]: 0
@@ -15268,7 +15268,7 @@ level.getUpdatePerLayer[1](): 0
 ideal_bandwidth_update_per_layer[1]: 0.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=66,355,200, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 66,355,200
+level.getFillPerLayerTotal[1](): 66,355,200
 ideal_bandwidth_fill_per_layer[1]: 16.0
 
 Latency for layer: 2 of Level: WeightMemory
@@ -15280,13 +15280,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 4,147,200
 ideal_bandwidth_read_per_layer[2]: 1.0
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 0
 ideal_bandwidth_update_per_layer[2]: 0.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=66,355,200, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 66,355,200
+level.getFillPerLayerTotal[2](): 66,355,200
 ideal_bandwidth_fill_per_layer[2]: 16.0
 
 Latency for layer: 3 of Level: WeightMemory
@@ -15298,11 +15298,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 4,147,200
 ideal_bandwidth_read_per_layer[3]: 1.0
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 0
 ideal_bandwidth_update_per_layer[3]: 0.0
-level.getFillPerLayer[3](): 66,355,200
+level.getFillPerLayerTotal[3](): 66,355,200
 ideal_bandwidth_fill_per_layer[3]: 16.0
 
 Latency for layer: 4 of Level: WeightMemory
@@ -15314,11 +15314,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 4,147,200
 ideal_bandwidth_read_per_layer[4]: 1.0
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 0
 ideal_bandwidth_update_per_layer[4]: 0.0
-level.getFillPerLayer[4](): 66,355,200
+level.getFillPerLayerTotal[4](): 66,355,200
 ideal_bandwidth_fill_per_layer[4]: 16.0
 
 Latency for layer: 5 of Level: WeightMemory
@@ -15330,11 +15330,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 4,147,200
 ideal_bandwidth_read_per_layer[5]: 1.0
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 0
 ideal_bandwidth_update_per_layer[5]: 0.0
-level.getFillPerLayer[5](): 66,355,200
+level.getFillPerLayerTotal[5](): 66,355,200
 ideal_bandwidth_fill_per_layer[5]: 16.0
 
 Latency for layer: 6 of Level: WeightMemory
@@ -15346,11 +15346,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 4,147,200
 ideal_bandwidth_read_per_layer[6]: 1.0
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 0
 ideal_bandwidth_update_per_layer[6]: 0.0
-level.getFillPerLayer[6](): 66,355,200
+level.getFillPerLayerTotal[6](): 66,355,200
 ideal_bandwidth_fill_per_layer[6]: 16.0
 
 Latency for layer: 7 of Level: WeightMemory
@@ -15362,11 +15362,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 4,147,200
 ideal_bandwidth_read_per_layer[7]: 1.0
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 0
 ideal_bandwidth_update_per_layer[7]: 0.0
-level.getFillPerLayer[7](): 66,355,200
+level.getFillPerLayerTotal[7](): 66,355,200
 ideal_bandwidth_fill_per_layer[7]: 16.0
 
 Latency for layer: 8 of Level: WeightMemory
@@ -15378,11 +15378,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 4,147,200
 ideal_bandwidth_read_per_layer[8]: 1.0
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 0
 ideal_bandwidth_update_per_layer[8]: 0.0
-level.getFillPerLayer[8](): 66,355,200
+level.getFillPerLayerTotal[8](): 66,355,200
 ideal_bandwidth_fill_per_layer[8]: 16.0
 
 Latency for layer: 9 of Level: WeightMemory
@@ -15394,11 +15394,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 0
 ideal_bandwidth_update_per_layer[9]: 0.0
-level.getFillPerLayer[9](): 368,640
+level.getFillPerLayerTotal[9](): 368,640
 ideal_bandwidth_fill_per_layer[9]: 1.6
 
 Start of calculation of latency:
@@ -15547,13 +15547,13 @@ self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_rea
 self.in_reads: 5529600, self.per_layer_w_reads[0]: 0, self.per_layer_int_out_reads[0]: 29534400
 level.getReadPerLayer[0](): 35,064,000
 ideal_bandwidth_read_per_layer[0]: 90.18518518518519
-level.getDrainPerLayer[0](): 29,491,200
+level.getDrainPerLayerTotal[0](): 29,491,200
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 43,200
 ideal_bandwidth_update_per_layer[0]: 0.1111111111111111
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=8,424,000, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 8,424,000
+level.getFillPerLayerTotal[0](): 8,424,000
 ideal_bandwidth_fill_per_layer[0]: 21.666666666666668
 
 Latency for layer: 1 of Level: FeatureMemory
@@ -15567,7 +15567,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, 
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=2,073,600, per_layer_w_reads[1]=0, per_layer_int_out_reads[1]=33,638,400, last_per_layer_int_out_writes[1]=29,491,200
 level.getReadPerLayer[1](): 6,220,800
 ideal_bandwidth_read_per_layer[1]: 1.5
-level.getDrainPerLayer[1](): 29,491,200
+level.getDrainPerLayerTotal[1](): 29,491,200
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 4147200 - self.last_per_layer_int_out_reads[1]: 0
@@ -15575,7 +15575,7 @@ level.getUpdatePerLayer[1](): 4,147,200
 ideal_bandwidth_update_per_layer[1]: 1.0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=30,035,200, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 30,035,200
+level.getFillPerLayerTotal[1](): 30,035,200
 ideal_bandwidth_fill_per_layer[1]: 7.242283950617284
 
 Latency for layer: 2 of Level: FeatureMemory
@@ -15587,13 +15587,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 6,220,800
 ideal_bandwidth_read_per_layer[2]: 1.5
-level.getDrainPerLayer[2](): 29,491,200
+level.getDrainPerLayerTotal[2](): 29,491,200
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 4,147,200
 ideal_bandwidth_update_per_layer[2]: 1.0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=30,035,200, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 30,035,200
+level.getFillPerLayerTotal[2](): 30,035,200
 ideal_bandwidth_fill_per_layer[2]: 7.242283950617284
 
 Latency for layer: 3 of Level: FeatureMemory
@@ -15605,11 +15605,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 6,220,800
 ideal_bandwidth_read_per_layer[3]: 1.5
-level.getDrainPerLayer[3](): 29,491,200
+level.getDrainPerLayerTotal[3](): 29,491,200
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 4,147,200
 ideal_bandwidth_update_per_layer[3]: 1.0
-level.getFillPerLayer[3](): 30,035,200
+level.getFillPerLayerTotal[3](): 30,035,200
 ideal_bandwidth_fill_per_layer[3]: 7.242283950617284
 
 Latency for layer: 4 of Level: FeatureMemory
@@ -15621,11 +15621,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 6,220,800
 ideal_bandwidth_read_per_layer[4]: 1.5
-level.getDrainPerLayer[4](): 29,491,200
+level.getDrainPerLayerTotal[4](): 29,491,200
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 4,147,200
 ideal_bandwidth_update_per_layer[4]: 1.0
-level.getFillPerLayer[4](): 30,035,200
+level.getFillPerLayerTotal[4](): 30,035,200
 ideal_bandwidth_fill_per_layer[4]: 7.242283950617284
 
 Latency for layer: 5 of Level: FeatureMemory
@@ -15637,11 +15637,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 6,220,800
 ideal_bandwidth_read_per_layer[5]: 1.5
-level.getDrainPerLayer[5](): 29,491,200
+level.getDrainPerLayerTotal[5](): 29,491,200
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 4,147,200
 ideal_bandwidth_update_per_layer[5]: 1.0
-level.getFillPerLayer[5](): 30,035,200
+level.getFillPerLayerTotal[5](): 30,035,200
 ideal_bandwidth_fill_per_layer[5]: 7.242283950617284
 
 Latency for layer: 6 of Level: FeatureMemory
@@ -15653,11 +15653,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 6,220,800
 ideal_bandwidth_read_per_layer[6]: 1.5
-level.getDrainPerLayer[6](): 29,491,200
+level.getDrainPerLayerTotal[6](): 29,491,200
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 4,147,200
 ideal_bandwidth_update_per_layer[6]: 1.0
-level.getFillPerLayer[6](): 30,035,200
+level.getFillPerLayerTotal[6](): 30,035,200
 ideal_bandwidth_fill_per_layer[6]: 7.242283950617284
 
 Latency for layer: 7 of Level: FeatureMemory
@@ -15669,11 +15669,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 6,220,800
 ideal_bandwidth_read_per_layer[7]: 1.5
-level.getDrainPerLayer[7](): 29,491,200
+level.getDrainPerLayerTotal[7](): 29,491,200
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 4,147,200
 ideal_bandwidth_update_per_layer[7]: 1.0
-level.getFillPerLayer[7](): 30,035,200
+level.getFillPerLayerTotal[7](): 30,035,200
 ideal_bandwidth_fill_per_layer[7]: 7.242283950617284
 
 Latency for layer: 8 of Level: FeatureMemory
@@ -15685,11 +15685,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 6,220,800
 ideal_bandwidth_read_per_layer[8]: 1.5
-level.getDrainPerLayer[8](): 29,491,200
+level.getDrainPerLayerTotal[8](): 29,491,200
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 4,147,200
 ideal_bandwidth_update_per_layer[8]: 1.0
-level.getFillPerLayer[8](): 30,035,200
+level.getFillPerLayerTotal[8](): 30,035,200
 ideal_bandwidth_fill_per_layer[8]: 7.242283950617284
 
 Latency for layer: 9 of Level: FeatureMemory
@@ -15701,11 +15701,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 23,040
 ideal_bandwidth_read_per_layer[9]: 0.1
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 20,480
 ideal_bandwidth_update_per_layer[9]: 0.08888888888888889
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:
@@ -15854,13 +15854,13 @@ self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_o
 self.in_reads: 8424000, self.per_layer_w_reads[0]: 6220800, self.per_layer_int_out_reads[0]: 29491200
 level.getReadPerLayer[0](): 44,136,000
 ideal_bandwidth_read_per_layer[0]: 113.51851851851852
-level.getDrainPerLayer[0](): 0
+level.getDrainPerLayerTotal[0](): 0
 ideal_bandwidth_drain_per_layer[0]: 0
 level.getUpdatePerLayer[0](): 29,491,200
 ideal_bandwidth_update_per_layer[0]: 75.85185185185185
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
 DEBUG getFill: layer_id=0, in_writes=0, per_layer_w_writes[0]=0, last_per_layer_int_out_reads[0]=0
-level.getFillPerLayer[0](): 0
+level.getFillPerLayerTotal[0](): 0
 ideal_bandwidth_fill_per_layer[0]: 0.0
 
 Latency for layer: 1 of Level: DRAM
@@ -15874,7 +15874,7 @@ DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66
 DEBUG: layer_id=1, per_layer_int_in_reads[0]=30,035,200, per_layer_w_reads[1]=66,355,200, per_layer_int_out_reads[1]=29,491,200, last_per_layer_int_out_writes[1]=0
 level.getReadPerLayer[1](): 125,881,600
 ideal_bandwidth_read_per_layer[1]: 30.353395061728396
-level.getDrainPerLayer[1](): 0
+level.getDrainPerLayerTotal[1](): 0
 ideal_bandwidth_drain_per_layer[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
 UpdatePerLayer: self.per_layer_int_out_writes[1]: 29491200 - self.last_per_layer_int_out_reads[1]: 0
@@ -15882,7 +15882,7 @@ level.getUpdatePerLayer[1](): 29,491,200
 ideal_bandwidth_update_per_layer[1]: 7.111111111111111
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
 DEBUG getFill: layer_id=1, per_layer_int_in_writes[0]=0, per_layer_w_writes[1]=0, last_per_layer_int_out_reads[1]=0
-level.getFillPerLayer[1](): 0
+level.getFillPerLayerTotal[1](): 0
 ideal_bandwidth_fill_per_layer[1]: 0.0
 
 Latency for layer: 2 of Level: DRAM
@@ -15894,13 +15894,13 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[2]:
 SCALED cc_per_all_tiles_per_layer[2]: 4,147,200
 level.getReadPerLayer[2](): 125,881,600
 ideal_bandwidth_read_per_layer[2]: 30.353395061728396
-level.getDrainPerLayer[2](): 0
+level.getDrainPerLayerTotal[2](): 0
 ideal_bandwidth_drain_per_layer[2]: 0
 level.getUpdatePerLayer[2](): 29,491,200
 ideal_bandwidth_update_per_layer[2]: 7.111111111111111
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
 DEBUG getFill: layer_id=2, per_layer_int_in_writes[1]=0, per_layer_w_writes[2]=0, last_per_layer_int_out_reads[2]=0
-level.getFillPerLayer[2](): 0
+level.getFillPerLayerTotal[2](): 0
 ideal_bandwidth_fill_per_layer[2]: 0.0
 
 Latency for layer: 3 of Level: DRAM
@@ -15912,11 +15912,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[3]:
 SCALED cc_per_all_tiles_per_layer[3]: 4,147,200
 level.getReadPerLayer[3](): 125,881,600
 ideal_bandwidth_read_per_layer[3]: 30.353395061728396
-level.getDrainPerLayer[3](): 0
+level.getDrainPerLayerTotal[3](): 0
 ideal_bandwidth_drain_per_layer[3]: 0
 level.getUpdatePerLayer[3](): 29,491,200
 ideal_bandwidth_update_per_layer[3]: 7.111111111111111
-level.getFillPerLayer[3](): 0
+level.getFillPerLayerTotal[3](): 0
 ideal_bandwidth_fill_per_layer[3]: 0.0
 
 Latency for layer: 4 of Level: DRAM
@@ -15928,11 +15928,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[4]:
 SCALED cc_per_all_tiles_per_layer[4]: 4,147,200
 level.getReadPerLayer[4](): 125,881,600
 ideal_bandwidth_read_per_layer[4]: 30.353395061728396
-level.getDrainPerLayer[4](): 0
+level.getDrainPerLayerTotal[4](): 0
 ideal_bandwidth_drain_per_layer[4]: 0
 level.getUpdatePerLayer[4](): 29,491,200
 ideal_bandwidth_update_per_layer[4]: 7.111111111111111
-level.getFillPerLayer[4](): 0
+level.getFillPerLayerTotal[4](): 0
 ideal_bandwidth_fill_per_layer[4]: 0.0
 
 Latency for layer: 5 of Level: DRAM
@@ -15944,11 +15944,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[5]:
 SCALED cc_per_all_tiles_per_layer[5]: 4,147,200
 level.getReadPerLayer[5](): 125,881,600
 ideal_bandwidth_read_per_layer[5]: 30.353395061728396
-level.getDrainPerLayer[5](): 0
+level.getDrainPerLayerTotal[5](): 0
 ideal_bandwidth_drain_per_layer[5]: 0
 level.getUpdatePerLayer[5](): 29,491,200
 ideal_bandwidth_update_per_layer[5]: 7.111111111111111
-level.getFillPerLayer[5](): 0
+level.getFillPerLayerTotal[5](): 0
 ideal_bandwidth_fill_per_layer[5]: 0.0
 
 Latency for layer: 6 of Level: DRAM
@@ -15960,11 +15960,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[6]:
 SCALED cc_per_all_tiles_per_layer[6]: 4,147,200
 level.getReadPerLayer[6](): 125,881,600
 ideal_bandwidth_read_per_layer[6]: 30.353395061728396
-level.getDrainPerLayer[6](): 0
+level.getDrainPerLayerTotal[6](): 0
 ideal_bandwidth_drain_per_layer[6]: 0
 level.getUpdatePerLayer[6](): 29,491,200
 ideal_bandwidth_update_per_layer[6]: 7.111111111111111
-level.getFillPerLayer[6](): 0
+level.getFillPerLayerTotal[6](): 0
 ideal_bandwidth_fill_per_layer[6]: 0.0
 
 Latency for layer: 7 of Level: DRAM
@@ -15976,11 +15976,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[7]:
 SCALED cc_per_all_tiles_per_layer[7]: 4,147,200
 level.getReadPerLayer[7](): 125,881,600
 ideal_bandwidth_read_per_layer[7]: 30.353395061728396
-level.getDrainPerLayer[7](): 0
+level.getDrainPerLayerTotal[7](): 0
 ideal_bandwidth_drain_per_layer[7]: 0
 level.getUpdatePerLayer[7](): 29,491,200
 ideal_bandwidth_update_per_layer[7]: 7.111111111111111
-level.getFillPerLayer[7](): 0
+level.getFillPerLayerTotal[7](): 0
 ideal_bandwidth_fill_per_layer[7]: 0.0
 
 Latency for layer: 8 of Level: DRAM
@@ -15992,11 +15992,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[8]:
 SCALED cc_per_all_tiles_per_layer[8]: 4,147,200
 level.getReadPerLayer[8](): 125,881,600
 ideal_bandwidth_read_per_layer[8]: 30.353395061728396
-level.getDrainPerLayer[8](): 0
+level.getDrainPerLayerTotal[8](): 0
 ideal_bandwidth_drain_per_layer[8]: 0
 level.getUpdatePerLayer[8](): 29,491,200
 ideal_bandwidth_update_per_layer[8]: 7.111111111111111
-level.getFillPerLayer[8](): 0
+level.getFillPerLayerTotal[8](): 0
 ideal_bandwidth_fill_per_layer[8]: 0.0
 
 Latency for layer: 9 of Level: DRAM
@@ -16008,11 +16008,11 @@ Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[9]:
 SCALED cc_per_all_tiles_per_layer[9]: 230,400
 level.getReadPerLayer[9](): 29,859,840
 ideal_bandwidth_read_per_layer[9]: 129.6
-level.getDrainPerLayer[9](): 0
+level.getDrainPerLayerTotal[9](): 0
 ideal_bandwidth_drain_per_layer[9]: 0
 level.getUpdatePerLayer[9](): 14,745,600
 ideal_bandwidth_update_per_layer[9]: 64.0
-level.getFillPerLayer[9](): 0
+level.getFillPerLayerTotal[9](): 0
 ideal_bandwidth_fill_per_layer[9]: 0.0
 
 Start of calculation of latency:

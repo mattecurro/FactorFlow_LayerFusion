@@ -11,7 +11,7 @@ from settings import *
 from factors import *
 from levels import *
 from prints import *
-from model import *
+from cost_model import *
 from utils import *
 from arch import *
 

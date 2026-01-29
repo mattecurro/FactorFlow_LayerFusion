@@ -315,7 +315,7 @@ class Coupling:
     ## get flat coupling list
     """
     Returns the flat coupling list for the provided operand.
-    Valid operand names are: 'in', 'w', and 'out'.
+    Valid operand names are: 'in', 'w', and 'out', 'int_in', 'int_out'.
     """
     def flatCouplingByOperand(self, operand : str, layer_index: Optional[int] = None) -> list[str]:
         if operand == 'in':
@@ -332,7 +332,7 @@ class Coupling:
             raise IndexError(f"Layer index {layer_index} not found in flat weight coupling.")
         elif operand == 'out':
             return self.flat_out_coupling
-        elif operand == 'int':
+        elif operand == 'int_in':
             if layer_index is not None and layer_index in self.flat_int_in_coupling:
                 return self.flat_int_in_coupling[layer_index]
             if layer_index is None:
@@ -341,6 +341,15 @@ class Coupling:
                     flat_int_coupling_entire.extend(self.flat_int_in_coupling[layer_id])
                 return flat_int_coupling_entire
             raise IndexError(f"Layer index {layer_index} not found in flat intermediate input/output coupling.")
+        elif operand == 'int_out':
+            if layer_index is not None and layer_index in self.flat_int_out_coupling:
+                return self.flat_int_out_coupling[layer_index]
+            if layer_index is None:
+                flat_int_out_coupling_entire = []
+                for layer_id in range(self.getNumLayers()-1):
+                    flat_int_out_coupling_entire.extend(self.flat_int_out_coupling[layer_id])
+                return flat_int_out_coupling_entire
+            raise IndexError(f"Layer index {layer_index} not found in flat intermediate output coupling.")
         else:
             raise Exception(f"Unrecognized operand ({operand}) in coupling.")
     
@@ -494,14 +503,6 @@ class Shape(dict[str, int]):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    ## it is not used anymore, but it may be useful to have it
-    def memFootprint(self, coupling : Coupling) -> int:
-        input_size = prod(sum(self[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in coupling.in_coupling)
-        output_size = prod(sum(self[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in coupling.out_coupling)
-        
-        weight_size = sum(prod(sum(self[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in w_coupling) for w_coupling in coupling.w_coupling)
-
-        return input_size + output_size + weight_size
     
     def FLOPs(self) -> int:
         return 2*prod(self.values())
@@ -591,15 +592,6 @@ class Factors(dict[str, dict[int, int]]):
     def fullProduct(self) -> int:
         return prod(self._dim_products.values())        
     
-    def fullProductWithPrint(self) -> int:
-        partial_prod = 1
-        for dim in self.keys():
-            partial_prod *= self._dim_products[dim]
-            print(f"Dim {dim}: iterations {self._dim_products[dim]}")
-            print(f"Partial product: {partial_prod}")
-        print(f"Total iterations: {prod(self._dim_products.values())}\n")
-        return prod(self._dim_products.values())
-
     """Total number of iterations across a list of dimensions. Every dimension belonging to intermediate input is not considered."""
     def partialProduct(self, dimensions : list[str]) -> int:
         return prod(self._dim_products[dim] for dim in dimensions)
@@ -625,10 +617,6 @@ class Factors(dict[str, dict[int, int]]):
                 set(arch.coupling.getFlatWeightCoupling(layer_id))|
                 set(arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
             )
-        #print(f"Layer {layer_id} dimensions: {dimensions}")
-        #for dim in dimensions:
-        #    print(f"Dim {dim}: iterations {self._dim_products[dim]}")
-        #print(f"Total iterations for layer {layer_id}: {prod(self._dim_products[dim] for dim in dimensions)}\n")
         return prod(self._dim_products[dim] for dim in dimensions)
                 
     """
@@ -675,13 +663,14 @@ class Factors(dict[str, dict[int, int]]):
     (It is assumed that a level always stores all data for the
     iterations unfolding over it)
     """
-    def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1, int_bp: bool = 1) -> int:
+    ## Potential BUG: Fully cached
+    def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1, int_in_bp: bool = 1, int_out_bp: bool = 1) -> int:
         ## TODO: General case: Fully Cached must be managed by the innermost dim sum (Q in DepFin), but for DepFiN is fixed
         if Settings.FULLY_CACHED:
             input_FC_size = 1
             intermediate_input_FC_size = 1    
             if arch.name == "DepFiN 10-Layer Architecture":
-                input_FC_size = tile_sizes['X0']*(tile_sizes['S0'] - arch.getInStride('S0')) * (self._dim_products['X0']-1) * tile_sizes['C0']
+                input_FC_size = tile_sizes['X0']*(tile_sizes['S0'] - arch.getInStride('S0')) * (self._dim_products['X0'] - 1) * tile_sizes['C0']
                 print(f"Input FC size: {input_FC_size}\n")
                 for layer_id in range(arch.coupling.getNumLayers() - 1):
                     for dim_sum in arch.coupling.getIntermediateInputCoupling(layer_id):
@@ -706,7 +695,7 @@ class Factors(dict[str, dict[int, int]]):
                         input_FC_size *= tile_sizes['C0']     
                 print(f"Input FC size: {input_FC_size}\n")
         input_FC_size *= in_bp
-        intermediate_input_FC_size *= int_bp 
+        intermediate_input_FC_size *= int_in_bp
         input_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.in_coupling)*in_bp
         print(f"Input size: {input_size}\n")
         output_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.out_coupling)*out_bp
@@ -715,9 +704,8 @@ class Factors(dict[str, dict[int, int]]):
         print(f"Weight size: {weight_size}\n")
         intermediate_input_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_i_coupling) for int_i_coupling in arch.coupling.int_in_coupling.values())
         print(f"Intermediate input size: {intermediate_input_size}")
-#        intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
-#        intermediate_size = (intermediate_input_size + intermediate_output_size)*int_bp
-        intermediate_size = intermediate_input_size*int_bp
+        intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
+        intermediate_size = intermediate_input_size*int_in_bp + intermediate_output_size*int_out_bp
         print(f"Total intermediate size (input + output): {intermediate_size}\n")
         print(f"input_size: {input_size}, output_size: {output_size}, weight_size: {weight_size}, intermediate_size: {intermediate_size}")
         print(f"Total mem footprint: {input_size + output_size + weight_size + intermediate_size + input_FC_size + intermediate_input_FC_size}\n\n\n")
@@ -744,4 +732,3 @@ class Factors(dict[str, dict[int, int]]):
 
     def __str__(self) -> str:
         return "{" + ", ".join(f"{k}: {v}" for k, v in self.items()) + "}"
-

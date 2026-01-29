@@ -213,6 +213,9 @@ def printMOPsFusion(arch : Arch, per_instance : bool = False) -> None:
                 print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Per-Layer Int_Out_W: [{layer_int_out_w_str}], Total: {total:,.0f}")
 
             # Total reads and writes
+            # For levels that store intermediates (e.g., FeatureMemory), 
+            # use bandwidth-adjusted values to exclude partial sum accumulation
+            # which happens in PE registers, not this memory level.
             reads = level.in_reads + level.w_reads + level.int_in_reads + level.int_out_reads + level.out_reads
             writes = level.in_writes + level.w_writes + level.int_in_writes + level.int_out_writes + level.out_writes
             print(f"{level.name}:{chr(9) * (2 - (len(level.name) + 1)//8)}Total Reads = {reads:,.0f}, Total Writes = {writes:,.0f}")

@@ -22,8 +22,8 @@ Bias present: False
 ------------------------------
 
 Threads: 8
-final_layer_dims: {'Z10', 'X0', 'R0', 'Q', 'S10', 'Y0', 'C10', 'S0', 'C0', 'R10', 'P'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'P', 'Q', 'Z10']
-INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'S1', 'C2', 'X3', 'X5', 'Z0', 'Z5', 'Y6', 'C6', 'R8', 'X4', 'S4', 'Z8', 'R3', 'S9', 'Z4', 'S2', 'X1', 'Y8', 'Y4', 'X8', 'X7', 'S3', 'Y7', 'R1', 'C8', 'R4', 'Y3', 'C7', 'X6', 'Z2', 'Z6', 'Z1', 'S7', 'S8', 'Z9', 'R9', 'Y9', 'Z7', 'R6', 'Y5', 'S6', 'X2', 'Y1', 'Z3', 'C1', 'C5', 'R7', 'S5', 'Y2', 'R2', 'C3', 'C4', 'C9', 'R5', 'X9'}
+final_layer_dims: {'R0', 'S0', 'Z10', 'R10', 'S10', 'P', 'C0', 'C10', 'Y0', 'X0', 'Q'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'P', 'Q', 'Z10']
+INFO: Arch: DepFiN 10-Layer Architecture: identified intermediate dimensions: {'C2', 'Z1', 'R3', 'S7', 'C9', 'S4', 'C6', 'C5', 'Y8', 'R2', 'X1', 'S1', 'Z4', 'S2', 'Z6', 'S5', 'S9', 'X2', 'S3', 'Y5', 'Z8', 'C4', 'R7', 'C3', 'Z3', 'Y4', 'X7', 'S8', 'R4', 'X4', 'Y2', 'R5', 'X8', 'X3', 'Z7', 'Y1', 'X9', 'X6', 'Y7', 'R8', 'R1', 'C1', 'R6', 'Z0', 'Z2', 'C8', 'Y3', 'Z5', 'R9', 'C7', 'X5', 'Y9', 'S6', 'Y6', 'Z9'}
 INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
 INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
 INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
@@ -1487,8 +1487,8 @@ Level FeatureMemory, Layer 10: total_reads = 29491200, total_writes = 14745600
 Check: Per Layer Total reads: {0: 79257600, 1: 560332800, 2: 560332800, 3: 560332800, 4: 560332800, 5: 560332800, 6: 560332800, 7: 560332800, 8: 560332800, 9: 560332800, 10: 29491200}, total: 5151744000
 Check: Per Layer Total writes: {0: 32256000, 1: 29491200, 2: 29491200, 3: 29491200, 4: 29491200, 5: 29491200, 6: 29491200, 7: 29491200, 8: 29491200, 9: 29491200, 10: 14745600}, 
  total: 312422400
-Level FeatureMemory total WMOPs from per layer sum: 7,617,068,800.000
-Level FeatureMemory total WMOPs from total reads/writes: 7,617,068,800.000
+Level FeatureMemory total WMOPs from per layer sum: 19,255,743,232.000
+Level FeatureMemory total WMOPs from total reads/writes: 19,255,743,232.000
 
 
 Questo mops è chiamato da update stats
@@ -1951,8 +1951,8 @@ Level WeightMemory, Layer 10: total_reads = 3686400, total_writes = 512
 Check: Per Layer Total reads: {0: 6220800, 1: 66355200, 2: 66355200, 3: 66355200, 4: 66355200, 5: 66355200, 6: 66355200, 7: 66355200, 8: 66355200, 9: 66355200, 10: 3686400}, total: 607104000
 Check: Per Layer Total writes: {0: 864, 1: 9216, 2: 9216, 3: 9216, 4: 9216, 5: 9216, 6: 9216, 7: 9216, 8: 9216, 9: 9216, 10: 512}, 
  total: 84320
-Level WeightMemory total WMOPs from per layer sum: 8,048,172,507.200
-Level WeightMemory total WMOPs from total reads/writes: 8,048,172,507.200
+Level WeightMemory total WMOPs from per layer sum: 20,682,635,784.000
+Level WeightMemory total WMOPs from total reads/writes: 20,682,635,784.000
 Fanout Level SACols_10, Layer 10, dim Q, layer_iterations: 128
 Updated considering level: SACols_10
 Fanout Level SARows_10, Layer 10, dim Z10, layer_iterations: 16
@@ -2265,8 +2265,8 @@ Level AccumulationIntermediateOutputRegister, Layer 10: total_reads = 0, total_w
 Check: Per Layer Total reads: {0: 796262400, 1: 8493465600, 2: 8493465600, 3: 8493465600, 4: 8493465600, 5: 8493465600, 6: 8493465600, 7: 8493465600, 8: 8493465600, 9: 8493465600, 10: 0}, total: 77237452800
 Check: Per Layer Total writes: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, 
  total: 77532364800
-Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 32,811,343,323.200
-Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 32,764,157,403.200
+Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 51,636,599,304.000
+Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 51,577,616,904.000
 
 
 Questo mops è chiamato da update stats
@@ -2385,16 +2385,16 @@ Level AccumulationOutputRegister, Layer 10: total_reads = 457113600, total_write
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 457113600}, total: 457113600
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, 
  total: 471859200
-Level AccumulationOutputRegister total WMOPs from per layer sum: 32,959,978,971.200
-Level AccumulationOutputRegister total WMOPs from total reads/writes: 32,912,793,051.200
+Level AccumulationOutputRegister total WMOPs from per layer sum: 51,868,842,504.000
+Level AccumulationOutputRegister total WMOPs from total reads/writes: 51,809,860,104.000
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 1061552946.24, 1: 4929637570.56, 2: 4929637570.56, 3: 4929637570.56, 4: 4929637570.56, 5: 4929637570.56, 6: 4929637570.56, 7: 4929637570.56, 8: 4929637570.56, 9: 4929637570.56, 10: 3228968913.92}
-WMOPs_till_now before compute level: 32,959,978,971.200
-Compute Level Compute total WMOPs from per layer sum: 48657259995.2
-Compute Level Compute total WMOPs: 1.7457594213707227e+106
-Total WMOPs after adding compute level: 81617238966.4
+Compute Level Compute WMOPs_per_layer: {0: 1388493806.4, 1: 7128339609.6, 2: 7128339609.6, 3: 7128339609.6, 4: 7128339609.6, 5: 7128339609.6, 6: 7128339609.6, 7: 7128339609.6, 8: 7128339609.6, 9: 7128339609.6, 10: 3421340851.2}
+WMOPs_till_now before compute level: 51,868,842,504.000
+Compute Level Compute total WMOPs from per layer sum: 68964891144.0
+Compute Level Compute total WMOPs: 1.9013221420869256e+106
+Total WMOPs after adding compute level: 120833733648.0
 END FIRST PART OF UPDATE STATS
 
 
@@ -4683,7 +4683,7 @@ Compute latency for layer 10: 230,400
 max_latency initially: 42523632.0
 compute_latency from compute level: 37,944,000
 max_latency after compute: 42,523,632, before fanout_level
-Initial condition (Wart: 8.354e+88):
+Initial condition (Wart: 5.894e+88):
 DRAM ----------> Q: 10, P: 720, X9: 10, Y9: 720, X8: 10, Y8: 720, X7: 10, Y7: 720, X6: 10, Y6: 720, X5: 10, Y5: 720, X4: 10, Y4: 720, X3: 10, Y3: 720, X2: 10, Y2: 720, X1: 10, Y1: 720, X0: 10, Y0: 720
 FeatureMemory -
 WeightMemory --> C10: 32, Z9: 2, C9: 32, R9: 3, S9: 3, Z8: 2, C8: 32, S8: 3, R8: 3, Z7: 2, C7: 32, S7: 3, R7: 3, Z6: 2, C6: 32, S6: 3, R6: 3, Z5: 2, C5: 32, S5: 3, R5: 3, Z4: 2, C4: 32, S4: 3, R4: 3, Z3: 2, C3: 32, S3: 3, R3: 3, Z2: 2, C2: 32, S2: 3, R2: 3, Z1: 2, C1: 32, S1: 3, R1: 3, Z0: 2, C0: 3, R0: 3, S0: 3
@@ -6072,8 +6072,8 @@ Level FeatureMemory, Layer 10: total_reads = 44236800, total_writes = 14745600
 Check: Per Layer Total reads: {0: 79257600, 1: 560332800, 2: 560332800, 3: 560332800, 4: 560332800, 5: 560332800, 6: 560332800, 7: 560332800, 8: 560332800, 9: 560332800, 10: 44236800}, total: 5166489600
 Check: Per Layer Total writes: {0: 32256000, 1: 29491200, 2: 29491200, 3: 29491200, 4: 29491200, 5: 29491200, 6: 29491200, 7: 29491200, 8: 29491200, 9: 29491200, 10: 14745600}, 
  total: 312422400
-Level FeatureMemory total WMOPs from per layer sum: 7,628,128,000.000
-Level FeatureMemory total WMOPs from total reads/writes: 7,628,128,000.000
+Level FeatureMemory total WMOPs from per layer sum: 19,298,210,560.000
+Level FeatureMemory total WMOPs from total reads/writes: 19,298,210,560.000
 
 
 Questo mops è chiamato da update stats
@@ -6536,8 +6536,8 @@ Level WeightMemory, Layer 10: total_reads = 3686400, total_writes = 512
 Check: Per Layer Total reads: {0: 6220800, 1: 66355200, 2: 66355200, 3: 66355200, 4: 66355200, 5: 66355200, 6: 66355200, 7: 66355200, 8: 66355200, 9: 66355200, 10: 3686400}, total: 607104000
 Check: Per Layer Total writes: {0: 864, 1: 9216, 2: 9216, 3: 9216, 4: 9216, 5: 9216, 6: 9216, 7: 9216, 8: 9216, 9: 9216, 10: 512}, 
  total: 84320
-Level WeightMemory total WMOPs from per layer sum: 8,059,231,707.200
-Level WeightMemory total WMOPs from total reads/writes: 8,059,231,707.200
+Level WeightMemory total WMOPs from per layer sum: 20,725,103,112.000
+Level WeightMemory total WMOPs from total reads/writes: 20,725,103,112.000
 Fanout Level SACols_10, Layer 10, dim Q, layer_iterations: 128
 Updated considering level: SACols_10
 Fanout Level SARows_10, Layer 10, dim Z10, layer_iterations: 16
@@ -6850,8 +6850,8 @@ Level AccumulationIntermediateOutputRegister, Layer 10: total_reads = 0, total_w
 Check: Per Layer Total reads: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, total: 77532364800
 Check: Per Layer Total writes: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, 
  total: 77532364800
-Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 32,869,588,443.200
-Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 32,775,216,603.200
+Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 51,738,049,032.000
+Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 51,620,084,232.000
 
 
 Questo mops è chiamato da update stats
@@ -6970,16 +6970,16 @@ Level AccumulationOutputRegister, Layer 10: total_reads = 471859200, total_write
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, total: 471859200
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, 
  total: 471859200
-Level AccumulationOutputRegister total WMOPs from per layer sum: 33,020,583,387.200
-Level AccumulationOutputRegister total WMOPs from total reads/writes: 32,926,211,547.200
+Level AccumulationOutputRegister total WMOPs from per layer sum: 51,973,978,632.000
+Level AccumulationOutputRegister total WMOPs from total reads/writes: 51,856,013,832.000
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 1066271538.24, 1: 4934356162.56, 2: 4934356162.56, 3: 4934356162.56, 4: 4934356162.56, 5: 4934356162.56, 6: 4934356162.56, 7: 4934356162.56, 8: 4934356162.56, 9: 4934356162.56, 10: 3242387409.92}
-WMOPs_till_now before compute level: 33,020,583,387.200
-Compute Level Compute total WMOPs from per layer sum: 48717864411.2
-Compute Level Compute total WMOPs: 1.7457594213707227e+106
-Total WMOPs after adding compute level: 81738447798.4
+Compute Level Compute WMOPs_per_layer: {0: 1394392046.4, 1: 7134237849.6, 2: 7134237849.6, 3: 7134237849.6, 4: 7134237849.6, 5: 7134237849.6, 6: 7134237849.6, 7: 7134237849.6, 8: 7134237849.6, 9: 7134237849.6, 10: 3467494579.2}
+WMOPs_till_now before compute level: 51,973,978,632.000
+Compute Level Compute total WMOPs from per layer sum: 69070027272.0
+Compute Level Compute total WMOPs: 1.9013221420869256e+106
+Total WMOPs after adding compute level: 121044005904.0
 END FIRST PART OF UPDATE STATS
 
 
@@ -10665,8 +10665,8 @@ Level FeatureMemory, Layer 10: total_reads = 44236800, total_writes = 14745600
 Check: Per Layer Total reads: {0: 79257600, 1: 560332800, 2: 560332800, 3: 560332800, 4: 560332800, 5: 560332800, 6: 560332800, 7: 560332800, 8: 560332800, 9: 560332800, 10: 44236800}, total: 5166489600
 Check: Per Layer Total writes: {0: 32256000, 1: 29491200, 2: 29491200, 3: 29491200, 4: 29491200, 5: 29491200, 6: 29491200, 7: 29491200, 8: 29491200, 9: 29491200, 10: 14745600}, 
  total: 312422400
-Level FeatureMemory total WMOPs from per layer sum: 7,628,128,000.000
-Level FeatureMemory total WMOPs from total reads/writes: 7,628,128,000.000
+Level FeatureMemory total WMOPs from per layer sum: 19,298,210,560.000
+Level FeatureMemory total WMOPs from total reads/writes: 19,298,210,560.000
 
 
 Questo mops è chiamato da update stats
@@ -11129,8 +11129,8 @@ Level WeightMemory, Layer 10: total_reads = 3686400, total_writes = 512
 Check: Per Layer Total reads: {0: 6220800, 1: 66355200, 2: 66355200, 3: 66355200, 4: 66355200, 5: 66355200, 6: 66355200, 7: 66355200, 8: 66355200, 9: 66355200, 10: 3686400}, total: 607104000
 Check: Per Layer Total writes: {0: 864, 1: 9216, 2: 9216, 3: 9216, 4: 9216, 5: 9216, 6: 9216, 7: 9216, 8: 9216, 9: 9216, 10: 512}, 
  total: 84320
-Level WeightMemory total WMOPs from per layer sum: 8,059,231,707.200
-Level WeightMemory total WMOPs from total reads/writes: 8,059,231,707.200
+Level WeightMemory total WMOPs from per layer sum: 20,725,103,112.000
+Level WeightMemory total WMOPs from total reads/writes: 20,725,103,112.000
 Fanout Level SACols_10, Layer 10, dim Q, layer_iterations: 128
 Updated considering level: SACols_10
 Fanout Level SARows_10, Layer 10, dim Z10, layer_iterations: 16
@@ -11443,8 +11443,8 @@ Level AccumulationIntermediateOutputRegister, Layer 10: total_reads = 0, total_w
 Check: Per Layer Total reads: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, total: 77532364800
 Check: Per Layer Total writes: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, 
  total: 77532364800
-Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 32,869,588,443.200
-Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 32,775,216,603.200
+Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 51,738,049,032.000
+Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 51,620,084,232.000
 
 
 Questo mops è chiamato da update stats
@@ -11563,16 +11563,16 @@ Level AccumulationOutputRegister, Layer 10: total_reads = 471859200, total_write
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, total: 471859200
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, 
  total: 471859200
-Level AccumulationOutputRegister total WMOPs from per layer sum: 33,020,583,387.200
-Level AccumulationOutputRegister total WMOPs from total reads/writes: 32,926,211,547.200
+Level AccumulationOutputRegister total WMOPs from per layer sum: 51,973,978,632.000
+Level AccumulationOutputRegister total WMOPs from total reads/writes: 51,856,013,832.000
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 1066271538.24, 1: 4934356162.56, 2: 4934356162.56, 3: 4934356162.56, 4: 4934356162.56, 5: 4934356162.56, 6: 4934356162.56, 7: 4934356162.56, 8: 4934356162.56, 9: 4934356162.56, 10: 3242387409.92}
-WMOPs_till_now before compute level: 33,020,583,387.200
-Compute Level Compute total WMOPs from per layer sum: 48717864411.2
-Compute Level Compute total WMOPs: 1.7457594213707227e+106
-Total WMOPs after adding compute level: 81738447798.4
+Compute Level Compute WMOPs_per_layer: {0: 1394392046.4, 1: 7134237849.6, 2: 7134237849.6, 3: 7134237849.6, 4: 7134237849.6, 5: 7134237849.6, 6: 7134237849.6, 7: 7134237849.6, 8: 7134237849.6, 9: 7134237849.6, 10: 3467494579.2}
+WMOPs_till_now before compute level: 51,973,978,632.000
+Compute Level Compute total WMOPs from per layer sum: 69070027272.0
+Compute Level Compute total WMOPs: 1.9013221420869256e+106
+Total WMOPs after adding compute level: 121044005904.0
 END FIRST PART OF UPDATE STATS
 
 
@@ -15257,8 +15257,8 @@ Level FeatureMemory, Layer 10: total_reads = 44236800, total_writes = 14745600
 Check: Per Layer Total reads: {0: 79257600, 1: 560332800, 2: 560332800, 3: 560332800, 4: 560332800, 5: 560332800, 6: 560332800, 7: 560332800, 8: 560332800, 9: 560332800, 10: 44236800}, total: 5166489600
 Check: Per Layer Total writes: {0: 32256000, 1: 29491200, 2: 29491200, 3: 29491200, 4: 29491200, 5: 29491200, 6: 29491200, 7: 29491200, 8: 29491200, 9: 29491200, 10: 14745600}, 
  total: 312422400
-Level FeatureMemory total WMOPs from per layer sum: 7,628,128,000.000
-Level FeatureMemory total WMOPs from total reads/writes: 7,628,128,000.000
+Level FeatureMemory total WMOPs from per layer sum: 19,298,210,560.000
+Level FeatureMemory total WMOPs from total reads/writes: 19,298,210,560.000
 
 
 Questo mops è chiamato da update stats
@@ -15721,8 +15721,8 @@ Level WeightMemory, Layer 10: total_reads = 3686400, total_writes = 512
 Check: Per Layer Total reads: {0: 6220800, 1: 66355200, 2: 66355200, 3: 66355200, 4: 66355200, 5: 66355200, 6: 66355200, 7: 66355200, 8: 66355200, 9: 66355200, 10: 3686400}, total: 607104000
 Check: Per Layer Total writes: {0: 864, 1: 9216, 2: 9216, 3: 9216, 4: 9216, 5: 9216, 6: 9216, 7: 9216, 8: 9216, 9: 9216, 10: 512}, 
  total: 84320
-Level WeightMemory total WMOPs from per layer sum: 8,059,231,707.200
-Level WeightMemory total WMOPs from total reads/writes: 8,059,231,707.200
+Level WeightMemory total WMOPs from per layer sum: 20,725,103,112.000
+Level WeightMemory total WMOPs from total reads/writes: 20,725,103,112.000
 Fanout Level SACols_10, Layer 10, dim Q, layer_iterations: 128
 Updated considering level: SACols_10
 Fanout Level SARows_10, Layer 10, dim Z10, layer_iterations: 16
@@ -16035,8 +16035,8 @@ Level AccumulationIntermediateOutputRegister, Layer 10: total_reads = 0, total_w
 Check: Per Layer Total reads: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, total: 77532364800
 Check: Per Layer Total writes: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, 
  total: 77532364800
-Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 32,869,588,443.200
-Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 32,775,216,603.200
+Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 51,738,049,032.000
+Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 51,620,084,232.000
 
 
 Questo mops è chiamato da update stats
@@ -16155,16 +16155,16 @@ Level AccumulationOutputRegister, Layer 10: total_reads = 471859200, total_write
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, total: 471859200
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, 
  total: 471859200
-Level AccumulationOutputRegister total WMOPs from per layer sum: 33,020,583,387.200
-Level AccumulationOutputRegister total WMOPs from total reads/writes: 32,926,211,547.200
+Level AccumulationOutputRegister total WMOPs from per layer sum: 51,973,978,632.000
+Level AccumulationOutputRegister total WMOPs from total reads/writes: 51,856,013,832.000
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 1066271538.24, 1: 4934356162.56, 2: 4934356162.56, 3: 4934356162.56, 4: 4934356162.56, 5: 4934356162.56, 6: 4934356162.56, 7: 4934356162.56, 8: 4934356162.56, 9: 4934356162.56, 10: 3242387409.92}
-WMOPs_till_now before compute level: 33,020,583,387.200
-Compute Level Compute total WMOPs from per layer sum: 48717864411.2
-Compute Level Compute total WMOPs: 1.7457594213707227e+106
-Total WMOPs after adding compute level: 81738447798.4
+Compute Level Compute WMOPs_per_layer: {0: 1394392046.4, 1: 7134237849.6, 2: 7134237849.6, 3: 7134237849.6, 4: 7134237849.6, 5: 7134237849.6, 6: 7134237849.6, 7: 7134237849.6, 8: 7134237849.6, 9: 7134237849.6, 10: 3467494579.2}
+WMOPs_till_now before compute level: 51,973,978,632.000
+Compute Level Compute total WMOPs from per layer sum: 69070027272.0
+Compute Level Compute total WMOPs: 1.9013221420869256e+106
+Total WMOPs after adding compute level: 121044005904.0
 END FIRST PART OF UPDATE STATS
 
 
@@ -18493,12 +18493,12 @@ max_latency initially: 42523632.0
 compute_latency from compute level: 37,944,000
 max_latency after compute: 42,523,632, before fanout_level
 max_latency: 42523632.0, max_latency_real (with fudge factor): 452000000.0
-Should be: WMOPs: 48717864411.2, EDP: 22020474.713862397
-My EDP: 2071660.5380477651
+Should be: WMOPs: 69070027272.0, EDP: 31219652.326943997
+My EDP: 2937108.421944492
 
 Final condition: 
-Wart: 8.343e+88
-EDP: 2.072e+06 (J*cycle)
+Wart: 5.885e+88
+EDP: 2.937e+06 (J*cycle)
 
 Performed moves: 0
 é stato chiamato update stats! 
@@ -19858,8 +19858,8 @@ Level FeatureMemory, Layer 10: total_reads = 44236800, total_writes = 14745600
 Check: Per Layer Total reads: {0: 79257600, 1: 560332800, 2: 560332800, 3: 560332800, 4: 560332800, 5: 560332800, 6: 560332800, 7: 560332800, 8: 560332800, 9: 560332800, 10: 44236800}, total: 5166489600
 Check: Per Layer Total writes: {0: 32256000, 1: 29491200, 2: 29491200, 3: 29491200, 4: 29491200, 5: 29491200, 6: 29491200, 7: 29491200, 8: 29491200, 9: 29491200, 10: 14745600}, 
  total: 312422400
-Level FeatureMemory total WMOPs from per layer sum: 7,628,128,000.000
-Level FeatureMemory total WMOPs from total reads/writes: 7,628,128,000.000
+Level FeatureMemory total WMOPs from per layer sum: 19,298,210,560.000
+Level FeatureMemory total WMOPs from total reads/writes: 19,298,210,560.000
 
 
 Questo mops è chiamato da update stats
@@ -20322,8 +20322,8 @@ Level WeightMemory, Layer 10: total_reads = 3686400, total_writes = 512
 Check: Per Layer Total reads: {0: 6220800, 1: 66355200, 2: 66355200, 3: 66355200, 4: 66355200, 5: 66355200, 6: 66355200, 7: 66355200, 8: 66355200, 9: 66355200, 10: 3686400}, total: 607104000
 Check: Per Layer Total writes: {0: 864, 1: 9216, 2: 9216, 3: 9216, 4: 9216, 5: 9216, 6: 9216, 7: 9216, 8: 9216, 9: 9216, 10: 512}, 
  total: 84320
-Level WeightMemory total WMOPs from per layer sum: 8,059,231,707.200
-Level WeightMemory total WMOPs from total reads/writes: 8,059,231,707.200
+Level WeightMemory total WMOPs from per layer sum: 20,725,103,112.000
+Level WeightMemory total WMOPs from total reads/writes: 20,725,103,112.000
 Fanout Level SACols_10, Layer 10, dim Q, layer_iterations: 128
 Updated considering level: SACols_10
 Fanout Level SARows_10, Layer 10, dim Z10, layer_iterations: 16
@@ -20636,8 +20636,8 @@ Level AccumulationIntermediateOutputRegister, Layer 10: total_reads = 0, total_w
 Check: Per Layer Total reads: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, total: 77532364800
 Check: Per Layer Total writes: {0: 825753600, 1: 8522956800, 2: 8522956800, 3: 8522956800, 4: 8522956800, 5: 8522956800, 6: 8522956800, 7: 8522956800, 8: 8522956800, 9: 8522956800, 10: 0}, 
  total: 77532364800
-Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 32,869,588,443.200
-Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 32,775,216,603.200
+Level AccumulationIntermediateOutputRegister total WMOPs from per layer sum: 51,738,049,032.000
+Level AccumulationIntermediateOutputRegister total WMOPs from total reads/writes: 51,620,084,232.000
 
 
 Questo mops è chiamato da update stats
@@ -20756,16 +20756,16 @@ Level AccumulationOutputRegister, Layer 10: total_reads = 471859200, total_write
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, total: 471859200
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 471859200}, 
  total: 471859200
-Level AccumulationOutputRegister total WMOPs from per layer sum: 33,020,583,387.200
-Level AccumulationOutputRegister total WMOPs from total reads/writes: 32,926,211,547.200
+Level AccumulationOutputRegister total WMOPs from per layer sum: 51,973,978,632.000
+Level AccumulationOutputRegister total WMOPs from total reads/writes: 51,856,013,832.000
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 1066271538.24, 1: 4934356162.56, 2: 4934356162.56, 3: 4934356162.56, 4: 4934356162.56, 5: 4934356162.56, 6: 4934356162.56, 7: 4934356162.56, 8: 4934356162.56, 9: 4934356162.56, 10: 3242387409.92}
-WMOPs_till_now before compute level: 33,020,583,387.200
-Compute Level Compute total WMOPs from per layer sum: 48717864411.2
-Compute Level Compute total WMOPs: 1.7457594213707227e+106
-Total WMOPs after adding compute level: 81738447798.4
+Compute Level Compute WMOPs_per_layer: {0: 1394392046.4, 1: 7134237849.6, 2: 7134237849.6, 3: 7134237849.6, 4: 7134237849.6, 5: 7134237849.6, 6: 7134237849.6, 7: 7134237849.6, 8: 7134237849.6, 9: 7134237849.6, 10: 3467494579.2}
+WMOPs_till_now before compute level: 51,973,978,632.000
+Compute Level Compute total WMOPs from per layer sum: 69070027272.0
+Compute Level Compute total WMOPs: 1.9013221420869256e+106
+Total WMOPs after adding compute level: 121044005904.0
 END FIRST PART OF UPDATE STATS
 
 
@@ -23094,17 +23094,17 @@ max_latency initially: 42523632.0
 compute_latency from compute level: 37,944,000
 max_latency after compute: 42,523,632, before fanout_level
 max_latency: 42523632.0, max_latency_real (with fudge factor): 452000000.0
-Should be: WMOPs: 48717864411.2, EDP: 22020474.713862397
-My EDP: 2071660.5380477651
+Should be: WMOPs: 69070027272.0, EDP: 31219652.326943997
+My EDP: 2937108.421944492
 DRAM in_reads set to: 2773830, w_reads set to: 84320, out_reads: 0, int_in_reads: 0, int_out_reads: 0
 DRAM Reads: 2858150: in:2773830, w:84320, out:0, int_in:0, int_out:0
 
-Finished in: 0.192s
+Finished in: 0.291s
 
 Best mapping found with:
-	Wart: 8.343e+88
-	EDP: 2.072e+06 (J*cycle)
-	Energy: 4.872e+04 (uJ)
+	Wart: 5.885e+88
+	EDP: 2.937e+06 (J*cycle)
+	Energy: 6.907e+04 (uJ)
 	Latency: 4.252e+07 (cc)
 
 Mapping:
@@ -23156,21 +23156,21 @@ FeatureMemory:	Per-Layer Int_Out_R: [L0: 29,491,200, L1: 29,491,200, L2: 29,491,
 FeatureMemory:	Per-Layer Int_Out_W: [L0: 29,491,200, L1: 29,491,200, L2: 29,491,200, L3: 29,491,200, L4: 29,491,200, L5: 29,491,200, L6: 29,491,200, L7: 29,491,200, L8: 29,491,200, L9: 29,491,200], Total: 294,912,000
 FeatureMemory:	Total Reads = 5,166,489,600, Total Writes = 312,422,400
 DEBUG: Calculating WMOPs for level FeatureMemory with reads=5166489600, writes=312422400
-DEBUG: WMOPs for level FeatureMemory = 7,629,934,000.000, 7.630e+09 pJ
+DEBUG: WMOPs for level FeatureMemory = 19,300,016,560.000, 1.930e+10 pJ
 WeightMemory:	Per-Layer W_R: [L0: 6,220,800, L1: 66,355,200, L2: 66,355,200, L3: 66,355,200, L4: 66,355,200, L5: 66,355,200, L6: 66,355,200, L7: 66,355,200, L8: 66,355,200, L9: 66,355,200, L10: 3,686,400], Total: 607,104,000
 WeightMemory:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0], Total: 0
 WeightMemory:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0], Total: 0
 WeightMemory:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0], Total: 0
 WeightMemory:	Total Reads = 607,104,000, Total Writes = 0
 DEBUG: Calculating WMOPs for level WeightMemory with reads=607104000, writes=0
-DEBUG: WMOPs for level WeightMemory = 8,060,977,840.000, 8.061e+09 pJ
+DEBUG: WMOPs for level WeightMemory = 20,726,710,960.000, 2.073e+10 pJ
 AccumulationIntermediateOutputRegister:Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0], Total: 0
 AccumulationIntermediateOutputRegister:Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0], Total: 0
 AccumulationIntermediateOutputRegister:Per-Layer Int_Out_R: [L0: 825,753,600, L1: 8,522,956,800, L2: 8,522,956,800, L3: 8,522,956,800, L4: 8,522,956,800, L5: 8,522,956,800, L6: 8,522,956,800, L7: 8,522,956,800, L8: 8,522,956,800, L9: 8,522,956,800], Total: 77,532,364,800
 AccumulationIntermediateOutputRegister:Per-Layer Int_Out_W: [L0: 825,753,600, L1: 8,522,956,800, L2: 8,522,956,800, L3: 8,522,956,800, L4: 8,522,956,800, L5: 8,522,956,800, L6: 8,522,956,800, L7: 8,522,956,800, L8: 8,522,956,800, L9: 8,522,956,800], Total: 77,532,364,800
 AccumulationIntermediateOutputRegister:Total Reads = 77,532,364,800, Total Writes = 77,532,364,800
 DEBUG: Calculating WMOPs for level AccumulationIntermediateOutputRegister with reads=77532364800, writes=77532364800
-DEBUG: WMOPs for level AccumulationIntermediateOutputRegister = 32,871,334,576.000, 3.287e+10 pJ
+DEBUG: WMOPs for level AccumulationIntermediateOutputRegister = 51,739,656,880.000, 5.174e+10 pJ
 AccumulationOutputRegister:Output Reads = 457,113,600 (reads) + 14,745,600 (drains), Output Writes = 471,859,200 (updates) + 0 (fills)
 AccumulationOutputRegister:Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0], Total: 0
 AccumulationOutputRegister:Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0], Total: 0
@@ -23178,9 +23178,9 @@ AccumulationOutputRegister:Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4:
 AccumulationOutputRegister:Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0], Total: 0
 AccumulationOutputRegister:Total Reads = 471,859,200, Total Writes = 471,859,200
 DEBUG: Calculating WMOPs for level AccumulationOutputRegister with reads=471859200, writes=471859200
-DEBUG: WMOPs for level AccumulationOutputRegister = 33,022,329,520.000, 3.302e+10 pJ
+DEBUG: WMOPs for level AccumulationOutputRegister = 51,975,586,480.000, 5.198e+10 pJ
 Totals:		83,780,675,750 R, 78,331,392,000 W, 162,112,067,750 Tot
-Energy:		48,719.611 uJ
+Energy:		69,071.635 uJ
 
 Final Latency per level:
 DRAM:		39,108,825 cc Read Drain , 41,691,622 cc Fill Update (Total across 11 layers), 2.0 Read Bandwidth , 4.0 Write Bandwidth,
