@@ -1,0 +1,2 @@
+experiment_id,workload_name,workload_variant,fusion_level,num_fused_layers,arch_name,fmem_size_kB,wmem_size_kB,pe_rows,pe_cols,success,error_message,energy_uJ,latency_cycles,edp,mops,utilization,mapping_time_s
+mccnn_4layer_2026-01-30T17:07:30.270391,mccnn,4layer,full,4,thesis_arch,1056,524,16,128,False,"Arch: Thesis_4Layers_1056KB_FMEM_16x128_PEs -> Level: SACols_0: Failed to fit comp to arch because the level's constraint (X0: 128) does not divide comp dimension X0 (1242) exactly. To compensate, consider setting 'Settings.PADDED_MAPPINGS' to True.",0.0,0,0.0,0,0.0,0.0

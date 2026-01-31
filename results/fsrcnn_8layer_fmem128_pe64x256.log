@@ -1,0 +1,285 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+
+============================================================
+Architecture sweep for fsrcnn/full/8layer
+1 configurations to test
+============================================================
+
+[1/1] FMEM=1280KB, WMEM=10KB, PE=64x128
+------ loading Accelergy ------
+ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
+Creating architecture: Thesis_8Layers_1310720KB_FMEM_64x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7PQZ7, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],, out_coupling: [Z7][P][Q]
+final_layer_dims: {'Z7', 'R7', 'P', 'C0', 'S7', 'Q', 'R0', 'X0', 'S0', 'Y0', 'C7'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'P', 'Q', 'Z7']
+INFO: Arch: Thesis_8Layers_1310720KB_FMEM_64x128_PEs: identified intermediate dimensions: {'Z2', 'C6', 'X1', 'S4', 'Y1', 'Z1', 'S3', 'R1', 'X3', 'C4', 'X4', 'R6', 'S1', 'Y6', 'S6', 'Y4', 'X6', 'X5', 'X2', 'C1', 'Z6', 'Y5', 'R4', 'Z3', 'Z4', 'Y2', 'C2', 'S2', 'R2', 'Y3', 'C3', 'Z0', 'R5', 'Z5', 'C5', 'R3', 'S5'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+Starting engine with mapper: breadthfirst_local
+
+WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.
+INFO: running multithreaded with THREADS_COUNT = 8
+
+-------- factorFlow -------- CIAO
+Arch after initialization:
+Level: DRAM: Checking factors constraints...
+tile_sizes[dim]: [120, 5], self._dim_products[dim]: [8, 1]
+CIAO disti: 120
+input_FC_size distinct: 11520
+Input FC size: 11520
+
+Input size: 1573248
+
+Output size: 8294400
+
+Weight size: 18792
+
+Intermediate input size: 89477216
+Total intermediate size (input + output): 0
+
+input_size: 1573248, output_size: 8294400, weight_size: 18792, intermediate_size: 0
+Total mem footprint: 9897960
+
+
+
+Level: FeatureMemory: Checking factors constraints...
+tile_sizes[dim]: [120, 5], self._dim_products[dim]: [1, 1]
+CIAO disti: 120
+input_FC_size distinct: 1440
+Input FC size: 1440
+
+Input size: 1860
+
+Output size: 1920
+
+Weight size: 0
+
+Intermediate input size: 46224
+Total intermediate size (input + output): 66864
+
+input_size: 1860, output_size: 1920, weight_size: 0, intermediate_size: 66864
+Total mem footprint: 72085
+
+
+
+Level: WeightMemory: Checking factors constraints...
+tile_sizes[dim]: [120, 1], self._dim_products[dim]: [1, 5]
+CIAO disti: 120
+input_FC_size distinct: 0
+Input FC size: 0
+
+Input size: 0
+
+Output size: 0
+
+Weight size: 18792
+
+Intermediate input size: 46224
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 0, weight_size: 18792, intermediate_size: 0
+Total mem footprint: 18792
+
+
+
+Level: DRAM: Checking factors constraints...
+tile_sizes[dim]: [120, 5], self._dim_products[dim]: [8, 1]
+CIAO disti: 120
+input_FC_size distinct: 11520
+Input FC size: 11520
+
+Input size: 1573248
+
+Output size: 8294400
+
+Weight size: 18792
+
+Intermediate input size: 89477216
+Total intermediate size (input + output): 0
+
+input_size: 1573248, output_size: 8294400, weight_size: 18792, intermediate_size: 0
+Total mem footprint: 9897960
+
+
+
+Level: FeatureMemory: Checking factors constraints...
+tile_sizes[dim]: [120, 5], self._dim_products[dim]: [1, 1]
+CIAO disti: 120
+input_FC_size distinct: 1440
+Input FC size: 1440
+
+Input size: 1860
+
+Output size: 1920
+
+Weight size: 0
+
+Intermediate input size: 46224
+Total intermediate size (input + output): 66864
+
+input_size: 1860, output_size: 1920, weight_size: 0, intermediate_size: 66864
+Total mem footprint: 72085
+
+
+
+Level: WeightMemory: Checking factors constraints...
+tile_sizes[dim]: [120, 1], self._dim_products[dim]: [1, 5]
+CIAO disti: 120
+input_FC_size distinct: 0
+Input FC size: 0
+
+Input size: 0
+
+Output size: 0
+
+Weight size: 18792
+
+Intermediate input size: 46224
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 0, weight_size: 18792, intermediate_size: 0
+Total mem footprint: 18792
+
+
+
+tile_sizes[dim]: [120, 1], self._dim_products[dim]: [1, 5]
+CIAO disti: 120
+input_FC_size distinct: 0
+Input FC size: 0
+
+Input size: 0
+
+Output size: 0
+
+Weight size: 18792
+
+Intermediate input size: 46224
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 0, weight_size: 18792, intermediate_size: 0
+Total mem footprint: 18792
+
+
+
+
+================================================================================
+MEMORY CONSTRAINT VIOLATION DEBUG - Level: WeightMemory
+================================================================================
+Memory footprint: 18,792 bytes
+Memory available: 10,240 bytes
+Overflow: 8,552 bytes
+
+Full architecture mapping:
+  DRAM: Q:8, P:540, X6:8, Y6:540, X5:8, Y5:540, X4:8, Y4:540, X3:8, Y3:540, X2:8, Y2:540, X1:8, Y1:540, X0:8, Y0:540
+  WeightMemory: C7:56, R7:3, S7:3, C6:12, C5:12, R5:3, S5:3, C4:12, R4:3, S4:3, C3:12, R3:3, S3:3, C2:12, R2:3, S2:3, C1:56, C0:3, R0:5, S0:5
+  SACols_7: Q:120
+  SARows_7: Z7:16
+  SACols_6: X6:120
+  SARows_6: Z6:56
+  SACols_5: X5:120
+  SARows_5: Z5:12
+  SACols_4: X4:120
+  SARows_4: Z4:12
+  SACols_3: X3:120
+  SARows_3: Z3:12
+  SACols_2: X2:120
+  SARows_2: Z2:12
+  SACols_1: X1:120
+  SARows_1: Z1:12
+  SACols_0: X0:120
+  SARows_0: Z0:56
+================================================================================
+
+Level: WeightRegister: Checking factors constraints...
+tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
+CIAO disti: 1
+input_FC_size distinct: 0
+Input FC size: 0
+
+Input size: 0
+
+Output size: 0
+
+Weight size: 8
+
+Intermediate input size: 7
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 0, weight_size: 8, intermediate_size: 0
+Total mem footprint: 8
+
+
+
+Level: AccumulationIntermediateOutputRegister: Checking factors constraints...
+tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
+CIAO disti: 1
+input_FC_size distinct: 0
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 420, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 80, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 639, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 325, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Thesis_8Layers_1310720KB_FMEM_64x128_PEs -> Level: WeightMemory: memory footprint: 18792 VS memory available: 10240
+Input FC size: 0
+
+Input size: 0
+
+Output size: 0
+
+Weight size: 0
+
+Intermediate input size: 7
+Total intermediate size (input + output): 7
+
+input_size: 0, output_size: 0, weight_size: 0, intermediate_size: 7
+Total mem footprint: 7
+
+
+
+Level: AccumulationOutputRegister: Checking factors constraints...
+tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
+CIAO disti: 1
+input_FC_size distinct: 0
+Input FC size: 0
+
+Input size: 0
+
+Output size: 1
+
+Weight size: 0
+
+Intermediate input size: 7
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 1, weight_size: 0, intermediate_size: 0
+Total mem footprint: 1
+
+
+
+INFO: forcefully updating setting forced_termination_flag to True
+  ✗ Failed
+Results exported to: results/results_20260131_112336.csv
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Total experiments: 1
+Successful: 0
+Failed: 1

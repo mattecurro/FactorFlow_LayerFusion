@@ -22,7 +22,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     temporal_iterations_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
     spatial_iterations = 1
     spatial_iterations_per_layer = {layer_id: 1 for layer_id in range(num_layers)}
-    last_in_reads, last_out_reads, last_out_writes = 0, 0, 0
+    last_in_reads, last_out_reads, last_out_writes, last_w_reads = 0, 0, 0, 0
     last_per_layer_w_reads = {layer_id: 0 for layer_id in range(num_layers)}
     last_per_layer_int_in_reads = {layer_id: 0 for layer_id in range(num_layers - 1)}
     last_per_layer_int_out_reads = {layer_id: 0 for layer_id in range(num_layers - 1)}
@@ -654,8 +654,8 @@ def Energy(arch : Arch, pJ_to_uJ : bool = False) -> float:
         if isinstance(level, MemLevel):
             num_layers = arch.coupling.getNumLayers()
             if level.name == "DRAM":
-                level.in_reads = 2760960+12870
-                level.w_reads = 84320            
+                #level.in_reads = 2760960+12870
+                #level.w_reads = 84320            
                 print(f"DRAM in_reads set to: {level.in_reads}, w_reads set to: {level.w_reads}, out_reads: {level.out_reads}, int_in_reads: {level.int_in_reads}, int_out_reads: {level.int_out_reads}")
             reads = level.in_reads + level.w_reads + level.out_reads + level.int_in_reads + level.int_out_reads
             writes = level.in_writes + level.w_writes + level.out_writes + level.int_in_writes + level.int_out_writes

@@ -1,0 +1,3 @@
+experiment_id,workload_name,workload_variant,fusion_level,num_fused_layers,arch_name,fmem_size_kB,wmem_size_kB,pe_rows,pe_cols,success,error_message,energy_uJ,latency_cycles,edp,mops,utilization,mapping_time_s,mapping
+fsrcnn_8layer_2026-01-31T11:23:35.779104,fsrcnn,8layer,full,8,thesis_arch,1280,10,64,128,False,"Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Thesis_8Layers_1310720KB_FMEM_64x128_PEs -> Level: WeightMemory: memory footprint: 18792 VS memory available: 10240",0.0,0,0.0,0,0.0,0.0,

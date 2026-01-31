@@ -202,10 +202,28 @@ class DepFinParamInfo:
     WMEM_bandwidth_bytes : int = 2 * 16 * 8  # bandwidth = 2*16, so 16 per direction
     WMEM_banks : int = 4 # multiple banks, mentioned in Figure 3
 
-    # Accumulation Register parameters
-    AccReg_size : int = 10 * 4 * 8  # 40 B
-    AccReg_word_bits : int = 32
+    # Accumulation Register parameters (for partial sums during MAC)
+    AccReg_size : int = 10 * 4 * 8  # 10 entries × 4 bytes = 40 B = 320 bits
+    AccReg_word_bits : int = 32  # 32-bit accumulator precision
     AccReg_bandwidth : int = 1 * 8  # 1 element per cycle
+
+    # Weight Register parameters (weight register file near PE)
+    WReg_size : int = 9 * 8  # 9 weights (3×3 kernel) × 8 bits = 72 bits
+    WReg_word_bits : int = 8  # 8-bit precision weights
+    WReg_bandwidth : int = 1 * 8  # 1 weight per cycle
+
+    # Input Register parameters (input activation register near PE)
+    InReg_size : int = 1 * 8  # 1 input activation × 8 bits = 8 bits
+    InReg_word_bits : int = 8  # 8-bit precision activations
+    InReg_bandwidth : int = 1 * 8  # 1 activation per cycle
+
+    # Intermediate Output Register parameters (between fused layers)
+    IntOutReg_size : int = 10 * 8  # 10 intermediate values × 8 bits = 80 bits
+    IntOutReg_word_bits : int = 32  # 32-bit output (quantized)
+    IntOutReg_bandwidth : int = 1 * 8  # 1 element per cycle
+
+    # NOTE: OutputRegister is not needed - AccumulationReg serves as output storage
+    # The last layer's AccumulationReg (AccumulationReg_10) doesn't bypass 'out'
 
     arguments = {
         "global_cycle_seconds": cycle_seconds,
@@ -304,6 +322,66 @@ def get_depfin_energy_per_byte(param: DepFinParamInfo = None) -> dict:
     acc_read_energy_per_byte = acc_read_energy / acc_bytes_per_access
     acc_write_energy_per_byte = acc_write_energy / acc_bytes_per_access
 
+    # --- Weight Register Energy ---
+    wreg_depth = max(1, math.ceil(param.WReg_size / param.WReg_word_bits))  # WReg_size is in bits
+    wreg_read_energy = smartbuffer_registerfile(
+        wreg_depth, param.WReg_word_bits, param.precision, 
+        cycle_seconds, technology, "read"
+    )
+    wreg_write_energy = smartbuffer_registerfile(
+        wreg_depth, param.WReg_word_bits, param.precision,
+        cycle_seconds, technology, "write"
+    )
+    wreg_leakage = smartbuffer_registerfile(
+        wreg_depth, param.WReg_word_bits, param.precision,
+        cycle_seconds, technology, "leak"
+    )
+    wreg_bytes_per_access = max(1, param.WReg_word_bits // 8)
+    wreg_area = smartbuffer_registerfile(wreg_depth, param.WReg_word_bits, param.precision, cycle_seconds, technology, energy=False)
+    wreg_read_energy_per_byte = wreg_read_energy / wreg_bytes_per_access
+    wreg_write_energy_per_byte = wreg_write_energy / wreg_bytes_per_access
+
+    # --- Input Register Energy ---
+    inreg_depth = max(1, math.ceil(param.InReg_size / param.InReg_word_bits))  # InReg_size is in bits
+    inreg_read_energy = smartbuffer_registerfile(
+        inreg_depth, param.InReg_word_bits, param.precision, 
+        cycle_seconds, technology, "read"
+    )
+    inreg_write_energy = smartbuffer_registerfile(
+        inreg_depth, param.InReg_word_bits, param.precision,
+        cycle_seconds, technology, "write"
+    )
+    inreg_leakage = smartbuffer_registerfile(
+        inreg_depth, param.InReg_word_bits, param.precision,
+        cycle_seconds, technology, "leak"
+    )
+    inreg_bytes_per_access = max(1, param.InReg_word_bits // 8)
+    inreg_area = smartbuffer_registerfile(inreg_depth, param.InReg_word_bits, param.precision, cycle_seconds, technology, energy=False)
+    inreg_read_energy_per_byte = inreg_read_energy / inreg_bytes_per_access
+    inreg_write_energy_per_byte = inreg_write_energy / inreg_bytes_per_access
+
+    # --- Intermediate Output Register Energy (between fused layers) ---
+    intoutreg_depth = max(1, math.ceil(param.IntOutReg_size / param.IntOutReg_word_bits))
+    intoutreg_read_energy = smartbuffer_registerfile(
+        intoutreg_depth, param.IntOutReg_word_bits, param.precision, 
+        cycle_seconds, technology, "read"
+    )
+    intoutreg_write_energy = smartbuffer_registerfile(
+        intoutreg_depth, param.IntOutReg_word_bits, param.precision,
+        cycle_seconds, technology, "write"
+    )
+    intoutreg_leakage = smartbuffer_registerfile(
+        intoutreg_depth, param.IntOutReg_word_bits, param.precision,
+        cycle_seconds, technology, "leak"
+    )
+    intoutreg_bytes_per_access = max(1, param.IntOutReg_word_bits // 8)
+    intoutreg_area = smartbuffer_registerfile(intoutreg_depth, param.IntOutReg_word_bits, param.precision, cycle_seconds, technology, energy=False)
+    intoutreg_read_energy_per_byte = intoutreg_read_energy / intoutreg_bytes_per_access
+    intoutreg_write_energy_per_byte = intoutreg_write_energy / intoutreg_bytes_per_access
+
+    # NOTE: No separate OutputRegister - AccumulationReg serves this purpose
+    # The last layer's AccumulationReg (AccumulationReg_10) stores final output
+
     # --- Compute Energy ---
     type_multiplier = "aladdin_multiplier"
     width_multiplier = 2 * param.precision
@@ -373,6 +451,43 @@ def get_depfin_energy_per_byte(param: DepFinParamInfo = None) -> dict:
             "depth": acc_depth,
             "area": acc_area,
         },
+        "WeightRegister": {
+            "read_energy_per_byte": wreg_read_energy_per_byte,
+            "write_energy_per_byte": wreg_write_energy_per_byte,
+            "read_energy_per_access": wreg_read_energy,
+            "write_energy_per_access": wreg_write_energy,
+            "value_access_energy_per_wordline": wreg_read_energy,
+            "leakage": wreg_leakage,
+            "bytes_per_access": wreg_bytes_per_access,
+            "word_bits": param.WReg_word_bits,
+            "depth": wreg_depth,
+            "area": wreg_area,
+        },
+        "InputRegister": {
+            "read_energy_per_byte": inreg_read_energy_per_byte,
+            "write_energy_per_byte": inreg_write_energy_per_byte,
+            "read_energy_per_access": inreg_read_energy,
+            "write_energy_per_access": inreg_write_energy,
+            "value_access_energy_per_wordline": inreg_read_energy,
+            "leakage": inreg_leakage,
+            "bytes_per_access": inreg_bytes_per_access,
+            "word_bits": param.InReg_word_bits,
+            "depth": inreg_depth,
+            "area": inreg_area,
+        },
+        "IntermediateOutputRegister": {
+            "read_energy_per_byte": intoutreg_read_energy_per_byte,
+            "write_energy_per_byte": intoutreg_write_energy_per_byte,
+            "read_energy_per_access": intoutreg_read_energy,
+            "write_energy_per_access": intoutreg_write_energy,
+            "value_access_energy_per_wordline": intoutreg_read_energy,
+            "leakage": intoutreg_leakage,
+            "bytes_per_access": intoutreg_bytes_per_access,
+            "word_bits": param.IntOutReg_word_bits,
+            "depth": intoutreg_depth,
+            "area": intoutreg_area,
+        },
+        # NOTE: No OutputRegister - AccumulationReg_10 serves as output storage
         "Compute": {
             "multiplier_energy": multiplier_energy,
             "multiplier_leakage": multiplier_leakage,

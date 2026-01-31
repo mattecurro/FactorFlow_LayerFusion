@@ -107,7 +107,7 @@ def factorsString(arch : Arch) -> str:
     for level in arch:
         res += f"{level.name}["
         for dim in level.dataflow:
-            res += f"{dim}{level.factors.dimProduct(dim)} "
+            res += f"{dim}={level.factors.dimProduct(dim)} "
         res = res[:-1] + "] "
     return res
 

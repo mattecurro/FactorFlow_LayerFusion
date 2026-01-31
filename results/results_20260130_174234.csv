@@ -1,0 +1,4 @@
+experiment_id,workload_name,workload_variant,fusion_level,num_fused_layers,arch_name,fmem_size_kB,wmem_size_kB,pe_rows,pe_cols,success,error_message,energy_uJ,latency_cycles,edp,mops,utilization,mapping_time_s,mapping
+mccnn_4layer_2026-01-30T17:42:33.481655,mccnn,4layer,full,4,thesis_arch,1056,524,16,128,False,"Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Thesis_4Layers_1056KB_FMEM_16x128_PEs -> Level: FeatureMemory: memory footprint: 29632 VS memory available: 1056
+CONSTRAINTS VIOLATION: Arch: Thesis_4Layers_1056KB_FMEM_16x128_PEs -> Level: WeightMemory: memory footprint: 27936 VS memory available: 524",0.0,0,0.0,0,0.0,0.0,

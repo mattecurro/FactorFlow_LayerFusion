@@ -13,7 +13,7 @@ class MetaSettings(type):
 class Settings(metaclass = MetaSettings):
     # If True, enables logging of the MSE process. Note that such prints occur during the timed
     # section of the program, set to False for accurate timing results.
-    VERBOSE = True
+    VERBOSE = False
     
     
     

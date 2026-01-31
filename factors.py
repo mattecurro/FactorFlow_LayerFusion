@@ -391,47 +391,52 @@ class Coupling:
 
     """Returns the intermediate output coupling for a specific layer."""
     def getIntermediateOutputCoupling(self, layer_index: Optional[int] = None) -> list[list[str]]:
-        if layer_index in self.int_out_coupling:
+        if layer_index is not None and layer_index in self.int_out_coupling:
             return self.int_out_coupling[layer_index]
         if layer_index is None:
             int_out_coupling_entire = []
             for layer_id in range(self.getNumLayers()-1):
                 int_out_coupling_entire.extend(self.int_out_coupling[layer_id])
             return int_out_coupling_entire
-        raise IndexError(f"Layer index {layer_index} not found in intermediate output coupling.")
+        # Return empty list for layers that don't have intermediate output coupling
+        return []
 
     """Returns the flat intermediate output coupling for a specific layer."""
     def getFlatIntermediateOutputCoupling(self, layer_index: Optional[int] = None) -> list[str]:
-        if layer_index in self.flat_int_out_coupling:
+        if layer_index is not None and layer_index in self.flat_int_out_coupling:
             return self.flat_int_out_coupling[layer_index]
         if layer_index is None:
             flat_int_out_coupling_entire = []
             for layer_id in range(self.getNumLayers()-1):
                 flat_int_out_coupling_entire.extend(self.flat_int_out_coupling[layer_id])
             return flat_int_out_coupling_entire
-        raise IndexError(f"Layer index {layer_index} not found in flat intermediate output coupling.")
+        # Return empty list for layers that don't have intermediate output coupling
+        # (e.g., single-layer workloads or the last layer in multi-layer workloads)
+        return []
 
     """Returns the intermediate input coupling for a specific layer."""
     def getIntermediateInputCoupling(self, layer_index: Optional[int] = None) -> list[list[str]]:
-        if layer_index in self.int_in_coupling:
+        if layer_index is not None and layer_index in self.int_in_coupling:
             return self.int_in_coupling[layer_index]
         if layer_index is None:
             int_in_coupling_entire = []
             for layer_id in range(self.getNumLayers()-1):
                 int_in_coupling_entire.extend(self.int_in_coupling[layer_id])
             return int_in_coupling_entire
-        raise IndexError(f"Layer index {layer_index} not found in intermediate input coupling.")
+        # Return empty list for layers that don't have intermediate input coupling
+        return []
     
     """Returns the flat intermediate input coupling for a specific layer."""
     def getFlatIntermediateInputCoupling(self, layer_index: Optional[int] = None) -> list[str]:
-        if layer_index in self.flat_int_in_coupling:
+        if layer_index is not None and layer_index in self.flat_int_in_coupling:
             return self.flat_int_in_coupling[layer_index]
         if layer_index is None:
             flat_int_in_coupling_entire = []
             for layer_id in range(self.getNumLayers()-1):
                 flat_int_in_coupling_entire.extend(self.flat_int_in_coupling[layer_id])
             return flat_int_in_coupling_entire
-        raise IndexError(f"Layer index {layer_index} not found in flat intermediate input coupling.")
+        # Return empty list for layers that don't have intermediate input coupling
+        return []
 
     """Returns the output coupling."""
     def getOutputCoupling(self) -> list[list[str]]:

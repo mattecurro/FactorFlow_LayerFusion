@@ -39,17 +39,18 @@ gemm_2layers_coupling = Coupling(
 # MAC: Intermediate_Out[z][y][x] += W0[z][c0][r0][s0] * In[c0][y+r0][x+s0]
 # => P+R1-1: Intermediate Input height
 # => Q+S1-1: Intermediate Input width
-# MAC: Out[c2][p][q] += W1[c2][c1][r1][s1] * Intermediate_In[c1][p+r1][q+s1]
+# MAC: Out[Z1][p][q] += W1[Z1][c1][r1][s1] * Intermediate_In[c1][p+r1][q+s1]
+# Uses indexed dimensions matching N-layer pattern: Z0 for layer 0 output, Z1 for layer 1 output
 conv_2layers_coupling = Coupling(
-                                dims = ['C0', 'Y', 'X', 'R0', 'S0', 'Z', 'C1', 'R1', 'S1', 'C2', 'P', 'Q'],
-                                in_coupling = ['C0', ['Y', 'R0'], ['X', 'S0']],      # In
+                                dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Z1', 'P', 'Q'],
+                                in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],      # In
                                 w_coupling = {
-                                    0: ['Z', 'C0', 'R0', 'S0'],               # W0
-                                    1: ['C2', 'C1', 'R1', 'S1']            # W1
+                                    0: ['Z0', 'C0', 'R0', 'S0'],               # W0
+                                    1: ['Z1', 'C1', 'R1', 'S1']            # W1
                                 },
                                 int_in_coupling = { 0: ['C1', ['P', 'R1'], ['Q', 'S1']]},                      # Intermediate_Out
-                                int_out_coupling = { 0: ['Z', 'Y', 'X'] },      # Intermediate_In
-                                out_coupling = ['C2', 'P', 'Q'])                       # Out
+                                int_out_coupling = { 0: ['Z0', 'Y0', 'X0'] },      # Intermediate_In
+                                out_coupling = ['Z1', 'P', 'Q'])                       # Out
 
 conv_3layers_coupling = Coupling(
     dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2'],
@@ -68,6 +69,29 @@ conv_3layers_coupling = Coupling(
         1: ['Z1', 'Y1', 'X1']                                       # Intermediate_In L2
     },
     out_coupling = ['Z2', 'P', 'Q']                                 # Out
+)
+
+# 4-layer coupling for MC-CNN (layers 0-3)
+conv_4layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'P', 'Q', 'Z3'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],               # In
+    w_coupling= {
+        0: ['Z0', 'C0', 'R0', 'S0'],                                # W0
+        1: ['Z1', 'C1', 'R1', 'S1'],                                # W1
+        2: ['Z2', 'C2', 'R2', 'S2'],                                # W2
+        3: ['Z3', 'C3', 'R3', 'S3'],                                # W3
+    },
+    int_in_coupling = {
+        0: ['C1', ['Y1', 'R1'], ['X1', 'S1']],                      # Intermediate_In L1
+        1: ['C2', ['Y2', 'R2'], ['X2', 'S2']],                      # Intermediate_In L2
+        2: ['C3', ['P', 'R3'], ['Q', 'S3']],                        # Intermediate_In L3 (uses output P,Q)
+    },
+    int_out_coupling = {
+        0: ['Z0', 'Y0', 'X0'],                                      # Intermediate_Out L0
+        1: ['Z1', 'Y1', 'X1'],                                      # Intermediate_Out L1
+        2: ['Z2', 'Y2', 'X2'],                                      # Intermediate_Out L2
+    },
+    out_coupling = ['Z3', 'P', 'Q']                                 # Out
 )
 
 conv_10layers_coupling = Coupling(
@@ -113,6 +137,84 @@ conv_10layers_coupling = Coupling(
         9: ['Z9', 'Y9', 'X9']
     },
     out_coupling = ['Z10', 'P', 'Q']
+)
+
+# 8-layer coupling for FSRCNN-TDC (layers 0-7)
+conv_8layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3',
+            'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6',
+            'C7', 'R7', 'S7', 'P', 'Q', 'Z7'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],               # In
+    w_coupling= {
+        0: ['Z0', 'C0', 'R0', 'S0'],                                # W0
+        1: ['Z1', 'C1', 'R1', 'S1'],                                # W1
+        2: ['Z2', 'C2', 'R2', 'S2'],                                # W2
+        3: ['Z3', 'C3', 'R3', 'S3'],                                # W3
+        4: ['Z4', 'C4', 'R4', 'S4'],                                # W4
+        5: ['Z5', 'C5', 'R5', 'S5'],                                # W5
+        6: ['Z6', 'C6', 'R6', 'S6'],                                # W6
+        7: ['Z7', 'C7', 'R7', 'S7'],                                # W7  
+    },
+    int_in_coupling = {
+        0: ['C1', ['Y1', 'R1'], ['X1', 'S1']],                      # Intermediate_In L1
+        1: ['C2', ['Y2', 'R2'], ['X2', 'S2']],                      # Intermediate_In L2
+        2: ['C3', ['Y3', 'R3'], ['X3', 'S3']],                      # Intermediate_In L3
+        3: ['C4', ['Y4', 'R4'], ['X4', 'S4']],                      # Intermediate_In L4
+        4: ['C5', ['Y5', 'R5'], ['X5', 'S5']],                      # Intermediate_In L5
+        5: ['C6', ['Y6', 'R6'], ['X6', 'S6']],                      # Intermediate_In L6
+        6: ['C7', ['P', 'R7'], ['Q', 'S7']],                        # Intermediate_In L7 (uses output P,Q)
+    },
+    int_out_coupling = {
+        0: ['Z0', 'Y0', 'X0'],                                      # Intermediate_Out L0
+        1: ['Z1', 'Y1', 'X1'],              
+        2: ['Z2', 'Y2', 'X2'],
+        3: ['Z3', 'Y3', 'X3'],
+        4: ['Z4', 'Y4', 'X4'],
+        5: ['Z5', 'Y5', 'X5'],
+        6: ['Z6', 'Y6', 'X6'],
+    },
+    out_coupling = ['Z7', 'P', 'Q']
+)
+
+# 13-layer coupling for VGG16 full conv fusion (layers 0-12)
+conv_13layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 
+            'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 
+            'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 
+            'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7',
+            'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9',
+            'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11',
+            'C12', 'R12', 'S12', 'P', 'Q', 'Z12'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],
+    w_coupling = {i: [f'Z{i}', f'C{i}', f'R{i}', f'S{i}'] for i in range(13)},
+    int_in_coupling = {
+        **{i: [f'C{i+1}', [f'Y{i+1}', f'R{i+1}'], [f'X{i+1}', f'S{i+1}']] for i in range(11)},
+        11: ['C12', ['P', 'R12'], ['Q', 'S12']]
+    },
+    int_out_coupling = {i: [f'Z{i}', f'Y{i}', f'X{i}'] for i in range(12)},
+    out_coupling = ['Z12', 'P', 'Q']
+)
+
+# 17-layer coupling for ResNet18 conv layers (excluding projections, layers 0-16 mapped to actual conv layers)
+# Note: This fuses the main conv path; projections are computed separately
+conv_17layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 
+            'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 
+            'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 
+            'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7',
+            'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9',
+            'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11',
+            'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13',
+            'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15',
+            'C16', 'R16', 'S16', 'P', 'Q', 'Z16'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],
+    w_coupling = {i: [f'Z{i}', f'C{i}', f'R{i}', f'S{i}'] for i in range(17)},
+    int_in_coupling = {
+        **{i: [f'C{i+1}', [f'Y{i+1}', f'R{i+1}'], [f'X{i+1}', f'S{i+1}']] for i in range(15)},
+        15: ['C16', ['P', 'R16'], ['Q', 'S16']]
+    },
+    int_out_coupling = {i: [f'Z{i}', f'Y{i}', f'X{i}'] for i in range(16)},
+    out_coupling = ['Z16', 'P', 'Q']
 )
 
 easy_conv_3layers_coupling = Coupling(
@@ -309,53 +411,155 @@ comp_maestro_blas = {
 Convolutions from the layers of VGG16. See:
 "Very Deep Convolutional Networks for Large-Scale Image Recognition"
 """
+# Revised VGG-16 Architecture Definition
+# Based on "Configuration D" from Simonyan & Zisserman (2015)
+# Input: 224x224 RGB Image
 comp_vgg_16 = {
-    'L0': Shape(C = 3, M = 64, P = 224, Q = 224, R = 3, S = 3),
-    'L1': Shape(C = 64, M = 64, P = 224, Q = 224, R = 3, S = 3),
-    'L2': Shape(C = 64, M = 128, P = 112, Q = 112, R = 3, S = 3),
-    'L3': Shape(C = 128, M = 128, P = 112, Q = 112, R = 3, S = 3),
-    'L4': Shape(C = 128, M = 256, P = 56, Q = 56, R = 3, S = 3),
-    'L5': Shape(C = 256, M = 256, P = 56, Q = 56, R = 3, S = 3),
-    #'L6': Shape(C = 256, M = 256, P = 56, Q = 56, R = 3, S = 3),
-    'L7': Shape(C = 256, M = 512, P = 28, Q = 28, R = 3, S = 3),
-    'L8': Shape(C = 512, M = 512, P = 28, Q = 28, R = 3, S = 3),
-    #'L9': Shape(C = 512, M = 512, P = 28, Q = 28, R = 3, S = 3),
-    'L10': Shape(C = 512, M = 512, P = 14, Q = 14, R = 3, S = 3),
-    #'L11': Shape(C = 512, M = 512, P = 14, Q = 14, R = 3, S = 3),
-    #'L12': Shape(C = 512, M = 512, P = 14, Q = 14, R = 3, S = 3),
-    'L13': Shape(C = 25088, M = 4096, P = 1, Q = 1, R = 1, S = 1), # fully connected
-    'L14': Shape(C = 4096, M = 4096, P = 1, Q = 1, R = 1, S = 1), # fully connected
-    'L15': Shape(C = 4096, M = 1000, P = 1, Q = 1, R = 1, S = 1), # fully connected
-    'L3+': Shape(C = 128, M = 128, P = 112, Q = 112, R = 9, S = 9) # large filter experiment
+    # --- Block 1: 2 Conv Layers (Output: 224x224) ---
+    'L0': Shape(C=3,   M=64, P=224, Q=224, R=3, S=3),  # Conv1_1
+    'L1': Shape(C=64,  M=64, P=224, Q=224, R=3, S=3),  # Conv1_2
+    # MaxPool 1: 224 -> 112
+
+    # --- Block 2: 2 Conv Layers (Output: 112x112) ---
+    'L2': Shape(C=64,  M=128, P=112, Q=112, R=3, S=3), # Conv2_1
+    'L3': Shape(C=128, M=128, P=112, Q=112, R=3, S=3), # Conv2_2
+    # MaxPool 2: 112 -> 56
+
+    # --- Block 3: 3 Conv Layers (Output: 56x56) ---
+    'L4': Shape(C=128, M=256, P=56, Q=56, R=3, S=3),   # Conv3_1
+    'L5': Shape(C=256, M=256, P=56, Q=56, R=3, S=3),   # Conv3_2
+    'L6': Shape(C=256, M=256, P=56, Q=56, R=3, S=3),   # Conv3_3 (commented)
+    # MaxPool 3: 56 -> 28
+
+    # --- Block 4: 3 Conv Layers (Output: 28x28) --- Should be interesting for fusion
+    'L7': Shape(C=256, M=512, P=28, Q=28, R=3, S=3),   # Conv4_1
+    'L8': Shape(C=512, M=512, P=28, Q=28, R=3, S=3),   # Conv4_2
+    'L9': Shape(C=512, M=512, P=28, Q=28, R=3, S=3),   # Conv4_3 (Previously commented)
+    # MaxPool 4: 28 -> 14
+
+    # --- Block 5: 3 Conv Layers (Output: 14x14) ---
+    'L10': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),  # Conv5_1
+    'L11': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),  # Conv5_2 (Previously commented)
+    'L12': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),  # Conv5_3 (Previously commented)
+    # MaxPool 5: 14 -> 7. Flatten: 7 * 7 * 512 = 25088
+
+    # --- Fully Connected Layers ---
+    'L13': Shape(C=25088, M=4096, P=1, Q=1, R=1, S=1), # FC1 (Flattened input)
+    'L14': Shape(C=4096,  M=4096, P=1, Q=1, R=1, S=1), # FC2
+    'L15': Shape(C=4096,  M=1000, P=1, Q=1, R=1, S=1), # FC3 (Output classes)
+    
+    # Experimental comparison layer (Active in original snippet)
+#    'L3+': Shape(C=128, M=128, P=112, Q=112, R=9, S=9) 
 }
 
+"""
+Convolutions from the layers of ResNet-18.
+Mappings based on Table 1 of "Deep Residual Learning for Image Recognition".
+"""
+comp_resnet_18 = {
+    # --- Conv1 ---
+    # 7x7 conv, 64, stride 2. Output 112x112.
+    # Followed implicitly by 3x3 max pool, stride 2 (not a conv layer).
+    'L0_conv1': Shape(C=3, M=64, P=112, Q=112, R=7, S=7, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # --- Conv2_x (56x56, 64 filters) ---
+    # 2 Blocks, 4 Layers total. All identical shapes.
+    'L1_conv2_1_1': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # 'L2_conv2_1_2': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # 'L3_conv2_2_1': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # 'L4_conv2_2_2': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Conv3_x (28x28, 128 filters) ---
+    # Block 1 (Downsampling): Stride 2, C=64 -> M=128
+    'L5_conv3_1_1': Shape(C=64, M=128, P=28, Q=28, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    'L6_conv3_1_2': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # Shortcut Projection (Option B): 1x1 conv, stride 2, match dimensions
+    'L7_conv3_proj': Shape(C=64, M=128, P=28, Q=28, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    
+    # Block 2: 2 Layers. Identical shape to L6.
+    # 'L8_conv3_2_1': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # 'L9_conv3_2_2': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Conv4_x (14x14, 256 filters) ---
+    # Block 1 (Downsampling): Stride 2, C=128 -> M=256
+    # CORRECTION: M must be 256 here (was 128 in snippet).
+    'L10_conv4_1_1': Shape(C=128, M=256, P=14, Q=14, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    'L11_conv4_1_2': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # Shortcut Projection: 1x1 conv, stride 2
+    'L12_conv4_proj': Shape(C=128, M=256, P=14, Q=14, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # Block 2: 2 Layers. Identical shape to L11.
+    # 'L13_conv4_2_1': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # 'L14_conv4_2_2': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Conv5_x (7x7, 512 filters) ---
+    # Block 1 (Downsampling): Stride 2, C=256 -> M=512
+    'L15_conv5_1_1': Shape(C=256, M=512, P=7, Q=7, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    'L16_conv5_1_2': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # Shortcut Projection: 1x1 conv, stride 2
+    'L17_conv5_proj': Shape(C=256, M=512, P=7, Q=7, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # Block 2: 2 Layers. Identical shape to L16.
+    # 'L18_conv5_2_1': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # 'L19_conv5_2_2': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Fully Connected ---
+    # Avg Pool (7x7 -> 1x1) is implicit before this.
+    'L20_fc': Shape(C=512, M=1000, P=1, Q=1, R=1, S=1, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1)
+}
 """
 Convolutions from the layers of ResNet18.
 """
 comp_resnet_18 = {
-    'L0': Shape(C = 3, M = 64, P = 112, Q = 112, R = 7, S = 7, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1),
-    'L1': Shape(C = 64, M = 64, P = 56, Q = 56, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    #'L2': Shape(C = 64, M = 64, P = 56, Q = 56, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    #'L3': Shape(C = 64, M = 64, P = 56, Q = 56, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    #'L4': Shape(C = 64, M = 64, P = 56, Q = 56, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L5': Shape(C = 64, M = 128, P = 28, Q = 28, R = 3, S = 3, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1),
-    'L6': Shape(C = 128, M = 128, P = 28, Q = 28, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L7': Shape(C = 64, M = 128, P = 28, Q = 28, R = 1, S = 1, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1), # point-wise
-    #'L8': Shape(C = 128, M = 128, P = 28, Q = 28, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    #'L9': Shape(C = 128, M = 128, P = 28, Q = 28, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L10': Shape(C = 128, M = 128, P = 14, Q = 14, R = 3, S = 3, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1),
-    'L11': Shape(C = 256, M = 256, P = 14, Q = 14, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L12': Shape(C = 128, M = 256, P = 14, Q = 14, R = 1, S = 1, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1), # point-wise
-    #'L13': Shape(C = 256, M = 256, P = 14, Q = 14, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    #'L14': Shape(C = 256, M = 256, P = 14, Q = 14, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L15': Shape(C = 256, M = 512, P = 7, Q = 7, R = 3, S = 3, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1),
-    'L16': Shape(C = 512, M = 512, P = 7, Q = 7, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L17': Shape(C = 256, M = 512, P = 7, Q = 7, R = 1, S = 1, Pstride = 2, Qstride = 2, Rdilation = 1, Sdilation = 1), # point-wise
-    #'L18': Shape(C = 512, M = 512, P = 7, Q = 7, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    #'L19': Shape(C = 512, M = 512, P = 7, Q = 7, R = 3, S = 3, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1),
-    'L20': Shape(C = 512, M = 1000, P = 1, Q = 1, R = 1, S = 1, Pstride = 1, Qstride = 1, Rdilation = 1, Sdilation = 1), # fully connected
-    'L1+': Shape(C = 256, M = 256, P = 56, Q = 56, R = 3, S = 3, Pstride = 2, Qstride = 2, Rdilation = 3, Sdilation = 3), # 2D dilation experiment
-    'L3+': Shape(C = 128, M = 128, P = 112, Q = 112, R = 9, S = 9, Pstride = 1, Qstride = 4, Rdilation = 1, Sdilation = 3) # 1D dilation experiment
+        # --- Conv1 ---
+    # 7x7 conv, 64, stride 2. Output 112x112.
+    # Followed implicitly by 3x3 max pool, stride 2 (not a conv layer).
+    'L0_conv1': Shape(C=3, M=64, P=112, Q=112, R=7, S=7, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # --- Conv2_x (56x56, 64 filters) ---
+    # 2 Blocks, 4 Layers total. All identical shapes.
+    'L1_conv2_1_1': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    'L2_conv2_1_2': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    'L3_conv2_2_1': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    'L4_conv2_2_2': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Conv3_x (28x28, 128 filters) ---
+    # Block 1 (Downsampling): Stride 2, C=64 -> M=128
+    'L5_conv3_1_1': Shape(C=64, M=128, P=28, Q=28, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    'L6_conv3_1_2': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # Shortcut Projection (Option B): 1x1 conv, stride 2, match dimensions
+    'L7_conv3_proj': Shape(C=64, M=128, P=28, Q=28, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # Block 2: 2 Layers. Identical shape to L6.
+    'L8_conv3_2_1': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    'L9_conv3_2_2': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Conv4_x (14x14, 256 filters) ---
+    # Block 1 (Downsampling): Stride 2, C=128 -> M=256
+    # CORRECTION: M must be 256 here (was 128 in snippet).
+    'L10_conv4_1_1': Shape(C=128, M=256, P=14, Q=14, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    'L11_conv4_1_2': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # Shortcut Projection: 1x1 conv, stride 2
+    'L12_conv4_proj': Shape(C=128, M=256, P=14, Q=14, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # Block 2: 2 Layers. Identical shape to L11.
+    'L13_conv4_2_1': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    'L14_conv4_2_2': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Conv5_x (7x7, 512 filters) ---
+    # Block 1 (Downsampling): Stride 2, C=256 -> M=512
+    'L15_conv5_1_1': Shape(C=256, M=512, P=7, Q=7, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+    'L16_conv5_1_2': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    # Shortcut Projection: 1x1 conv, stride 2
+    'L17_conv5_proj': Shape(C=256, M=512, P=7, Q=7, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
+
+    # Block 2: 2 Layers. Identical shape to L16.
+    'L18_conv5_2_1': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+    'L19_conv5_2_2': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
+
+    # --- Fully Connected ---
+    # Avg Pool (7x7 -> 1x1) is implicit before this.
+    'L20_fc': Shape(C=512, M=1000, P=1, Q=1, R=1, S=1, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1)
 }
 
 """
