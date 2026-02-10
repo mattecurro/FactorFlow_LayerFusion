@@ -1,0 +1,2316 @@
+nohup: ignoring input
+
+######################################################################
+# SINGLE-LAYER DISCOVERY FOR RESNET18 17-LAYER FUSION
+# PE Array: 12x14 = 168 PEs
+# Global Buffer: 128 KB
+# Layers: 0 to 16
+######################################################################
+
+============================================================
+Layer 0: L0_conv1
+Shape: M=64, P=112, Q=112, C=3, R=7, S=7
+============================================================
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 0.5833333333333334
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 0.5833333333333334
+  EDP: 7.971e+01, Energy: 66.15nJ, Latency: 1204224cyc
+  Utilization: 58.3%, Time: 3.3s
+  SARows factors: {}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['M', 'C', 'R', 'S', 'P', 'Q']
+  GlobalBuffer factors: {'P': 3, 'Q': 3}
+  DRAM factors: {'M': 2}
+
+============================================================
+Layer 1: L1_conv2_1_1
+Shape: M=64, P=56, Q=56, C=64, R=3, S=3
+============================================================
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 673,792
+  out_writes: 7,913,472
+  out_reads_factors: 48
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 7913472
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 53,661,573.120
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 53806080.0
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005828373015873016 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.06845238095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.4583333333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.39880952380952384 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.2916666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 53806080.0, EDP: 24320.348159999998
+My EDP: 37.02547021824
+DRAM in_reads set to: 200704, w_reads set to: 73728, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 274432: in:200704, w:73728, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.703e+01, Energy: 53.66nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 3.6s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 2, 'P': 3}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 2: L2_conv2_1_2
+Shape: M=64, P=56, Q=56, C=64, R=3, S=3
+============================================================
+output layer 0 read after next_spatials handling: 1
+out remaining dim in actual_dataflow_per_layer[0][:1]: ['M']
+actual_dataflow_per_layer[0]: ['M'], i = 0
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=48
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 673792
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 673,792
+  out_writes: 7,913,472
+  out_reads_factors: 48
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 7913472
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 53,661,573.120
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 53806080.0
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005828373015873016 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.06845238095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.4583333333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.39880952380952384 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.2916666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 53806080.0, EDP: 24320.348159999998
+My EDP: 37.02547021824
+DRAM in_reads set to: 200704, w_reads set to: 73728, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 274432: in:200704, w:73728, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.703e+01, Energy: 53.66nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 3.2s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 2, 'P': 3}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 3: L3_conv2_2_1
+Shape: M=64, P=56, Q=56, C=64, R=3, S=3
+============================================================
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=48
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 673792
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 673,792
+  out_writes: 7,913,472
+  out_reads_factors: 48
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 7913472
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 53,661,573.120
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 53806080.0
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005828373015873016 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.06845238095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.4583333333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.39880952380952384 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.2916666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 53806080.0, EDP: 24320.348159999998
+My EDP: 37.02547021824
+DRAM in_reads set to: 200704, w_reads set to: 73728, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 274432: in:200704, w:73728, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.703e+01, Energy: 53.66nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 5.0s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 2, 'P': 2, 'Q': 2}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 4: L4_conv2_2_2
+Shape: M=64, P=56, Q=56, C=64, R=3, S=3
+============================================================
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=48
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 673792
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 673,792
+  out_writes: 7,913,472
+  out_reads_factors: 48
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 7913472
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 53,661,573.120
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 53806080.0
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005828373015873016 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.06845238095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.4583333333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.39880952380952384 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.2916666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 53806080.0, EDP: 24320.348159999998
+My EDP: 37.02547021824
+DRAM in_reads set to: 200704, w_reads set to: 73728, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 274432: in:200704, w:73728, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.703e+01, Energy: 53.66nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 4.1s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 2, 'P': 2, 'Q': 2}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 5: L5_conv3_1_1
+Shape: M=128, P=28, Q=28, C=64, R=3, S=3
+============================================================
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=344064, out_reads=344064, out_reads_factors=48
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 336896
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 336,896
+  out_writes: 3,956,736
+  out_reads_factors: 48
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 3956736
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 72253.44}
+WMOPs_till_now before compute level: 25,950,085.120
+Compute Level Compute total WMOPs from per layer sum: 72253.44
+Compute Level Compute total WMOPs: 12138577.92
+Total WMOPs after adding compute level: 26022338.56
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005828373015873016 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.06845238095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.3125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.3601190476190476 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.2916666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 344064, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 26022338.56, EDP: 11762.09702912
+My EDP: 8.95334989430784
+DRAM in_reads set to: 50176, w_reads set to: 73728, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 123904: in:50176, w:73728, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 8.953e+00, Energy: 25.88nJ, Latency: 344064cyc
+  Utilization: 100.0%, Time: 2.5s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 3, 'P': 2}
+  DRAM factors: {}
+
+============================================================
+Layer 6: L6_conv3_1_2
+Shape: M=128, P=28, Q=28, C=128, R=3, S=3
+============================================================
+
+
+Stationarity calculation for Level: OutRegister: in_bp = 0, w_bp = 0, int_in_bp = 1, int_out_bp = 1, out_bp = 1
+
+
+Initialization Level: OutRegister, Layer 0: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['M']
+out layer read after innermost_dim_sum handling: 1
+CIAO disti: 1
+CIAO disti: 1
+CIAO disti: 1
+innermost_dim_sum: None, next_spatial_unroll: {'M': 1, 'P': 1, 'Q': 1}
+tile sizes[dim] for dim in dim_sum: [[1], [1], [1]]
+output layer 0 read after next_spatials handling: 1
+out remaining dim in actual_dataflow_per_layer[0][:1]: ['M']
+actual_dataflow_per_layer[0]: ['M'], i = 0
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=96
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 680960
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 680,960
+  out_writes: 9,117,696
+  out_reads_factors: 96
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 9117696
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 47,303,618.560
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 47448125.440000005
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005890376984126984 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07886904761904762 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.520833333333333 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.3125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.3601190476190476 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.14583333333333334 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 47448125.440000005, EDP: 21446.552698880005
+My EDP: 32.65038366277632
+DRAM in_reads set to: 100352, w_reads set to: 147456, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 247808: in:100352, w:147456, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.265e+01, Energy: 47.16nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 3.2s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 3, 'P': 2}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 7: L8_conv3_2_1
+Shape: M=128, P=28, Q=28, C=128, R=3, S=3
+============================================================
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=96
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 680960
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 680,960
+  out_writes: 9,117,696
+  out_reads_factors: 96
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 9117696
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 47,303,618.560
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 47448125.440000005
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005890376984126984 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07886904761904762 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.520833333333333 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.3125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.3601190476190476 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.14583333333333334 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 47448125.440000005, EDP: 21446.552698880005
+My EDP: 32.65038366277632
+DRAM in_reads set to: 100352, w_reads set to: 147456, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 247808: in:100352, w:147456, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.265e+01, Energy: 47.16nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 5.0s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 3, 'P': 2}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 8: L9_conv3_2_2
+Shape: M=128, P=28, Q=28, C=128, R=3, S=3
+============================================================
+DRAM in_reads set to: 100352, w_reads set to: 147456, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 247808: in:100352, w:147456, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.265e+01, Energy: 47.16nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 4.0s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['S', 'R', 'C', 'M', 'Q', 'P']
+  GlobalBuffer factors: {'M': 3, 'P': 2}
+  DRAM factors: {'C': 2}
+
+============================================================
+Layer 9: L10_conv4_1_1
+Shape: M=256, P=14, Q=14, C=128, R=3, S=3
+============================================================
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005890376984126984 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07886904761904762 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.520833333333333 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.2395833333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.9300595238095238 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.14583333333333334 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 344064, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 36659261.44, EDP: 16569.986170879998
+My EDP: 12.61313212809216
+DRAM in_reads set to: 25088, w_reads set to: 294912, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 320000: in:25088, w:294912, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 1.261e+01, Energy: 36.08nJ, Latency: 344064cyc
+  Utilization: 100.0%, Time: 4.4s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['M', 'Q', 'R', 'S', 'C', 'P']
+  GlobalBuffer factors: {'C': 3}
+  DRAM factors: {'M': 4}
+
+============================================================
+Layer 10: L11_conv4_1_2
+Shape: M=256, P=14, Q=14, C=256, R=3, S=3
+============================================================
+in_writes: 0, w_writes: 589824, int_in_writes: 0, int_out_writes: 0, out_writes: 0
+Name of the level: WRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: WRegister
+
+
+
+Questo mops è chiamato da update stats
+Level: OutRegister, arch bypasses for the level: ['in', 'w'], in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1
+arch.name: Eyeriss_DF_1Layer_12x14_PEs, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1, ignore_bypasses: False, dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, tile_sizes: {M: 1, P: 1, Q: 1, C: 1, R: 1, S: 1}, factors_constraints: {'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
+Level: OutRegister: actual_dataflow: ['M'], dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], actual_dataflow_per_layer: {0: ['M']}, factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, num layers: 1
+tile size for each dim in actual_dataflow: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: N/A
+tile size for each dim in actual_dataflow_per_layer[2]: N/A
+...
+tile size for each dim in actual_dataflow_per_layer[10]: N/A
+
+
+Stationarity calculation for Level: OutRegister: in_bp = 0, w_bp = 0, int_in_bp = 1, int_out_bp = 1, out_bp = 1
+
+
+Initialization Level: OutRegister, Layer 0: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['M']
+out layer read after innermost_dim_sum handling: 1
+CIAO disti: 1
+CIAO disti: 1
+CIAO disti: 1
+innermost_dim_sum: None, next_spatial_unroll: {'M': 1, 'P': 1, 'Q': 1}
+tile sizes[dim] for dim in dim_sum: [[1], [1], [1]]
+output layer 0 read after next_spatials handling: 1
+out remaining dim in actual_dataflow_per_layer[0][:1]: ['M']
+actual_dataflow_per_layer[0]: ['M'], i = 0
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=192
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 684544
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 684,544
+  out_writes: 9,719,808
+  out_reads_factors: 192
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 9719808
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 70,875,740.160
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 71020247.03999999
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005921378968253968 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08407738095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.59375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.2395833333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.9300595238095238 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07291666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 71020247.03999999, EDP: 32101.151662079996
+My EDP: 48.871020555141115
+DRAM in_reads set to: 50176, w_reads set to: 589824, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 640000: in:50176, w:589824, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 4.887e+01, Energy: 69.86nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 5.4s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['M', 'Q', 'R', 'S', 'C', 'P']
+  GlobalBuffer factors: {'C': 4}
+  DRAM factors: {'M': 4}
+
+============================================================
+Layer 11: L13_conv4_2_1
+Shape: M=256, P=14, Q=14, C=256, R=3, S=3
+============================================================
+in_writes: 0, w_writes: 589824, int_in_writes: 0, int_out_writes: 0, out_writes: 0
+Name of the level: WRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: WRegister
+
+
+
+Questo mops è chiamato da update stats
+Level: OutRegister, arch bypasses for the level: ['in', 'w'], in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1
+arch.name: Eyeriss_DF_1Layer_12x14_PEs, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1, ignore_bypasses: False, dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, tile_sizes: {M: 1, P: 1, Q: 1, C: 1, R: 1, S: 1}, factors_constraints: {'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
+Level: OutRegister: actual_dataflow: ['M'], dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], actual_dataflow_per_layer: {0: ['M']}, factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, num layers: 1
+tile size for each dim in actual_dataflow: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: N/A
+tile size for each dim in actual_dataflow_per_layer[2]: N/A
+...
+tile size for each dim in actual_dataflow_per_layer[10]: N/A
+
+
+Stationarity calculation for Level: OutRegister: in_bp = 0, w_bp = 0, int_in_bp = 1, int_out_bp = 1, out_bp = 1
+
+
+Initialization Level: OutRegister, Layer 0: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['M']
+out layer read after innermost_dim_sum handling: 1
+CIAO disti: 1
+CIAO disti: 1
+CIAO disti: 1
+innermost_dim_sum: None, next_spatial_unroll: {'M': 1, 'P': 1, 'Q': 1}
+tile sizes[dim] for dim in dim_sum: [[1], [1], [1]]
+output layer 0 read after next_spatials handling: 1
+out remaining dim in actual_dataflow_per_layer[0][:1]: ['M']
+actual_dataflow_per_layer[0]: ['M'], i = 0
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=192
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 684544
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 684,544
+  out_writes: 9,719,808
+  out_reads_factors: 192
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 9719808
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 70,875,740.160
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 71020247.03999999
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005921378968253968 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08407738095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.59375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.2395833333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.9300595238095238 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07291666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 71020247.03999999, EDP: 32101.151662079996
+My EDP: 48.871020555141115
+DRAM in_reads set to: 50176, w_reads set to: 589824, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 640000: in:50176, w:589824, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 4.887e+01, Energy: 69.86nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 5.7s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['M', 'Q', 'R', 'S', 'C', 'P']
+  GlobalBuffer factors: {'C': 4}
+  DRAM factors: {'M': 4}
+
+============================================================
+Layer 12: L14_conv4_2_2
+Shape: M=256, P=14, Q=14, C=256, R=3, S=3
+============================================================
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005921378968253968 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08407738095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 4.59375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.2395833333333335 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.9300595238095238 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07291666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 71020247.03999999, EDP: 32101.151662079996
+My EDP: 48.871020555141115
+DRAM in_reads set to: 50176, w_reads set to: 589824, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 640000: in:50176, w:589824, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 4.887e+01, Energy: 69.86nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 4.8s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['M', 'Q', 'R', 'S', 'C', 'P']
+  GlobalBuffer factors: {'C': 4}
+  DRAM factors: {'M': 4}
+
+============================================================
+Layer 13: L15_conv5_1_1
+Shape: M=512, P=7, Q=7, C=256, R=3, S=3
+============================================================
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=344064, out_reads=344064, out_reads_factors=192
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 342272
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 342,272
+  out_writes: 4,859,904
+  out_reads_factors: 192
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 4859904
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 72253.44}
+WMOPs_till_now before compute level: 91,759,482.880
+Compute Level Compute total WMOPs from per layer sum: 72253.44
+Compute Level Compute total WMOPs: 12138577.92
+Total WMOPs after adding compute level: 91831736.32000001
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005921378968253968 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08407738095238096 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 2.84375 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.203125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 3.465029761904762 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.07291666666666667 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 344064, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 91831736.32000001, EDP: 41507.944816639996
+My EDP: 31.595994525204485
+DRAM in_reads set to: 12544, w_reads set to: 1179648, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 1192192: in:12544, w:1179648, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 3.160e+01, Energy: 89.51nJ, Latency: 344064cyc
+  Utilization: 100.0%, Time: 3.3s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['Q', 'C', 'R', 'S', 'M', 'P']
+  GlobalBuffer factors: {'M': 4}
+  DRAM factors: {'C': 4}
+
+============================================================
+Layer 14: L16_conv5_1_2
+Shape: M=512, P=7, Q=7, C=512, R=3, S=3
+============================================================
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 686,336
+  out_writes: 10,020,864
+  out_reads_factors: 384
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 10020864
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 182,369,827.840
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 182514334.72
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.00593687996031746 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08668154761904762 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 2.8802083333333335 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.203125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 3.465029761904762 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.036458333333333336 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 182514334.72, EDP: 82496.47929344
+My EDP: 125.59322412220415
+DRAM in_reads set to: 25088, w_reads set to: 2359296, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 2384384: in:25088, w:2359296, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 1.256e+02, Energy: 177.87nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 4.4s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['Q', 'C', 'R', 'S', 'M', 'P']
+  GlobalBuffer factors: {'M': 4}
+  DRAM factors: {'C': 5}
+
+============================================================
+Layer 15: L18_conv5_2_1
+Shape: M=512, P=7, Q=7, C=512, R=3, S=3
+============================================================
+in_writes: 0, w_writes: 2359296, int_in_writes: 0, int_out_writes: 0, out_writes: 0
+Name of the level: WRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: WRegister
+
+
+
+Questo mops è chiamato da update stats
+Level: OutRegister, arch bypasses for the level: ['in', 'w'], in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1
+arch.name: Eyeriss_DF_1Layer_12x14_PEs, level.name: OutRegister
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1, ignore_bypasses: False, dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, tile_sizes: {M: 1, P: 1, Q: 1, C: 1, R: 1, S: 1}, factors_constraints: {'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
+Level: OutRegister: actual_dataflow: ['M'], dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], actual_dataflow_per_layer: {0: ['M']}, factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, num layers: 1
+tile size for each dim in actual_dataflow: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: N/A
+tile size for each dim in actual_dataflow_per_layer[2]: N/A
+...
+tile size for each dim in actual_dataflow_per_layer[10]: N/A
+
+
+Stationarity calculation for Level: OutRegister: in_bp = 0, w_bp = 0, int_in_bp = 1, int_out_bp = 1, out_bp = 1
+
+
+Initialization Level: OutRegister, Layer 0: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['M']
+out layer read after innermost_dim_sum handling: 1
+CIAO disti: 1
+CIAO disti: 1
+CIAO disti: 1
+innermost_dim_sum: None, next_spatial_unroll: {'M': 1, 'P': 1, 'Q': 1}
+tile sizes[dim] for dim in dim_sum: [[1], [1], [1]]
+output layer 0 read after next_spatials handling: 1
+out remaining dim in actual_dataflow_per_layer[0][:1]: ['M']
+actual_dataflow_per_layer[0]: ['M'], i = 0
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=384
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 686336
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 686,336
+  out_writes: 10,020,864
+  out_reads_factors: 384
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 10020864
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 182,369,827.840
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 182514334.72
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.00593687996031746 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08668154761904762 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 2.8802083333333335 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.203125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 3.465029761904762 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.036458333333333336 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 182514334.72, EDP: 82496.47929344
+My EDP: 125.59322412220415
+DRAM in_reads set to: 25088, w_reads set to: 2359296, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 2384384: in:25088, w:2359296, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 1.256e+02, Energy: 177.87nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 4.4s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['Q', 'C', 'R', 'S', 'M', 'P']
+  GlobalBuffer factors: {'M': 4}
+  DRAM factors: {'C': 5}
+
+============================================================
+Layer 16: L19_conv5_2_2
+Shape: M=512, P=7, Q=7, C=512, R=3, S=3
+============================================================
+Level: OutRegister: Starting MOPs calculation with in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1, ignore_bypasses: False, dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, tile_sizes: {M: 1, P: 1, Q: 1, C: 1, R: 1, S: 1}, factors_constraints: {'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}, bypasses: ['in', 'w'], multiple_buffering: 1, multiple_reuses: True
+Level: OutRegister: actual_dataflow: ['M'], dataflow: ['M', 'S', 'R', 'Q', 'P', 'C'], actual_dataflow_per_layer: {0: ['M']}, factors: {M: {2: 4}, P: {}, Q: {}, C: {}, R: {}, S: {}}, num layers: 1
+tile size for each dim in actual_dataflow: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[0]: [('M', 1)]
+tile size for each dim in actual_dataflow_per_layer[1]: N/A
+tile size for each dim in actual_dataflow_per_layer[2]: N/A
+...
+tile size for each dim in actual_dataflow_per_layer[10]: N/A
+
+
+Stationarity calculation for Level: OutRegister: in_bp = 0, w_bp = 0, int_in_bp = 1, int_out_bp = 1, out_bp = 1
+
+
+Initialization Level: OutRegister, Layer 0: out_reads = 1, innermost_dim_sum = None, i = 0, actual_dataflow = ['M']
+out layer read after innermost_dim_sum handling: 1
+CIAO disti: 1
+CIAO disti: 1
+CIAO disti: 1
+innermost_dim_sum: None, next_spatial_unroll: {'M': 1, 'P': 1, 'Q': 1}
+tile sizes[dim] for dim in dim_sum: [[1], [1], [1]]
+output layer 0 read after next_spatials handling: 1
+out remaining dim in actual_dataflow_per_layer[0][:1]: ['M']
+actual_dataflow_per_layer[0]: ['M'], i = 0
+
+output layer 0 final read: 16, out_reads_factors (orthogonal to output) = 1
+
+BEFORE BYPASS: ignore_bypasses: False, In reads: 0, Per Layer W Reads: {0: 0}, w_reads: 0,
+ Per Layer Intermediate Input reads: {}, int_in_reads: 1, Per Layer Intermediate Output reads: {}, int_out_reads: 1, Out reads: 16
+I AM HANDLING BYPASS NOW
+
+
+Level: OutRegister: Operand = in
+No levels in between for bypass operand in
+
+
+Level: OutRegister: Operand = w
+No levels in between for bypass operand w
+
+
+Level: OutRegister: Operand = out
+No levels in between for bypass operand out
+
+
+Level: OutRegister: Operand = int_in
+No levels in between for bypass operand int_in
+
+
+Level: OutRegister: Operand = int_out
+No levels in between for bypass operand int_out
+
+AFTER BYPASS of all operands:  OutRegister: in_reads: 0, per_layer_w_reads: {0: 0}, w_reads: 0, per_layer_int_in_reads: {}, int_in_reads: 1, per_layer_int_out_reads: {}, int_out_reads: 1, out_reads: 16, out_writes: 16, out_reads_factors: 1
+
+Start spatials for Level: OutRegister
+
+Level: OutRegister, handling spatial level: Compute, spatial_level_multicast_support = False, spatial_level_spatial_reduction_support = False
+After Spatials: Level: OutRegister: MOPs in_reads = 0, per_layer_w_reads = {0: 0}, w_reads = 0, per_layer_int_in_reads = {}, int_in_reads = 1, per_layer_int_out_reads = {}, int_out_reads = 1, out_reads = 16, out_writes = 16, CIAOout_reads_factors = 1
+
+End MOPs with Bypasses for Level: OutRegister
+
+
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 16
+  out_writes: 16
+  out_reads_factors: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=688128, out_reads=688128, out_reads_factors=384
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 686336
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 686,336
+  out_writes: 10,020,864
+  out_reads_factors: 384
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 10020864
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 168
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 144506.88}
+WMOPs_till_now before compute level: 182,369,827.840
+Compute Level Compute total WMOPs from per layer sum: 144506.88
+Compute Level Compute total WMOPs: 24277155.84
+Total WMOPs after adding compute level: 182514334.72
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.00593687996031746 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.08668154761904762 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.005952380952380952 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.020833333333333332 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 2.8802083333333335 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.203125 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 3.465029761904762 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.036458333333333336 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+max_latency: 688128, max_latency_real (with fudge factor): 452000000.0
+Should be: WMOPs: 182514334.72, EDP: 82496.47929344
+My EDP: 125.59322412220415
+DRAM in_reads set to: 25088, w_reads set to: 2359296, out_reads: 0, int_in_reads: 0, int_out_reads: 0
+DRAM Reads: 2384384: in:25088, w:2359296, out:0, int_in:0, int_out:0
+level SACols utilization: 14/14=1.0
+utilization after level SACols: 1.0
+level SARows utilization: 12/12=1.0
+utilization after level SARows: 1.0
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 1.0
+Arch: Eyeriss_DF_1Layer_12x14_PEs: spatial utilization is 1.0
+  EDP: 1.256e+02, Energy: 177.87nJ, Latency: 688128cyc
+  Utilization: 100.0%, Time: 3.6s
+  SARows factors: {'C': 2}
+  SACols factors: {}
+  GlobalBuffer dataflow: ['Q', 'C', 'R', 'S', 'M', 'P']
+  GlobalBuffer factors: {'M': 4}
+  DRAM factors: {'C': 5}
+
+======================================================================
+DISCOVERY COMPLETE
+======================================================================
+Total time: 69.7s (1.2 minutes)
+Results saved to: resnet18_17layer_discovered.json
+
+======================================================================
+DISCOVERED CONSTRAINTS SUMMARY
+======================================================================
+
+Layer 0 (L0_conv1):
+  EDP=7.97e+01, SARows={}, SACols={}
+  GB dataflow=['M', 'C', 'R', 'S']...
+
+Layer 1 (L1_conv2_1_1):
+  EDP=3.70e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 2 (L2_conv2_1_2):
+  EDP=3.70e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 3 (L3_conv2_2_1):
+  EDP=3.70e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 4 (L4_conv2_2_2):
+  EDP=3.70e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 5 (L5_conv3_1_1):
+  EDP=8.95e+00, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 6 (L6_conv3_1_2):
+  EDP=3.27e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 7 (L8_conv3_2_1):
+  EDP=3.27e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 8 (L9_conv3_2_2):
+  EDP=3.27e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['S', 'R', 'C', 'M']...
+
+Layer 9 (L10_conv4_1_1):
+  EDP=1.26e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['M', 'Q', 'R', 'S']...
+
+Layer 10 (L11_conv4_1_2):
+  EDP=4.89e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['M', 'Q', 'R', 'S']...
+
+Layer 11 (L13_conv4_2_1):
+  EDP=4.89e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['M', 'Q', 'R', 'S']...
+
+Layer 12 (L14_conv4_2_2):
+  EDP=4.89e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['M', 'Q', 'R', 'S']...
+
+Layer 13 (L15_conv5_1_1):
+  EDP=3.16e+01, SARows={'C': 2}, SACols={}
+  GB dataflow=['Q', 'C', 'R', 'S']...
+
+Layer 14 (L16_conv5_1_2):
+  EDP=1.26e+02, SARows={'C': 2}, SACols={}
+  GB dataflow=['Q', 'C', 'R', 'S']...
+
+Layer 15 (L18_conv5_2_1):
+  EDP=1.26e+02, SARows={'C': 2}, SACols={}
+  GB dataflow=['Q', 'C', 'R', 'S']...
+
+Layer 16 (L19_conv5_2_2):
+  EDP=1.26e+02, SARows={'C': 2}, SACols={}
+  GB dataflow=['Q', 'C', 'R', 'S']...

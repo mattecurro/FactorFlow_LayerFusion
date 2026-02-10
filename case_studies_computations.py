@@ -8,6 +8,12 @@ This file defines workloads for layer fusion experiments, categorized as:
 For each network, we provide:
 1. Single-layer versions (for baseline comparisons)
 2. Multi-layer fused versions (for fusion experiments)
+
+Multi-layer Shape Convention:
+- Layer i has dimensions: Yi, Xi (input spatial), Zi (output channels), Ci (input channels), Ri, Si (kernel)
+- Output layer uses P, Q instead of Y, X (no layer index)
+- Strides are stored as: Pstride{i}, Qstride{i} for layer i (default 1 if not specified)
+- For layer fusion tile sizing with Fully Cached: input_tile = output_tile * stride (when kernel >= stride)
 """
 
 from factors import Shape, Coupling
@@ -22,6 +28,111 @@ from computations import (
     conv_13layers_coupling,
     conv_17layers_coupling
 )
+from typing import List, Tuple
+
+
+# =============================================================================
+# HELPER FUNCTIONS FOR STRIDE-AWARE TILE SIZING
+# =============================================================================
+
+def get_layer_stride(shape: Shape, layer_idx: int) -> Tuple[int, int]:
+    """
+    Get the (Pstride, Qstride) for a given layer index.
+    Returns (1, 1) if strides are not specified (default).
+    
+    Args:
+        shape: Multi-layer Shape containing stride info
+        layer_idx: Layer index (0 = first/input layer)
+    
+    Returns:
+        (pstride, qstride) tuple
+    """
+    pstride = shape.get(f'Pstride{layer_idx}', 1)
+    qstride = shape.get(f'Qstride{layer_idx}', 1)
+    return (pstride, qstride)
+
+
+def get_layer_kernel(shape: Shape, layer_idx: int) -> Tuple[int, int]:
+    """
+    Get the (R, S) kernel size for a given layer index.
+    
+    Args:
+        shape: Multi-layer Shape
+        layer_idx: Layer index
+    
+    Returns:
+        (R, S) tuple
+    """
+    r = shape.get(f'R{layer_idx}', 1)
+    s = shape.get(f'S{layer_idx}', 1)
+    return (r, s)
+
+
+def calculate_per_layer_tile_sizes(
+    shape: Shape,
+    num_layers: int,
+    output_tile_h: int,
+    output_tile_w: int
+) -> List[Tuple[int, int]]:
+    """
+    Calculate the required tile sizes at each layer for depth-first processing in Fully Cached mode.
+    Propagates backwards from output layer to input layer.
+    
+    Formula: new_input = output * stride (when stride <= kernel)
+    
+    Args:
+        shape: Multi-layer Shape with stride info
+        num_layers: Number of layers
+        output_tile_h: Desired output tile height
+        output_tile_w: Desired output tile width
+    
+    Returns:
+        List of (height, width) tuples for each layer (index 0 = input layer)
+    """
+    # Start with output tile size
+    sizes = [(output_tile_h, output_tile_w)]
+    curr_h, curr_w = output_tile_h, output_tile_w
+    
+    # Propagate backwards from last layer to first layer
+    for layer_idx in range(num_layers - 1, -1, -1):
+        pstride, qstride = get_layer_stride(shape, layer_idx)
+        r, s = get_layer_kernel(shape, layer_idx)
+        
+        # Calculate new input size for this layer
+        # new_input = output * stride (when stride <= kernel, halo is reused)
+        if pstride <= r:
+            new_h = curr_h * pstride
+        else:
+            # stride > kernel: no halo overlap, need full input
+            new_h = (curr_h - 1) * pstride + r
+            
+        if qstride <= s:
+            new_w = curr_w * qstride
+        else:
+            new_w = (curr_w - 1) * qstride + s
+        
+        sizes.insert(0, (new_h, new_w))
+        curr_h, curr_w = new_h, new_w
+    
+    return sizes
+
+
+def get_cumulative_stride(shape: Shape, num_layers: int) -> Tuple[int, int]:
+    """
+    Calculate the cumulative stride across all layers.
+    This is the product of all individual strides.
+    
+    For depth-first: input_tile = output_tile * cumulative_stride
+    """
+    cum_pstride = 1
+    cum_qstride = 1
+    
+    for layer_idx in range(num_layers):
+        pstride, qstride = get_layer_stride(shape, layer_idx)
+        cum_pstride *= pstride
+        cum_qstride *= qstride
+    
+    return (cum_pstride, cum_qstride)
 
 # =============================================================================
 # ACTIVATION-DOMINANT WORKLOADS
@@ -158,14 +269,14 @@ fsrcnn_tdc_2layer_fused = {
         C1=56, R1=1, S1=1, Z1=12  # L1: 1×1, 56→12 (Z1 = output channels)
     ),
     # L2 + L3: Mapping layers 1-2 (both 3×3, 12→12)
-    'L2_L3_mapping12': Shape(
+    'L2_L3': Shape(
         P=540, Q=960,
         C0=12, R0=3, S0=3,
         Y0=540, X0=960, Z0=12,
         C1=12, R1=3, S1=3, Z1=12
     ),
     # L4 + L5: Mapping layers 3-4 (both 3×3, 12→12)
-    'L4_L5_mapping34': Shape(
+    'L4_L5': Shape(
         P=540, Q=960,
         C0=12, R0=3, S0=3,
         Y0=540, X0=960, Z0=12,
@@ -193,7 +304,7 @@ fsrcnn_tdc_3layer_fused = {
         C2=12, R2=3, S2=3, Z2=12  # L2: 3×3, 12→12
     ),
     # L2 + L3 + L4: Mapping layers 1-3 (all 3×3, 12→12)
-    'L2_L3_L4_mapping': Shape(
+    'L2_L3_L4': Shape(
         P=540, Q=960,
         C0=12, R0=3, S0=3,
         Y0=540, X0=960, Z0=12,
@@ -202,7 +313,7 @@ fsrcnn_tdc_3layer_fused = {
         C2=12, R2=3, S2=3, Z2=12
     ),
     # L3 + L4 + L5: Mapping layers 2-4 (all 3×3, 12→12)
-    'L3_L4_L5_mapping': Shape(
+    'L3_L4_L5': Shape(
         P=540, Q=960,
         C0=12, R0=3, S0=3,
         Y0=540, X0=960, Z0=12,
@@ -474,6 +585,15 @@ vgg16_block_couplings = {
 # VGG16 FULL FUSION (all 13 conv layers)
 # This is impractical but useful for theoretical case studies
 # Uses conv_13layers_coupling
+#
+# STRIDE INFO: VGG16 uses MaxPool (stride=2) between blocks, not strided convolutions.
+# For tile size calculation, we model the pooling as effective stride=2 on the first
+# layer of each new block:
+#   - Layer 2 (conv2_1): after pool1, effective Pstride2=2, Qstride2=2
+#   - Layer 4 (conv3_1): after pool2, effective Pstride4=2, Qstride4=2
+#   - Layer 7 (conv4_1): after pool3, effective Pstride7=2, Qstride7=2
+#   - Layer 10 (conv5_1): after pool4, effective Pstride10=2, Qstride10=2
+# Cumulative stride = 2*2*2*2 = 16
 # =============================================================================
 vgg16_full_fused = Shape(
     # Output (after L12 = conv5_3)
@@ -482,24 +602,24 @@ vgg16_full_fused = Shape(
     C12=512, R12=3, S12=3,
     # Layer 11 (conv5_2): 512->512, 14x14
     Y11=14, X11=14, Z11=512, C11=512, R11=3, S11=3,
-    # Layer 10 (conv5_1): 512->512, 14x14
-    Y10=14, X10=14, Z10=512, C10=512, R10=3, S10=3,
+    # Layer 10 (conv5_1): 512->512, 14x14 (after pool4 from 28x28)
+    Y10=14, X10=14, Z10=512, C10=512, R10=3, S10=3, Pstride10=2, Qstride10=2,
     # Layer 9 (conv4_3): 512->512, 28x28
     Y9=28, X9=28, Z9=512, C9=512, R9=3, S9=3,
     # Layer 8 (conv4_2): 512->512, 28x28
     Y8=28, X8=28, Z8=512, C8=512, R8=3, S8=3,
-    # Layer 7 (conv4_1): 256->512, 28x28
-    Y7=28, X7=28, Z7=512, C7=256, R7=3, S7=3,
+    # Layer 7 (conv4_1): 256->512, 28x28 (after pool3 from 56x56)
+    Y7=28, X7=28, Z7=512, C7=256, R7=3, S7=3, Pstride7=2, Qstride7=2,
     # Layer 6 (conv3_3): 256->256, 56x56
     Y6=56, X6=56, Z6=256, C6=256, R6=3, S6=3,
     # Layer 5 (conv3_2): 256->256, 56x56
     Y5=56, X5=56, Z5=256, C5=256, R5=3, S5=3,
-    # Layer 4 (conv3_1): 128->256, 56x56
-    Y4=56, X4=56, Z4=256, C4=128, R4=3, S4=3,
+    # Layer 4 (conv3_1): 128->256, 56x56 (after pool2 from 112x112)
+    Y4=56, X4=56, Z4=256, C4=128, R4=3, S4=3, Pstride4=2, Qstride4=2,
     # Layer 3 (conv2_2): 128->128, 112x112
     Y3=112, X3=112, Z3=128, C3=128, R3=3, S3=3,
-    # Layer 2 (conv2_1): 64->128, 112x112
-    Y2=112, X2=112, Z2=128, C2=64, R2=3, S2=3,
+    # Layer 2 (conv2_1): 64->128, 112x112 (after pool1 from 224x224)
+    Y2=112, X2=112, Z2=128, C2=64, R2=3, S2=3, Pstride2=2, Qstride2=2,
     # Layer 1 (conv1_2): 64->64, 224x224
     Y1=224, X1=224, Z1=64, C1=64, R1=3, S1=3,
     # Layer 0 (conv1_1): 3->64, 224x224
@@ -594,6 +714,9 @@ resnet18_2layer_fused = {
 #         L10,L11,L13,L14 (stage3) + L15,L16,L18,L19 (stage4)
 # This is impractical but useful for theoretical case studies
 # Uses conv_17layers_coupling
+#
+# STRIDE INFO: Stride=2 at layers 0, 5, 9, 13 (downsampling layers)
+#              Cumulative stride = 2*2*2*2 = 16 (so 7x7 output needs 112x112 input tile)
 # =============================================================================
 resnet18_full_fused = Shape(
     # Output (7x7, 512 channels)
@@ -605,7 +728,7 @@ resnet18_full_fused = Shape(
     # Layer 14 (L16_conv5_1_2): 512->512, 7x7
     Y14=7, X14=7, Z14=512, C14=512, R14=3, S14=3,
     # Layer 13 (L15_conv5_1_1): 256->512, 7x7 (stride 2 from 14x14)
-    Y13=14, X13=14, Z13=512, C13=256, R13=3, S13=3,
+    Y13=14, X13=14, Z13=512, C13=256, R13=3, S13=3, Pstride13=2, Qstride13=2,
     # Layer 12 (L14_conv4_2_2): 256->256, 14x14
     Y12=14, X12=14, Z12=256, C12=256, R12=3, S12=3,
     # Layer 11 (L13_conv4_2_1): 256->256, 14x14
@@ -613,7 +736,7 @@ resnet18_full_fused = Shape(
     # Layer 10 (L11_conv4_1_2): 256->256, 14x14
     Y10=14, X10=14, Z10=256, C10=256, R10=3, S10=3,
     # Layer 9 (L10_conv4_1_1): 128->256, 14x14 (stride 2 from 28x28)
-    Y9=28, X9=28, Z9=256, C9=128, R9=3, S9=3,
+    Y9=28, X9=28, Z9=256, C9=128, R9=3, S9=3, Pstride9=2, Qstride9=2,
     # Layer 8 (L9_conv3_2_2): 128->128, 28x28
     Y8=28, X8=28, Z8=128, C8=128, R8=3, S8=3,
     # Layer 7 (L8_conv3_2_1): 128->128, 28x28
@@ -621,7 +744,7 @@ resnet18_full_fused = Shape(
     # Layer 6 (L6_conv3_1_2): 128->128, 28x28
     Y6=28, X6=28, Z6=128, C6=128, R6=3, S6=3,
     # Layer 5 (L5_conv3_1_1): 64->128, 28x28 (stride 2 from 56x56)
-    Y5=56, X5=56, Z5=128, C5=64, R5=3, S5=3,
+    Y5=56, X5=56, Z5=128, C5=64, R5=3, S5=3, Pstride5=2, Qstride5=2,
     # Layer 4 (L4_conv2_2_2): 64->64, 56x56
     Y4=56, X4=56, Z4=64, C4=64, R4=3, S4=3,
     # Layer 3 (L3_conv2_2_1): 64->64, 56x56
@@ -630,8 +753,8 @@ resnet18_full_fused = Shape(
     Y2=56, X2=56, Z2=64, C2=64, R2=3, S2=3,
     # Layer 1 (L1_conv2_1_1): 64->64, 56x56
     Y1=56, X1=56, Z1=64, C1=64, R1=3, S1=3,
-    # Layer 0 (L0_conv1): 3->64, 112x112 (stride 2 from 224x224)
-    Y0=224, X0=224, Z0=64, R0=7, S0=7, C0=3
+    # Layer 0 (L0_conv1): 3->64, 112x112 (stride 2 from 112x112)
+    Y0=112, X0=112, Z0=64, R0=7, S0=7, C0=3, Pstride0=2, Qstride0=2
 )
 
 resnet18_full_coupling = conv_17layers_coupling
@@ -742,7 +865,7 @@ all_fused_workloads = {
 # Representative workloads for quick experiments
 representative_workloads = {
     # Activation-dominant
-    'fsrcnn_mapping': fsrcnn_tdc_2layer_fused['L2_L3_mapping12'],  # Small channels, large spatial
+    'fsrcnn_mapping': fsrcnn_tdc_2layer_fused['L2_L3'],  # Small channels, large spatial
     'mccnn_full': mccnn_4layer_fused,                              # Full MC-CNN fused
     
     # Weight-dominant  

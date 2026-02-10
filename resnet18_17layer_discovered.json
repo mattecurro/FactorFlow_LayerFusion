@@ -1,0 +1,748 @@
+{
+  "config": {
+    "pe_rows": 12,
+    "pe_cols": 14,
+    "global_buffer_kb": 128
+  },
+  "total_time_seconds": 69.73361825942993,
+  "layers": [
+    {
+      "layer_idx": 0,
+      "name": "L0_conv1",
+      "shape": {
+        "M": 64,
+        "P": 112,
+        "Q": 112,
+        "C": 3,
+        "R": 7,
+        "S": 7
+      },
+      "edp": 79.7073299157811,
+      "energy": 66.15271935999999,
+      "latency": 1204224,
+      "utilization": 0.5833333333333334,
+      "mapping_time": 3.3181564807891846,
+      "sarows_factors": {},
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "M",
+        "C",
+        "R",
+        "S",
+        "P",
+        "Q"
+      ],
+      "globalbuffer_factors": {
+        "P": 3,
+        "Q": 3
+      },
+      "dram_dataflow": [
+        "Q",
+        "C",
+        "R",
+        "S",
+        "P",
+        "M"
+      ],
+      "dram_factors": {
+        "M": 2
+      }
+    },
+    {
+      "layer_idx": 1,
+      "name": "L1_conv2_1_1",
+      "shape": {
+        "M": 64,
+        "P": 56,
+        "Q": 56,
+        "C": 64,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 37.02547021824,
+      "energy": 53.66083584,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 3.600346088409424,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 2,
+        "P": 3
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "R",
+        "S",
+        "Q",
+        "C"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 2,
+      "name": "L2_conv2_1_2",
+      "shape": {
+        "M": 64,
+        "P": 56,
+        "Q": 56,
+        "C": 64,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 37.02547021824,
+      "energy": 53.66083584,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 3.1908674240112305,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 2,
+        "P": 3
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "R",
+        "S",
+        "Q",
+        "C"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 3,
+      "name": "L3_conv2_2_1",
+      "shape": {
+        "M": 64,
+        "P": 56,
+        "Q": 56,
+        "C": 64,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 37.02547021824,
+      "energy": 53.66083584,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 5.001669883728027,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 2,
+        "P": 2,
+        "Q": 2
+      },
+      "dram_dataflow": [
+        "M",
+        "Q",
+        "R",
+        "S",
+        "P",
+        "C"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 4,
+      "name": "L4_conv2_2_2",
+      "shape": {
+        "M": 64,
+        "P": 56,
+        "Q": 56,
+        "C": 64,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 37.02547021824,
+      "energy": 53.66083584,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 4.090912103652954,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 2,
+        "P": 2,
+        "Q": 2
+      },
+      "dram_dataflow": [
+        "M",
+        "Q",
+        "R",
+        "S",
+        "P",
+        "C"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 5,
+      "name": "L5_conv3_1_1",
+      "shape": {
+        "M": 128,
+        "P": 28,
+        "Q": 28,
+        "C": 64,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 8.95334989430784,
+      "energy": 25.877094399999997,
+      "latency": 344064,
+      "utilization": 1.0,
+      "mapping_time": 2.4582457542419434,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 3,
+        "P": 2
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {}
+    },
+    {
+      "layer_idx": 6,
+      "name": "L6_conv3_1_2",
+      "shape": {
+        "M": 128,
+        "P": 28,
+        "Q": 28,
+        "C": 128,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 32.65038366277632,
+      "energy": 47.157637120000004,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 3.1846916675567627,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 3,
+        "P": 2
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 7,
+      "name": "L8_conv3_2_1",
+      "shape": {
+        "M": 128,
+        "P": 28,
+        "Q": 28,
+        "C": 128,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 32.65038366277632,
+      "energy": 47.157637120000004,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 4.967226982116699,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 3,
+        "P": 2
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 8,
+      "name": "L9_conv3_2_2",
+      "shape": {
+        "M": 128,
+        "P": 28,
+        "Q": 28,
+        "C": 128,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 32.65038366277632,
+      "energy": 47.157637120000004,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 3.97456955909729,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "S",
+        "R",
+        "C",
+        "M",
+        "Q",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 3,
+        "P": 2
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 2
+      }
+    },
+    {
+      "layer_idx": 9,
+      "name": "L10_conv4_1_1",
+      "shape": {
+        "M": 256,
+        "P": 14,
+        "Q": 14,
+        "C": 128,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 12.61313212809216,
+      "energy": 36.0782848,
+      "latency": 344064,
+      "utilization": 1.0,
+      "mapping_time": 4.352900266647339,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "M",
+        "Q",
+        "R",
+        "S",
+        "C",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "C": 3
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "M": 4
+      }
+    },
+    {
+      "layer_idx": 10,
+      "name": "L11_conv4_1_2",
+      "shape": {
+        "M": 256,
+        "P": 14,
+        "Q": 14,
+        "C": 256,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 48.871020555141115,
+      "energy": 69.85829375999998,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 5.415314674377441,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "M",
+        "Q",
+        "R",
+        "S",
+        "C",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "C": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "M": 4
+      }
+    },
+    {
+      "layer_idx": 11,
+      "name": "L13_conv4_2_1",
+      "shape": {
+        "M": 256,
+        "P": 14,
+        "Q": 14,
+        "C": 256,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 48.871020555141115,
+      "energy": 69.85829375999998,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 5.651874542236328,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "M",
+        "Q",
+        "R",
+        "S",
+        "C",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "C": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "M": 4
+      }
+    },
+    {
+      "layer_idx": 12,
+      "name": "L14_conv4_2_2",
+      "shape": {
+        "M": 256,
+        "P": 14,
+        "Q": 14,
+        "C": 256,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 48.871020555141115,
+      "energy": 69.85829375999998,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 4.812824249267578,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "M",
+        "Q",
+        "R",
+        "S",
+        "C",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "C": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "M": 4
+      }
+    },
+    {
+      "layer_idx": 13,
+      "name": "L15_conv5_1_1",
+      "shape": {
+        "M": 512,
+        "P": 7,
+        "Q": 7,
+        "C": 256,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 31.595994525204485,
+      "energy": 89.50782976,
+      "latency": 344064,
+      "utilization": 1.0,
+      "mapping_time": 3.2667016983032227,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "Q",
+        "C",
+        "R",
+        "S",
+        "M",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 4
+      }
+    },
+    {
+      "layer_idx": 14,
+      "name": "L16_conv5_1_2",
+      "shape": {
+        "M": 512,
+        "P": 7,
+        "Q": 7,
+        "C": 512,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 125.59322412220415,
+      "energy": 177.8665216,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 4.352706670761108,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "Q",
+        "C",
+        "R",
+        "S",
+        "M",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 5
+      }
+    },
+    {
+      "layer_idx": 15,
+      "name": "L18_conv5_2_1",
+      "shape": {
+        "M": 512,
+        "P": 7,
+        "Q": 7,
+        "C": 512,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 125.59322412220415,
+      "energy": 177.8665216,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 4.342706918716431,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "Q",
+        "C",
+        "R",
+        "S",
+        "M",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 5
+      }
+    },
+    {
+      "layer_idx": 16,
+      "name": "L19_conv5_2_2",
+      "shape": {
+        "M": 512,
+        "P": 7,
+        "Q": 7,
+        "C": 512,
+        "R": 3,
+        "S": 3
+      },
+      "edp": 125.59322412220415,
+      "energy": 177.8665216,
+      "latency": 688128,
+      "utilization": 1.0,
+      "mapping_time": 3.5820021629333496,
+      "sarows_factors": {
+        "C": 2
+      },
+      "sacols_factors": {},
+      "globalbuffer_dataflow": [
+        "Q",
+        "C",
+        "R",
+        "S",
+        "M",
+        "P"
+      ],
+      "globalbuffer_factors": {
+        "M": 4
+      },
+      "dram_dataflow": [
+        "M",
+        "P",
+        "Q",
+        "C",
+        "R",
+        "S"
+      ],
+      "dram_factors": {
+        "C": 5
+      }
+    }
+  ]
+}

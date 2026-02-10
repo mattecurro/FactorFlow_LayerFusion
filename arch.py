@@ -34,7 +34,7 @@ Constructor arguments:
 class Arch(list[Level]):
     def __init__(self, levels : list[Level], coupling : Coupling, name : str ="<unnamed architecture>"):
         self.name : str = name
-        print(f"Creating architecture: {self.name} with coupling: {coupling.compactStr()}")
+        vprint(f"Creating architecture: {self.name} with coupling: {coupling.compactStr()}")
         # TODO: maybe store Wart, EDP, etc. here?
         self.coupling : Coupling = coupling
         self.stride_values : dict[str, int] = {}
@@ -109,7 +109,7 @@ class Arch(list[Level]):
         assert coupling.isCompatibleComp(comp), f"The provided computation ({comp}) is not compatible with the provided coupling ({coupling.compactStr()}), note that each dimension and stride of the latter must appear in the computation."
         assert self.coupling.isCompatibleCoupling(coupling), f"The provided coupling ({coupling}) is not compatible with arch {self.name}'s coupling ({self.coupling.compactStr()})."
         if verbose and not self.coupling.isSubcoupling(coupling):
-            print(f"WARNING: the used coupling ({coupling.compactStr()}) is not a subcoupling of arch {self.name}'s coupling ({self.coupling.compactStr()}), but is still compatible.")
+            vprint(f"WARNING: the used coupling ({coupling.compactStr()}) is not a subcoupling of arch {self.name}'s coupling ({self.coupling.compactStr()}), but is still compatible.")
         comp.fitToCoupling(self.coupling)
 
 
@@ -138,7 +138,7 @@ class Arch(list[Level]):
                                       x_dim: str) -> bool:        
         # 1. Initial Check: The first loop with iter > 1 MUST be an Input Loop (x_dim)
         #    (Or an orthogonal dimension, but cannot be Q or S before X at the lowest level)
-        print(f"Validating per-layer heuristic for dimensions: Q={q_dim}, S={s_dim}, X={x_dim}")
+        vprint(f"Validating per-layer heuristic for dimensions: Q={q_dim}, S={s_dim}, X={x_dim}")
         for loop in reversed(loop_order):
             base, level = self.parse_loop_name(loop)
             # If we hit the Input dimension, we are safe to start checking logic
@@ -150,9 +150,9 @@ class Arch(list[Level]):
             if base == q_dim or (s_dim and base == s_dim):
                 iter_key = f'iterations_{loop}'
                 if tiling.get(iter_key, 1) != 1:
-                    print(f"Heuristic Fail: Inner loop {loop} (Q/S) found inside innermost {x_dim}.")
+                    vprint(f"Heuristic Fail: Inner loop {loop} (Q/S) found inside innermost {x_dim}.")
                     return False
-        print(f"Initial Check Passed.")        
+        vprint(f"Initial Check Passed.")        
 
         # 2. Extract Input (X) loop positions
         x_positions = []
@@ -161,10 +161,10 @@ class Arch(list[Level]):
             if base == x_dim:
                 x_positions.append((i, loop, level))
 
-        print(f"X loop positions: {x_positions}")
+        vprint(f"X loop positions: {x_positions}")
         # Sort by level (Innermost level (0) first) 
         x_positions.sort(key=lambda x: -x[2]) 
-        print(f"Sorted X loop positions (innermost first): {x_positions}")
+        vprint(f"Sorted X loop positions (innermost first): {x_positions}")
 
         # 3. Iterate through each hierarchy level of X
         for x_pos_idx, (pos, x_loop, x_level) in enumerate(x_positions):           
@@ -217,8 +217,8 @@ class Arch(list[Level]):
             lhs = q_iterations + s_iterations - 1
             
             if lhs > x_iterations:
-                print(f"Heuristic Failed at {x_loop}:")
-                print(f"  {q_dim}_iter({q_iterations}) + {s_dim or '0'}_iter({s_iterations}) - 1 > {x_dim}_iter({x_iterations})")
+                vprint(f"Heuristic Failed at {x_loop}:")
+                vprint(f"  {q_dim}_iter({q_iterations}) + {s_dim or '0'}_iter({s_iterations}) - 1 > {x_dim}_iter({x_iterations})")
                 return False
 
         return True
@@ -237,9 +237,9 @@ class Arch(list[Level]):
         loop_order = self._extractLoopOrder()
         num_layers = self.coupling.getNumLayers()  
 
-        print(f"Validating fused-layer heuristic for {num_layers} layers...")
-        print(f"Current Tiling: {tiling}")
-        print(f"Current Loop Order: {loop_order}")
+        vprint(f"Validating fused-layer heuristic for {num_layers} layers...")
+        vprint(f"Current Tiling: {tiling}")
+        vprint(f"Current Loop Order: {loop_order}")
         for i in range(num_layers - 1, 0, -1):
             # Define dimension names for Layer i
             # Width Dimension Triplet
@@ -256,7 +256,7 @@ class Arch(list[Level]):
 
             # Validate Width (Q, S, X)
             if not self.validate_per_layer_heuristic(tiling, loop_order, q_dim, s_dim, x_dim):
-                print(f"Heuristic Failed on Layer {i} Width: {q_dim} + {s_dim} - 1 <= {x_dim}")
+                vprint(f"Heuristic Failed on Layer {i} Width: {q_dim} + {s_dim} - 1 <= {x_dim}")
                 return False
 
             # Height Dimension Triplet (Optional, depending on architecture)
@@ -274,7 +274,7 @@ class Arch(list[Level]):
             p_exists = any(p_dim.lower() in l for l in loop_order)
             if p_exists:
                 if not self.validate_per_layer_heuristic(tiling, loop_order, p_dim, r_dim, y_dim):
-                    print(f"Heuristic Failed on Layer {i} Height: {p_dim} + {r_dim} - 1 <= {y_dim}")
+                    vprint(f"Heuristic Failed on Layer {i} Height: {p_dim} + {r_dim} - 1 <= {y_dim}")
                     return False
 
             c_dim = f'C{i+1}'
@@ -282,7 +282,7 @@ class Arch(list[Level]):
             c_exists = any(c_dim.lower() in l for l in loop_order)
             if c_exists:
                 if not self.validate_per_layer_heuristic(tiling, loop_order, c_dim, None, z_dim):
-                    print(f"Heuristic Failed on Layer {i} Depth: {c_dim} <= {z_dim}")
+                    vprint(f"Heuristic Failed on Layer {i} Depth: {c_dim} <= {z_dim}")
                     return False
         return True
   
@@ -301,7 +301,7 @@ class Arch(list[Level]):
         # Check if the dimension in loop_order before the first 'x' are with iteration equal to 1
         for i, loop in enumerate(reversed(loop_order)):
             base, level = self.parse_loop_name(loop)
-            print(f"i: {i}, loop: {loop}, base: {base}, level: {level}")
+            vprint(f"i: {i}, loop: {loop}, base: {base}, level: {level}")
             if base != 'x':
                 # base_iter is the number of iterations of the position in the loop order correspondent to base
                 iter_key = f'iterations_{loop}'
@@ -519,10 +519,10 @@ class Arch(list[Level]):
             return False
         # If we reach this point, the move was successful: check if the mapping is still valid
         if not skip_heuristic_check:
-            print("Checking heuristic validity after move...")
+            vprint("Checking heuristic validity after move...")
             heuristic_valid = self.validate_mapping_heuristic()
             if not heuristic_valid:
-                print("Heuristic violated after move, rolling back...")
+                vprint("Heuristic violated after move, rolling back...")
                 ## Rollback due to heuristic violation
                 self[src_level_idx].addFactor(dimension, factor, amount)
                 assert self[dst_level_idx].removeFactor(dimension, factor, amount) # something is broken, cannot undo the move
@@ -701,6 +701,9 @@ class Arch(list[Level]):
         for level in self:
             if isinstance(level, SpatialLevel):
                 utilization *= level.factors.fullProduct()/level.mesh
+                vprint(f"level {level.name} utilization: {level.factors.fullProduct()}/{level.mesh}={level.factors.fullProduct()/level.mesh}")
+                vprint(f"utilization after level {level.name}: {utilization}")
+        vprint(f"Arch: {self.name}: spatial utilization is {utilization}")
         return utilization
 
     """
@@ -756,14 +759,14 @@ class Arch(list[Level]):
             # Add final layer input coupling dimensions
             final_layer_dims.update(self.coupling.getFlatInputCoupling())
             intermediate_dims = set(self.coupling.dims) - final_layer_dims
-            print(f"final_layer_dims: {final_layer_dims}, coupling.dims: {self.coupling.dims}")
-            print(f"INFO: Arch: {self.name}: identified intermediate dimensions: {intermediate_dims}")
+            vprint(f"final_layer_dims: {final_layer_dims}, coupling.dims: {self.coupling.dims}")
+            vprint(f"INFO: Arch: {self.name}: identified intermediate dimensions: {intermediate_dims}")
             for level in self:
                 if isinstance(level, MemLevel) and any(name in level.name.lower() for name in ['inregister','register', 'reg']):
                     for dim in ['P', 'R1']:
                         if dim in level.dataflow:
                             #level.factors_constraints[dim] = 2**32
-                            print(f"INFO: Added high constraint for intermediate dimension {dim} in level {level.name}")
+                            vprint(f"INFO: Added high constraint for intermediate dimension {dim} in level {level.name}")
 
         failed = False
         for dim in self.coupling.dims:
@@ -781,16 +784,16 @@ class Arch(list[Level]):
                             if enforce:
                                 assert False, f"Arch: {self.name} -> Level: {level.name}: Failed to fit comp to arch because the level's constraint on dimension: {dim} ({eq}{level.factors_constraints[dim + eq]}) cannot be satisfied by comp ({dim}: {comp[dim]})!"
                             else:
-                                print(f"ERROR: Arch: {self.name} -> Level: {level.name}: failed to fit comp: {comp_name if comp_name else comp} to arch because the level's constraint on dimension: {dim} ({eq}{level.factors_constraints[dim + eq]}) cannot be satisfied by comp ({dim}: {comp[dim]})!")
+                                vprint(f"ERROR: Arch: {self.name} -> Level: {level.name}: failed to fit comp: {comp_name if comp_name else comp} to arch because the level's constraint on dimension: {dim} ({eq}{level.factors_constraints[dim + eq]}) cannot be satisfied by comp ({dim}: {comp[dim]})!")
                             failed = True
                             break
-                        print(f"WARNING: Arch: {self.name} -> Level: {level.name}: updating constraint ({dim}: {level.factors_constraints[dim + eq]}) to ({dim}: {comp[dim] // total_constraint}) to fit the computation.")
+                        vprint(f"WARNING: Arch: {self.name} -> Level: {level.name}: updating constraint ({dim}: {level.factors_constraints[dim + eq]}) to ({dim}: {comp[dim] // total_constraint}) to fit the computation.")
                         level.factors_constraints[dim + eq] = comp[dim] // total_constraint
                     elif eq == '' and (comp[dim] // total_constraint) % level.factors_constraints[dim] != 0 and not Settings.PADDED_MAPPINGS:
                         if enforce:
                             assert False, f"Arch: {self.name} -> Level: {level.name}: Failed to fit comp to arch because the level's constraint ({dim}: {level.factors_constraints[dim]}) does not divide comp dimension {dim} ({comp[dim]}) exactly. To compensate, consider setting 'Settings.PADDED_MAPPINGS' to True."
                         else:
-                            print(f"ERROR: Arch: {self.name} -> Level: {level.name}: Failed to fit comp to arch because the level's constraint ({dim}: {level.factors_constraints[dim]}) does not divide comp dimension {dim} ({comp[dim]}) exactly. To compensate, consider setting 'Settings.PADDED_MAPPINGS' to True.")
+                            vprint(f"ERROR: Arch: {self.name} -> Level: {level.name}: Failed to fit comp to arch because the level's constraint ({dim}: {level.factors_constraints[dim]}) does not divide comp dimension {dim} ({comp[dim]}) exactly. To compensate, consider setting 'Settings.PADDED_MAPPINGS' to True.")
                         failed = True
                         break
                     total_constraint *= level.factors_constraints[dim + eq]
@@ -808,7 +811,7 @@ class Arch(list[Level]):
         for level in self:
             if level.area == None:
                 if verbose:
-                    print(f"WARNING: Arch: {self.name}: None value for area found on level {level.name}, area calculation aborted.")
+                    vprint(f"WARNING: Arch: {self.name}: None value for area found on level {level.name}, area calculation aborted.")
                 return None
             area += level.area*physical_instances
             if isinstance(level, SpatialLevel):

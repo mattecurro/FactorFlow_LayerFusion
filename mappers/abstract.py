@@ -43,7 +43,7 @@ Mapper Step 1: exhaustively iterate loop permutations/dataflows.
 NOTE: this is a placeholder.
 """
 def optimizeDataflows(arch : Arch, comp : Shape, bias_read : bool, thread_idx : int = -1, threads_count : int = 1, past_perms : dict[tuple[int, ...], ThreadSafeHeap[float, list[LevelCore], int, int]] = None, lock : threading.Lock = None, barrier : threading.Barrier = None, verbose : bool = False) -> Optional[tuple[Arch, float]]:
-    if verbose: print("WARNING: placeholder implementation, no exploration is being carried out, returning the default mapping.")
+    if verbose: vprint("WARNING: placeholder implementation, no exploration is being carried out, returning the default mapping.")
     if thread_idx == 0:
         arch.initFactors(comp)
         # multithreading: the caller expects the best mapping found to be the top of the heap in past_perms[()]

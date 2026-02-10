@@ -453,62 +453,8 @@ comp_vgg_16 = {
 }
 
 """
-Convolutions from the layers of ResNet-18.
-Mappings based on Table 1 of "Deep Residual Learning for Image Recognition".
-"""
-comp_resnet_18 = {
-    # --- Conv1 ---
-    # 7x7 conv, 64, stride 2. Output 112x112.
-    # Followed implicitly by 3x3 max pool, stride 2 (not a conv layer).
-    'L0_conv1': Shape(C=3, M=64, P=112, Q=112, R=7, S=7, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-
-    # --- Conv2_x (56x56, 64 filters) ---
-    # 2 Blocks, 4 Layers total. All identical shapes.
-    'L1_conv2_1_1': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # 'L2_conv2_1_2': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # 'L3_conv2_2_1': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # 'L4_conv2_2_2': Shape(C=64, M=64, P=56, Q=56, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-
-    # --- Conv3_x (28x28, 128 filters) ---
-    # Block 1 (Downsampling): Stride 2, C=64 -> M=128
-    'L5_conv3_1_1': Shape(C=64, M=128, P=28, Q=28, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-    'L6_conv3_1_2': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # Shortcut Projection (Option B): 1x1 conv, stride 2, match dimensions
-    'L7_conv3_proj': Shape(C=64, M=128, P=28, Q=28, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-    
-    # Block 2: 2 Layers. Identical shape to L6.
-    # 'L8_conv3_2_1': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # 'L9_conv3_2_2': Shape(C=128, M=128, P=28, Q=28, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-
-    # --- Conv4_x (14x14, 256 filters) ---
-    # Block 1 (Downsampling): Stride 2, C=128 -> M=256
-    # CORRECTION: M must be 256 here (was 128 in snippet).
-    'L10_conv4_1_1': Shape(C=128, M=256, P=14, Q=14, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-    'L11_conv4_1_2': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # Shortcut Projection: 1x1 conv, stride 2
-    'L12_conv4_proj': Shape(C=128, M=256, P=14, Q=14, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-
-    # Block 2: 2 Layers. Identical shape to L11.
-    # 'L13_conv4_2_1': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # 'L14_conv4_2_2': Shape(C=256, M=256, P=14, Q=14, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-
-    # --- Conv5_x (7x7, 512 filters) ---
-    # Block 1 (Downsampling): Stride 2, C=256 -> M=512
-    'L15_conv5_1_1': Shape(C=256, M=512, P=7, Q=7, R=3, S=3, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-    'L16_conv5_1_2': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # Shortcut Projection: 1x1 conv, stride 2
-    'L17_conv5_proj': Shape(C=256, M=512, P=7, Q=7, R=1, S=1, Pstride=2, Qstride=2, Rdilation=1, Sdilation=1),
-
-    # Block 2: 2 Layers. Identical shape to L16.
-    # 'L18_conv5_2_1': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-    # 'L19_conv5_2_2': Shape(C=512, M=512, P=7, Q=7, R=3, S=3, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1),
-
-    # --- Fully Connected ---
-    # Avg Pool (7x7 -> 1x1) is implicit before this.
-    'L20_fc': Shape(C=512, M=1000, P=1, Q=1, R=1, S=1, Pstride=1, Qstride=1, Rdilation=1, Sdilation=1)
-}
-"""
 Convolutions from the layers of ResNet18.
+Mappings based on Table 1 of "Deep Residual Learning for Image Recognition".
 """
 comp_resnet_18 = {
         # --- Conv1 ---

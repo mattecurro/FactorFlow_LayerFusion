@@ -1,4 +1,5 @@
 from math import log2, ceil
+from settings import vprint
 
 from architectures.accelergy_hw_data import accelergy_estimate_energy, accelergy_estimate_area
 from architectures.architectures import WS, OS, IS
@@ -355,11 +356,11 @@ def get_arch_gemmini_hw_data():
         )
     ], name="Gemmini (Accelergy data)")
 
-    print(f"\nEnergy per action in {arch.name}:")
+    vprint(f"\nEnergy per action in {arch.name}:")
     printEnergyPerAction(arch)
-    print(f"\nArea per level in {arch.name}:")
+    vprint(f"\nArea per level in {arch.name}:")
     printAreaPerLevel(arch)
-    print(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
+    vprint(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
     return arch
 
 
@@ -569,11 +570,11 @@ def get_arch_eyeriss_hw_data():
         )
     ], name="Eyeriss (Accelergy data)")
     
-    print(f"\nEnergy per action in {arch.name}:")
+    vprint(f"\nEnergy per action in {arch.name}:")
     printEnergyPerAction(arch)
-    print(f"\nArea per level in {arch.name}:")
+    vprint(f"\nArea per level in {arch.name}:")
     printAreaPerLevel(arch)
-    print(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
+    vprint(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
     return arch
 
 
@@ -778,11 +779,11 @@ def get_arch_simba_hw_data():
         )
     ], name="Simba")
     
-    print(f"\nEnergy per action in {arch.name}:")
+    vprint(f"\nEnergy per action in {arch.name}:")
     printEnergyPerAction(arch)
-    print(f"\nArea per level in {arch.name}:")
+    vprint(f"\nArea per level in {arch.name}:")
     printAreaPerLevel(arch)
-    print(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
+    vprint(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
     return arch
 
 
@@ -1110,9 +1111,9 @@ def get_arch_tpu_hw_data():
         )
     ], name="TPUv1")
 
-    print(f"\nEnergy per action in {arch.name}:")
+    vprint(f"\nEnergy per action in {arch.name}:")
     printEnergyPerAction(arch)
-    print(f"\nArea per level in {arch.name}:")
+    vprint(f"\nArea per level in {arch.name}:")
     printAreaPerLevel(arch)
-    print(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
+    vprint(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2")
     return arch

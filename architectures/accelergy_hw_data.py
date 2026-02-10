@@ -15,7 +15,7 @@ except:
     sys.path.append("..")
     from settings import *
 
-print("------ loading Accelergy ------")
+vprint("------ loading Accelergy ------")
 
 # Prepare Accelergy plug-ins
 try:
@@ -24,7 +24,7 @@ try:
     import accelergy.plug_in_path_to_obj as accelergy_plug_in_path_to_obj # type: ignore
     from accelergy.plug_in_interface.query_plug_ins import get_best_estimate as accelergy_get_best_estimate # type: ignore
 except:
-    print("WARNING: Accelergy package not found or incompatible, trying a manual import from ACCELERGY_PATH.")
+    vprint("WARNING: Accelergy package not found or incompatible, trying a manual import from ACCELERGY_PATH.")
     assert os.path.exists(Settings.ACCELERGY_PATH), f"The provided ACCELERGY_PATH ({Settings.ACCELERGY_PATH}) does not exist."
     sys.path.append(Settings.ACCELERGY_PATH)
     
@@ -53,7 +53,7 @@ accelergy_state.add_plug_ins(
                 'tmp',
             ),
         )
-print("ACCELERGY PLUG-INS:", list(map(lambda p : p.get_name(), accelergy_state.plug_ins)))
+vprint("ACCELERGY PLUG-INS:", list(map(lambda p : p.get_name(), accelergy_state.plug_ins)))
 
 # Prepare the query functions
 # NOTE: for details on how queries are handled, read the code in .../accelergy/plug_in_interface/query_plug_ins.py lines 116-209
@@ -68,8 +68,8 @@ accelergy_estimate_area_raw = partial(accelergy_get_best_estimate, plug_ins=acce
 accelergy_estimate_area = lambda query : accelergy_estimate_area_raw(query=query).get_value()*(10**12) # m^2 -> um^2
 
 if __name__ == "__main__":
-    print("\nTesting Accelergy:")
-    print("LPDDR4 read estimation test:", accelergy_estimate_energy(query={
+    vprint("\nTesting Accelergy:")
+    vprint("LPDDR4 read estimation test:", accelergy_estimate_energy(query={
         "class_name": "DRAM",
         "attributes": {
             "type": "LPDDR4",
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         }
     }), "pJ")
     
-    print("LPDDR4 area estimation test (should be 0):", accelergy_estimate_area(query={
+    vprint("LPDDR4 area estimation test (should be 0):", accelergy_estimate_area(query={
         "class_name": "DRAM",
         "attributes": {
             "type": "LPDDR4",
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         }
     }), "um^2")
     
-    print("SRAM read estimation test:", accelergy_estimate_energy(query={
+    vprint("SRAM read estimation test:", accelergy_estimate_energy(query={
         "class_name": "SRAM",
         "attributes": {
             "n_rw_ports": 1,
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         }
     }), "pJ")
     
-    print("SRAM area estimation test:", accelergy_estimate_area(query={
+    vprint("SRAM area estimation test:", accelergy_estimate_area(query={
         "class_name": "SRAM",
         "attributes": {
             "n_rw_ports": 1,
@@ -165,8 +165,8 @@ if __name__ == "__main__":
     dynamic_energy_scale = 1#(16/std_width)*((12/std_depth)**(1.56/2)) # taken from smartbuffer_RF
     static_energy_scale = 1#(16/std_width)*(12/std_depth) # = area_scale
     # NOTE: Accelergy seems to screw up and does not include these scales...
-    print("Smartbuffer register file, dynamic_energy_scale:", dynamic_energy_scale, "static_energy_scale:", static_energy_scale)
-    print("Register read estimation test:", accelergy_estimate_energy(query={
+    vprint("Smartbuffer register file, dynamic_energy_scale:", dynamic_energy_scale, "static_energy_scale:", static_energy_scale)
+    vprint("Register read estimation test:", accelergy_estimate_energy(query={
         "class_name": "aladdin_register",
         "attributes": {
             "global_cycle_seconds": 1.2e-09,
@@ -226,7 +226,7 @@ if __name__ == "__main__":
             #"technology": "32nm",
         }
     })*1, "pJ") # these are the 2 (whops, only 1 used while reading) address generators
-    print("Register leak estimation test:", accelergy_estimate_energy(query={
+    vprint("Register leak estimation test:", accelergy_estimate_energy(query={
         "class_name": "aladdin_register",
         "attributes": {
             "global_cycle_seconds": 1.2e-09,
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     })*2, "pJ") # these are the 2 address generators
 
     area_scale = static_energy_scale
-    print("Register area estimation test:", accelergy_estimate_area(query={
+    vprint("Register area estimation test:", accelergy_estimate_area(query={
         "class_name": "aladdin_register",
         "attributes": {
             "global_cycle_seconds": 1.2e-09,
@@ -325,7 +325,7 @@ if __name__ == "__main__":
         }
     })*2, "um^2") # these are the 2 address generators
 
-    print("MAC compute (read) estimation test:", accelergy_estimate_energy(query={
+    vprint("MAC compute (read) estimation test:", accelergy_estimate_energy(query={
         "class_name": "aladdin_adder",
         "attributes": {
             # output bitwidth
@@ -366,7 +366,7 @@ if __name__ == "__main__":
         }
     }), "pJ")
 
-    print("MAC area estimation test:", accelergy_estimate_area(query={
+    vprint("MAC area estimation test:", accelergy_estimate_area(query={
         "class_name": "aladdin_adder",
         "attributes": {
             # output bitwidth

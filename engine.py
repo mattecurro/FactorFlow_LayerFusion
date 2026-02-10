@@ -30,18 +30,18 @@ Update Settings:
 def forcedSettingsUpdate(arch : Arch, verbose : bool = True) -> None:
     mapperForcedSettingsUpdate(arch, verbose)
     if Settings.MULTITHREADED:
-        if sys.version_info[1] < 13 or sys._is_gil_enabled() and verbose: print(f"WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.")
+        if sys.version_info[1] < 13 or sys._is_gil_enabled() and verbose: vprint(f"WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.")
         Settings.THREADS_COUNT = Settings.THREADS_COUNT if Settings.THREADS_COUNT else os.cpu_count()
-        if verbose: print(f"INFO: running multithreaded with THREADS_COUNT = {Settings.THREADS_COUNT}")
+        if verbose: vprint(f"INFO: running multithreaded with THREADS_COUNT = {Settings.THREADS_COUNT}")
     if not Settings.VERBOSE:
-        if verbose: print(f"INFO: VERBOSE output disabled, wait patiently...")
-    if verbose: print("")
+        if verbose: vprint(f"INFO: VERBOSE output disabled, wait patiently...")
+    if verbose: vprint("")
 
 """
 Mapper entry point.
 """
 def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool, verbose : bool = True) -> tuple[float, int, float, int, float, float, Arch]:
-    print(f"Starting engine with mapper: {Settings.MAPPER}\n")
+    vprint(f"Starting engine with mapper: {Settings.MAPPER}\n")
     try:
         forcedSettingsUpdate(arch, verbose = Settings.VERBOSE)
         start_time = time.time()
@@ -80,19 +80,19 @@ def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool,
         raise e
     
     if Settings.VERBOSE:
-        print(f"\nFinished in: {end_time:.3f}s")
+        vprint(f"\nFinished in: {end_time:.3f}s")
         
-        print(f"\nBest mapping found with:\n\tWart: {wart:.3e}\n\tEDP: {edp:.3e} (J*cycle)\n\tEnergy: {energy:.3e} (uJ)\n\tLatency: {latency:.3e} (cc)")
-        print("\nMapping:")
+        vprint(f"\nBest mapping found with:\n\tWart: {wart:.3e}\n\tEDP: {edp:.3e} (J*cycle)\n\tEnergy: {energy:.3e} (uJ)\n\tLatency: {latency:.3e} (cc)")
+        vprint("\nMapping:")
         printFactors(arch)
         
-        print("\nFinal MOPs per memory level:")
+        vprint("\nFinal MOPs per memory level:")
         printMOPsFusion(arch)
-        print("\nFinal Latency per level:")
+        vprint("\nFinal Latency per level:")
         printLatency(arch)
         
         if Settings.PADDED_MAPPINGS:
-            print("")
+            vprint("")
             printPadding(arch, comp)
     elif verbose:
         printFactors(arch)

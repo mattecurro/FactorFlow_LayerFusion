@@ -1,4 +1,5 @@
 from __future__ import annotations
+from settings import vprint
 from typing import TYPE_CHECKING, Optional, Union
 
 from itertools import permutations
@@ -321,7 +322,7 @@ class Coupling:
         if operand == 'in':
             return self.flat_in_coupling
         elif operand == 'w':
-            print(f"Getting flat weight coupling for layer {layer_index}")
+            vprint(f"Getting flat weight coupling for layer {layer_index}")
             if layer_index is not None and layer_index in self.flat_w_coupling:
                 return self.flat_w_coupling[layer_index]
             if layer_index is None:
@@ -675,45 +676,45 @@ class Factors(dict[str, dict[int, int]]):
             input_FC_size = 1
             intermediate_input_FC_size = 1    
             if arch.name == "DepFiN 10-Layer Architecture":
-                input_FC_size = tile_sizes['X0']*(tile_sizes['S0'] - arch.getInStride('S0')) * (self._dim_products['X0'] - 1) * tile_sizes['C0']
-                print(f"Input FC size: {input_FC_size}\n")
+                input_FC_size = tile_sizes['X0']*(tile_sizes['S0'] - arch.getInStride('X0')) * (self._dim_products['X0'] - 1) * tile_sizes['C0']
+                vprint(f"Input FC size: {input_FC_size}\n")
                 for layer_id in range(arch.coupling.getNumLayers() - 1):
                     for dim_sum in arch.coupling.getIntermediateInputCoupling(layer_id):
                         x_dim = 'X' + str(layer_id)
                         s_dim = 'S' + str(layer_id)
-                        intermediate_input_FC_size += tile_sizes[x_dim]*(tile_sizes[s_dim] - (arch.getWStride(s_dim, layer_id)))* (self._dim_products[x_dim]-1) * tile_sizes['C' + str(layer_id)]
-                print(f"Intermediate Input FC size: {intermediate_input_FC_size}\n")
+                        intermediate_input_FC_size += tile_sizes[x_dim]*(tile_sizes[s_dim] - (arch.getIntermediateInputStride(x_dim, layer_id)))* (self._dim_products[x_dim]-1) * tile_sizes['C' + str(layer_id)]
+                vprint(f"Intermediate Input FC size: {intermediate_input_FC_size}\n")
             else:
                 # In case of Fully Cached, I need to store an entire row of input*(W_h-Stride_h)*C_input
                 for dim_sum in arch.coupling.in_coupling:
 
                     if 'X0' in dim_sum: 
-                        print(f"tile_sizes[dim]: {[tile_sizes[dim] for dim in dim_sum]}, self._dim_products[dim]: {[self._dim_products[dim] for dim in dim_sum]}")
+                        vprint(f"tile_sizes[dim]: {[tile_sizes[dim] for dim in dim_sum]}, self._dim_products[dim]: {[self._dim_products[dim] for dim in dim_sum]}")
                         input_FC_size *= distinct_values([tile_sizes[dim] for dim in dim_sum], [arch.getInStride(dim) for dim in dim_sum])
                         input_FC_size *= prod(self._dim_products[dim] for dim in dim_sum)
-                        print(f"input_FC_size distinct: {input_FC_size}")
+                        vprint(f"input_FC_size distinct: {input_FC_size}")
                     if 'Y0' in dim_sum:
                         for dim in dim_sum:
                             if dim == 'R0':
                                 input_FC_size *= tile_sizes[dim] - arch.getInStride(dim)
                     if 'C0' in dim_sum:
                         input_FC_size *= tile_sizes['C0']     
-                print(f"Input FC size: {input_FC_size}\n")
+                vprint(f"Input FC size: {input_FC_size}\n")
         input_FC_size *= in_bp
         intermediate_input_FC_size *= int_in_bp
         input_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.in_coupling)*in_bp
-        print(f"Input size: {input_size}\n")
+        vprint(f"Input size: {input_size}\n")
         output_size = prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in arch.coupling.out_coupling)*out_bp
-        print(f"Output size: {output_size}\n")
+        vprint(f"Output size: {output_size}\n")
         weight_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in w_coupling) for w_coupling in arch.coupling.w_coupling.values())*w_bp
-        print(f"Weight size: {weight_size}\n")
+        vprint(f"Weight size: {weight_size}\n")
         intermediate_input_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_i_coupling) for int_i_coupling in arch.coupling.int_in_coupling.values())
-        print(f"Intermediate input size: {intermediate_input_size}")
+        vprint(f"Intermediate input size: {intermediate_input_size}")
         intermediate_output_size = sum(prod(sum(tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum) - len(dim_sum) + 1 for dim_sum in int_o_coupling) for int_o_coupling in arch.coupling.int_out_coupling.values())
         intermediate_size = intermediate_input_size*int_in_bp + intermediate_output_size*int_out_bp
-        print(f"Total intermediate size (input + output): {intermediate_size}\n")
-        print(f"input_size: {input_size}, output_size: {output_size}, weight_size: {weight_size}, intermediate_size: {intermediate_size}")
-        print(f"Total mem footprint: {input_size + output_size + weight_size + intermediate_size + input_FC_size + intermediate_input_FC_size}\n\n\n")
+        vprint(f"Total intermediate size (input + output): {intermediate_size}\n")
+        vprint(f"input_size: {input_size}, output_size: {output_size}, weight_size: {weight_size}, intermediate_size: {intermediate_size}")
+        vprint(f"Total mem footprint: {input_size + output_size + weight_size + intermediate_size + input_FC_size + intermediate_input_FC_size}\n\n\n")
         return input_size + output_size + weight_size + intermediate_size + input_FC_size + intermediate_input_FC_size
         # TODO: uncomment me to fix invalid mappings!
         #return (prod(distinct_values([tile_sizes[dim]*self._dim_products[dim] for dim in dim_sum], [arch.getInStride(dim) for dim in dim_sum]) for dim_sum in arch.coupling.in_coupling)*in_bp +

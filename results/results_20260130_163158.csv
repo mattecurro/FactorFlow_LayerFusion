@@ -1,2 +1,0 @@
-experiment_id,workload_name,workload_variant,fusion_level,num_fused_layers,arch_name,fmem_size_kB,wmem_size_kB,pe_rows,pe_cols,success,error_message,energy_uJ,latency_cycles,edp,mops,utilization,mapping_time_s
-mccnn_L0_2026-01-30T16:31:58.651088,mccnn,L0,single,1,thesis_arch,1056,524,16,128,True,,3175.2568985599996,134493696,2753419.63163294,"(911568384, 672468480)",0.005952380952380952,0.03768014907836914

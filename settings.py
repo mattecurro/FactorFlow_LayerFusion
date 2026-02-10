@@ -13,7 +13,7 @@ class MetaSettings(type):
 class Settings(metaclass = MetaSettings):
     # If True, enables logging of the MSE process. Note that such prints occur during the timed
     # section of the program, set to False for accurate timing results.
-    VERBOSE = False
+    VERBOSE = True
     
     
     
@@ -175,3 +175,13 @@ class Settings(metaclass = MetaSettings):
             if not k.startswith("__") and not callable(getattr(self, k)):
                 res += f"{k}={v}, "
         return res[:-2] + ")"
+
+
+def vprint(*args, **kwargs):
+    """
+    Verbose print - only prints if Settings.VERBOSE is True.
+    Use this instead of print() for debug/trace output that should be
+    suppressible via the verbose flag.
+    """
+    if Settings.VERBOSE:
+        print(*args, **kwargs)

@@ -1,4 +1,5 @@
 """
+from settings import vprint
 Convolution Loop Scheduling Validator
 Validates loop orderings and tiling configurations for convolution operations
 based on dependency heuristics to prevent reading from Int before it's written.
@@ -188,40 +189,40 @@ class ConvolutionScheduleValidator:
     def print_validation_report(self, config_name: str, tiling: Dict[str, int],
                                loop_order: List[str], expected_result: str = None):
         """Print detailed validation report for a configuration"""
-        print(f"\n{'='*60}")
-        print(f"Testing Configuration: {config_name}")
-        print(f"{'='*60}")
-        print(f"Loop Order: {loop_order}")
-        print(f"Tiling: {json.dumps(tiling, indent=2)}")
+        vprint(f"\n{'='*60}")
+        vprint(f"Testing Configuration: {config_name}")
+        vprint(f"{'='*60}")
+        vprint(f"Loop Order: {loop_order}")
+        vprint(f"Tiling: {json.dumps(tiling, indent=2)}")
 
         is_valid, results = self.validate_heuristic(tiling, loop_order)
 
-        print(f"\nHeuristic Validation:")
-        print("-" * 40)
+        vprint(f"\nHeuristic Validation:")
+        vprint("-" * 40)
 
         for result in results:
             status = "✓" if result.is_valid else "❌"
-            print(f"- {result.level_name} level: {result.calculation_str} {status}")
+            vprint(f"- {result.level_name} level: {result.calculation_str} {status}")
 
         overall_status = "VALID" if is_valid else "INVALID"
         failed_levels = [r.level_name for r in results if not r.is_valid]
 
         if failed_levels:
-            print(f"\nOverall Result: {overall_status} (fails at {', '.join(failed_levels)} level(s))")
+            vprint(f"\nOverall Result: {overall_status} (fails at {', '.join(failed_levels)} level(s))")
         else:
-            print(f"\nOverall Result: {overall_status} ✓")
+            vprint(f"\nOverall Result: {overall_status} ✓")
 
         if expected_result:
             matches = (expected_result == "VALID" and is_valid) or (expected_result == "FAIL" and not is_valid)
             match_str = "✓ MATCHES EXPECTED" if matches else "❌ DOES NOT MATCH EXPECTED"
-            print(f"Expected: {expected_result} - {match_str}")
+            vprint(f"Expected: {expected_result} - {match_str}")
 
         return is_valid
 
 def main():
     """Main entry point"""
-    print("Convolution Loop Scheduling Validator")
-    print("=====================================")
+    vprint("Convolution Loop Scheduling Validator")
+    vprint("=====================================")
 
     validator = ConvolutionScheduleValidator()
 
@@ -278,7 +279,7 @@ def main():
 
     # Validate with heuristic
     is_valid, _ = validator.validate_heuristic(custom_tiling, custom_order)
-    print(f"\nCustom Configuration Validation Result: {'VALID' if is_valid else 'INVALID'}")
+    vprint(f"\nCustom Configuration Validation Result: {'VALID' if is_valid else 'INVALID'}")
         
     #call to print_validation_report
     validator.print_validation_report("Custom Configuration", custom_tiling, custom_order)

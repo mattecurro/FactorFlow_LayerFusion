@@ -75,11 +75,11 @@ def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
     caller_line = caller_info.lineno
     caller_function = caller_info.name
     
-    print(f"DEBUG interleave: START - Called from {caller_file}:{caller_line} in {caller_function}()")
-    print(f"                       array={array}, elements={elements} (len={len(elements)})")
+    vprint(f"DEBUG interleave: START - Called from {caller_file}:{caller_line} in {caller_function}()")
+    vprint(f"                       array={array}, elements={elements} (len={len(elements)})")
     
 
-    if len(elements) > 9 :
+    if len(array) + len(elements) > 10:
         if not elements:
             return [array]
         results = []
@@ -88,7 +88,7 @@ def interleave(array : list[T], elements : list[T]) -> list[list[T]]:
         if len(array) > 0:
             mid_pos = len(array) // 2
             results.append(array[:mid_pos] + elements + array[mid_pos:])
-        print(f"interleave: too many elements ({len(elements)}), returning {len(results)} results")
+        vprint(f"interleave: too many elements ({len(elements)}), returning {len(results)} results")
         return results
     
     def recursive_insert(arr, elems):
@@ -109,7 +109,7 @@ possible ways the remaining entries of 'elements' in the template.
 def slot_in(template : list[T], elements : list[T], placeholder: T) -> list[list[T]]:
     import time
     start_time = time.time()
-    print(f"Debug slot: Start template={template}, elements={elements}, placeholder={placeholder}")
+    vprint(f"Debug slot: Start template={template}, elements={elements}, placeholder={placeholder}")
     placeholder_indices = [i for i, x in enumerate(template) if x == placeholder]
     num_placeholders = len(placeholder_indices)
     remaining_elements = [x for x in elements if x not in template]
@@ -336,7 +336,7 @@ def distinct_values(Xs : list[int], x_consts : list[int]) -> int:
             product *= X
             #exit from the loop
             break
-        print(f"CIAO disti: {product}")
+        #vprint(f"CIAO disti: {product}")
         return product
     else:
         if len(Xs) == 1: # trivial case

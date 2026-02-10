@@ -12,7 +12,7 @@ Entry point for the analytical model.
 Updates the MOPs and Latency data of each level w.r.t. the current mapping.
 """
 def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
-    print("é stato chiamato update stats! \n\n")
+    vprint("é stato chiamato update stats! \n\n")
     assert arch.initialized, f"Arch {arch.name}: architecture not initialized, ensure to call 'initFactors' first."
     
     WMOPs_per_layer = {layer_id: 0 for layer_id in range(arch.coupling.getNumLayers())}
@@ -81,12 +81,12 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
         # Calculate results after scaling        
         if isinstance(level, MemLevel):
             # multiply by spatial_iterations too, because memory is replicated spatially
-            print("\n\nQuesto mops è chiamato da update stats")     
-            print(f"Level: {level.name}, arch bypasses for the level: {level.bypasses}, in_bp: {level.in_bp}, w_bp: {level.w_bp}, out_bp: {level.out_bp}, int_in_bp: {level.int_in_bp}, int_out_bp: {level.int_out_bp}")      
+            vprint("\n\nQuesto mops è chiamato da update stats")     
+            vprint(f"Level: {level.name}, arch bypasses for the level: {level.bypasses}, in_bp: {level.in_bp}, w_bp: {level.w_bp}, out_bp: {level.out_bp}, int_in_bp: {level.int_in_bp}, int_out_bp: {level.int_out_bp}")      
             #regime_mops = level.MOPs_Regime()
             level_mops = level.MOPs()
             in_reads, per_layer_w_reads, per_layer_int_in_reads, per_layer_int_out_reads, per_layer_int_out_writes, out_reads, out_writes, out_reads_factors = level_mops[:8]
-            print(f"DEBUG updateStats pre scaling: Level {level.name}:"
+            vprint(f"DEBUG updateStats pre scaling: Level {level.name}:"
                   f"\n  in_reads: {in_reads}"
                   f"\n  per_layer_w_reads: {per_layer_w_reads}"
                   f"\n  per_layer_int_in_reads: {per_layer_int_in_reads}"
@@ -97,7 +97,10 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                   f"\n  out_reads_factors: {out_reads_factors}"
                   )
             scale_per_layer = {layer_id: temporal_iterations_per_layer[layer_id]*spatial_iterations_per_layer[layer_id] for layer_id in range(num_layers)}
+            if level.name == "WeightMemory":
+                vprint(f"scale_per_layer[0] = {scale_per_layer[0]}, temporal_iterations_per_layer[0] = {temporal_iterations_per_layer[0]}, spatial_iterations_per_layer[0] = {spatial_iterations_per_layer[0]}")
             in_reads = in_reads * scale_per_layer[0]
+            vprint(f"scale_per_layer[0]: {scale_per_layer[0]}, temporal_iterations_per_layer[0]: {temporal_iterations_per_layer[0]}, spatial_iterations_per_layer[0]: {spatial_iterations_per_layer[0]}")
             for layer_id, w_read in per_layer_w_reads.items():
                 per_layer_w_reads[layer_id] = w_read * scale_per_layer[layer_id]
             w_reads = sum(per_layer_w_reads.values())
@@ -111,14 +114,14 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 per_layer_int_out_writes[layer_id] = int_out_write * scale_per_layer[layer_id]
             int_out_writes = sum(per_layer_int_out_writes.values())
             out_writes = out_writes * scale_per_layer[num_layers - 1]
-            out_reads = out_reads * scale_per_layer[num_layers - 1]
-            out_reads_factors = level_mops[7]* acc_out_reads_factors
+            out_reads = out_reads * scale_per_layer[num_layers - 1] 
+            out_reads_factors = level_mops[7]*acc_out_reads_factors
             ## TODO: check if there is a per_layer_int_out_reads_factors 
-            print(f"DEBUG: results after scaling: Level {level.name}: in_reads={in_reads}, w_reads={w_reads}, int_in_reads={int_in_reads}, int_out_reads={int_out_reads}, int_out_writes={int_out_writes}, out_writes={out_writes}, out_reads={out_reads}, out_reads_factors={out_reads_factors}")            
+            vprint(f"DEBUG: results after scaling: Level {level.name}: in_reads={in_reads}, w_reads={w_reads}, int_in_reads={int_in_reads}, int_out_reads={int_out_reads}, int_out_writes={int_out_writes}, out_writes={out_writes}, out_reads={out_reads}, out_reads_factors={out_reads_factors}")            
             # Adjust for bias read if needed, update writes, DRAINS management
             if not bias_read and out_reads_factors != 0:
                 out_reads = (out_reads*(out_reads_factors - 1))//out_reads_factors
-                print(f"DEBUG: Level {level.name} adjusted out_reads for no bias read: {out_reads}")
+                vprint(f"DEBUG: Level {level.name} adjusted out_reads for no bias read: {out_reads}")
             ## TODO: possible add of bias read for intermediate outputs? I think so
             if 'in' not in level.bypasses:
                 in_writes = last_in_reads # reads of the above level are written here
@@ -155,9 +158,9 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         per_layer_int_out_reads[layer_id] += last_per_layer_int_out_writes.get(layer_id, 0) # writes above are read here
                         last_per_layer_int_out_writes[layer_id] = per_layer_int_out_writes.get(layer_id, 0)
             else:
-                print(f"DEBUG: Level {level.name} bypasses intermediate storage")
+                vprint(f"DEBUG: Level {level.name} bypasses intermediate storage")
                 level.setAboveMOPs(last_per_layer_int_out_reads={layer_id: 0 for layer_id in range(num_layers - 1)}, last_per_layer_int_out_writes={layer_id: 0 for layer_id in range(num_layers - 1)})
-            print(f"DEBUG updateStats post scaling: Level {level.name}:"
+            vprint(f"DEBUG updateStats post scaling: Level {level.name}:"
                   f"\n  in_reads: {in_reads:,.0f}"
                   f"\n  per_layer_w_reads: {per_layer_w_reads}"
                   f"\n  w_reads: {w_reads:,.0f}"
@@ -188,10 +191,10 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             # Calculate total reads and writes for energy calculation
             total_reads = in_reads + w_reads + int_in_reads + int_out_reads + out_reads
             total_writes = in_writes + sum(per_layer_w_writes.values()) + sum(per_layer_int_in_writes.values()) + int_out_writes + out_writes
-            print(f"in_writes: {in_writes}, w_writes: {sum(per_layer_w_writes.values())}, int_in_writes: {sum(per_layer_int_in_writes.values())}, int_out_writes: {int_out_writes}, out_writes: {out_writes}")
+            vprint(f"in_writes: {in_writes}, w_writes: {sum(per_layer_w_writes.values())}, int_in_writes: {sum(per_layer_int_in_writes.values())}, int_out_writes: {int_out_writes}, out_writes: {out_writes}")
             level.active_instances_per_layer = spatial_iterations_per_layer.copy()
             level.active_instances = spatial_iterations
-            print(f"Name of the level: {level.name}, level active instances per layer: {level.active_instances_per_layer}, level active instances: {level.active_instances}")
+            vprint(f"Name of the level: {level.name}, level active instances per layer: {level.active_instances_per_layer}, level active instances: {level.active_instances}")
             # Calculate WMOPs per layer
             if num_layers > 1:    
                 for layer_id in range(num_layers):
@@ -201,23 +204,23 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         layer_total_writes = in_writes + per_layer_w_writes[layer_id] + per_layer_int_out_writes[layer_id]
                     elif layer_id == num_layers - 1:
                         layer_total_reads = per_layer_int_in_reads[layer_id - 1] + per_layer_w_reads[layer_id] + out_reads
-                        print(f"DEBUG: Level {level.name}, Layer {layer_id}, per_layer_int_in_reads{layer_id - 1}: {per_layer_int_in_reads[layer_id - 1]}, per_layer_w_reads{layer_id}: {per_layer_w_reads[layer_id]}, out_reads: {out_reads}")
+                        vprint(f"DEBUG: Level {level.name}, Layer {layer_id}, per_layer_int_in_reads{layer_id - 1}: {per_layer_int_in_reads[layer_id - 1]}, per_layer_w_reads{layer_id}: {per_layer_w_reads[layer_id]}, out_reads: {out_reads}")
                         layer_total_writes = per_layer_int_in_writes[layer_id - 1] + per_layer_w_writes[layer_id] + out_writes
                     else:
                         layer_total_reads = per_layer_int_in_reads[layer_id-1] + per_layer_w_reads[layer_id] + per_layer_int_out_reads[layer_id]
                         layer_total_writes = per_layer_int_in_writes[layer_id-1] + per_layer_w_writes[layer_id] + per_layer_int_out_writes[layer_id]
                     total_reads_per_layer[layer_id] = layer_total_reads
                     total_writes_per_layer[layer_id] = layer_total_writes
-                    print(f"Level {level.name}, Layer {layer_id}: total_reads = {layer_total_reads}, total_writes = {layer_total_writes}")
+                    vprint(f"Level {level.name}, Layer {layer_id}: total_reads = {layer_total_reads}, total_writes = {layer_total_writes}")
                     WMOPs_per_layer[layer_id] += level.WMOPs(layer_total_reads, layer_total_writes)
                     #print(f"Level {level.name} WMOPs_per_layer[{layer_id}]: {level.WMOPs(layer_total_reads, layer_total_writes):,.3f}")
                     #print(f"Level {level.name} Accumulated WMOPs_per_layer: {WMOPs_per_layer[layer_id]:,.3f}")
                 WMOPs = sum(WMOPs_per_layer.values())
                 WMOPs_another_check += level.WMOPs(total_reads, total_writes)
-                print(f"Check: Per Layer Total reads: {total_reads_per_layer}, total: {sum(total_reads_per_layer.values())}")  
-                print(f"Check: Per Layer Total writes: {total_writes_per_layer}, \n total: {sum(total_writes_per_layer.values())}")          
-                print(f"Level {level.name} total WMOPs from per layer sum: {WMOPs:,.3f}")
-                print(f"Level {level.name} total WMOPs from total reads/writes: {WMOPs_another_check:,.3f}")
+                vprint(f"Check: Per Layer Total reads: {total_reads_per_layer}, total: {sum(total_reads_per_layer.values())}")  
+                vprint(f"Check: Per Layer Total writes: {total_writes_per_layer}, \n total: {sum(total_writes_per_layer.values())}")          
+                vprint(f"Level {level.name} total WMOPs from per layer sum: {WMOPs:,.3f}")
+                vprint(f"Level {level.name} total WMOPs from total reads/writes: {WMOPs_another_check:,.3f}")
             else:
                 total_reads = in_reads + w_reads + out_reads
                 WMOPs += level.WMOPs(total_reads, total_writes)            
@@ -229,11 +232,14 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 temporal_iterations_per_layer[layer_id] *= layer_factors_product            
             temporal_iterations *= level.factors.fullProduct()
             acc_out_reads_factors *= math.prod(level.factors.dimProduct(dim) for dim in dataflow_per_layer[num_layers-1] if dim not in level.arch.coupling.getFlatOutputCoupling())
+            vprint(f"End first part of update for level: {level.name}\n")
         # update of last reads
         elif isinstance(level, FanoutLevel):
+            vprint(f"\n\nCalculating Fanout Level: {level.name}, updating spatial and last reads")
             spatial_iterations *= level.factors.fullProduct()
             if num_layers > 1:
                 actual_dataflow_per_layer: dict[int, list[str]] = {}
+                # actual_dataflow_per_layer and spatial_iterations_per_layer: Initialization
                 for layer_id in range(num_layers):
                     spatial_iterations_per_layer[layer_id] *= level.factors.fullLayerProduct(layer_id, arch)
                     # spatial reuse of an operand occurs if the fanout is along a dimension not coupled to such operand,
@@ -256,10 +262,11 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         dim for dim in level.dataflow
                         if dim in layer_relevant_dims
                     ]
+                # Update last_XX_reads considering spatial reuse
                 for layer_id in range(num_layers):
                     for dim in actual_dataflow_per_layer[layer_id]:
                         layer_iterations = level.factors.dimProduct(dim)
-                        print(f"Fanout Level {level.name}, Layer {layer_id}, dim {dim}, layer_iterations: {layer_iterations}")
+                        vprint(f"Fanout Level {level.name}, Layer {layer_id}, dim {dim}, layer_iterations: {layer_iterations}")
                         if layer_id == 0:
                             if dim not in arch.coupling.getFlatInputCoupling():
                                 last_in_reads *= layer_iterations
@@ -296,9 +303,9 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         last_out_writes *= layer_iterations
                     if dim not in arch.coupling.getFlatWeightCoupling(0):
                         last_w_reads *= layer_iterations
-            print(f"Updated considering level: {level.name}")
+            vprint(f"End of the first part of Update Stats for fanout level: {level.name}")
         elif isinstance(level, ComputeLevel):
-            print("\n\nCalculating WMOPs for Compute Level")
+            vprint("\n\nCalculating WMOPs for Compute Level")
             # TODO: remove cost of first output accumulate if bias_read is False!
             # => not needed because the cost of the add is << than the multiply!
             level.temporal_iterations_per_layer = temporal_iterations_per_layer.copy()
@@ -307,125 +314,126 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
             level.active_instances = spatial_iterations
             for layer_id in range(num_layers):
                 WMOPs_per_layer[layer_id] += level.computeCostPerLayer(layer_id, temporal_iterations_per_layer[layer_id]*level.active_instances_per_layer[layer_id])
-            print(f"Compute Level {level.name} WMOPs_per_layer: {WMOPs_per_layer}")
+            vprint(f"Compute Level {level.name} WMOPs_per_layer: {WMOPs_per_layer}")
             ## TODO Comparison check
-            print(f"WMOPs_till_now before compute level: {WMOPs:,.3f}")
+            vprint(f"WMOPs_till_now before compute level: {WMOPs:,.3f}")
             sum_WMOPS = sum(WMOPs_per_layer.values())
-            print(f"Compute Level {level.name} total WMOPs from per layer sum: {sum_WMOPS}")
+            vprint(f"Compute Level {level.name} total WMOPs from per layer sum: {sum_WMOPS}")
             standard_WMOPs = level.computeCost(temporal_iterations*spatial_iterations)
-            print(f"Compute Level {level.name} total WMOPs: {standard_WMOPs}")
+            vprint(f"Compute Level {level.name} total WMOPs: {standard_WMOPs}")
             ## TODO check if this is the correect one, I think so
             WMOPs += sum_WMOPS
-            print(f"Total WMOPs after adding compute level: {WMOPs}")
+            vprint(f"Total WMOPs after adding compute level: {WMOPs}")
             if WMOPs == standard_WMOPs:
-                print("Check OK: WMOPs from per-layer sum matches standard WMOPs")
+                vprint("Check OK: WMOPs from per-layer sum matches standard WMOPs")
             # compute is meant to be the innermost level
             break
-    print("END FIRST PART OF UPDATE STATS\n\n")
+    vprint("END FIRST PART OF UPDATE STATS\n\n")
     # Latency:
     max_latency = 0
     # Compute level latency
     ## DOUBT can ComputeLevel.latency() be != to 1? In that case is it a problem?
     cc_per_tile = arch[len(arch)-1].latency()
-    print(f"First cc_per_tile, it is from compute = {cc_per_tile}")
+    vprint(f"First cc_per_tile, it is from compute = {cc_per_tile}")
     cc_per_tile_per_layer = {layer_id: arch[len(arch)-1].latency() for layer_id in range(num_layers)}
-    print(f"First cc_per_tile_per_layer it is from compute = {cc_per_tile_per_layer}")
+    vprint(f"First cc_per_tile_per_layer it is from compute = {cc_per_tile_per_layer}")
     # Calculate latency from Bottom (Compute) to Top (DRAM)
     for i in range(len(arch) - 2, -1, -1):
         level = arch[i]
         previous_fanout_pe_to_pe_warmup = 0
         if isinstance(level, MemLevel):
-            print(f"\n\nCalculating Latency for Level: {level.name}")
+            vprint(f"\n\nCalculating Latency for Level: {level.name}")
             scaling = level.active_instances*level.temporal_iterations
             # Version with multi layer
             if num_layers > 1:
                 
                 #  Calculation: ideal bandwidth per layer, ideal latency per layer (no stalls)
                 for layer_id in range(num_layers):
-                    print(f"\nLatency for layer: {layer_id} of Level: {level.name}")
-                    print(f"level.active_instances_per_layer[{layer_id}]: {level.active_instances_per_layer[layer_id]}")
-                    print(f"level.temporal_iterations_per_layer[{layer_id}]: {level.temporal_iterations_per_layer[layer_id]}")
+                    vprint(f"\nLatency for layer: {layer_id} of Level: {level.name}")
+                    vprint(f"level.active_instances_per_layer[{layer_id}]: {level.active_instances_per_layer[layer_id]}")
+                    vprint(f"level.temporal_iterations_per_layer[{layer_id}]: {level.temporal_iterations_per_layer[layer_id]}")
                     scaling_per_layer[layer_id] = level.active_instances_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
-                    print(f"Scaling per layer[{layer_id}]: {scaling_per_layer[layer_id]:,.0f}")
-                    print(f"Single Tile latency: cc_per_tile_per_layer[{layer_id}]: {cc_per_tile_per_layer[layer_id]}")
+                    vprint(f"Scaling per layer[{layer_id}]: {scaling_per_layer[layer_id]:,.0f}")
+                    vprint(f"Single Tile latency: cc_per_tile_per_layer[{layer_id}]: {cc_per_tile_per_layer[layer_id]}")
                     cc_per_all_tiles_per_layer[layer_id] = cc_per_tile_per_layer[layer_id]*level.factors.fullLayerProduct(layer_id, arch)
-                    print(f"Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]}")
+                    vprint(f"Ideal Case, Latency at this level without stalls: cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]}")
                     scaled_cc_per_all_tiles_per_layer[layer_id] = scaling_per_layer[layer_id]*cc_per_all_tiles_per_layer[layer_id]
-                    print(f"SCALED cc_per_all_tiles_per_layer[{layer_id}]: {scaled_cc_per_all_tiles_per_layer[layer_id]:,.0f}")                    
+                    vprint(f"SCALED cc_per_all_tiles_per_layer[{layer_id}]: {scaled_cc_per_all_tiles_per_layer[layer_id]:,.0f}")                    
                     ideal_bandwidth_read_per_layer[layer_id] = level.getReadPerLayer(layer_id) / scaled_cc_per_all_tiles_per_layer[layer_id]
-                    print(f"level.getReadPerLayer[{layer_id}](): {level.getReadPerLayer(layer_id):,.0f}")
-                    print(f"  (For comparison - full reads including accumulation: {level.getReadPerLayerTotal(layer_id):,.0f})")
-                    print(f"ideal_bandwidth_read_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id]}")
+                    vprint(f"level.getReadPerLayer[{layer_id}](): {level.getReadPerLayer(layer_id):,.0f}")
+                    vprint(f"  (For comparison - full reads including accumulation: {level.getReadPerLayerTotal(layer_id):,.0f})")
+                    vprint(f"ideal_bandwidth_read_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id]}")
 
                     Settings.FREE_DRAINS = False
                     ideal_bandwidth_drain_per_layer[layer_id] = level.getDrainPerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id] if not Settings.FREE_DRAINS else 0
-                    print(f"level.getDrainPerLayer[{layer_id}](): {level.getDrainPerLayer(layer_id):,.0f}")       
-                    print(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")             
+                    vprint(f"level.getDrainPerLayer[{layer_id}](): {level.getDrainPerLayer(layer_id):,.0f}")       
+                    vprint(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")             
                     
                     ideal_bandwidth_update_per_layer[layer_id] = level.getUpdatePerLayer(layer_id) / scaled_cc_per_all_tiles_per_layer[layer_id]
                     #print(f"level.getUpdatePerLayer[{layer_id}](): {level.getUpdatePerLayer(layer_id):,.0f}")
-                    print(f"ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_update_per_layer[layer_id]}")
+                    vprint(f"ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_update_per_layer[layer_id]}")
                     # Debug: also show the full update (including accumulation) vs actual update
-                    print(f"  (For comparison - full updates including accumulation: {level.getUpdatePerLayerTotal(layer_id):,.0f})")
+                    vprint(f"  (For comparison - full updates including accumulation: {level.getUpdatePerLayerTotal(layer_id):,.0f})")
 
                     ideal_bandwidth_fill_per_layer[layer_id] = level.getFillPerLayer(layer_id)/scaled_cc_per_all_tiles_per_layer[layer_id]
-                    print(f"level.getFillPerLayer[{layer_id}](): {level.getFillPerLayer(layer_id):,.0f}")
-                    print(f"ideal_bandwidth_fill_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id]}")
+                    vprint(f"level.getFillPerLayer[{layer_id}](): {level.getFillPerLayer(layer_id):,.0f}")
+                    vprint(f"ideal_bandwidth_fill_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id]}")
                 # Calculate latency per layer considering stalls due to bandwidth limits
                 # Two cases: Sequential Layer Execution or Parallel Layer Execution
                 # Sequential Layer Execution Case: sum latencies per layer
                 if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
-                    print("\nStart of calculation of latency:")
+                    vprint("\nStart of calculation of latency:")
                     if level.name == "FeatureMemory":
-                        print("I am in FeatureMemory level, so I use different formula for latency calculation")
+                        vprint("I am in FeatureMemory level, so I use different formula for latency calculation")
                         total_latency = 0
                         latency_until_now = 0
                     for layer_id in range(num_layers):
                         if level.name == "FeatureMemory":
-                            print(f"\n\nLayer_id: {layer_id} in {level.name}\n")
-                            print(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")
+                            vprint(f"\n\nLayer_id: {layer_id} in {level.name}\n")
+                            vprint(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")
                             total_data_rd = int(level.getReadPerLayer(layer_id)) + level.getDrainPerLayer(layer_id)
+                            vprint(f"I AM HERE total_data_rd: {total_data_rd}")
                             latency_read_drain_per_layer[layer_id] = (total_data_rd/scaling_per_layer[layer_id])*(1/level.read_bandwidth) if not Settings.FREE_DRAINS else (int(level.getReadPerLayer(layer_id))/scaling_per_layer[layer_id])*(1/level.read_bandwidth)
                             total_data_fu = level.getFillPerLayer(layer_id) + level.getUpdatePerLayer(layer_id)
                             latency_fill_update_per_layer[layer_id] = (total_data_fu/scaling_per_layer[layer_id])*(1/level.write_bandwidth)                            
                             latency_per_layer[layer_id] = latency_read_drain_per_layer[layer_id] + latency_fill_update_per_layer[layer_id]
                             total_latency += latency_per_layer[layer_id]
-                            print(f"latency_per_layer[{layer_id}]: {latency_per_layer[layer_id]}, latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}, latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
-                            print(f"Total latency so far: {total_latency}")
+                            vprint(f"latency_per_layer[{layer_id}]: {latency_per_layer[layer_id]}, latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}, latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
+                            vprint(f"Total latency so far: {total_latency}")
                         else:
-                            print(f"\n\nLayer_id: {layer_id} in {level.name}\n")
-                            print(f"ideal_bandwidth_read_per_layer[{layer_id}] + ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id]} vs level.read_bandwidth: {level.read_bandwidth}")
+                            vprint(f"\n\nLayer_id: {layer_id} in {level.name}\n")
+                            vprint(f"ideal_bandwidth_read_per_layer[{layer_id}] + ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id]} vs level.read_bandwidth: {level.read_bandwidth}")
                             if ideal_bandwidth_read_per_layer[layer_id] + ideal_bandwidth_drain_per_layer[layer_id] <= level.read_bandwidth:
-                                print("I am in Compute Bound")
+                                vprint("I am in Compute Bound")
                                 latency_read_drain_per_layer[layer_id] = cc_per_all_tiles_per_layer[layer_id] + previous_fanout_pe_to_pe_warmup*cc_per_tile_per_layer[layer_id]
-                                print(f"cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]}")
-                                print(f"STANDARD CASE latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}")
+                                vprint(f"cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]}")
+                                vprint(f"STANDARD CASE latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}")
                             else:
-                                print("I am in Slowdown: Memory Bound")
-                                print(f"ideal_bandwidth_read_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id]}")
-                                print(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")
-                                print(f"level.read_bandwidth: {level.read_bandwidth}")
+                                vprint("I am in Slowdown: Memory Bound")
+                                vprint(f"ideal_bandwidth_read_per_layer[{layer_id}]: {ideal_bandwidth_read_per_layer[layer_id]}")
+                                vprint(f"ideal_bandwidth_drain_per_layer[{layer_id}]: {ideal_bandwidth_drain_per_layer[layer_id]}")
+                                vprint(f"level.read_bandwidth: {level.read_bandwidth}")
                                 total_data = level.getReadPerLayer(layer_id) + level.getDrainPerLayer(layer_id)
                                 latency_read_drain_per_layer[layer_id] = (total_data/scaling_per_layer[layer_id])*(1/level.read_bandwidth) if not Settings.FREE_DRAINS else (level.getReadPerLayer(layer_id)/scaling_per_layer[layer_id])*(1/level.read_bandwidth)
-                                print(f"total data (for bandwidth): {total_data}")
-                                print(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")
-                                print(f"SLOWDOWN CASE latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}")
-                            print(f"\nideal_bandwidth_fill_per_layer[{layer_id}] + ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id] + ideal_bandwidth_update_per_layer[layer_id]} vs level.write_bandwidth: {level.write_bandwidth}")
+                                vprint(f"total data (for bandwidth): {total_data}")
+                                vprint(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")
+                                vprint(f"SLOWDOWN CASE latency_read_drain_per_layer[{layer_id}]: {latency_read_drain_per_layer[layer_id]}")
+                            vprint(f"\nideal_bandwidth_fill_per_layer[{layer_id}] + ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id] + ideal_bandwidth_update_per_layer[layer_id]} vs level.write_bandwidth: {level.write_bandwidth}")
                             if ideal_bandwidth_fill_per_layer[layer_id] + ideal_bandwidth_update_per_layer[layer_id] <= level.write_bandwidth:
-                                print(f"previous_fanout_pe_to_pe_warmup: {previous_fanout_pe_to_pe_warmup}")
+                                vprint(f"previous_fanout_pe_to_pe_warmup: {previous_fanout_pe_to_pe_warmup}")
                                 latency_fill_update_per_layer[layer_id] = cc_per_all_tiles_per_layer[layer_id] + previous_fanout_pe_to_pe_warmup*cc_per_tile_per_layer[layer_id]
-                                print(f"STANDARD CASE latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
+                                vprint(f"STANDARD CASE latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
                             else: 
-                                print(f"ideal_bandwidth_fill_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id]}")
-                                print(f"ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_update_per_layer[layer_id]}")
-                                print(f"level.write_bandwidth: {level.write_bandwidth}")
+                                vprint(f"ideal_bandwidth_fill_per_layer[{layer_id}]: {ideal_bandwidth_fill_per_layer[layer_id]}")
+                                vprint(f"ideal_bandwidth_update_per_layer[{layer_id}]: {ideal_bandwidth_update_per_layer[layer_id]}")
+                                vprint(f"level.write_bandwidth: {level.write_bandwidth}")
                                 # Use bandwidth-specific method (excludes internal accumulation traffic)
                                 total_data = level.getFillPerLayer(layer_id) + level.getUpdatePerLayer(layer_id)
                                 latency_fill_update_per_layer[layer_id] = (total_data/scaling_per_layer[layer_id])*(1/level.write_bandwidth)
-                                print(f"total data (for bandwidth): {total_data}")
-                                print(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")                        
-                                print(f"SLOWDOWN CASE latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
-                    print(f"\nEnd of calculation of latency.\n")
+                                vprint(f"total data (for bandwidth): {total_data}")
+                                vprint(f"scaling_per_layer[{layer_id}]: {scaling_per_layer[layer_id]}")                        
+                                vprint(f"SLOWDOWN CASE latency_fill_update_per_layer[{layer_id}]: {latency_fill_update_per_layer[layer_id]}")
+                    vprint(f"\nEnd of calculation of latency.\n")
                 else:
                     total_read_bandwidth_demand = sum(ideal_bandwidth_read_per_layer.values()) + sum(ideal_bandwidth_drain_per_layer.values())
                     total_write_bandwidth_demand = sum(ideal_bandwidth_fill_per_layer.values()) + sum(ideal_bandwidth_update_per_layer.values())
@@ -440,22 +448,22 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                         latency_fill_update_per_layer[layer_id] = cc_per_all_tiles_per_layer[layer_id]*write_slowdown
                 for layer_id in range(num_layers):
                     if level.name == "FeatureMemory":
-                        print(f"Calculating per tile final latency and stall for layer {layer_id} in {level.name}: latency_read_drain_per_layer[{layer_id}] = {latency_read_drain_per_layer[layer_id]}, latency_fill_update_per_layer[{layer_id}] = {latency_fill_update_per_layer[layer_id]}")
+                        vprint(f"Calculating per tile final latency and stall for layer {layer_id} in {level.name}: latency_read_drain_per_layer[{layer_id}] = {latency_read_drain_per_layer[layer_id]}, latency_fill_update_per_layer[{layer_id}] = {latency_fill_update_per_layer[layer_id]}")
                         summed_latency = latency_read_drain_per_layer[layer_id] + latency_fill_update_per_layer[layer_id] 
                         latency_per_layer[layer_id] = max(summed_latency, cc_per_all_tiles_per_layer[layer_id])
                         stall_cycles_per_layer[layer_id] = latency_per_layer[layer_id] - cc_per_all_tiles_per_layer[layer_id]
-                        print(f"Final per tile latency_per_layer[{layer_id}]: {latency_per_layer[layer_id]:,.0f}")
-                        print(f"Final per tile stall_cycles_per_layer[{layer_id}]: {stall_cycles_per_layer[layer_id]:,.0f}")
-                        print(f"Ideal case: no stall introduced by this level per this layer: cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]:,.0f}")
+                        vprint(f"Final per tile latency_per_layer[{layer_id}]: {latency_per_layer[layer_id]:,.0f}")
+                        vprint(f"Final per tile stall_cycles_per_layer[{layer_id}]: {stall_cycles_per_layer[layer_id]:,.0f}")
+                        vprint(f"Ideal case: no stall introduced by this level per this layer: cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]:,.0f}")
                         
                     else:
                         # Slower between: Read or Write
-                        print(f"Calculating per tile final latency and stall for layer {layer_id} in {level.name}: latency_read_drain_per_layer[{layer_id}] = {latency_read_drain_per_layer[layer_id]}, latency_fill_update_per_layer[{layer_id}] = {latency_fill_update_per_layer[layer_id]}")
+                        vprint(f"Calculating per tile final latency and stall for layer {layer_id} in {level.name}: latency_read_drain_per_layer[{layer_id}] = {latency_read_drain_per_layer[layer_id]}, latency_fill_update_per_layer[{layer_id}] = {latency_fill_update_per_layer[layer_id]}")
                         latency_per_layer[layer_id] = max(latency_read_drain_per_layer[layer_id], latency_fill_update_per_layer[layer_id])
                         stall_cycles_per_layer[layer_id] = latency_per_layer[layer_id] - cc_per_all_tiles_per_layer[layer_id]
-                        print(f"Final per tile latency_per_layer[{layer_id}]: {latency_per_layer[layer_id]:,.0f}")
-                        print(f"Final per tile stall_cycles_per_layer[{layer_id}]: {stall_cycles_per_layer[layer_id]:,.0f}")
-                        print(f"Ideal case: no stall introduced by this level per this layer: cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]:,.0f}")
+                        vprint(f"Final per tile latency_per_layer[{layer_id}]: {latency_per_layer[layer_id]:,.0f}")
+                        vprint(f"Final per tile stall_cycles_per_layer[{layer_id}]: {stall_cycles_per_layer[layer_id]:,.0f}")
+                        vprint(f"Ideal case: no stall introduced by this level per this layer: cc_per_all_tiles_per_layer[{layer_id}]: {cc_per_all_tiles_per_layer[layer_id]:,.0f}")
                       
                 latency_read_drain_per_layer[layer_id] = latency_read_drain_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
                 latency_fill_update_per_layer[layer_id] = latency_fill_update_per_layer[layer_id]*level.temporal_iterations_per_layer[layer_id]
@@ -483,15 +491,15 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                 ideal_bandwidth_update = level.getUpdate()/scaled_cc_per_all_tiles_per_layer[0]
                 ideal_bandwidth_fill = level.getFill()/scaled_cc_per_all_tiles_per_layer[0]
                 ideal_bandwidth_drain = level.getDrain()/scaled_cc_per_all_tiles_per_layer[0] if not Settings.FREE_DRAINS else 0
-                print(f"ideal_bandwidth_read + ideal_bandwidth_drain: {ideal_bandwidth_read + ideal_bandwidth_drain} vs level.read_bandwidth: {level.read_bandwidth}")
+                vprint(f"ideal_bandwidth_read + ideal_bandwidth_drain: {ideal_bandwidth_read + ideal_bandwidth_drain} vs level.read_bandwidth: {level.read_bandwidth}")
                 if ideal_bandwidth_read + ideal_bandwidth_drain <= level.read_bandwidth:
-                    print("entro nel caso ideale read + drain")
+                    vprint("entro nel caso ideale read + drain")
                     latency_read_drain = cc_per_all_tiles_per_layer[0] + previous_fanout_pe_to_pe_warmup*cc_per_tile
                 else:
                     latency_read_drain = ((level.getRead() + level.getDrain())/scaling)*(1/level.read_bandwidth) if not Settings.FREE_DRAINS else (level.getRead()/scaling)*(1/level.read_bandwidth)
-                print(f"ideal_bandwidth_fill + ideal_bandwidth_update: {ideal_bandwidth_fill + ideal_bandwidth_update} vs level.write_bandwidth: {level.write_bandwidth}")
+                vprint(f"ideal_bandwidth_fill + ideal_bandwidth_update: {ideal_bandwidth_fill + ideal_bandwidth_update} vs level.write_bandwidth: {level.write_bandwidth}")
                 if ideal_bandwidth_fill + ideal_bandwidth_update <= level.write_bandwidth:
-                    print("entro nel caso ideale fill + update")
+                    vprint("entro nel caso ideale fill + update")
                     latency_fill_update = cc_per_all_tiles_per_layer[0] + previous_fanout_pe_to_pe_warmup*cc_per_tile
                 else:
                     latency_fill_update = ((level.getFill() + level.getUpdate())/scaling)*(1/level.write_bandwidth)
@@ -511,19 +519,19 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
     max_latency_per_layer = {layer_id: 0 for layer_id in range(num_layers)}
     for i in range(len(arch)):
         level = arch[i]
-        print(f"\n\nFinal WMOPs and Latency calculation for Level: {level.name}")
+        vprint(f"\n\nFinal WMOPs and Latency calculation for Level: {level.name}")
         if isinstance(level, MemLevel):
                 if num_layers > 1:
                     for layer_id in range(num_layers):
-                        print(f"Level: {level.name}, Layer: {layer_id}")
-                        print(f"max_latency_per_layer[{layer_id}]: {max_latency_per_layer[layer_id]:,.0f} before update")
-                        print(f"level.getSettedLatencyPerLayer[{layer_id}](): {level.getSettedLatencyPerLayer(layer_id):,.0f}")
+                        vprint(f"Level: {level.name}, Layer: {layer_id}")
+                        vprint(f"max_latency_per_layer[{layer_id}]: {max_latency_per_layer[layer_id]:,.0f} before update")
+                        vprint(f"level.getSettedLatencyPerLayer[{layer_id}](): {level.getSettedLatencyPerLayer(layer_id):,.0f}")
                         max_latency_per_layer[layer_id] = max(max_latency_per_layer[layer_id], level.getSettedLatencyPerLayer(layer_id))
                         WMOPs_per_layer[layer_id] += level.Leakage(level.getSettedLatencyPerLayer(layer_id)) * powered_instances_per_layer[layer_id]
                         temporal_iterations_per_layer[layer_id] *= level.factors.fullLayerProduct(layer_id, arch) 
                     if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
                         max_latency = sum(max_latency_per_layer.values())
-                        print(f"Level.name: {arch.name}, max_latency (sequential layers): {max_latency:,.0f}")
+                        vprint(f"Level {level.name}: {arch.name}, max_latency (sequential layers): {max_latency:,.0f}")
                     else:
                         max_latency = max(max_latency_per_layer.values())                        
                     WMOPs = sum(WMOPs_per_layer.values())
@@ -554,21 +562,21 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
         elif isinstance(level, ComputeLevel):
             ## TODO: Problem of latency calculation with multiple layers
             ## TODO: Ideal compute latency per layer and then sum or max according to execution mode: 
-            print(f"Compute level latency: {level.latency():,.0f}")
+            vprint(f"Compute level latency: {level.latency():,.0f}")
             if num_layers > 1: 
                 compute_latencies = []
                 for layer_id in range(num_layers):
                     latency = level.latency() * temporal_iterations_per_layer[layer_id]
-                    print(f"Compute latency for layer {layer_id}: {latency:,.0f}")
+                    vprint(f"Compute latency for layer {layer_id}: {latency:,.0f}")
                     compute_latencies.append(latency)
                 if getattr(Settings, 'SEQUENTIAL_LAYER_EXECUTION', True):
                     compute_latency = sum(compute_latencies)
                 else:
                     compute_latency = max(compute_latencies)
-                print(f"max_latency initially: {max_latency}")
-                print(f"compute_latency from compute level: {compute_latency:,.0f}")    
+                vprint(f"max_latency initially: {max_latency}")
+                vprint(f"compute_latency from compute level: {compute_latency:,.0f}")    
                 max_latency = max(max_latency, compute_latency)
-                print(f"max_latency after compute: {max_latency:,.0f}, before fanout_level")
+                vprint(f"max_latency after compute: {max_latency:,.0f}, before fanout_level")
             else:
                 max_latency = max(max_latency, level.latency() * temporal_iterations)
             break
@@ -585,6 +593,7 @@ def Wart(arch : Arch, comp : Shape, bias_read : bool, utilization_exponent : int
     FLOPs = comp.FLOPs()
     WMOPs, max_latency = updateStats(arch, bias_read)
     utilization = arch.spatialUtilization()**utilization_exponent if Settings.UTILIZATION_IN_WART else 1
+    vprint(f"utilization used in WART calculation: {utilization}")
     return (FLOPs/(WMOPs*max_latency))*utilization
 
 """
@@ -595,9 +604,9 @@ If pJ_to_J is True, the returned value is in [J*cc].
 def EDP(arch : Arch, bias_read : bool, pJ_to_J : bool = False) -> float:
     WMOPs, max_latency = updateStats(arch, bias_read)
     max_latency_real = 45.2*10**7
-    print(f"max_latency: {max_latency}, max_latency_real (with fudge factor): {max_latency_real}")
-    print(f"Should be: WMOPs: {WMOPs}, EDP: {WMOPs*max_latency_real*(10**-12 if pJ_to_J else 1)}") 
-    print(f"My EDP: {WMOPs*max_latency*(10**-12 if pJ_to_J else 1)}")
+    vprint(f"max_latency: {max_latency}, max_latency_real (with fudge factor): {max_latency_real}")
+    vprint(f"Should be: WMOPs: {WMOPs}, EDP: {WMOPs*max_latency_real*(10**-12 if pJ_to_J else 1)}") 
+    vprint(f"My EDP: {WMOPs*max_latency*(10**-12 if pJ_to_J else 1)}")
     return WMOPs*max_latency*(10**-12 if pJ_to_J else 1)
 
 """
@@ -656,12 +665,12 @@ def Energy(arch : Arch, pJ_to_uJ : bool = False) -> float:
             if level.name == "DRAM":
                 #level.in_reads = 2760960+12870
                 #level.w_reads = 84320            
-                print(f"DRAM in_reads set to: {level.in_reads}, w_reads set to: {level.w_reads}, out_reads: {level.out_reads}, int_in_reads: {level.int_in_reads}, int_out_reads: {level.int_out_reads}")
+                vprint(f"DRAM in_reads set to: {level.in_reads}, w_reads set to: {level.w_reads}, out_reads: {level.out_reads}, int_in_reads: {level.int_in_reads}, int_out_reads: {level.int_out_reads}")
             reads = level.in_reads + level.w_reads + level.out_reads + level.int_in_reads + level.int_out_reads
             writes = level.in_writes + level.w_writes + level.out_writes + level.int_in_writes + level.int_out_writes
         
             if level.name == "DRAM":
-                print(f"DRAM Reads: {reads}: in:{level.in_reads}, w:{level.w_reads}, out:{level.out_reads}, int_in:{level.int_in_reads}, int_out:{level.int_out_reads}")
+                vprint(f"DRAM Reads: {reads}: in:{level.in_reads}, w:{level.w_reads}, out:{level.out_reads}, int_in:{level.int_in_reads}, int_out:{level.int_out_reads}")
             WMOPs += level.WMOPs(reads, writes)
         elif isinstance(level, FanoutLevel):
             continue

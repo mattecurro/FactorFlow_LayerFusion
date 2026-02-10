@@ -506,47 +506,47 @@ def print_depfin_energy_summary():
     """Print a summary of DepFiN energy values for use in multi_layer_arch.py"""
     energies = get_depfin_energy_per_byte()
     
-    print("\n" + "="*80)
-    print("DepFiN Energy, Area, and Configuration Values")
-    print("="*80)
+    vprint("\n" + "="*80)
+    vprint("DepFiN Energy, Area, and Configuration Values")
+    vprint("="*80)
     
     for level, data in energies.items():
-        print(f"\n{'─'*40}")
-        print(f"{level}:")
-        print(f"{'─'*40}")
+        vprint(f"\n{'─'*40}")
+        vprint(f"{level}:")
+        vprint(f"{'─'*40}")
         
         if level == "Compute":
-            print(f"  Multiplier:")
-            print(f"    energy  = {data['multiplier_energy']:.6f} pJ")
-            print(f"    leakage = {data['multiplier_leakage']:.6f} pJ/cycle")
-            print(f"    area    = {data['multiplier_area']:.4f} um²")
-            print(f"  Adder:")
-            print(f"    energy  = {data['adder_energy']:.6f} pJ")
-            print(f"    leakage = {data['adder_leakage']:.6f} pJ/cycle")
-            print(f"    area    = {data['adder_area']:.4f} um²")
-            print(f"  FMA (Fused Multiply-Add):")
-            print(f"    energy  = {data['fma_energy']:.6f} pJ/MAC")
-            print(f"    leakage = {data['fma_leakage']:.6f} pJ/cycle")
-            print(f"    area    = {data['fma_area']:.4f} um²")
+            vprint(f"  Multiplier:")
+            vprint(f"    energy  = {data['multiplier_energy']:.6f} pJ")
+            vprint(f"    leakage = {data['multiplier_leakage']:.6f} pJ/cycle")
+            vprint(f"    area    = {data['multiplier_area']:.4f} um²")
+            vprint(f"  Adder:")
+            vprint(f"    energy  = {data['adder_energy']:.6f} pJ")
+            vprint(f"    leakage = {data['adder_leakage']:.6f} pJ/cycle")
+            vprint(f"    area    = {data['adder_area']:.4f} um²")
+            vprint(f"  FMA (Fused Multiply-Add):")
+            vprint(f"    energy  = {data['fma_energy']:.6f} pJ/MAC")
+            vprint(f"    leakage = {data['fma_leakage']:.6f} pJ/cycle")
+            vprint(f"    area    = {data['fma_area']:.4f} um²")
         else:
-            print(f"  Configuration:")
-            print(f"    word_bits (wordline) = {data['word_bits']} bits ({data['bytes_per_access']} bytes)")
-            print(f"    depth                = {data['depth']} entries")
+            vprint(f"  Configuration:")
+            vprint(f"    word_bits (wordline) = {data['word_bits']} bits ({data['bytes_per_access']} bytes)")
+            vprint(f"    depth                = {data['depth']} entries")
             if 'banks' in data:
-                print(f"    banks                = {data['banks']}")
-            print(f"  Energy:")
-            print(f"    read_energy_per_byte   = {data['read_energy_per_byte']:.6f} pJ/byte")
-            print(f"    write_energy_per_byte  = {data['write_energy_per_byte']:.6f} pJ/byte")
-            print(f"    value_access_energy_per_wordline (read) = {data['value_access_energy_per_wordline']:.6f} pJ (entire wordline)")
-            print(f"    read_energy_per_access = {data['read_energy_per_access']:.6f} pJ (per wordline)")
-            print(f"    write_energy_per_access= {data['write_energy_per_access']:.6f} pJ (per wordline)")
-            print(f"    leakage                = {data['leakage']:.6f} pJ/cycle")
-            print(f"  Area:")
-            print(f"    area = {data['area']:.4f} um²")
+                vprint(f"    banks                = {data['banks']}")
+            vprint(f"  Energy:")
+            vprint(f"    read_energy_per_byte   = {data['read_energy_per_byte']:.6f} pJ/byte")
+            vprint(f"    write_energy_per_byte  = {data['write_energy_per_byte']:.6f} pJ/byte")
+            vprint(f"    value_access_energy_per_wordline (read) = {data['value_access_energy_per_wordline']:.6f} pJ (entire wordline)")
+            vprint(f"    read_energy_per_access = {data['read_energy_per_access']:.6f} pJ (per wordline)")
+            vprint(f"    write_energy_per_access= {data['write_energy_per_access']:.6f} pJ (per wordline)")
+            vprint(f"    leakage                = {data['leakage']:.6f} pJ/cycle")
+            vprint(f"  Area:")
+            vprint(f"    area = {data['area']:.4f} um²")
     
-    print("\n" + "="*80)
-    print("Suggested values for multi_layer_arch.py:")
-    print("="*80)
+    vprint("\n" + "="*80)
+    vprint("Suggested values for multi_layer_arch.py:")
+    vprint("="*80)
     
     # For value_access_energy (average of read/write per byte)
     dram_avg = (energies["DRAM"]["read_energy_per_byte"] + 
@@ -558,7 +558,7 @@ def print_depfin_energy_summary():
     acc_avg = (energies["AccumulationRegister"]["read_energy_per_byte"] + 
                energies["AccumulationRegister"]["write_energy_per_byte"]) / 2
     
-    print(f"""
+    vprint(f"""
 # DRAM
 read_value_access_energy = {energies["DRAM"]["read_energy_per_byte"]:.4f},  # pJ/byte
 write_value_access_energy = {energies["DRAM"]["write_energy_per_byte"]:.4f},  # pJ/byte
@@ -930,9 +930,9 @@ def get_arch_eyeriss_hw_data(
     ], coupling=conv_coupling_with_stride_and_batches, name = name)
     
     if Settings.VERBOSE:
-        print(f"\nEnergy per action in {arch.name}:")
+        vprint(f"\nEnergy per action in {arch.name}:")
         printEnergyPerAction(arch)
-        print(f"\nArea per level in {arch.name}:")
+        vprint(f"\nArea per level in {arch.name}:")
         printAreaPerLevel(arch)
-        print(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2\n")
+        vprint(f"Total area of {arch.name}: {arch.totalArea(True):.3e} um^2\n")
     return arch

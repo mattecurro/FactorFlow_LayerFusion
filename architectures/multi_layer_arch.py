@@ -3,6 +3,7 @@ from levels import *
 from arch import *
 from architectures.arch_hw_data import get_depfin_energy_per_byte, DepFinParamInfo
 
+# Validation CL: python3 main_cli.py architectures/multi_layer_arch.py architectures/10layer_comp.py > output_FW_int.log 2>&1
 
 def get_scaled_energy_values(
     feature_memory_size_kb: int,
@@ -212,7 +213,6 @@ arch = arch_depfin_10layers_F1S = Arch([
     ),
 
 
-
     MemLevel(
         name = "WeightMemory", # WMEM
         size = 524 * 1024, 
@@ -297,24 +297,13 @@ arch = arch_depfin_10layers_F1S = Arch([
 
     MemLevel(
         name = "AccumulationIntermediateOutputRegister",
-        size = 10,
+        size = 11,
         value_access_energy = 0.16,
         read_bandwidth = 1,
         write_bandwidth = 1,
-        bypasses = ['in', 'w', 'out', 'int_in'],
-        dataflow_constraints = ['Z9', 'Y9', 'X9', 'Z8', 'Y8', 'X8', 'Z7', 'Y7', 'X7', 'Z6', 'Y6', 'X6', 'Z5', 'Y5', 'X5', 'Z4', 'Y4', 'X4', 'Z3', 'Y3', 'X3', 'Z2', 'Y2', 'X2', 'Z1', 'Y1', 'X1',        'Z0', 'Y0', 'X0'],
-        factors_constraints = {'Z9': 1, 'Y9': 1, 'X9': 1, 'Z8': 1, 'Y8': 1, 'X8': 1, 'Z7': 1, 'Y7': 1, 'X7': 1, 'Z6': 1, 'Y6': 1, 'X6': 1, 'Z5': 1, 'Y5': 1, 'X5': 1, 'Z4': 1, 'Y4': 1, 'X4': 1, 'Z3': 1, 'Y3': 1, 'X3': 1, 'Z2': 1, 'Y2': 1, 'X2': 1, 'Z1': 1, 'Y1': 1, 'X1': 1,        'Z0': 1, 'Y0': 1, 'X0': 1}
-    ),
-
-    MemLevel(
-        name = "AccumulationOutputRegister",
-        size = 1,
-        value_access_energy = 0.16,
-        read_bandwidth = 1,
-        write_bandwidth = 1,
-        bypasses = ['in', 'w', 'int_in', 'int_out'],
-        dataflow_constraints = ['Q', 'P', 'Z10'],
-        factors_constraints = {'Q': 1, 'P': 1, 'Z10': 1}
+        bypasses = ['in', 'w', 'int_in'],
+        dataflow_constraints = ['Z10', 'P', 'Q', 'Z9', 'Y9', 'X9', 'Z8', 'Y8', 'X8', 'Z7', 'Y7', 'X7', 'Z6', 'Y6', 'X6', 'Z5', 'Y5', 'X5', 'Z4', 'Y4', 'X4', 'Z3', 'Y3', 'X3', 'Z2', 'Y2', 'X2', 'Z1', 'Y1', 'X1', 'Z0', 'Y0', 'X0'],
+        factors_constraints = {'Z10': 1, 'P': 1, 'Q': 1, 'Z9': 1, 'Y9': 1, 'X9': 1, 'Z8': 1, 'Y8': 1, 'X8': 1, 'Z7': 1, 'Y7': 1, 'X7': 1, 'Z6': 1, 'Y6': 1, 'X6': 1, 'Z5': 1, 'Y5': 1, 'X5': 1, 'Z4': 1, 'Y4': 1, 'X4': 1, 'Z3': 1, 'Y3': 1, 'X3': 1, 'Z2': 1, 'Y2': 1, 'X2': 1, 'Z1': 1, 'Y1': 1, 'X1': 1,        'Z0': 1, 'Y0': 1, 'X0': 1}
     ),
 
     ComputeLevel(
