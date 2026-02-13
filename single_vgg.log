@@ -1,0 +1,517 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+------ loading Accelergy for Eyeriss ------
+------ loading Accelergy ------
+ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
+Creating architecture: Eyeriss_1Layer_16384.0B_GB_256x8_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+Starting engine with mapper: breadthfirst_local
+
+WARNING: running on a Python version without free-threading (GIL enabled), this program relies heavily on true multithreading, thus expect a severe performance hit with your current setup. Consider updating to Python 3.13t or newer.
+INFO: running multithreaded with THREADS_COUNT = 8
+
+DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
+                       array=[], elements=['M', 'P', 'Q', 'C', 'R', 'S'] (len=6)
+DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
+                       array=[], elements=['M', 'P', 'Q', 'C', 'R', 'S'] (len=6)
+DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
+                       array=['S', 'R', 'Q', 'P', 'C', 'M'], elements=[] (len=0)
+DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
+                       array=['R', 'C', 'S', 'Q', 'P', 'M'], elements=[] (len=0)
+DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
+                       array=['M', 'S', 'R', 'Q', 'P', 'C'], elements=[] (len=0)
+-------- factorFlow -------- CIAO
+Arch after initialization:
+Input FC size: 1
+
+Input size: 153228
+
+Output size: 3211264
+
+Weight size: 1728
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 153228, output_size: 3211264, weight_size: 1728, intermediate_size: 0
+Total mem footprint: 3366222
+
+
+
+Input FC size: 1
+
+Input size: 1
+
+Output size: 1
+
+Weight size: 0
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 1, output_size: 1, weight_size: 0, intermediate_size: 0
+Total mem footprint: 4
+
+
+
+Input FC size: 1
+
+Input size: 1
+
+Output size: 0
+
+Weight size: 0
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 1, output_size: 0, weight_size: 0, intermediate_size: 0
+Total mem footprint: 3
+
+
+
+Input FC size: 1
+
+Input size: 0
+
+Output size: 0
+
+Weight size: 1
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 0, weight_size: 1, intermediate_size: 0
+Total mem footprint: 2
+
+
+
+Input FC size: 1
+
+Input size: 0
+
+Output size: 1
+
+Weight size: 0
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 0, output_size: 1, weight_size: 0, intermediate_size: 0
+Total mem footprint: 2
+
+
+
+DRAM ----------> M: 64, P: 224, Q: 224, C: 3, R: 3, S: 3
+GlobalBuffer --
+SACols --------
+SARows --------
+InRegister ----
+WRegister -----
+OutRegister ---
+Compute -------
+
+Starting FactorFlow tiling optimization:
+
+é stato chiamato update stats! 
+
+
+
+
+Questo mops è chiamato da update stats
+Level: DRAM, arch bypasses for the level: [], in_bp: 1, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1
+DEBUG updateStats pre scaling: Level DRAM:
+  in_reads: 86704128
+  per_layer_w_reads: {0: 86704128}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 3211264
+  out_writes: 3211264
+  out_reads_factors: 1
+scale_per_layer[0]: 1, temporal_iterations_per_layer[0]: 1, spatial_iterations_per_layer[0]: 1
+DEBUG: results after scaling: Level DRAM: in_reads=86704128, w_reads=86704128, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=3211264, out_reads=3211264, out_reads_factors=1
+DEBUG: Level DRAM adjusted out_reads for no bias read: 0
+DEBUG updateStats post scaling: Level DRAM:
+  in_reads: 86,704,128
+  per_layer_w_reads: {0: 86704128}
+  w_reads: 86,704,128
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 0
+  out_writes: 3,211,264
+  out_reads_factors: 1
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 3211264
+Name of the level: DRAM, level active instances per layer: {0: 1}, level active instances: 1
+End first part of update for level: DRAM
+
+
+
+Questo mops è chiamato da update stats
+Level: GlobalBuffer, arch bypasses for the level: ['w'], in_bp: 1, w_bp: 0, out_bp: 0, int_in_bp: 1, int_out_bp: 1
+DEBUG updateStats pre scaling: Level GlobalBuffer:
+  in_reads: 1
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 1
+  out_writes: 1
+  out_reads_factors: 1
+scale_per_layer[0]: 86704128, temporal_iterations_per_layer[0]: 86704128, spatial_iterations_per_layer[0]: 1
+DEBUG: results after scaling: Level GlobalBuffer: in_reads=86704128, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=86704128, out_reads=86704128, out_reads_factors=27
+DEBUG: Level GlobalBuffer adjusted out_reads for no bias read: 83492864
+DEBUG updateStats post scaling: Level GlobalBuffer:
+  in_reads: 86,704,128
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 83,492,864
+  out_writes: 86,704,128
+  out_reads_factors: 27
+in_writes: 86704128, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 86704128
+Name of the level: GlobalBuffer, level active instances per layer: {0: 1}, level active instances: 1
+End first part of update for level: GlobalBuffer
+
+
+
+Calculating Fanout Level: SACols, updating spatial and last reads
+End of the first part of Update Stats for fanout level: SACols
+
+
+Calculating Fanout Level: SARows, updating spatial and last reads
+End of the first part of Update Stats for fanout level: SARows
+
+
+Questo mops è chiamato da update stats
+Level: InRegister, arch bypasses for the level: ['w', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_in_bp: 1, int_out_bp: 1
+DEBUG updateStats pre scaling: Level InRegister:
+  in_reads: 1
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 0
+  out_writes: 0
+  out_reads_factors: 0
+scale_per_layer[0]: 86704128, temporal_iterations_per_layer[0]: 86704128, spatial_iterations_per_layer[0]: 1
+DEBUG: results after scaling: Level InRegister: in_reads=86704128, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=0, out_reads=0, out_reads_factors=0
+DEBUG updateStats post scaling: Level InRegister:
+  in_reads: 86,704,128
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 0
+  out_writes: 0
+  out_reads_factors: 0
+in_writes: 86704128, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 0
+Name of the level: InRegister, level active instances per layer: {0: 1}, level active instances: 1
+End first part of update for level: InRegister
+
+
+
+Questo mops è chiamato da update stats
+Level: WRegister, arch bypasses for the level: ['in', 'out'], in_bp: 0, w_bp: 0, out_bp: 0, int_in_bp: 1, int_out_bp: 1
+DEBUG updateStats pre scaling: Level WRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 1}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 0
+  out_writes: 0
+  out_reads_factors: 0
+scale_per_layer[0]: 86704128, temporal_iterations_per_layer[0]: 86704128, spatial_iterations_per_layer[0]: 1
+DEBUG: results after scaling: Level WRegister: in_reads=0, w_reads=86704128, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=0, out_reads=0, out_reads_factors=0
+DEBUG updateStats post scaling: Level WRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 86704128}
+  w_reads: 86,704,128
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 0
+  out_writes: 0
+  out_reads_factors: 0
+in_writes: 0, w_writes: 86704128, int_in_writes: 0, int_out_writes: 0, out_writes: 0
+Name of the level: WRegister, level active instances per layer: {0: 1}, level active instances: 1
+End first part of update for level: WRegister
+
+
+
+Questo mops è chiamato da update stats
+Level: OutRegister, arch bypasses for the level: ['in', 'w'], in_bp: 0, w_bp: 0, out_bp: 1, int_in_bp: 1, int_out_bp: 1
+DEBUG updateStats pre scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  per_layer_int_in_reads: {}
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  out_reads: 1
+  out_writes: 1
+  out_reads_factors: 1
+scale_per_layer[0]: 86704128, temporal_iterations_per_layer[0]: 86704128, spatial_iterations_per_layer[0]: 1
+DEBUG: results after scaling: Level OutRegister: in_reads=0, w_reads=0, int_in_reads=0, int_out_reads=0, int_out_writes=0, out_writes=86704128, out_reads=86704128, out_reads_factors=27
+DEBUG: Level OutRegister adjusted out_reads for no bias read: 83492864
+DEBUG updateStats post scaling: Level OutRegister:
+  in_reads: 0
+  per_layer_w_reads: {0: 0}
+  w_reads: 0
+  per_layer_int_in_reads: {}
+  per_layer_int_in_writes: {}
+  int_in_reads: 0
+  per_layer_int_out_reads: {}
+  per_layer_int_out_writes: {}
+  int_out_reads: 0
+  out_reads: 83,492,864
+  out_writes: 170,196,992
+  out_reads_factors: 27
+in_writes: 0, w_writes: 0, int_in_writes: 0, int_out_writes: 0, out_writes: 170196992
+Name of the level: OutRegister, level active instances per layer: {0: 1}, level active instances: 1
+End first part of update for level: OutRegister
+
+
+
+Calculating WMOPs for Compute Level
+Compute Level Compute WMOPs_per_layer: {0: 16119543.298415689}
+WMOPs_till_now before compute level: 6,195,402,540.162
+Compute Level Compute total WMOPs from per layer sum: 16119543.298415689
+Compute Level Compute total WMOPs: 16119543.298415689
+Total WMOPs after adding compute level: 6211522083.460407
+END FIRST PART OF UPDATE STATS
+
+
+First cc_per_tile, it is from compute = 1
+First cc_per_tile_per_layer it is from compute = {0: 1}
+
+
+Calculating Latency for Level: OutRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 0.9629629629629629 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.9629629629629628 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: WRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 1.0 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: InRegister
+ideal_bandwidth_read + ideal_bandwidth_drain: 1.0 vs level.read_bandwidth: 2.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 1.0 vs level.write_bandwidth: 2.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: GlobalBuffer
+ideal_bandwidth_read + ideal_bandwidth_drain: 1.962962962962963 vs level.read_bandwidth: 16.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 2.0 vs level.write_bandwidth: 16.0
+entro nel caso ideale fill + update
+
+
+Calculating Latency for Level: DRAM
+ideal_bandwidth_read + ideal_bandwidth_drain: 2.0 vs level.read_bandwidth: 4.0
+entro nel caso ideale read + drain
+ideal_bandwidth_fill + ideal_bandwidth_update: 0.037037037037037035 vs level.write_bandwidth: 4.0
+entro nel caso ideale fill + update
+
+
+Final WMOPs and Latency calculation for Level: DRAM
+
+
+Final WMOPs and Latency calculation for Level: GlobalBuffer
+
+
+Final WMOPs and Latency calculation for Level: SACols
+
+
+Final WMOPs and Latency calculation for Level: SARows
+
+
+Final WMOPs and Latency calculation for Level: InRegister
+
+
+Final WMOPs and Latency calculation for Level: WRegister
+
+
+Final WMOPs and Latency calculation for Level: OutRegister
+
+
+Final WMOPs and Latency calculation for Level: Compute
+Compute level latency: 1
+level SACols utilization: 1/256=0.00390625
+utilization after level SACols: 0.00390625
+level SARows utilization: 1/8=0.125
+utilization after level SARows: 0.00048828125
+level Compute utilization: 1/1=1.0
+utilization after level Compute: 0.00048828125
+Arch: Eyeriss_1Layer_16384.0B_GB_256x8_PEs: spatial utilization is 0.00048828125
+utilization used in WART calculation: 0.00048828125
+CIAO!
+updateStats2
+-- fanout maximization --
+Input FC size: 1
+
+Input size: 6102
+
+Output size: 100352
+
+Weight size: 1728
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 6102, output_size: 100352, weight_size: 1728, intermediate_size: 0
+Total mem footprint: 108184
+
+
+
+Input FC size: 1
+
+Input size: 153228
+
+Output size: 3211264
+
+Weight size: 1728
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 153228, output_size: 3211264, weight_size: 1728, intermediate_size: 0
+Total mem footprint: 3366222
+
+
+
+Input FC size: 1
+
+Input size: 32
+
+Output size: 32
+
+Weight size: 0
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 32, output_size: 32, weight_size: 0, intermediate_size: 0
+Total mem footprint: 66
+
+
+
+╶ Moving DRAM --Q:32--> SACols
+Input FC size: 1
+
+Input size: 23052
+
+Output size: 458752
+
+Weight size: 1728
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 23052, output_size: 458752, weight_size: 1728, intermediate_size: 0
+Total mem footprint: 483534
+
+
+
+Input FC size: 1
+
+Input size: 153228
+
+Output size: 3211264
+
+Weight size: 1728
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 153228, output_size: 3211264, weight_size: 1728, intermediate_size: 0
+Total mem footprint: 3366222
+
+
+
+Input FC size: 1
+
+Input size: 224
+
+Output size: 224
+
+Weight size: 0
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 224, output_size: 224, weight_size: 0, intermediate_size: 0
+Total mem footprint: 450
+
+
+
+╶ Moving DRAM --Q:7--> SACols
+Input FC size: 1
+
+Input size: 151872
+
+Output size: 3211264
+
+Weight size: 576
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 151872, output_size: 3211264, weight_size: 576, intermediate_size: 0
+Total mem footprint: 3363714
+
+
+
+Input FC size: 1
+
+Input size: 153228
+
+Output size: 3211264
+
+Weight size: 1728
+
+Intermediate input size: 0
+Total intermediate size (input + output): 0
+
+input_size: 153228, output_size: 3211264, weight_size: 1728, intermediate_size: 0
+Total mem footprint: 3366222
+
+
+
+Input FC size: 1
+
+Input size: 226
+
+Output size: 224
+
+Weight size: 0
+
+Intermediate input size: 0

@@ -1,0 +1,348 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+
+==========================================================================================
+FUSION COMPARISON CASE STUDIES: VGG16
+==========================================================================================
+Architecture: Eyeriss, GB=128KB, PE=196x64
+Registers: InReg=750, WReg=5000, IntReg=300, OutReg=64
+Tile size override: 1
+==========================================================================================
+
+--- FULL FUSION: vgg16/full/13layer ---
+[Constrained Eyeriss] 13 layers, tile_size=1
+  DRAM: {'Q': 14, 'P': 14, 'X0': 224, 'Y0': 224, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 224, 'Y1': 224, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'X2': 112, 'Y2': 112, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1, 'X3': 112, 'Y3': 112, 'Z3': 1, 'C3': 1, 'R3': 1, 'S3': 1, 'X4': 56, 'Y4': 56, 'Z4': 1, 'C4': 1, 'R4': 1, 'S4': 1, 'X5': 56, 'Y5': 56, 'Z5': 1, 'C5': 1, 'R5': 1, 'S5': 1, 'X6': 56, 'Y6': 56, 'Z6': 1, 'C6': 1, 'R6': 1, 'S6': 1, 'X7': 28, 'Y7': 28, 'Z7': 1, 'C7': 1, 'R7': 1, 'S7': 1, 'X8': 28, 'Y8': 28, 'Z8': 1, 'C8': 1, 'R8': 1, 'S8': 1, 'X9': 28, 'Y9': 28, 'Z9': 1, 'C9': 1, 'R9': 1, 'S9': 1, 'X10': 14, 'Y10': 14, 'Z10': 1, 'C10': 1, 'R10': 1, 'S10': 1, 'X11': 14, 'Y11': 14, 'Z11': 1, 'C11': 1, 'R11': 1, 'S11': 1, 'Z12': 1, 'C12': 1, 'R12': 1, 'S12': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'X0': 1, 'Y0': 1, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 1, 'Y1': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'X2': 1, 'Y2': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1, 'X3': 1, 'Y3': 1, 'Z3': 1, 'C3': 1, 'R3': 1, 'S3': 1, 'X4': 1, 'Y4': 1, 'Z4': 1, 'C4': 1, 'R4': 1, 'S4': 1, 'X5': 1, 'Y5': 1, 'Z5': 1, 'C5': 1, 'R5': 1, 'S5': 1, 'X6': 1, 'Y6': 1, 'Z6': 1, 'C6': 1, 'R6': 1, 'S6': 1, 'X7': 1, 'Y7': 1, 'Z7': 1, 'C7': 1, 'R7': 1, 'S7': 1, 'X8': 1, 'Y8': 1, 'Z8': 1, 'C8': 1, 'R8': 1, 'S8': 1, 'X9': 1, 'Y9': 1, 'Z9': 1, 'C9': 1, 'R9': 1, 'S9': 1, 'X10': 1, 'Y10': 1, 'Z10': 1, 'C10': 1, 'R10': 1, 'S10': 1, 'X11': 1, 'Y11': 1, 'Z11': 1, 'C11': 1, 'R11': 1, 'S11': 1, 'Z12': 1, 'C12': 1, 'R12': 1, 'S12': 1}
+  SACols: {'Q': 1, 'Z12': 64}
+  SARows_0: {'S0': 3, 'C0': 3, 'Z0': 1}
+  SARows_1: {'S1': 3, 'C1': 64, 'Z1': 1}
+  SARows_2: {'S2': 3, 'C2': 64, 'Z2': 1}
+  SARows_3: {'S3': 3, 'C3': 64, 'Z3': 1}
+  SARows_4: {'S4': 3, 'C4': 64, 'Z4': 1}
+  SARows_5: {'S5': 3, 'C5': 64, 'Z5': 1}
+  SARows_6: {'S6': 3, 'C6': 64, 'Z6': 1}
+  SARows_7: {'S7': 3, 'C7': 64, 'Z7': 1}
+  SARows_8: {'S8': 3, 'C8': 64, 'Z8': 1}
+  SARows_9: {'S9': 3, 'C9': 64, 'Z9': 1}
+  SARows_10: {'S10': 3, 'C10': 64, 'Z10': 1}
+  SARows_11: {'S11': 3, 'C11': 64, 'Z11': 1}
+  SARows_12: {'S12': 3, 'C12': 64, 'Z12': 1}
+Creating architecture: Eyeriss_Constrained_13L_tile1_64x196 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
+final_layer_dims: {'C12', 'S12', 'R0', 'X0', 'Z12', 'Q', 'P', 'R12', 'C0', 'Y0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_64x196: identified intermediate dimensions: {'Z10', 'S7', 'Z3', 'X7', 'S2', 'R7', 'C5', 'X11', 'S10', 'Y4', 'X4', 'Y11', 'Z8', 'C3', 'X9', 'Z5', 'R1', 'Z2', 'C2', 'R9', 'X3', 'Z0', 'Y7', 'Y10', 'R5', 'C1', 'Z6', 'R11', 'C7', 'S8', 'Z7', 'Y9', 'Y1', 'X8', 'X5', 'X10', 'X1', 'S11', 'Z11', 'X2', 'Y6', 'R4', 'Y3', 'Y2', 'Z9', 'S1', 'R8', 'Y5', 'S4', 'S5', 'R10', 'R2', 'Z1', 'C11', 'X6', 'C8', 'R3', 'S6', 'Y8', 'S3', 'C10', 'S9', 'C9', 'Z4', 'C4', 'C6', 'R6'}
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension R1 in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z0: 64) to (Z0: 1) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z1: 64) to (Z1: 1) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z2: 128) to (Z2: 2) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z3: 128) to (Z3: 2) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z4: 256) to (Z4: 4) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z5: 256) to (Z5: 4) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z6: 256) to (Z6: 4) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z7: 512) to (Z7: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z8: 512) to (Z8: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z9: 512) to (Z9: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z10: 512) to (Z10: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z11: 512) to (Z11: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_13L_tile1_64x196 -> Level: OutRegister: updating constraint (Z12: 512) to (Z12: 8) to fit the computation.
+  ✓ Energy: 4.245e+04 μJ, Latency: 8.159e+07 cc, EDP: 3.51e+06, MOPs: (38378878656, 17383525376)
+
+--- CS1: NON-FUSED (single layers) ---
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 224, 'P': 224, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 3, 'M': 1}
+  WRegister: {'C': 1, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 1, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L0: E=1.444e+02 μJ, L=7.326e+06 cc, MOPs=(33117888, 35624960)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 224, 'P': 224, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 1, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 1, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L1: E=8.524e+02 μJ, L=2.569e+07 cc, MOPs=(633057280, 626347008)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 112, 'P': 112, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 1, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 2, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L2: E=3.458e+02 μJ, L=8.028e+06 cc, MOPs=(313372672, 158230016)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 112, 'P': 112, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 2, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 2, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L3: E=4.305e+02 μJ, L=1.285e+07 cc, MOPs=(316883456, 313248768)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 56, 'P': 56, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 2, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 4, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L4: E=1.813e+02 μJ, L=4.014e+06 cc, MOPs=(157057280, 79152640)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 56, 'P': 56, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 4, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 4, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L5: E=2.320e+02 μJ, L=6.423e+06 cc, MOPs=(159183616, 156699648)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 56, 'P': 56, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 4, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 4, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L6: E=2.320e+02 μJ, L=6.423e+06 cc, MOPs=(159183616, 156699648)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 28, 'P': 28, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 4, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 8, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L7: E=1.238e+02 μJ, L=2.007e+06 cc, MOPs=(79673728, 39613952)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 28, 'P': 28, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 8, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 8, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L8: E=1.823e+02 μJ, L=3.211e+06 cc, MOPs=(81881984, 78425088)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 28, 'P': 28, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 8, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 8, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L9: E=1.823e+02 μJ, L=3.211e+06 cc, MOPs=(81881984, 78425088)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 14, 'P': 14, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 8, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 8, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L10: E=1.022e+02 μJ, L=8.028e+05 cc, MOPs=(22239968, 19606272)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 14, 'P': 14, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 8, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 8, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L11: E=1.022e+02 μJ, L=8.028e+05 cc, MOPs=(22239968, 19606272)
+[Constrained Eyeriss] Single layer, tile_size=1
+  DRAM: {'Q': 14, 'P': 14, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'M': 1, 'C': 1, 'R': 1, 'S': 1}
+  SACols: {'Q': 1, 'M': 64}
+  SARows: {'S': 3, 'C': 64, 'M': 1}
+  WRegister: {'C': 8, 'R': 3, 'M': 1, 'P': 1, 'Q': 1, 'S': 1}
+  OutRegister: {'M': 8, 'C': 1, 'P': 1, 'Q': 1, 'R': 1, 'S': 1}
+Creating architecture: Eyeriss_Constrained_1L_tile1_64x196 with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L12: E=1.022e+02 μJ, L=8.028e+05 cc, MOPs=(22239968, 19606272)
+  [skip] L13 (not in full fusion)
+  [skip] L14 (not in full fusion)
+  [skip] L15 (not in full fusion)
+
+--- CS2: INTERMEDIATE FUSION (block) ---
+[Constrained Eyeriss] 2 layers, tile_size=1
+  DRAM: {'Q': 224, 'P': 224, 'X0': 224, 'Y0': 224, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'X0': 1, 'Y0': 1, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1}
+  SACols: {'Q': 1, 'Z1': 64}
+  SARows_0: {'S0': 3, 'C0': 3, 'Z0': 1}
+  SARows_1: {'S1': 3, 'C1': 64, 'Z1': 1}
+Creating architecture: Eyeriss_Constrained_2L_tile1_64x196 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Z1PQ, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],, out_coupling: [Z1][P][Q]
+final_layer_dims: {'S0', 'R1', 'R0', 'X0', 'Z1', 'S1', 'Q', 'P', 'C0', 'Y0', 'C1'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Z1', 'P', 'Q']
+INFO: Arch: Eyeriss_Constrained_2L_tile1_64x196: identified intermediate dimensions: {'Z0'}
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension R1 in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+WARNING: Arch: Eyeriss_Constrained_2L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z0: 64) to (Z0: 1) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_2L_tile1_64x196 -> Level: OutRegister: updating constraint (Z1: 64) to (Z1: 1) to fit the computation.
+  ✓ block1 (2L): E=5.554e+03 μJ, L=3.302e+07 cc, MOPs=(5854774976, 2003979264)
+[Constrained Eyeriss] 2 layers, tile_size=1
+  DRAM: {'Q': 112, 'P': 112, 'X0': 112, 'Y0': 112, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'X0': 1, 'Y0': 1, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1}
+  SACols: {'Q': 1, 'Z1': 64}
+  SARows_0: {'S0': 3, 'C0': 64, 'Z0': 1}
+  SARows_1: {'S1': 3, 'C1': 64, 'Z1': 1}
+Creating architecture: Eyeriss_Constrained_2L_tile1_64x196 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Z1PQ, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],, out_coupling: [Z1][P][Q]
+final_layer_dims: {'S0', 'R1', 'R0', 'X0', 'Z1', 'S1', 'Q', 'P', 'C0', 'Y0', 'C1'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Z1', 'P', 'Q']
+INFO: Arch: Eyeriss_Constrained_2L_tile1_64x196: identified intermediate dimensions: {'Z0'}
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension R1 in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+WARNING: Arch: Eyeriss_Constrained_2L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z0: 128) to (Z0: 2) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_2L_tile1_64x196 -> Level: OutRegister: updating constraint (Z1: 128) to (Z1: 2) to fit the computation.
+  ✓ block2 (2L): E=8.105e+03 μJ, L=2.087e+07 cc, MOPs=(8180916224, 3242573824)
+[Constrained Eyeriss] 3 layers, tile_size=1
+  DRAM: {'Q': 56, 'P': 56, 'X0': 56, 'Y0': 56, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 56, 'Y1': 56, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'X0': 1, 'Y0': 1, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 1, 'Y1': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1}
+  SACols: {'Q': 1, 'Z2': 64}
+  SARows_0: {'S0': 3, 'C0': 64, 'Z0': 1}
+  SARows_1: {'S1': 3, 'C1': 64, 'Z1': 1}
+  SARows_2: {'S2': 3, 'C2': 64, 'Z2': 1}
+Creating architecture: Eyeriss_Constrained_3L_tile1_64x196 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+final_layer_dims: {'R0', 'R2', 'Z2', 'X0', 'C2', 'S2', 'Q', 'P', 'C0', 'Y0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: Eyeriss_Constrained_3L_tile1_64x196: identified intermediate dimensions: {'R1', 'Y1', 'Z1', 'S1', 'X1', 'Z0', 'C1'}
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension R1 in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z0: 256) to (Z0: 4) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z1: 256) to (Z1: 4) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: OutRegister: updating constraint (Z2: 256) to (Z2: 4) to fit the computation.
+  ✓ block3 (3L): E=1.265e+04 μJ, L=1.686e+07 cc, MOPs=(12110348288, 5013184512)
+[Constrained Eyeriss] 3 layers, tile_size=1
+  DRAM: {'Q': 28, 'P': 28, 'X0': 28, 'Y0': 28, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 28, 'Y1': 28, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'X0': 1, 'Y0': 1, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 1, 'Y1': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1}
+  SACols: {'Q': 1, 'Z2': 64}
+  SARows_0: {'S0': 3, 'C0': 64, 'Z0': 1}
+  SARows_1: {'S1': 3, 'C1': 64, 'Z1': 1}
+  SARows_2: {'S2': 3, 'C2': 64, 'Z2': 1}
+Creating architecture: Eyeriss_Constrained_3L_tile1_64x196 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+final_layer_dims: {'R0', 'R2', 'Z2', 'X0', 'C2', 'S2', 'Q', 'P', 'C0', 'Y0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: Eyeriss_Constrained_3L_tile1_64x196: identified intermediate dimensions: {'R1', 'Y1', 'Z1', 'S1', 'X1', 'Z0', 'C1'}
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension R1 in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z0: 512) to (Z0: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z1: 512) to (Z1: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: OutRegister: updating constraint (Z2: 512) to (Z2: 8) to fit the computation.
+  ✓ block4 (3L): E=1.243e+04 μJ, L=8.430e+06 cc, MOPs=(11609399296, 4818702336)
+[Constrained Eyeriss] 3 layers, tile_size=1
+  DRAM: {'Q': 14, 'P': 14, 'X0': 14, 'Y0': 14, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 14, 'Y1': 14, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1}
+  GlobalBuffer: {'Q': 1, 'P': 1, 'X0': 1, 'Y0': 1, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 1, 'Y1': 1, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1}
+  SACols: {'Q': 1, 'Z2': 64}
+  SARows_0: {'S0': 3, 'C0': 64, 'Z0': 1}
+  SARows_1: {'S1': 3, 'C1': 64, 'Z1': 1}
+  SARows_2: {'S2': 3, 'C2': 64, 'Z2': 1}
+Creating architecture: Eyeriss_Constrained_3L_tile1_64x196 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+final_layer_dims: {'R0', 'R2', 'Z2', 'X0', 'C2', 'S2', 'Q', 'P', 'C0', 'Y0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: Eyeriss_Constrained_3L_tile1_64x196: identified intermediate dimensions: {'R1', 'Y1', 'Z1', 'S1', 'X1', 'Z0', 'C1'}
+INFO: Added high constraint for intermediate dimension P in level InRegister
+INFO: Added high constraint for intermediate dimension R1 in level InRegister
+INFO: Added high constraint for intermediate dimension P in level WRegister
+INFO: Added high constraint for intermediate dimension R1 in level WRegister
+INFO: Added high constraint for intermediate dimension P in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension R1 in level IntermediateRegister
+INFO: Added high constraint for intermediate dimension P in level OutRegister
+INFO: Added high constraint for intermediate dimension R1 in level OutRegister
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z0: 512) to (Z0: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: IntermediateRegister: updating constraint (Z1: 512) to (Z1: 8) to fit the computation.
+WARNING: Arch: Eyeriss_Constrained_3L_tile1_64x196 -> Level: OutRegister: updating constraint (Z2: 512) to (Z2: 8) to fit the computation.
+  ✓ block5 (3L): E=3.863e+03 μJ, L=2.408e+06 cc, MOPs=(3399477248, 1445570560)
+
+====================================================================================================
+FUSION COMPARISON RESULTS: VGG16 (EYERISS)
+====================================================================================================
+Level                        Energy (μJ)   Latency (cc)            EDP       DRAM Reads      DRAM Writes
+----------------------------------------------------------------------------------------------------
+Full Fusion                    4.245e+04      8.159e+07       3.51e+06       14,860,992          100,352
+Σ Singles (CS1)                3.213e+03      8.159e+07       2.62e+11       23,792,320       13,547,520
+Σ Intermediate (CS2)           4.260e+04      8.159e+07       3.48e+12       16,366,272        6,121,472
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+RATIOS (Full Fusion / Baseline) — values < 1.0 mean fusion wins
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Comparison                              Energy    Latency            EDP   DRAM Rds   DRAM Wrs
+----------------------------------------------------------------------------------------------------
+CS1: Full / Σ Singles                  13.2117     1.0000         0.0000     0.6246     0.0074
+    → Savings (%)                     -1221.2%      +0.0%        +100.0%     +37.5%     +99.3%
+CS2: Full / Σ Intermediate              0.9965     1.0000         0.0000     0.9080     0.0164
+    → Savings (%)                        +0.3%      +0.0%        +100.0%      +9.2%     +98.4%
+
+──────────────────────────────────────────────────────────────────────────────────────────
+CS1 vs CS2: Intermediate fusion captures how much of full fusion benefit?
+====================================================================================================
+
+Results exported to: results/results_20260212_122546.csv
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Total experiments: 19
+Successful: 19
+Failed: 0
+
+────────────────────────────────────────────────────────────────────────────────
+Results by workload:
+────────────────────────────────────────────────────────────────────────────────
+
+VGG16:
+  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=4.25e+04μJ, L=8.16e+07cc, EDP=3.51e+06
+  single/L0, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.44e+02μJ, L=7.33e+06cc, EDP=1.06e+03
+  single/L1, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=8.52e+02μJ, L=2.57e+07cc, EDP=2.19e+04
+  single/L2, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=3.46e+02μJ, L=8.03e+06cc, EDP=2.78e+03
+  single/L3, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=4.31e+02μJ, L=1.28e+07cc, EDP=5.53e+03
+  single/L4, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.81e+02μJ, L=4.01e+06cc, EDP=7.29e+02
+  single/L5, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=2.32e+02μJ, L=6.42e+06cc, EDP=1.49e+03
+  single/L6, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=2.32e+02μJ, L=6.42e+06cc, EDP=1.49e+03
+  single/L7, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.24e+02μJ, L=2.01e+06cc, EDP=2.51e+02
+  single/L8, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.82e+02μJ, L=3.21e+06cc, EDP=5.93e+02
+  single/L9, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.82e+02μJ, L=3.21e+06cc, EDP=5.93e+02
+  single/L10, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.02e+02μJ, L=8.03e+05cc, EDP=8.39e+01
+  single/L11, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.02e+02μJ, L=8.03e+05cc, EDP=8.39e+01
+  single/L12, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.02e+02μJ, L=8.03e+05cc, EDP=8.39e+01
+  block/block1, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=5.55e+03μJ, L=3.30e+07cc, EDP=1.90e+05
+  block/block2, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=8.10e+03μJ, L=2.09e+07cc, EDP=1.71e+05
+  block/block3, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.27e+04μJ, L=1.69e+07cc, EDP=2.15e+05
+  block/block4, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=1.24e+04μJ, L=8.43e+06cc, EDP=1.05e+05
+  block/block5, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 196, pe_cols: 64 -> E=3.86e+03μJ, L=2.41e+06cc, EDP=9.35e+03

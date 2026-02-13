@@ -24,6 +24,7 @@ from computations import (
     conv_2layers_coupling,
     conv_3layers_coupling,
     conv_4layers_coupling,
+    conv_5layers_coupling,
     conv_8layers_coupling,
     conv_13layers_coupling,
     conv_17layers_coupling
@@ -303,15 +304,6 @@ fsrcnn_tdc_3layer_fused = {
         Y1=540, X1=960, Z1=12,
         C2=12, R2=3, S2=3, Z2=12  # L2: 3×3, 12→12
     ),
-    # L2 + L3 + L4: Mapping layers 1-3 (all 3×3, 12→12)
-    'L2_L3_L4': Shape(
-        P=540, Q=960,
-        C0=12, R0=3, S0=3,
-        Y0=540, X0=960, Z0=12,
-        C1=12, R1=3, S1=3,
-        Y1=540, X1=960, Z1=12,
-        C2=12, R2=3, S2=3, Z2=12
-    ),
     # L3 + L4 + L5: Mapping layers 2-4 (all 3×3, 12→12)
     'L3_L4_L5': Shape(
         P=540, Q=960,
@@ -321,15 +313,20 @@ fsrcnn_tdc_3layer_fused = {
         Y1=540, X1=960, Z1=12,
         C2=12, R2=3, S2=3, Z2=12
     ),
-    # L5 + L6 + L7: Mapping4 + Expanding + Output
-    'L5_L6_L7_output': Shape(
+    # L6 + L7: Expanding (1×1) + Output (3×3)
+    'L6_L7_expanding_output': Shape(
         P=540, Q=960,
-        C0=12, R0=3, S0=3,       # L5: 3×3, 12→12
-        Y0=540, X0=960, Z0=12,
-        C1=12, R1=1, S1=1,       # L6: 1×1, 12→56
-        Y1=540, X1=960, Z1=56,
-        C2=56, R2=3, S2=3, Z2=16  # L7: 3×3, 56→16
+        C0=12, R0=1, S0=1,       # L6: 1×1, 12→56
+        Y0=540, X0=960, Z0=56,
+        C1=56, R1=3, S1=3, Z1=16  # L7: 3×3, 56→16
     ),
+}
+
+# Per-variant couplings for FSRCNN-TDC 3-layer level (L6_L7 is only 2 layers)
+fsrcnn_tdc_3layer_couplings = {
+    'L0_L1_L2': conv_3layers_coupling,
+    'L3_L4_L5': conv_3layers_coupling,
+    'L6_L7_expanding_output': conv_2layers_coupling,
 }
 
 # 4-layer fused FSRCNN-TDC (all mapping layers)
@@ -467,25 +464,24 @@ mccnn_single_layers = {
 # 2-layer fused MC-CNN
 mccnn_2layer_fused = {
     'L0_L1': Shape(
-        C0=1, Z=32, R0=3, S0=3,
-        Y=376, X=1242,
-        C1=32, C2=32, R1=3, S1=3,
-        P=376, Q=1242
+        P=376, Q=1242,
+        C0=1, R0=3, S0=3,
+        Y0=376, X0=1242, Z0=32,
+        C1=32, R1=3, S1=3, Z1=32
     ),
     'L2_L3': Shape(
-        C0=32, Z=32, R0=3, S0=3,
-        Y=376, X=1242,
-        C1=32, C2=32, R1=3, S1=3,
-        P=376, Q=1242
+        P=376, Q=1242,
+        C0=32, R0=3, S0=3,
+        Y0=376, X0=1242, Z0=32,
+        C1=32, R1=3, S1=3, Z1=32
     ),
 }
 
 # 4-layer fully fused MC-CNN (entire network fused)
 # Uses conv_4layers_coupling from computations.py
 mccnn_4layer_fused = Shape(
-    P=376, Q=1242, Z3=32,
     # Layer 3 (output layer)
-    C3=32, R3=3, S3=3,
+    P=376, Q=1242, Z3=32, C3=32, R3=3, S3=3,
     # Layer 2
     Y2=376, X2=1242, Z2=32, C2=32, R2=3, S2=3,
     # Layer 1
@@ -514,6 +510,7 @@ mccnn_4layer_coupling = conv_4layers_coupling
 # Single-layer VGG16 shapes (from computations.py)
 from computations import comp_vgg_16 as vgg16_single_layers
 
+
 # Block-based fusion for VGG16 (layers within each block share spatial dimensions)
 # Block 1: L0+L1 (2 layers, 224x224, 64 channels) - uses conv_2layers_coupling
 vgg16_block1_fused = Shape(
@@ -521,44 +518,34 @@ vgg16_block1_fused = Shape(
     C1=64, R1=3, S1=3,
     Y0=224, X0=224, Z0=64, R0=3, S0=3, C0=3
 )
-
+    
 # Block 2: L2+L3 (2 layers, 112x112, 128 channels) - uses conv_2layers_coupling
 vgg16_block2_fused = Shape(
-    P=112, Q=112, Z1=128,
-    C1=128, R1=3, S1=3,
-    Y0=112, X0=112, Z0=128, R0=3, S0=3, C0=64
+    P=112, Q=112, Z1=128, C1=128, R1=3, S1=3, 
+    Y0=112, X0=112, Z0=128, R0=3, S0=3, C0=64, Pstride0=2, Qstride0=2,
 )
 
 # Block 3: L4+L5+L6 (3 layers, 56x56, 256 channels) - uses conv_3layers_coupling
 vgg16_block3_fused = Shape(
-    P=56, Q=56, Z2=256,
-    C2=256, R2=3, S2=3,
+    P=56, Q=56, Z2=256, C2=256, R2=3, S2=3,
     Y1=56, X1=56, Z1=256, C1=256, R1=3, S1=3,
-    Y0=56, X0=56, Z0=256, R0=3, S0=3, C0=128
+    Y0=56, X0=56, Z0=256, R0=3, S0=3, C0=128, Pstride0=2, Qstride0=2
 )
 
 # Block 4: L7+L8+L9 (3 layers, 28x28, 512 channels) - uses conv_3layers_coupling
 vgg16_block4_fused = Shape(
-    P=28, Q=28, Z2=512,
-    C2=512, R2=3, S2=3,
+    P=28, Q=28, Z2=512, C2=512, R2=3, S2=3,
     Y1=28, X1=28, Z1=512, C1=512, R1=3, S1=3,
-    Y0=28, X0=28, Z0=512, R0=3, S0=3, C0=256
+    Y0=28, X0=28, Z0=512, R0=3, S0=3, C0=256, Pstride0=2, Qstride0=2
 )
+
 
 # Block 5: L10+L11+L12 (3 layers, 14x14, 512 channels) - uses conv_3layers_coupling
 vgg16_block5_fused = Shape(
-    P=14, Q=14, Z2=512,
-    C2=512, R2=3, S2=3,
+    # Output (after L12 = conv5_3)
+    P=14, Q=14, Z2=512, C2=512, R2=3, S2=3,
     Y1=14, X1=14, Z1=512, C1=512, R1=3, S1=3,
-    Y0=14, X0=14, Z0=512, R0=3, S0=3, C0=512
-)
-
-# FC layers: L13+L14+L15 (3 layers, 1x1) - uses conv_3layers_coupling
-vgg16_fc_fused = Shape(
-    P=1, Q=1, Z2=1000,
-    C2=4096, R2=1, S2=1,
-    Y1=1, X1=1, Z1=4096, C1=4096, R1=1, S1=1,
-    Y0=1, X0=1, Z0=4096, R0=1, S0=1, C0=25088
+    Y0=14, X0=14, Z0=512, R0=3, S0=3, C0=512, Pstride0=2, Qstride0=2
 )
 
 # Dictionary of all VGG16 block fusions
@@ -568,7 +555,6 @@ vgg16_block_fused = {
     'block3': vgg16_block3_fused,  # L4+L5+L6, 3 layers
     'block4': vgg16_block4_fused,  # L7+L8+L9, 3 layers
     'block5': vgg16_block5_fused,  # L10+L11+L12, 3 layers
-    'fc': vgg16_fc_fused,          # L13+L14+L15, 3 layers
 }
 
 # Couplings for each block
@@ -578,7 +564,6 @@ vgg16_block_couplings = {
     'block3': conv_3layers_coupling,
     'block4': conv_3layers_coupling,
     'block5': conv_3layers_coupling,
-    'fc': conv_3layers_coupling,
 }
 
 # =============================================================================
@@ -597,9 +582,7 @@ vgg16_block_couplings = {
 # =============================================================================
 vgg16_full_fused = Shape(
     # Output (after L12 = conv5_3)
-    P=14, Q=14, Z12=512,
-    # Layer 12 (conv5_3): 512->512, 14x14
-    C12=512, R12=3, S12=3,
+    P=14, Q=14, Z12=512, C12=512, R12=3, S12=3,
     # Layer 11 (conv5_2): 512->512, 14x14
     Y11=14, X11=14, Z11=512, C11=512, R11=3, S11=3,
     # Layer 10 (conv5_1): 512->512, 14x14 (after pool4 from 28x28)
@@ -652,60 +635,132 @@ vgg16_full_coupling = conv_13layers_coupling
 from computations import comp_resnet_18 as resnet18_single_layers
 
 # Block-based fusion for ResNet18
-# Stage 1 (Conv2_x): L1+L2+L3+L4 (4 layers, 56x56, 64 channels) - uses conv_4layers_coupling
+# Stage 1 (Conv2_x): L0+L1+L2+L3+L4 (5 layers, 56x56, 64 channels) - uses conv_4layers_coupling
 resnet18_stage1_fused = Shape(
-    P=56, Q=56, Z3=64,
-    C3=64, R3=3, S3=3,
+    # Layer 4 (L4_conv2_2_2): 64->64, 56x56
+    P=56, Q=56, Z4=64, C4=64, R4=3, S4=3,
+    # Layer 3 (L3_conv2_2_1): 64->64, 56x56
+    Y3=56, X3=56, Z3=64, C3=64, R3=3, S3=3,
+    # Layer 2 (L2_conv2_1_2): 64->64, 56x56
     Y2=56, X2=56, Z2=64, C2=64, R2=3, S2=3,
+    # Layer 1 (L1_conv2_1_1): 64->64, 56x56
     Y1=56, X1=56, Z1=64, C1=64, R1=3, S1=3,
-    Y0=56, X0=56, Z0=64, R0=3, S0=3, C0=64
+    # Layer 0 (L0_conv1): 3->64, 112x112 (stride 2 from 112x112)
+    Y0=112, X0=112, Z0=64, R0=7, S0=7, C0=3, Pstride0=2, Qstride0=2
 )
 
-# Stage 2 Block 2 only (Conv3_2): L8+L9 (2 layers, 28x28, 128 channels)
-# Note: L5+L6 have stride, so we fuse L8+L9 only
+# Stage 2: L5+L6+L7+L8(4 layers, 28x28, 128 channels)
 resnet18_stage2_b2_fused = Shape(
-    P=28, Q=28, Z1=128,
-    C1=128, R1=3, S1=3,
-    Y0=28, X0=28, Z0=128, R0=3, S0=3, C0=128
+    # Layer 8 (L9_conv3_2_2): 128->128, 28x28
+    P=28, Q=28, Z3=128, C3=128, R3=3, S3=3,
+    # Layer 7 (L8_conv3_2_1): 128->128, 28x28
+    Y2=28, X2=28, Z2=128, C2=128, R2=3, S2=3,
+    # Layer 6 (L6_conv3_1_2): 128->128, 28x28
+    Y1=28, X1=28, Z1=128, C1=128, R1=3, S1=3,
+    # Layer 5 (L5_conv3_1_1): 64->128, 28x28 (stride 2 from 56x56)
+    Y0=56, X0=56, Z0=128, C0=64, R0=3, S0=3, Pstride0=2, Qstride0=2,
 )
 
-# Stage 3 Block 2 only (Conv4_2): L13+L14 (2 layers, 14x14, 256 channels)
+
+# Stage 3: L9+L10+L11+L12 (4 layers, 14x14, 256 channels)
 resnet18_stage3_b2_fused = Shape(
-    P=14, Q=14, Z1=256,
-    C1=256, R1=3, S1=3,
-    Y0=14, X0=14, Z0=256, R0=3, S0=3, C0=256
+    # Layer 12 (L14_conv4_2_2): 256->256, 14x14
+    P=14, Q=14, Z3=256, C3=256, R3=3, S3=3,
+    # Layer 11 (L13_conv4_2_1): 256->256, 14x14
+    Y2=14, X2=14, Z2=256, C2=256, R2=3, S2=3,
+    # Layer 10 (L11_conv4_1_2): 256->256, 14x14
+    Y1=14, X1=14, Z1=256, C1=256, R1=3, S1=3,
+    # Layer 9 (L10_conv4_1_1): 128->256, 14x14 (stride 2 from 28x28)
+    Y0=28, X0=28, Z0=256, C0=128, R0=3, S0=3, Pstride0=2, Qstride0=2,
+    
+    
 )
 
-# Stage 4 Block 2 only (Conv5_2): L18+L19 (2 layers, 7x7, 512 channels)
+# Stage 4: L13+L14+L15+L16 (4 layers, 7x7, 512 channels)
 resnet18_stage4_b2_fused = Shape(
-    P=7, Q=7, Z1=512,
-    C1=512, R1=3, S1=3,
-    Y0=7, X0=7, Z0=512, R0=3, S0=3, C0=512
-)
+    # Output (7x7, 512 channels)
+    P=7, Q=7, Z3=512, C3=512, R3=3, S3=3,
+    # Layer 15 (L18_conv5_2_1): 512->512, 7x7
+    Y2=7, X2=7, Z2=512, C2=512, R2=3, S2=3,
+    # Layer 14 (L16_conv5_1_2): 512->512, 7x7
+    Y1=7, X1=7, Z1=512, C1=512, R1=3, S1=3,
+    # Layer 13 (L15_conv5_1_1): 256->512, 7x7 (stride 2 from 14x14)
+    Y0=14, X0=14, Z0=512, C0=256, R0=3, S0=3, Pstride0=2, Qstride0=2,
+    )
 
 # Dictionary of all ResNet18 block fusions
 resnet18_block_fused = {
-    'stage1': resnet18_stage1_fused,       # L1+L2+L3+L4, 4 layers, 56x56
-    'stage2_b2': resnet18_stage2_b2_fused, # L8+L9, 2 layers, 28x28
-    'stage3_b2': resnet18_stage3_b2_fused, # L13+L14, 2 layers, 14x14
-    'stage4_b2': resnet18_stage4_b2_fused, # L18+L19, 2 layers, 7x7
+    'stage1': resnet18_stage1_fused,       # L0+L1+L2+L3+L4, 5 layers, 56x56
+    'stage2_b2': resnet18_stage2_b2_fused, # L5+L6+L7+L8, 4 layers, 28x28
+    'stage3_b2': resnet18_stage3_b2_fused, # L9+L10+L11+L12, 4 layers, 14x14
+    'stage4_b2': resnet18_stage4_b2_fused, # L13+L14+L15+L16, 4 layers, 7x7
 }
 
 # Couplings for each block
 resnet18_block_couplings = {
-    'stage1': conv_4layers_coupling,
-    'stage2_b2': conv_2layers_coupling,
-    'stage3_b2': conv_2layers_coupling,
-    'stage4_b2': conv_2layers_coupling,
+    'stage1': conv_5layers_coupling,
+    'stage2_b2': conv_4layers_coupling,
+    'stage3_b2': conv_4layers_coupling,
+    'stage4_b2': conv_4layers_coupling,
 }
 
 # 2-layer fused segments (for finer granularity)
+# Covers all 17 fused layers without overlap:
+# s1b1(2) + s1b2(3) + s2b1(2) + s2b2(2) + s3b1(2) + s3b2(2) + s4b1(2) + s4b2(2) = 17
 resnet18_2layer_fused = {
-    's1b1': Shape(P=56, Q=56, Z1=64, C1=64, R1=3, S1=3, Y0=56, X0=56, Z0=64, R0=3, S0=3, C0=64),  # L1+L2
-    's1b2': Shape(P=56, Q=56, Z1=64, C1=64, R1=3, S1=3, Y0=56, X0=56, Z0=64, R0=3, S0=3, C0=64),  # L3+L4
-    's2b2': Shape(P=28, Q=28, Z1=128, C1=128, R1=3, S1=3, Y0=28, X0=28, Z0=128, R0=3, S0=3, C0=128),  # L8+L9
-    's3b2': Shape(P=14, Q=14, Z1=256, C1=256, R1=3, S1=3, Y0=14, X0=14, Z0=256, R0=3, S0=3, C0=256),  # L13+L14
-    's4b2': Shape(P=7, Q=7, Z1=512, C1=512, R1=3, S1=3, Y0=7, X0=7, Z0=512, R0=3, S0=3, C0=512),  # L18+L19
+    # Stage 1, block 1: L0+L1 (7x7 stride2 + 3x3)
+    's1b1': Shape(
+        P=56, Q=56, Z1=64, C1=64, R1=3, S1=3,
+        Y0=112, X0=112, Z0=64, R0=7, S0=7, C0=3, Pstride0=2, Qstride0=2
+    ),
+    # Stage 1, block 2: L2+L3+L4 (3 layers, all 56x56, 64ch — odd remainder)
+    's1b2': Shape(
+        P=56, Q=56, Z2=64, C2=64, R2=3, S2=3,
+        Y1=56, X1=56, Z1=64, C1=64, R1=3, S1=3,
+        Y0=56, X0=56, Z0=64, R0=3, S0=3, C0=64
+    ),
+    # Stage 2, block 1: L5+L6 (stride 2 on L5, 64→128)
+    's2b1': Shape(
+        P=28, Q=28, Z1=128, C1=128, R1=3, S1=3,
+        Y0=56, X0=56, Z0=128, C0=64, R0=3, S0=3, Pstride0=2, Qstride0=2
+    ),
+    # Stage 2, block 2: L8+L9 (28x28, 128ch)
+    's2b2': Shape(
+        P=28, Q=28, Z1=128, C1=128, R1=3, S1=3,
+        Y0=28, X0=28, Z0=128, C0=128, R0=3, S0=3
+    ),
+    # Stage 3, block 1: L10+L11 (stride 2 on L10, 128→256)
+    's3b1': Shape(
+        P=14, Q=14, Z1=256, C1=256, R1=3, S1=3,
+        Y0=28, X0=28, Z0=256, C0=128, R0=3, S0=3, Pstride0=2, Qstride0=2
+    ),
+    # Stage 3, block 2: L13+L14 (14x14, 256ch)
+    's3b2': Shape(
+        P=14, Q=14, Z1=256, C1=256, R1=3, S1=3,
+        Y0=14, X0=14, Z0=256, C0=256, R0=3, S0=3
+    ),
+    # Stage 4, block 1: L15+L16 (stride 2 on L15, 256→512)
+    's4b1': Shape(
+        P=7, Q=7, Z1=512, C1=512, R1=3, S1=3,
+        Y0=14, X0=14, Z0=512, C0=256, R0=3, S0=3, Pstride0=2, Qstride0=2
+    ),
+    # Stage 4, block 2: L18+L19 (7x7, 512ch)
+    's4b2': Shape(
+        P=7, Q=7, Z1=512, C1=512, R1=3, S1=3,
+        Y0=7, X0=7, Z0=512, C0=512, R0=3, S0=3
+    ),
+}
+
+# Per-variant couplings for ResNet18 2-layer level (s1b2 is 3-layer)
+resnet18_2layer_couplings = {
+    's1b1': conv_2layers_coupling,
+    's1b2': conv_3layers_coupling,   # 3 layers (odd remainder from stage1)
+    's2b1': conv_2layers_coupling,
+    's2b2': conv_2layers_coupling,
+    's3b1': conv_2layers_coupling,
+    's3b2': conv_2layers_coupling,
+    's4b1': conv_2layers_coupling,
+    's4b2': conv_2layers_coupling,
 }
 
 # =============================================================================

@@ -70,7 +70,6 @@ def run_engine(arch : Arch, comp : Shape, coupling : Coupling, bias_read : bool,
         end_time = time.time() - start_time
         
         edp = EDP(arch, bias_read, True)
-        ## DOUBT potential error
         mops = MOPs(arch)
         energy = Energy(arch, True)
         latency = Latency(arch)

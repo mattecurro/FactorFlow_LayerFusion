@@ -1245,24 +1245,150 @@ class EyerissArchConfig:
 
 def get_eyeriss_energy_values(config: EyerissArchConfig) -> dict:
     """
-    Get energy values for Eyeriss-like architecture.
+    Get energy values for Eyeriss-like architecture using Accelergy.
     
-    Uses fixed energy values from arch_eyeriss_conv, scaled by technology.
+    Derives energy-per-access from actual memory sizes using the same Accelergy
+    estimators used by DepFiN (smartbuffer_registerfile for registers, 
+    aclg_energy_mem/SRAM for GlobalBuffer, aclg_energy_mem/DRAM for DRAM).
+    
+    This makes Eyeriss energy size-dependent: larger registers/buffers have
+    higher energy per access, enabling fair comparisons when register sizes
+    differ between fusion levels.
+    
+    Falls back to hardcoded arch_eyeriss_conv values if Accelergy is unavailable.
     """
-    # Base energy values from arch_eyeriss_conv (pJ per access)
+    try:
+        print("------ loading Accelergy for Eyeriss ------")
+        from architectures.arch_hw_data import (
+            aclg_energy_mem,
+            aclg_energy_mul,
+            aclg_energy_add,
+            smartbuffer_registerfile,
+            accelergy_estimate_energy
+        )
+    except (ImportError, Exception) as e:
+        print(f"WARNING: Accelergy not available for Eyeriss ({e}), using hardcoded energy values")
+        return _get_eyeriss_energy_values_hardcoded(config)
+    
+    try:
+        cycle_seconds = 1.075e-09  # ~930 MHz (same as DepFiN)
+        arguments = {"global_cycle_seconds": cycle_seconds}
+        precision = 8  # 8-bit data
+        
+        # === DRAM Energy ===
+        DRAM_attributes = {
+            "type": "LPDDR4",
+            "width": 64,
+            "technology": config.technology,
+            "cycle_seconds": cycle_seconds
+        }
+        dram_energy_per_access = aclg_energy_mem("DRAM", DRAM_attributes, "read", arguments)
+        # Eyeriss uses per-operand energy (not per-byte), DRAM access = 8 bytes
+        dram_energy_per_operand = dram_energy_per_access / 8
+        
+        # === GlobalBuffer Energy (SRAM) ===
+        gb_size_bits = config.global_buffer_size_B
+        gb_word_bits = 64  # 64-bit bus (same as arch_eyeriss_conv bandwidth=32 at 16b)
+        gb_depth = math.ceil(gb_size_bits / gb_word_bits)
+        
+        GB_attributes = {
+            "n_rd_ports": 1,
+            "n_wr_ports": 1,
+            "n_rdwr_ports": 0,
+            "depth": gb_depth,
+            "width": gb_word_bits,
+            "technology": config.technology,
+            "cycle_seconds": cycle_seconds,
+            "global_cycle_seconds": cycle_seconds,
+            "n_banks": 1
+        }
+        gb_energy_per_access = aclg_energy_mem("SRAM", GB_attributes, "read", arguments)
+        # Convert to per-operand (1 operand = precision/8 bytes = 1 byte for 8-bit)
+        gb_bytes_per_access = gb_word_bits // 8
+        gb_energy_per_operand = gb_energy_per_access / gb_bytes_per_access
+        
+        # === Weight Register Energy ===
+        wreg_depth = max(1, config.weight_reg_entries)
+        wreg_word_bits = precision
+        wreg_energy_per_access = smartbuffer_registerfile(
+            wreg_depth, wreg_word_bits, precision,
+            cycle_seconds, config.technology, "read"
+        )
+        wreg_energy_per_operand = wreg_energy_per_access / max(1, wreg_word_bits // 8)
+        
+        # === Input Register Energy ===
+        inreg_depth = max(1, config.input_reg_entries)
+        inreg_word_bits = precision
+        inreg_energy_per_access = smartbuffer_registerfile(
+            inreg_depth, inreg_word_bits, precision,
+            cycle_seconds, config.technology, "read"
+        )
+        inreg_energy_per_operand = inreg_energy_per_access / max(1, inreg_word_bits // 8)
+        
+        # === Output Register Energy ===
+        outreg_depth = max(1, config.output_reg_entries)
+        outreg_word_bits = precision
+        outreg_energy_per_access = smartbuffer_registerfile(
+            outreg_depth, outreg_word_bits, precision,
+            cycle_seconds, config.technology, "read"
+        )
+        outreg_energy_per_operand = outreg_energy_per_access / max(1, outreg_word_bits // 8)
+        
+        # === Intermediate Register Energy (for layer fusion) ===
+        intreg_depth = max(1, config.intermediate_out_reg_entries)
+        intreg_word_bits = precision
+        intreg_energy_per_access = smartbuffer_registerfile(
+            intreg_depth, intreg_word_bits, precision,
+            cycle_seconds, config.technology, "read"
+        )
+        intreg_energy_per_operand = intreg_energy_per_access / max(1, intreg_word_bits // 8)
+        
+        # === Compute Energy (FMA) ===
+        type_multiplier = "aladdin_multiplier"
+        width_multiplier = 2 * precision  # 8x8 -> 16-bit result
+        multiplier_energy = aclg_energy_mul(
+            type_multiplier, width_multiplier, precision,
+            config.technology, "read", arguments
+        )
+        type_adder = "aladdin_adder"
+        adder_energy = aclg_energy_add(
+            type_adder, 2 * precision,  # 16-bit accumulator
+            config.technology, "read", arguments
+        )
+        compute_energy = multiplier_energy + adder_energy
+        
+        # Apply technology scaling
+        scale = config.technology_scale
+        
+        return {
+            'dram_energy': dram_energy_per_operand * scale,
+            'global_buffer_energy': gb_energy_per_operand * scale,
+            'input_reg_energy': inreg_energy_per_operand * scale,
+            'weight_reg_energy': wreg_energy_per_operand * scale,
+            'output_reg_energy': outreg_energy_per_operand * scale,
+            'intermediate_reg_energy': intreg_energy_per_operand * scale,
+            'compute_energy': compute_energy * scale,
+        }
+    except Exception as e:
+        print(f"WARNING: Accelergy estimation failed for Eyeriss ({e}), using hardcoded values")
+        return _get_eyeriss_energy_values_hardcoded(config)
+
+
+def _get_eyeriss_energy_values_hardcoded(config: EyerissArchConfig) -> dict:
+    """
+    Fallback: hardcoded energy values from arch_eyeriss_conv.
+    Used when Accelergy is not available.
+    """
     base_energy = {
         'dram': 64.00,
         'global_buffer': 2.02,
         'input_reg': 0.69,
         'weight_reg': 1.97,
         'output_reg': 1.34,
-        'intermediate_reg': 1.34,  # Same as output_reg
+        'intermediate_reg': 1.34,
         'compute': 0.21,
     }
-    
-    # Scale by technology
     scale = config.technology_scale
-    
     return {
         'dram_energy': base_energy['dram'] * scale,
         'global_buffer_energy': base_energy['global_buffer'] * scale,

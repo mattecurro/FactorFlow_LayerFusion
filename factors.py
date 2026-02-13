@@ -672,6 +672,8 @@ class Factors(dict[str, dict[int, int]]):
     ## Potential BUG: Fully cached
     def memFootprint(self, tile_sizes : Shape, arch : Arch, in_bp : bool = 1, w_bp : bool = 1, out_bp : bool = 1, int_in_bp: bool = 1, int_out_bp: bool = 1) -> int:
         ## TODO: General case: Fully Cached must be managed by the innermost dim sum (Q in DepFin), but for DepFiN is fixed
+        input_FC_size = 0
+        intermediate_input_FC_size = 0
         if Settings.FULLY_CACHED:
             input_FC_size = 1
             intermediate_input_FC_size = 1    

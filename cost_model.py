@@ -603,10 +603,6 @@ If pJ_to_J is True, the returned value is in [J*cc].
 """
 def EDP(arch : Arch, bias_read : bool, pJ_to_J : bool = False) -> float:
     WMOPs, max_latency = updateStats(arch, bias_read)
-    max_latency_real = 45.2*10**7
-    vprint(f"max_latency: {max_latency}, max_latency_real (with fudge factor): {max_latency_real}")
-    vprint(f"Should be: WMOPs: {WMOPs}, EDP: {WMOPs*max_latency_real*(10**-12 if pJ_to_J else 1)}") 
-    vprint(f"My EDP: {WMOPs*max_latency*(10**-12 if pJ_to_J else 1)}")
     return WMOPs*max_latency*(10**-12 if pJ_to_J else 1)
 
 """
@@ -681,15 +677,14 @@ def Energy(arch : Arch, pJ_to_uJ : bool = False) -> float:
     return WMOPs * (10**-6 if pJ_to_uJ else 1)
 
 """
-TODO: 
 Total read and write Memory Operations (MOPs)
 """
 def MOPs(arch : Arch) -> tuple[int, int]:
     tot_reads, tot_writes = 0, 0
     for level in arch:
         if isinstance(level, MemLevel):
-            reads = level.in_reads + level.w_reads + level.out_reads
-            writes = level.in_writes + level.w_writes + level.out_writes
+            reads = level.in_reads + level.w_reads + level.out_reads + level.int_in_reads + level.int_out_reads
+            writes = level.in_writes + level.w_writes + level.out_writes + level.int_in_writes + level.int_out_writes
             tot_reads += reads
             tot_writes += writes
         elif isinstance(level, FanoutLevel):
@@ -697,3 +692,16 @@ def MOPs(arch : Arch) -> tuple[int, int]:
         elif isinstance(level, ComputeLevel):
             break
     return tot_reads, tot_writes
+
+"""
+DRAM-level Memory Operations only (first MemLevel in the architecture).
+Returns (reads, writes) for the DRAM level specifically, including
+in_reads, w_reads, out_reads, int_in_reads, int_out_reads and their write counterparts.
+"""
+def DRAM_MOPs(arch : Arch) -> tuple[int, int]:
+    for level in arch:
+        if isinstance(level, MemLevel):
+            reads = level.in_reads + level.w_reads + level.out_reads + level.int_in_reads + level.int_out_reads
+            writes = level.in_writes + level.w_writes + level.out_writes + level.int_in_writes + level.int_out_writes
+            return reads, writes
+    return 0, 0

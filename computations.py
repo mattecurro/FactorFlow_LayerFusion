@@ -71,6 +71,34 @@ conv_3layers_coupling = Coupling(
     out_coupling = ['Z2', 'P', 'Q']                                 # Out
 )
 
+# 5-layer coupling (e.g., ResNet18 stage1: L0+L1+L2+L3+L4)
+conv_5layers_coupling = Coupling(
+    dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1',
+            'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3',
+            'C4', 'R4', 'S4', 'P', 'Q', 'Z4'],
+    in_coupling = ['C0', ['Y0', 'R0'], ['X0', 'S0']],               # In
+    w_coupling= {
+        0: ['Z0', 'C0', 'R0', 'S0'],                                # W0
+        1: ['Z1', 'C1', 'R1', 'S1'],                                # W1
+        2: ['Z2', 'C2', 'R2', 'S2'],                                # W2
+        3: ['Z3', 'C3', 'R3', 'S3'],                                # W3
+        4: ['Z4', 'C4', 'R4', 'S4'],                                # W4
+    },
+    int_in_coupling = {
+        0: ['C1', ['Y1', 'R1'], ['X1', 'S1']],                      # Intermediate_In L1
+        1: ['C2', ['Y2', 'R2'], ['X2', 'S2']],                      # Intermediate_In L2
+        2: ['C3', ['Y3', 'R3'], ['X3', 'S3']],                      # Intermediate_In L3
+        3: ['C4', ['P', 'R4'], ['Q', 'S4']],                        # Intermediate_In L4 (uses output P,Q)
+    },
+    int_out_coupling = {
+        0: ['Z0', 'Y0', 'X0'],                                      # Intermediate_Out L0
+        1: ['Z1', 'Y1', 'X1'],                                      # Intermediate_Out L1
+        2: ['Z2', 'Y2', 'X2'],                                      # Intermediate_Out L2
+        3: ['Z3', 'Y3', 'X3'],                                      # Intermediate_Out L3
+    },
+    out_coupling = ['Z4', 'P', 'Q']                                 # Out
+)
+
 # 4-layer coupling for MC-CNN (layers 0-3)
 conv_4layers_coupling = Coupling(
     dims = ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'P', 'Q', 'Z3'],

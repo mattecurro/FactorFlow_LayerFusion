@@ -1,0 +1,171 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+
+==========================================================================================
+FUSION COMPARISON CASE STUDIES: VGG16
+==========================================================================================
+Architecture: DepFiN, FMEM=1056KB, WMEM=14400KB, PE=16x128
+Tile size: auto-detected per fusion level
+==========================================================================================
+
+--- FULL FUSION: vgg16/full/13layer ---
+------ loading Accelergy ------
+ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
+Creating architecture: Thesis_13Layers_1081344KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
+final_layer_dims: {'S0', 'R12', 'Z12', 'C12', 'C0', 'Q', 'Y0', 'S12', 'R0', 'X0', 'P'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Thesis_13Layers_1081344KB_FMEM_16x128_PEs: identified intermediate dimensions: {'C1', 'Z4', 'R7', 'Z10', 'Y2', 'Z3', 'Y9', 'S3', 'C4', 'X2', 'Z9', 'S2', 'X4', 'S8', 'C8', 'R2', 'R4', 'Y11', 'Z8', 'Y7', 'R5', 'C3', 'R8', 'Y8', 'Y1', 'X6', 'S5', 'Y5', 'Y10', 'X10', 'S11', 'Z7', 'Z0', 'X1', 'X8', 'C11', 'Y3', 'X9', 'S7', 'R9', 'Z1', 'X11', 'C6', 'C2', 'C10', 'S4', 'S1', 'R10', 'R1', 'Y4', 'C7', 'Y6', 'X7', 'R3', 'R6', 'S9', 'R11', 'S6', 'S10', 'X3', 'Z11', 'Z6', 'C5', 'X5', 'Z2', 'C9', 'Z5'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  ✓ Energy: 7.641e+04 μJ, Latency: 2.433e+07 cc, EDP: 3.41e+06, MOPs: (32083159744, 15373876224)
+
+--- CS1: NON-FUSED (single layers) ---
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L0: E=1.214e+02 μJ, L=2.676e+05 cc, MOPs=(12862912, 6621440)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L1: E=3.818e+02 μJ, L=1.032e+06 cc, MOPs=(143853824, 10665984)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L2: E=1.663e+02 μJ, L=5.161e+05 cc, MOPs=(71179392, 4530176)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L3: E=2.784e+02 μJ, L=1.032e+06 cc, MOPs=(139148416, 5849088)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L4: E=1.699e+02 μJ, L=1.032e+06 cc, MOPs=(78683264, 3039232)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L5: E=3.127e+02 μJ, L=2.064e+06 cc, MOPs=(155761792, 4472832)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L6: E=3.127e+02 μJ, L=2.064e+06 cc, MOPs=(155761792, 4472832)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L7: E=2.517e+02 μJ, L=2.064e+06 cc, MOPs=(97143936, 3067904)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L8: E=4.899e+02 μJ, L=4.129e+06 cc, MOPs=(193485952, 5332992)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L9: E=4.899e+02 μJ, L=4.129e+06 cc, MOPs=(193485952, 5332992)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L10: E=2.527e+02 μJ, L=2.064e+06 cc, MOPs=(68720192, 2365440)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L11: E=2.527e+02 μJ, L=2.064e+06 cc, MOPs=(68720192, 2365440)
+Creating architecture: Thesis_1Layer_1081344B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  ✓ L12: E=2.527e+02 μJ, L=2.064e+06 cc, MOPs=(68720192, 2365440)
+  [skip] L13 (not in full fusion)
+  [skip] L14 (not in full fusion)
+  [skip] L15 (not in full fusion)
+
+--- CS2: INTERMEDIATE FUSION (block) ---
+Creating architecture: Thesis_2Layers_1081344KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Z1PQ, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],, out_coupling: [Z1][P][Q]
+final_layer_dims: {'S0', 'C1', 'C0', 'Q', 'Y0', 'R0', 'S1', 'X0', 'P', 'R1', 'Z1'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Z1', 'P', 'Q']
+INFO: Arch: Thesis_2Layers_1081344KB_FMEM_16x128_PEs: identified intermediate dimensions: {'Z0'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  ✓ block1 (2L): E=9.566e+03 μJ, L=1.091e+06 cc, MOPs=(4020921024, 1949387776)
+Creating architecture: Thesis_2Layers_1081344KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Z1PQ, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],, out_coupling: [Z1][P][Q]
+final_layer_dims: {'S0', 'C1', 'C0', 'Q', 'Y0', 'R0', 'S1', 'X0', 'P', 'R1', 'Z1'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Z1', 'P', 'Q']
+INFO: Arch: Thesis_2Layers_1081344KB_FMEM_16x128_PEs: identified intermediate dimensions: {'Z0'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  ✓ block2 (2L): E=1.362e+04 μJ, L=1.550e+06 cc, MOPs=(5753085952, 2781757440)
+Creating architecture: Thesis_3Layers_1081344KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+final_layer_dims: {'S0', 'C0', 'Q', 'Y0', 'R0', 'X0', 'P', 'S2', 'Z2', 'R2', 'C2'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: Thesis_3Layers_1081344KB_FMEM_16x128_PEs: identified intermediate dimensions: {'C1', 'Z0', 'X1', 'S1', 'Y1', 'R1', 'Z1'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  ✓ block3 (3L): E=2.282e+04 μJ, L=5.164e+06 cc, MOPs=(9625919488, 4629438464)
+Creating architecture: Thesis_3Layers_1081344KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+final_layer_dims: {'S0', 'C0', 'Q', 'Y0', 'R0', 'X0', 'P', 'S2', 'Z2', 'R2', 'C2'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: Thesis_3Layers_1081344KB_FMEM_16x128_PEs: identified intermediate dimensions: {'C1', 'Z0', 'X1', 'S1', 'Y1', 'R1', 'Z1'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  ✓ block4 (3L): E=2.328e+04 μJ, L=1.032e+07 cc, MOPs=(9710710784, 4626829312)
+Creating architecture: Thesis_3Layers_1081344KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2PQZ2, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],, out_coupling: [Z2][P][Q]
+final_layer_dims: {'S0', 'C0', 'Q', 'Y0', 'R0', 'X0', 'P', 'S2', 'Z2', 'R2', 'C2'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'P', 'Q', 'Z2']
+INFO: Arch: Thesis_3Layers_1081344KB_FMEM_16x128_PEs: identified intermediate dimensions: {'C1', 'Z0', 'X1', 'S1', 'Y1', 'R1', 'Z1'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  ✓ block5 (3L): E=7.361e+03 μJ, L=6.194e+06 cc, MOPs=(2968006656, 1387968512)
+
+====================================================================================================
+FUSION COMPARISON RESULTS: VGG16 (DEPFIN)
+====================================================================================================
+Level                        Energy (μJ)   Latency (cc)            EDP       DRAM Reads      DRAM Writes
+----------------------------------------------------------------------------------------------------
+Full Fusion                    7.641e+04      2.433e+07       3.41e+06       14,860,992          100,352
+Σ Singles (CS1)                3.733e+03      2.452e+07       9.16e+10       23,792,320       13,547,520
+Σ Intermediate (CS2)           7.665e+04      2.432e+07       1.86e+12       16,366,272        6,121,472
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+RATIOS (Full Fusion / Baseline) — values < 1.0 mean fusion wins
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Comparison                              Energy    Latency            EDP   DRAM Rds   DRAM Wrs
+----------------------------------------------------------------------------------------------------
+CS1: Full / Σ Singles                  20.4683     0.9919         0.0000     0.6246     0.0074
+    → Savings (%)                     -1946.8%      +0.8%        +100.0%     +37.5%     +99.3%
+CS2: Full / Σ Intermediate              0.9969     1.0001         0.0000     0.9080     0.0164
+    → Savings (%)                        +0.3%      -0.0%        +100.0%      +9.2%     +98.4%
+
+──────────────────────────────────────────────────────────────────────────────────────────
+CS1 vs CS2: Intermediate fusion captures how much of full fusion benefit?
+  Latency: intermediate captures 100.7% of full fusion benefit
+====================================================================================================
+
+Results exported to: results/results_20260212_122131.csv
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Total experiments: 19
+Successful: 19
+Failed: 0
+
+────────────────────────────────────────────────────────────────────────────────
+Results by workload:
+────────────────────────────────────────────────────────────────────────────────
+
+VGG16:
+  full/13layer, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=7.64e+04μJ, L=2.43e+07cc, EDP=3.41e+06
+  single/L0, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=1.21e+02μJ, L=2.68e+05cc, EDP=3.33e+01
+  single/L1, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=3.82e+02μJ, L=1.03e+06cc, EDP=4.65e+02
+  single/L2, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=1.66e+02μJ, L=5.16e+05cc, EDP=1.04e+02
+  single/L3, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.78e+02μJ, L=1.03e+06cc, EDP=3.59e+02
+  single/L4, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=1.70e+02μJ, L=1.03e+06cc, EDP=2.48e+02
+  single/L5, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=3.13e+02μJ, L=2.06e+06cc, EDP=9.34e+02
+  single/L6, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=3.13e+02μJ, L=2.06e+06cc, EDP=9.34e+02
+  single/L7, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.52e+02μJ, L=2.06e+06cc, EDP=8.13e+02
+  single/L8, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=4.90e+02μJ, L=4.13e+06cc, EDP=3.20e+03
+  single/L9, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=4.90e+02μJ, L=4.13e+06cc, EDP=3.20e+03
+  single/L10, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.53e+02μJ, L=2.06e+06cc, EDP=8.26e+02
+  single/L11, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.53e+02μJ, L=2.06e+06cc, EDP=8.26e+02
+  single/L12, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.53e+02μJ, L=2.06e+06cc, EDP=8.26e+02
+  block/block1, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=9.57e+03μJ, L=1.09e+06cc, EDP=1.92e+04
+  block/block2, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=1.36e+04μJ, L=1.55e+06cc, EDP=3.90e+04
+  block/block3, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.28e+04μJ, L=5.16e+06cc, EDP=2.17e+05
+  block/block4, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=2.33e+04μJ, L=1.03e+07cc, EDP=4.39e+05
+  block/block5, fmem_size: 1056kB, wmem_size: 14400kB, pe_rows: 16, pe_cols: 128 -> E=7.36e+03μJ, L=6.19e+06cc, EDP=8.15e+04
