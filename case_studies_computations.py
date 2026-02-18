@@ -525,26 +525,23 @@ vgg16_block2_fused = Shape(
     Y0=112, X0=112, Z0=128, R0=3, S0=3, C0=64, Pstride0=2, Qstride0=2,
 )
 
-# Block 3: L4+L5+L6 (3 layers, 56x56, 256 channels) - uses conv_3layers_coupling
+# Block 3: L4+L5 (2 layers, 56x56, 256 channels) - uses conv_2layers_coupling
 vgg16_block3_fused = Shape(
-    P=56, Q=56, Z2=256, C2=256, R2=3, S2=3,
-    Y1=56, X1=56, Z1=256, C1=256, R1=3, S1=3,
+    P=56, Q=56, Z1=256, C1=256, R1=3, S1=3,
     Y0=56, X0=56, Z0=256, R0=3, S0=3, C0=128, Pstride0=2, Qstride0=2
 )
 
-# Block 4: L7+L8+L9 (3 layers, 28x28, 512 channels) - uses conv_3layers_coupling
+# Block 4: L7+L8 (2 layers, 28x28, 512 channels) - uses conv_2layers_coupling
 vgg16_block4_fused = Shape(
-    P=28, Q=28, Z2=512, C2=512, R2=3, S2=3,
-    Y1=28, X1=28, Z1=512, C1=512, R1=3, S1=3,
+    P=28, Q=28, Z1=512, C1=512, R1=3, S1=3,
     Y0=28, X0=28, Z0=512, R0=3, S0=3, C0=256, Pstride0=2, Qstride0=2
 )
 
+    
 
-# Block 5: L10+L11+L12 (3 layers, 14x14, 512 channels) - uses conv_3layers_coupling
+# Block 5: L10+L11 (2 layers, 14x14, 512 channels) - uses conv_2layers_coupling
 vgg16_block5_fused = Shape(
-    # Output (after L12 = conv5_3)
-    P=14, Q=14, Z2=512, C2=512, R2=3, S2=3,
-    Y1=14, X1=14, Z1=512, C1=512, R1=3, S1=3,
+    P=14, Q=14, Z1=512, C1=512, R1=3, S1=3,
     Y0=14, X0=14, Z0=512, R0=3, S0=3, C0=512, Pstride0=2, Qstride0=2
 )
 
@@ -552,18 +549,24 @@ vgg16_block5_fused = Shape(
 vgg16_block_fused = {
     'block1': vgg16_block1_fused,  # L0+L1, 2 layers
     'block2': vgg16_block2_fused,  # L2+L3, 2 layers
-    'block3': vgg16_block3_fused,  # L4+L5+L6, 3 layers
-    'block4': vgg16_block4_fused,  # L7+L8+L9, 3 layers
-    'block5': vgg16_block5_fused,  # L10+L11+L12, 3 layers
+    'block3': vgg16_block3_fused,  # L4+L5, 2 layers
+    'L6': Shape(C=256, M=256, P=56, Q=56, R=3, S=3),
+    'block4': vgg16_block4_fused,  # L7+L8, 2 layers
+    'L9': Shape(C=512, M=512, P=28, Q=28, R=3, S=3),
+    'block5': vgg16_block5_fused,  # L10+L11, 2 layers
+    'L12': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),
 }
 
 # Couplings for each block
 vgg16_block_couplings = {
     'block1': conv_2layers_coupling,
     'block2': conv_2layers_coupling,
-    'block3': conv_3layers_coupling,
-    'block4': conv_3layers_coupling,
-    'block5': conv_3layers_coupling,
+    'block3': conv_2layers_coupling,
+    'L6': conv_coupling,
+    'block4': conv_2layers_coupling,
+    'L9': conv_coupling,
+    'block5': conv_2layers_coupling,
+    'L12': conv_coupling  
 }
 
 # =============================================================================

@@ -19,11 +19,20 @@ Case Study: Tile Size Width Sweep with Bandwidth Scaling ----- FSRCNN 8-layer fu
   DepFiN 16×128 PEs, FMEM=1056KB, WMEM=524KB
   FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)
     
-    python3 experiment_runner.py --sweep-tile-sizes \
-    --workload fsrcnn --fusion full --variant 8layer \
-    --tile-sizes 120 64 32 16 8 2>&1
+    python3 experiment_runner.py --sweep-tile-sizes  \
+      --workload fsrcnn --fusion full --variant 8layer \
+      --wmem-size 19 --fmem-size 72 --pe-rows 16 --pe-cols 128 \
+      --tile-sizes 120 64 32 16 8 2>&1 | tee results/DF_CS1_FSRCNN.log
 
     Tried tile sizes: 120 - 64 - 32 - 16 - 8
+
+    Tile  PE Util   Energy(μJ)    Latency(cc)          EDP     Util   DRAM R   DRAM W
+  ----------------------------------------------------------------------
+      120    93.8%    8.356e+03      6.156e+06     6.01e+04   10.8%  1573992  8294400
+      64     50.0%    8.364e+03      1.154e+07     1.13e+05    0.1%  1573992  8294400
+      32     25.0%    8.381e+03      2.308e+07     2.26e+05    0.0%  1573992  8294400
+      16     12.5%    8.433e+03      4.622e+07     4.55e+05    0.0%  1573992  8294400
+      8      6.2%     8.524e+03      9.244e+07     9.18e+05    0.0%  1573992  8294400
 
     What changes in the mapping: DRAM Q/X iterations increase, SACols decrease
     
@@ -78,19 +87,17 @@ Case Study: Architecture Sweep: FMEM Size ----- FSRCNN 8-layer full fusion
 
 
     
-Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=64) ----- FSRCNN 8-layer full fusion
-  FSRCNN 8-layer full fusion, DepFiN, FMEM=1056KB, WMEM=524KB
+Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128) ----- FSRCNN 8-layer full fusion
+  FSRCNN 8-layer full fusion, DepFiN, FMEM=576KB, WMEM=19KB
 
-    python3 experiment_runner.py --sweep-arch \
-    --workload fsrcnn --fusion full --variant 8layer \
-    --fmem-sizes 1056 --wmem-sizes 524 \
-    --pe-configs 8x64 16x64 32x64 64x64 2>&1
+    python3 experiment_runner.py --sweep-arch  \
+    --workload fsrcnn --fusion full --variant 8layer  \
+    --fmem-sizes 576 --wmem-sizes 19     --pe-configs 8x128 16x128 32x128  2>&1 | tee results/DF_CS2_FSRCNN.log
 
     Config   | PEs   | Energy(μJ) | Latency(cc) | EDP
-    8×64     | 512   | 1.556e+04  | 2.125e+07   | 4.95e+05
-    16×64    | 1024  | 1.500e+04  | 1.110e+07   | 2.51e+05
-    32×64    | 2048  | 1.500e+04  | 1.070e+07   | 2.42e+05
-    64×64    | 4096  | 1.490e+04  | 1.070e+07   | 2.41e+05
+    8×128    | 1024  | 8.67e+03   | 1.148e+07   | 1.16e+05
+    16×128   | 2048  | 8.35e+03   | 6.17e+06    | 5.98e+04
+    32×128   | 4096  | 8.31e+03   | 5.909e+06   | 5.74e+04
 
     What changes in the mapping: 
       SARows Z values increase (more output channels parallelized spatially).
@@ -98,7 +105,13 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=64) ----- FSRCNN 8
       WMEM content unchanged (all weights fit in WMEM for all configs).
       Intermediate output register and output register iterations decrease (more spatial parallelism → fewer temporal iterations at WMEM/FMEM levels).
 
-      8 rows:  SARows Z7=8,  Z6=8,  Z5=6,  Z4-Z2=6, Z1=6,  Z0=8
+      FMEM Access Breakdown:
+      PE Config  | in_reads      | int_in_reads    | int_out_reads | int_out_writes
+      8x128      | 272,160,000   | 1,072,051,200   | 89,164,800    | 89,164,800
+      16x128     | 155,520,000   | 539,136,000     | 89,164,800    | 89,164,800
+      32x128     |  77,760,000   | 526,694,400     | 89,164,800    | 89,164,800
+
+    
       16 rows: SARows Z7=16, Z6=14, Z5=12, Z4-Z2=12, Z1=12, Z0=14
       32 rows: SARows Z7=16, Z6=28, Z5=12, Z4-Z2=12, Z1=12, Z0=28
       64 rows: SARows Z7=16, Z6=56, Z5=12, Z4-Z2=12, Z1=12, Z0=56
@@ -109,117 +122,176 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=64) ----- FSRCNN 8
       (more spatial parallelism → fewer reads at intermediate memory levels).
 
     Latency: two-stage saturation pattern.
-      8→16:  ~1.9× improvement. The PRIMARY bottleneck layer L7 (Z7=16) goes from
-        SARows Z7=8 to Z7=16, fully parallelizing its Z dimension.
-        This halves the temporal weight iterations for L7, nearly halving latency.
       16→32: ~3.6% improvement (1.110e+07 → 1.070e+07). L7 is already saturated, but
         L6 and L0 (Z_shape=56) are SECONDARY bottlenecks. Z6 goes from 14→28
         (temporal iterations halved from 4→2), producing a small gain.
 
-    KEY INSIGHT: Latency shows a two-stage saturation pattern.
-      (1) PRIMARY bottleneck (L7, Z7=16): saturates at 16 rows → big 1.9× improvement.
-      (2) SECONDARY bottleneck (L6, Z6=56): provides diminishing returns beyond 16 rows
-          → small 3.6% improvement from 16→32 rows.
+    Analysis:
+    - SARows maps Z0 (first layer output channels, Z0=56). More rows → more Z0
+      processed per pass → fewer reloads of Layer 0 input features from FMEM.
+    - in_reads halves each step: 272M → 156M → 78M (proportional to passes over Z0).
+    - int_in_reads drops sharply 8→16 (1,072M→539M, ~2x) but barely 16→32
+      (539M→527M, only 2.3%). The 16→32 benefit saturates because the large
+      intermediate activations (layers 2-5 have Z=4) are already covered in 1 pass.
+    - int_out_reads/writes constant at 89M (depend on spatial tiling, not Z).
+    - WMEM and DRAM completely unchanged across configs.
+    - Energy drops -3.7% (8→16) then only -0.5% (16→32): diminishing returns as
+      register-level WMOPs (~17.3B total, ~82%) dominate the energy budget.
+    - Latency drops sharply 8→16 (1.15e+07→6.12e+06, -46.8%) due to halved
+      Z0 passes, then only -3.4% (16→32) as compute parallelism saturates.
+    - The large Latency drop at 8→16 is because FSRCNN Layer 0 (C=1, Z=56, R=S=5)
+      is the latency bottleneck: with 8 rows, it needs 7 passes; with 16 rows
+      (Z0=14, a divisor of 56), it needs only 4 passes → nearly 2x speedup.
 
 
 Case Study: PE Array Sweep — Increasing PE Cols (fixed rows=16) ----- FSRCNN 8-layer full fusion
-  FSRCNN 8-layer full fusion, DepFiN, FMEM=1056KB, WMEM=524KB
+  FSRCNN 8-layer full fusion, DepFiN, FMEM=576KB, WMEM=19KB
 
   In the DepFiN architecture, the tile size is automatically set as the largest divisor of Q that fits in pe_cols
 
     python3 experiment_runner.py --sweep-arch \
     --workload fsrcnn --fusion full --variant 8layer \
-    --fmem-sizes 1056 --wmem-sizes 524 \
-    --pe-configs 16x64 16x120 16x128 16x256 2>&1
+    --fmem-sizes 576 --wmem-sizes 19 \
+    --pe-configs 16x64 16x128 16x256 --verbose 2>&1 | tee results/DF_CS3_FSRCNN.log
 
     Config   | PEs   | Energy(μJ) | Latency(cc) | EDP
-    16×64    | 1024  | 1.500e+04  | 1.110e+07   | 2.51e+05
-    16×120   | 1920  | 1.500e+04  | 6.120e+06   | 1.39e+05
-    16×128   | 2048  | 1.500e+04  | 6.120e+06   | 1.39e+05
-    16×256   | 4096  | 1.495e+04  | 3.349e+06   | 7.59e+04
+    16×64    | 1024  | 8.355e+04  | 1.110e+07   | 1.08e+05    tile 64
+    16×128   | 2048  | 8.352e+04  | 6.120e+06   | 5.98e+04    tile 120
+    16×256   | 4096  | 8.352e+04  | 3.349e+06   | 3.27e+04    tile 240
 
     What changes in the mapping:
       SACols Q/X values increase (larger tile fits spatially).
       DRAM Q/X iterations DECREASE: Q=15 → 8 → 8 → 4.
       SARows Z unchanged (always Z7=16, Z6=14, Z5-Z2=12, Z0=14).
-      WMEM content unchanged (all weights fit for all configs).
+      WMEM content unchanged (all weights fit for all configs), but change the accesses:
+      WMEM Access (changes with cols):
+        16x64  → w_reads = 152,215,200
+        16x128 → w_reads =  81,181,440   (-46.7%)
+        16x256 → w_reads =  40,590,720   (-73.3%)
+      FMEM acceses unchanged.
 
-      64 cols:  SACols Q/X = 64,  DRAM Q = 15  (tile_size = 64)
-      120 cols: SACols Q/X = 120, DRAM Q = 8   (tile_size = 120 = max divisor of 960 ≤ 120)
-      128 cols: SACols Q/X = 120, DRAM Q = 8   (tile_size = 120, NOT 128: 960%128≠0)
-      256 cols: SACols Q/X = 240, DRAM Q = 4   (tile_size = 240 = max divisor of 960 ≤ 256)
 
-    Energy: near-constant across all configs (~1.50e+04 μJ).
-      Total DRAM reads are identical (in=1,555,200, w=18,792). All weights always fit in WMEM.
-      More cols only change HOW the spatial dimensions are distributed (larger tile), 
-      not the total number of memory operations.
 
+    Energy: near-constant across all configs
+      
     Latency: consistent ~1.8× reduction each time tile size doubles.
       More cols → larger tile → fewer DRAM temporal iterations in Q/X dimensions.
       64→120: DRAM Q from 15→8 iterations. Latency halves (1.11e+07 → 6.12e+06).
       120→128: NO improvement. tile_size stays 120 (128 doesn't divide Q=960 evenly)
       128→256: DRAM Q from 8→4 iterations. Latency halves again (6.12e+06 → 3.35e+06).
     
-    Note: 120→128 cols gives ZERO improvement because tile_size = max divisor of Q ≤ pe_cols.
-      Q=960, and the max divisor of 960 ≤128 is 120 (≠128). So 8 extra PEs are unused.
-      This shows that PE cols should be chosen to match valid tile sizes for the workload.
-
-
 
 
     
 Case Study: PE Array Sweep — Changing the aspect ratio (fixed total PEs=2048)
-  FSRCNN 8-layer full fusion, DepFiN, FMEM=1056KB, WMEM=524KB
+  FSRCNN 8-layer full fusion, DepFiN, FMEM=576KB, WMEM=19KB
 
     python3 experiment_runner.py --sweep-arch \
     --workload fsrcnn --fusion full --variant 8layer \
-    --fmem-sizes 1056 --wmem-sizes 524 \
-    --pe-configs 2x1024 4x512 8x256 16x128 32x64 64x32  2>&1
+    --fmem-sizes 576 --wmem-sizes 19 \
+    --pe-configs 2x1024 4x512 8x256 16x128 32x64 64x32 128x16 256x8 512x4 2x1024 --verbose 2>&1 | tee results/DF_CS4_FSRCNN.log
     
-    Config   | Tile | DRAM Q | SARows Z7 | SARows Z6 | SARows Z1-5 | Energy(μJ) | Latency(cc) | EDP
-    2×1024   | 960  | 1      | 2         | 2         | 2           | 1.83e+04   | 8.89e+06    | 2.31e+05
-    4×512    | 480  | 2      | 4         | 4         | 4           | 1.63e+04   | 5.68e+06    | 1.37e+05  ← BEST EDP
-    8×256    | 240  | 4      | 8         | 8         | 6           | 1.55e+04   | 5.98e+06    | 1.39e+05
-    16×128   | 120  | 8      | 16        | 14        | 12          | 1.50e+04   | 6.12e+06    | 1.39e+05
-    32×64    | 64   | 15     | 16        | 28        | 12          | 1.50e+04   | 1.07e+07    | 2.42e+05
-    64×32    | 32   | 30     | 16        | 56        | 12          | 1.51e+04   | 2.11e+07    | 4.80e+05
 
-    What changes in the mapping (trade-off between SACols Q/X and SARows Z):
-      - SACols Q/X = tile_size = pe_cols  (960 → 480 → 240 → 120 → 64 → 32)
-      - SARows Z = min(pe_rows, Z_dim)  — saturates when pe_rows ≥ Z dimension
-      - DRAM Q iterations = ceil(960 / tile_size) — increases as tile shrinks
-      - FSRCNN Z dimensions: Z7=16, Z6=56, Z0=14, Z1-Z5=12
-      - Intermediate Output register iterations = ceil(Z_dim / SARows Z) — decreases as more Z parallelism
 
-    Energy: monotonic decrease from 2×1024 to 16×128, then plateau (~1.50e+04 μJ).
-      More rows → more Z parallelism → fewer temporal weight iterations at WMEM level
-      → fewer intermediate reads. Saturates once Z dimensions are fully parallelized.
-      Beyond 16 rows, only Z6 (=56) can use more rows, but it contributes
-      little extra energy saving since the bottleneck layer L7 (Z7=16) is already saturated.
+    Config   | Tile | DRAM Q | SARows Z7 | SARows Z6 | SARows Z1-5 
+    2×1024   | 960  | 1      | 2         | 2         | 2           
+    4×512    | 480  | 2      | 4         | 4         | 4           
+    8×256    | 240  | 4      | 8         | 8         | 6           
+    16×128   | 120  | 8      | 16        | 14        | 12          
+    32×64    | 64   | 15     | 16        | 28        | 12          
+    64×32    | 32   | 30     | 16        | 56        | 12          
+    128×16   | 16   | 60     | 16        | 56        | 12
+    256×8    | 8    | 120    | 16        | 56        | 12
+    512×4    | 4    | 240    | 16        | 56        | 12
 
-    Latency: Minimum at 4×512 (5.68e+06 cc).
-      Too few rows → Z under-parallelized:
-        2×1024: Tile=960 covers all of Q spatially (DRAM Q=1), but only 2 Z rows.
-          Each layer needs many temporal Z iterations (Z7=16 needs 8 passes).
-          Despite zero DRAM Q overhead, the WMEM weight-reload penalty dominates.
+    PE         Energy (μJ)   Latency (cc)    EDP
+    2x1024     1.04e+04      8.89e+06        1.05e+05
+    4x512      9.19e+03      5.68e+06        6.02e+04
+    8x256      8.66e+03      5.98e+06        6.03e+04
+    16x128     8.35e+03      6.12e+06        5.98e+04    ← EDP minimum
+    32x64      8.32e+03      1.07e+07        1.04e+05
+    64x32      8.32e+03      2.11e+07        2.05e+05
+    128x16     8.36e+03      4.22e+07        4.12e+05
+    256x8      8.45e+03      8.43e+07        8.32e+05
+    512x4      8.63e+03      1.69e+08        1.69e+06
 
-      Best SPOT (4×512 to 16×128): Latency roughly stable (~5.7M–6.1M cc).
-        Increasing rows from 4→8→16 gives more Z parallelism, but the simultaneous
-        tile shrink (480→240→120) adds more DRAM Q iterations (2→4→8).
-        
-      Too many rows → Q tile too small:
-        32×64:  Z saturated at most layers (Z7=16 ✓, Z1-5=12 ✓), but tile=64 → 
-          DRAM Q=15 iterations. The 15× Q overhead overwhelms the Z parallelism gain.
-        64×32:  Same Z saturation, tile=32 → DRAM Q=30 iterations. Latency explodes ~2×.
+    Energy:   decreases 2x1024→32x64 (–20.0 %), then nearly flat 32x64→64x32,
+              then slowly rises again 64x32→512x4 (+3.7 %).
+              Minimum at 32x64 / 64x32 (8.32e+03 μJ).
 
-      1. MORE ROWS (Z parallelism): Reduces temporal weight iterations across all layers.
-         Benefit saturates when pe_rows ≥ max(Z_dims). For FSRCNN: only Z6=56 keeps benefiting beyond 32 rows.
-      2. MORE COLS (Q tile size): Reduces DRAM temporal iterations for Q/X dimensions.
-         Benefit scales continuously (no saturation until tile=Q=960).
+    Latency:  minimum at 4x512 (5.68e+06 cc), close second 8x256 (5.98e+06).
+              Rises steeply with more rows: 64x32 = 2.11e+07, 512x4 = 1.69e+08.
+              Latency from 4x512→512x4 grows ~30× (tile shrinks 480→4).
 
-      CONCLUSION: For activation-dominant workloads like FSRCNN (large Q, small Z),
-      a column-heavy aspect ratio is preferred. The optimal ratio depends on when
-      the dominant Z dimensions saturate vs. the Q iteration cost.
+    EDP:      minimum at 16x128 (5.98e+04).
+              4x512 and 8x256 are very close (6.02e+04, 6.03e+04).
+              EDP degrades rapidly beyond 16x128 toward row-heavy configs.
+
+    Column-heavy configs (2x1024, 4x512): FMEM energy is ~4× higher because
+    few rows → many Z passes → FMEM features reloaded many times.
+    Row-heavy configs (256x8, 512x4): WMEM energy rises because tiny tile
+    → many spatial passes → weights reloaded many times.
+
+    
+    FeatureMemory:
+      PE         in_reads        int_in_reads     int_out_reads  int_out_writes  out_writes
+      2x1024     1,088,640,000   3,782,246,400    89,164,800     89,164,800      8,294,400
+      4x512        544,320,000   1,891,123,200    89,164,800     89,164,800      8,294,400
+      8x256        272,160,000   1,072,051,200    89,164,800     89,164,800      8,294,400
+      16x128       155,520,000     539,136,000    89,164,800     89,164,800      8,294,400
+      32x64         77,760,000     526,694,400    89,164,800     89,164,800      8,294,400
+      64x32         38,880,000     520,473,600    89,164,800     89,164,800      8,294,400
+      128x16        38,880,000     520,473,600    89,164,800     89,164,800      8,294,400
+      256x8         38,880,000     520,473,600    89,164,800     89,164,800      8,294,400
+      512x4         38,880,000     520,473,600    89,164,800     89,164,800      8,294,400
+
+    
+    WeightMemory w_reads:
+      PE         w_reads
+      2x1024      10,147,680
+      4x512       20,295,360
+      8x256       40,590,720
+      16x128      81,181,440
+      32x64      152,215,200
+      64x32      304,430,400
+      128x16     608,860,800
+      256x8    1,217,721,600
+      512x4    2,435,443,200
+
+      Analysis
+      --------
+      This sweep reveals the fundamental ROWS vs COLS trade-off in DepFin
+      at fixed PE budget (2048 PEs):
+
+        MORE COLS (column-heavy, e.g. 2x1024):
+        + Larger spatial tile → fewer tile passes → fewer WMEM w_reads
+        + Lower latency per tile pass
+        − Very few rows → Z mapped partially → many Z passes
+        − FMEM in_reads and int_in_reads explode (features reloaded per Z pass)
+        − Higher total energy from FMEM accesses
+
+        MORE ROWS (row-heavy, e.g. 512x4):
+        + Full Z mapping → single Z pass → FMEM accesses minimised
+        + Lower FMEM energy
+        − Tiny spatial tile → many tile passes → WMEM w_reads explode
+        − Latency scales linearly with tile passes (169M cc at 512x4)
+        − Higher WMEM energy
+
+        SWEET SPOT:
+        The EDP-optimal config is 16x128 (EDP=5.98e+04), closely followed
+        by 4x512 (6.02e+04) and 8x256 (6.03e+04).
+
+        Energy is minimised around 32x64–64x32 where Z0 is fully mapped (56)
+        and the tile is still reasonable (32–64).
+
+        Latency is minimised at 4x512 (5.68e+06 cc) where the tile (480)
+        covers nearly half the spatial dimension in one pass.
+
+        The 16x128 config achieves the best EDP by balancing moderate energy
+        (only 0.4 % above minimum) with reasonable latency.
+
+        Beyond 64x32, latency degrades rapidly (~2× per halving of cols)
+        while energy savings plateau, making row-heavy configs inefficient.
 
 
 ================================================================================
@@ -235,15 +307,15 @@ Case Study: Tile Size Sweep with Bandwidth Scaling ----- ResNet18 17-layer full 
 
     python3 experiment_runner.py --sweep-tile-sizes \
     --workload resnet18 --fusion full --variant 17layer \
-    --wmem-size 11264 --fmem-size 1056 --pe-rows 16 --pe-cols 128 \
+    --wmem-size 10738 --fmem-size 266 --pe-rows 16 --pe-cols 128 \
     --tile-sizes 7 1 2>&1
 
     Only 2 valid tile sizes: Q=7 → divisors are 7 and 1.
     (Cumulative stride = 2⁴ = 16, so output_tile=7 → input_tile=112)
 
     Tile  | SACols Q | SACols X0 | DRAM Q iters | Energy(μJ) | Latency(cc) | EDP
-    7     | Q=7      | X0=112    | 1            | 1.088e+04  | 8.998e+06   | 1.75e+05
-    1     | Q=1      | X0=16     | 7            | 1.362e+04  | 6.299e+07   | 1.40e+06
+    7     | Q=7      | X0=112    | 1            | 1.083e+04  | 8.998e+06   | 1.74e+05
+    1     | Q=1      | X0=16     | 7            | 1.359e+04  | 6.299e+07   | 1.39e+06
 
     What changes in the mapping:
       tile=7: SACols maps full spatial dims: Q=7, X13=14, X9=28, X5=56, X0=112
@@ -260,15 +332,13 @@ Case Study: Tile Size Sweep with Bandwidth Scaling ----- ResNet18 17-layer full 
       Directly proportional to DRAM Q iterations (1 → 7).
       DRAM is the latency bottleneck at both tile sizes.
 
-    EDP: 8× worse (1.75e+05 → 1.40e+06).
+    EDP: 8× worse (1.74e+05 → 1.39e+06).
 
     COMPARISON WITH FSRCNN TILE SWEEP:
       FSRCNN had many valid tile sizes (120, 64, 32, 16, 8) → gradual degradation.
       ResNet18 has only 2 valid tiles (7, 1) → binary choice, no middle ground.
       This is because Q=7 with cumulative stride=16 severely limits
-      valid tiles. For weight-dominant workloads, tile=Q (full output width) is always best
-      since there's no DRAM Q overhead and weight re-reads are minimized.
-
+      valid tiles.
 
 
 
@@ -279,32 +349,24 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128) ----- ResNet1
 
     python3 experiment_runner.py --sweep-arch \
     --workload resnet18 --fusion full --variant 17layer \
-    --fmem-sizes 1056 --wmem-sizes 11264 \
-    --pe-configs 8x128 16x128 32x128 64x128 128x128 256x128 512x128 2>&1
+    --fmem-sizes 266 --wmem-sizes 10738 \
+    --pe-configs 16x128 32x128 64x128 128x128  --tile-size 7 2>&1 | tee results/DF_CS2_ResNet18.log
 
     ResNet18 Z dimensions: Z0=64, Z1-4=64, Z5-8=128, Z9-12=256, Z13-16=512
 
     Config   | PEs    | SARows Z16 | SARows Z0 | FMem Reads | Energy(μJ) | Latency(cc) | Bottleneck | EDP
-    8×128    | 1,024  | 8          | 8         | 292M       | 1.099e+04  | 1.56e+07    | DRAM       | 3.05e+05
-    16×128   | 2,048  | 16         | 16        | 147M       | 1.088e+04  | 7.81e+06    | DRAM       | 1.52e+05
-    32×128   | 4,096  | 32         | 32        | 75M        | 1.082e+04  | 7.81e+06    | WMem       | 1.51e+05
-    64×128   | 8,192  | 64         | 64        | 39M        | 1.079e+04  | 7.81e+06    | WMem       | 1.51e+05
-    128×128  | 16,384 | 128        | 64        | 25M        | 1.078e+04  | 7.81e+06    | WMem       | 1.51e+05
-    256×128  | 32,768 | 256        | 64        | 21M        | 1.077e+04  | 7.81e+06    | WMem       | 1.51e+05
-    512×128  | 65,536 | 512        | 64        | 20M        | 1.077e+04  | 7.81e+06    | WMem       | 1.51e+05
-
+    16×128   | 2,048  | 16         | 16        | 147M       | 1.083e+04  | 7.812e+06    | DRAM       | 1.514e+05
+    32×128   | 4,096  | 32         | 32        | 75M        | 1.081e+04  | 7.807e+06    | WMem       | 1.511e+05
+    64×128   | 8,192  | 64         | 64        | 39M        | 1.079e+04  | 7.807e+06    | WMem       | 1.510e+05
+    128×128  | 16,384 | 128        | 64        | 25M        | 1.079e+04  | 7.807e+06    | WMem       | 1.510e+05
+    
     What changes in the mapping:
       SARows Z increases with pe_rows: each layer gets Z_i = min(pe_rows, Z_i_shape).
       SACols unchanged.
       DRAM unchanged.
 
-    Latency: only ONE step of improvement (8→16 rows: 2× reduction)
-      8→16:  1.56e+07 → 7.81e+06 cc (2× improvement). Bottleneck is DRAM.
-        At 8 rows, DRAM takes longer because fe memory feeds data more slowly
-        (more temporal Z iterations upstream → more stalls/delay propagating to DRAM).
-      16→512: Latency is CONSTANT at 7.81e+06 cc. No further improvement.
-        The bottleneck shifts to WeightMemory (16 words/cc bandwidth) at 32+ rows.
-        Adding rows doesn't help.
+    Latency: 
+
 
     Energy: tiny decrease (~2% total, from 10,992 → 10,773 μJ over 8→512 rows).
       What is CONSTANT across all configs (and why):
@@ -314,14 +376,11 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128) ----- ResNet1
         - IntReg R+W:  2,201,722,880 each (intermediate activations between layers)
         - OutReg R+W:  115,605,504 each (final output accumulation)
       What CHANGES (only FeatureMemory reads):
-        8 rows:   FMem reads = 292,149,760
         16 rows:  FMem reads = 147,492,352  (halved)
         32 rows:  FMem reads = 75,163,648   (halved again)
         64 rows:  FMem reads = 38,999,296
         128 rows: FMem reads = 25,451,776
-        256 rows: FMem reads = 20,935,936
-        512 rows: FMem reads = 19,806,976   (near minimum)
-
+        
     ANALYSIS — Why FeatureMemory reads decrease with more PE rows:
       In fused execution, FMEM stores intermediate activations passed between layers.
       Each layer reads its input activations from FMEM (written by the previous layer).
@@ -345,155 +404,153 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128) ----- ResNet1
       FSRCNN: Latency showed a two-stage saturation (1.9× at 16 rows, +3.6% at 32).
         Z dimensions are small (12-56), so they saturate quickly. The latency bottleneck
         was DRAM Q iterations (DRAM Q=15 at cols=64), which rows don't affect.
-      ResNet18: Latency shows a single step (2× at 16 rows), then HARD CEILING.
-        Z dimensions are large (64-512), but the bottleneck is WeightMemory bandwidth,
-        not DRAM Q. With DRAM Q=1 (tile=7 covers all of Q=7), the only bottleneck
-        after DRAM is the WMem→WReg pipe. No amount of Z parallelism helps.
-
+      ResNet18: For ResNet18 with tile=7, the computation is so heavily 
+      register/compute-bound that even a dramatic 6.6x reduction in FMEM reads has almost
+      zero impact on total Energy or Latency
 
         
     
 Case Study: PE Array Sweep — Increasing PE Cols (fixed rows=16) ----- ResNet18 17-layer full fusion
-  ResNet18 17-layer full fusion, DepFiN, FMEM=1056KB, WMEM=11264KB
+  ResNet18 17-layer full fusion, DepFiN, FMEM=266KB, WMEM=10739KB
 
     python3 experiment_runner.py --sweep-arch \
       --workload resnet18 --fusion full --variant 17layer \
-      --fmem-sizes 1056 --wmem-sizes 11264 \
-      --pe-configs 16x7 16x14 16x28 16x56 16x112 16x128 \
-      --verbose 2>&1 | tee results/DF_resnet_pe_cols_sweep.log
+      --fmem-sizes 266 --wmem-sizes 10739 \
+      --pe-configs 16x128 16x256 16x512 16x1024 \
+      --verbose 2>&1 | tee results/DF_CS3_ResNet.log
 
-    SACols mapping (cols map X_i/Q spatial dims, clamped to actual dimension):
-      ResNet18 input spatial dims per stage group (from cumulative strides):
-        Q = 7  (output spatial)
-        X13 = 14  (after stride-2 at L13, receptive field from Q)
-        X9  = 28  (after stride-2 at L9)
-        X5  = 56  (after stride-2 at L5)
-        X0  = 112 (input image, after stride-2 at L0)
 
-      SACols allocation = min(pe_cols, X_i) for each stage:
-      Cols  |  Q  | X13 | X9  | X5  | X0
-      ------+-----+-----+-----+-----+------
-        7   |  7  |  7  |  7  |  7  |   7    
-       14   |  7  | 14  | 14  | 14  |  14    <- X13 fully covered
-       28   |  7  | 14  | 28  | 28  |  28    <- X9 fully covered
-       56   |  7  | 14  | 28  | 56  |  56    <- X5 fully covered
-      112   |  7  | 14  | 28  | 56  | 112    <- X0 fully covered (all stages full)
-      128   |  7  | 14  | 28  | 56  | 112    <- same as 112 (X0 max = 112)
+  PE         Energy (μJ)   Latency (cc)    EDP
+  16x128     1.08e+04      7.81e+06        1.51e+05
+  16x256     1.08e+04      7.81e+06        1.51e+05
+  16x512     1.08e+04      7.81e+06        1.51e+05
+  16x1024    1.08e+04      7.81e+06        1.51e+05
 
-    Results:
-      Cols | Energy (uJ) | Latency (cc) | Bottleneck | WMem Reads    | DRAM Reads  | FMem Reads
-      -----+-------------+--------------+------------+---------------+-------------+------------
-        7  | 11,630      | 2,067,968    | DRAM       | 330,645,504   | 11,032,512  | 147,492,352
-       14  | 11,115      | 1,033,984    | DRAM       | 190,095,360   | 11,032,512  | 147,492,352
-       28  | 10,933      | 1,032,640    | DRAM       | 140,464,128   | 11,032,512  | 147,492,352
-       56  | 10,880      | 1,032,640    | DRAM       | 125,970,432   | 11,032,512  | 147,492,352
-      112  | 10,876      | 1,032,640    | DRAM       | 124,916,736   | 11,032,512  | 147,492,352
-      128  | 10,876      | 1,032,640    | DRAM       | 124,916,736   | 11,032,512  | 147,492,352
-
+   Energy:  0 % change across all configs.
+   Latency: 0 % change across all configs.
+   EDP:     0 % change across all configs.
     Analysis:
-      - DRAM reads and FMem reads are CONSTANT across all configs. 
-        Only WMem reads change. Cols only affect how many temporal passes over
-        weights are needed (more spatial coverage → fewer WMem reloads).
-
-      - LATENCY: A single 2× step from cols=7 → cols=14, then completely flat.
-        At 7 cols, DRAM latency is 2.07M cc; from 14+ cols it locks at ~1.03M cc.
-        The bottleneck is always DRAM. Once cols ≥ 14 (enough to fully cover X13),
-        the DRAM streaming schedule no longer requires extra passes.
-
-      - ENERGY: Gradual decrease driven by falling WMem reads (energy cost per WMem
-        access). From 7→128 cols: 11,630 → 10,876 uJ (−6.5% total).
-        Breakdown by step:
-          7→14:   −515 uJ (−4.4%)  ... WMem reads drop 43%
-          14→28:  −182 uJ (−1.6%)  ... WMem reads drop 26%
-          28→56:   −53 uJ (−0.5%)  ... WMem reads drop 10%
-          56→112:   −4 uJ (~0%)    ... WMem reads drop 0.8% improvement for X0
-          112→128:   0 uJ          ... identical (X0 already fully mapped at 112)
-
-      - SATURATION AT 112 COLS: With 128 cols, the mapping is identical to 112.
-        X0 = 112 is the largest spatial dimension in the fused workload, so
-        any cols beyond 112 are wasted. The 16 extra cols in 128 sit idle.
-
-    COMPARISON WITH FSRCNN PE COLS SWEEP:
-      FSRCNN (activation-heavy, small weights): cols dramatically improve both
-        latency and energy because X_7 = 52 spreads across cols, reducing
-        DRAM Q iterations. Returns diminish above ~56 cols.
-      ResNet18 (weight-heavy, fully cached weights): cols have minimal impact.
-        Latency improves only once (2× at 14 cols), then hits the DRAM ceiling.
-        Energy drops modestly via fewer WMem reads. The workload is fundamentally
-        weight memory bandwidth-bound, not parallelism-bound.
+      ResNet18's spatial dimensions (112, 56, 28, 14, 7) all fit within
+      the smallest tested pe_cols=128.  The auto-tile selector picks the
+      full spatial width for every layer, producing exactly ONE spatial
+      pass per layer regardless of how many columns are available.
+      Because the tile never changes, no data-reuse or pass-count metrics
+      are affected: access counts, WMOPs, latency, and energy are all
+      identical across 16x128 through 16x1024.
+     
+      Conclusion: for ResNet18 17-layer full fusion with these memory
+      sizes, increasing PE columns beyond 128 yields ZERO benefit.
+      The bottleneck is elsewhere (PE rows / Z-dimension or memory BW).
+      The extra columns are entirely wasted.
 
     
 Case Study: PE Array Sweep — Aspect Ratio (fixed total PEs=2048) ----- ResNet18 17-layer full fusion
-  ResNet18 17-layer full fusion, DepFiN, FMEM=1056KB, WMEM=11264KB
+  ResNet18 17-layer full fusion, DepFiN, FMEM=266KB, WMEM=10738KB
 
     python3 experiment_runner.py --sweep-arch \
       --workload resnet18 --fusion full --variant 17layer \
-      --fmem-sizes 1056 --wmem-sizes 11264 \
-      --pe-configs 4x512 8x256 16x128 32x64 64x32 128x16 256x8 512x4 \
-      --verbose 2>&1 | tee results/DF_resnet_pe_aspect_ratio_sweep.log
+      --fmem-sizes 266 --wmem-sizes 10738 \
+      --pe-configs 2x1024 4x512 8x256 16x128 32x64 64x32 128x16 256x8 512x4 1024x2\
+      --verbose 2>&1 | tee results/DF_CS4_ResNet18.log
 
     Results:
-      Config  | Energy (uJ) | Latency (cc) | Bottleneck |  WMem Reads   | FMem Reads  | DRAM Reads   | EDP
-      --------+-------------+--------------+------------+---------------+-------------+--------------+----------
-      4×512   |  11,226     | 31,247,104   | DRAM       |  124,916,736  | 581,464,576 | 11,032,512   | 3.51e+05
-      8×256   |  10,993     | 15,623,552   | DRAM       |  124,916,736  | 292,149,760 | 11,032,512   | 1.72e+05
-      16×128  |  10,876     |  7,811,776   | DRAM       |  124,916,736  | 147,492,352 | 11,032,512   | 8.50e+04
-      32×64   |  10,822     |  7,872,768   | WMem       |  125,970,432  |  75,163,648 | 11,032,512   | 8.52e+04
-      64×32   |  10,846     |  8,779,264   | WMem       |  140,464,128  |  38,999,296 | 11,032,512   | 9.52e+04
-      128×16  |  11,013     | 11,823,616   | WMem       |  189,041,664  |  25,451,776 | 11,032,512   | 1.30e+05
-      256×8   |  11,475     | 19,756,032   | DRAM       |  316,151,808  |  20,935,936 | 11,032,512   | 2.27e+05
-      512×4   |  13,920     | 61,453,056   | WMem       |  983,248,896  |  19,806,976 | 11,032,512   | 8.55e+05
+    
+    PE         Energy (μJ)   Latency (cc)    EDP
+    2x1024     1.12e+04      6.25e+07        1.23e+06
+    4x512      1.10e+04      3.12e+07        6.10e+05
+    8x256      1.09e+04      1.56e+07        3.04e+05
+    16x128     1.08e+04      7.81e+06        1.51e+05    ← EDP minimum
+    32x64      1.08e+04      7.87e+06        1.52e+05
+    64x32      1.09e+04      8.78e+06        1.70e+05
+    128x16     1.10e+04      1.18e+07        2.31e+05
+    256x8      1.15e+04      1.98e+07        3.96e+05
+    512x4      1.39e+04      6.15e+07        1.38e+06
+    1024x2     1.52e+04      8.32e+07        1.98e+06
 
-    Analysis:
-      The tool picks the best tile per config, so
-      per-tile latencies are now smaller and total latency reflects natural
-      tiling across the spatial dims.
+    Energy:   decreases 2x1024→16x128 (–3.6 %), nearly flat 16x128→32x64
+            (≈0 %), then rises 32x64→1024x2 (+40.7 %).
+            Minimum at 16x128 / 32x64 (1.08e+04 μJ).
+            Sharp rise at 512x4 and 1024x2 driven by massive WMEM overhead.
 
-      LATENCY:
-        - 4×512 → 8×256 → 16×128: Latency halves each step (31.2M → 15.6M → 7.81M).
-          Bottleneck is DRAM. With few rows, Z parallelism is low, requiring more
-          temporal passes to stream weights from DRAM.
-        - 16×128 → 32×64: Bottleneck SHIFTS from DRAM to WMem (7.81M → 7.87M).
-          Latency is essentially flat — the WMem bandwidth ceiling takes over.
-        - 64×32 → 128×16: Latency INCREASES (8.78M → 11.8M) because with fewer cols,
-          the X-dimension tiling becomes less efficient, requiring more WMem passes.
-        - 256×8: Bottleneck shifts BACK to DRAM (19.8M) — with only 8 cols, the
-          per-tile DRAM streaming cost dominates again.
-        - 512×4: Worst (61.5M) — WMem bottleneck with massive temporal reuse.
+    Latency:  minimum at 16x128 (7.81e+06 cc).
+              2x1024→16x128: halves each step (perfect 2× scaling from Z passes).
+              16x128→32x64: nearly identical (+0.8 %) — tile drops 112→56 for
+              early layers but Z0 doubles 16→32, roughly cancelling.
+              Beyond 64x32: rises steeply. 1024x2 = 8.32e+07 (10.7× worse).
 
-      ENERGY:
-        - Decreasing trend from 4×512 (11,226) to 32×64 (10,822): −3.6% total.
-          Driven by decreasing FMem reads. More rows → more Z parallelism → fewer
-          intermediate activation reloads from FMem.
-          FMem reads: 581M → 292M → 147M → 75M (halving with each doubling of rows).
-        - TURNAROUND from 64×32 onward: Energy INCREASES.
-          WMem reads grow: 125M → 140M → 189M → 316M → 983M as fewer cols force
-          extra WMem temporal passes. The WMem energy increase overwhelms the
-          continued FMem decrease.
-        - BEST ENERGY: 32×64 (10,822 uJ).
+    EDP:      minimum at 16x128 (1.51e+05), barely ahead of 32x64 (1.52e+05).
+              Symmetric degradation toward both extremes.
+              EDP at 2x1024 (1.23e+06) ≈ EDP at 512x4 (1.38e+06).
 
-      DRAM READS: Constant 11,032,512 across all configs (weights + activations
-        always read once from DRAM regardless of PE aspect ratio).
+    FeatureMemory:
+    PE         in_reads      int_in_reads     int_out_reads  int_out_writes
+    2x1024     59,006,976    1,098,252,288    2,809,856      2,809,856
+    4x512      29,503,488      549,126,144    2,809,856      2,809,856
+    8x256      14,751,744      274,563,072    2,809,856      2,809,856
+    16x128      7,375,872      137,281,536    2,809,856      2,809,856
+    32x64       3,687,936       68,640,768    2,809,856      2,809,856
+    64x32       1,843,968       34,320,384    2,809,856      2,809,856
+    128x16      1,843,968       20,772,864    2,809,856      2,809,856
+    256x8       1,843,968       16,257,024    2,809,856      2,809,856
+    512x4       1,843,968       15,128,064    2,809,856      2,809,856
+    1024x2      1,843,968       15,128,064    2,809,856      2,809,856
 
-      WMem READS: Constant ~125M for 4×512 through 16×128 (identical weight
-        streaming), then increases at 32×64 (126M), 64×32 (140M), 128×16 (189M),
-        256×8 (316M), 512×4 (983M) due to more temporal weight reloads when cols
-        are too few for the X-dimension.
+    in_reads:     drop 59M → 1.8M (–96.9 %). Saturates at 64x32 (Z0=64=full).
+    int_in_reads: drop 1,098M → 15M (–98.6 %). Saturates at 512x4/1024x2.
+                  Note: does NOT fully saturate at 64x32 because deeper layers
+                  (Z=128,256,512) still need multiple Z passes even at rows=64.
+                  Full saturation requires rows≥512 to cover Z16=512.
+    int_out_reads/writes: constant at 2.8M across all configs.
 
-      BEST EDP: 16×128 (8.50e+04) and 32×64 (8.52e+04) — essentially tied.
-        This is the sweet spot where latency is near the WMem floor and energy
-        is near minimum. The broad optimum spans 16×128 to 32×64.
+  WeightMemory w_reads:
+    PE         w_reads
+    2x1024     124,916,736
+    4x512      124,916,736
+    8x256      124,916,736
+    16x128     124,916,736     ← all 4 identical (all tiles ≤ pe_cols, no extra passes)
+    32x64      125,970,432     (+0.8 % — X0=56<112 → 2 passes for layer 0)
+    64x32      140,464,128     (+12.4 %)
+    128x16     189,041,664     (+51.3 %)
+    256x8      316,151,808     (+153.1 %)
+    512x4      983,248,896     (+686.8 %)
+    1024x2   1,330,667,520     (+964.9 %)
 
-    COMPARISON WITH FSRCNN PE ASPECT RATIO SWEEP:
-      FSRCNN (activation-dominant): Best at 4×512 (col-heavy), then degrades with
-        more rows. Q dimension (960) is huge, so more cols = bigger tile = fewer
-        DRAM iterations. Z dims are small (12-56), saturated quickly.
-      ResNet18 (weight-dominant, deep network): Best EDP at 16×128 to 32×64 (balanced).
-        More rows help Z parallelism and reduce FMem reads, but too many rows (> 64)
-        cause WMem reads to explode because cols drop below X_i requirements.
-        Unlike FSRCNN, there is no strong preference for extreme aspect ratios —
-        a balanced configuration works best.
+    At pe_cols ≥ 128 all ResNet18 spatial dims fit → constant w_reads.
+    Below 128, tiles shrink and w_reads scale with spatial passes.
+    512x4→1024x2: smaller jump because deepest layers (Q=7) still
+    fit in a single pass; only early layers (X0=112) fragment heavily.
 
+
+Analysis
+--------
+ResNet18's multi-scale spatial structure (112→56→28→14→7) creates a
+distinctive pattern compared to single-scale workloads (FSRCNN, MC-CNN):
+
+1. FMEM saturation is gradual: Z dimensions range from Z0=64 to Z16=512.
+   Even at rows=64 (full Z0), deeper layers still have unsaturated Z.
+   FMEM int_in_reads only fully plateau at rows≥512.
+
+2. WMEM w_reads stay constant from 2x1024 through 16x128 because ALL
+   layer spatial dims (max 112) fit within pe_cols=128. This makes the
+   column-heavy configs unusually efficient — they gain nothing from
+   larger tiles but also lose nothing.
+
+3. The latency pattern 2x1024→16x128 shows perfect 2× scaling per
+   row-doubling because latency is purely Z-pass-limited when all
+   tiles fit in one spatial pass. At 32x64, layer 0's tile drops to
+   56, introducing 2 spatial passes and breaking the scaling.
+
+4. The energy "U-shape" is asymmetric:
+   - Column-heavy side (2x1024→16x128): mild, only –3.6 % total
+     because FMEM WMOPs (762M→407M) are small vs total (~59B).
+   - Row-heavy side (64x32→1024x2): steep, +40.7 % because WMEM
+     inflates (925M→5,292M).
+
+5. The EDP-optimal 16x128 config coincides with the exact threshold
+   where ALL spatial dims fit in pe_cols (max dim 112 < 128). Going
+   wider adds unused columns; going narrower fragments tiles and
+   inflates WMEM reads. This makes 16x128 a natural sweet spot for
+   ResNet18-like architectures with small spatial dimensions.
     
 
     
@@ -524,24 +581,25 @@ DEPFIN CASE STUDIES — MC-CNN 4-layer full fusion
 
 
 Case Study: Tile Size Width Sweep with Bandwidth Scaling ----- MC-CNN 4-layer full fusion
-  DepFiN 16×128 PEs, FMEM=1056KB, WMEM=524KB
+  DepFiN 16×128 PEs, FMEM=522KB, WMEM=29KB
   FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)
   Auto-selected tile = max divisor of 1242 ≤ 128 = 69
 
     python3 experiment_runner.py --sweep-tile-sizes \
     --workload mccnn --fusion full --variant 4layer \
-    --tile-sizes 69 46 27 18 9 3 2>&1 | tee mccnn_4layer_tile_sweep.log
+  --wmem-size 28 --fmem-size 522 --pe-rows 16 --pe-cols 128     --tile-sizes 69 46 27 18 9 3 2>&1 | tee results/DF_CS1_MCCNN_tile_sweep.log
 
     Tried tile sizes: 69 - 46 - 27 - 18 - 9 - 3
 
     Tile  DRAM Q  Energy(μJ)  Latency(cc)       EDP    PE Util
     ----  ------  ----------  -----------  ---------   --------
-    69      18    1.996e+04   1.218e+07    3.69e+05     53.9%
-    46      27    2.004e+04   1.827e+07    5.55e+05     35.9%
-    27      46    2.019e+04   3.114e+07    9.50e+05     21.1%
-    18      69    2.039e+04   4.671e+07    1.43e+06     14.1%
-     9     138    2.096e+04   9.343e+07    2.92e+06      7.0%
-     3     414    2.325e+04   2.803e+08    9.41e+06      2.3%
+    69      18    1.127e+04   1.218e+07    1.64e+05     53.9%
+    46      27    1.133e+04   1.827e+07    2.46e+05     35.9%
+    27      46    1.138e+04   3.114e+07    4.18e+05     21.1%
+    18      69    1.142e+04   4.671e+07    6.31e+05     14.1%
+     9     138    1.150e+04   9.343e+07    1.27e+06      7.0%
+     3     414    1.201e+04   2.803e+08    3.95e+06      2.3%
+
 
     Memory reads:
       Tile  DRAM Reads     FMem Reads      WMem Reads
@@ -555,9 +613,12 @@ Case Study: Tile Size Width Sweep with Bandwidth Scaling ----- MC-CNN 4-layer fu
     What changes in the mapping: DRAM Q/X iterations increase, SACols decrease
 
     PE Utilization: decrease (53.9% → 2.3%) — smaller tile wastes more PE columns.
-    Energy: increase (+16.5%, from 19,960 → 23,250 μJ)
+    Energy: increase (+6.5%)
     Latency: increase 23× (12.2M → 280M cc), dominated by more DRAM temporal iterations
-    EDP: increase 25.5× (dominated by latency)
+      Latency scales nearly proportionally to the number of spatial passes:
+      tile=69: 1242/69 = 18 passes → 1.218e+07 cc
+      tile= 3: 1242/3  = 414 passes → 2.803e+08 cc  (ratio: 23x, close to 414/18 = 23x)
+    EDP: increase 24× (dominated by latency)
 
     ANALYSIS:
       DRAM reads: CONSTANT at 1,979,712 across all tiles.
@@ -584,22 +645,21 @@ Case Study: Tile Size Width Sweep with Bandwidth Scaling ----- MC-CNN 4-layer fu
 
 
       
-Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=64), MC-CNN 4-layer full fusion
-  DepFiN, FMEM=1056KB, WMEM=524KB
+Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128), MC-CNN 4-layer full fusion
+  DepFiN, FMEM=522KB, WMEM=28KB
   Auto tile = max divisor of 1242 ≤ 64 = 54
 
     python3 experiment_runner.py --sweep-arch \
     --workload mccnn --fusion full --variant 4layer \
-    --fmem-sizes 1056 --wmem-sizes 524 \
-    --pe-configs 8x64 16x64 32x64 64x64 2>&1
+    --fmem-sizes 522 --wmem-sizes 28 \
+    --pe-configs 8x128 16x128 32x128 2>&1 | tee results/DF_CS2_MCCNN.log
 
     MC-CNN Z dimensions: Z0=Z1=Z2=Z3=32 (uniform across all layers)
 
-    Config  PEs    Energy(μJ)  Latency(cc)  Bottleneck  FMem Reads      WMem Reads      DRAM Reads
-    8×64    512    2.066e+04   3.034e+07    DRAM        6,747,100,416     966,362,112   1,979,712
-    16×64   1024   2.000e+04   1.522e+07    DRAM        3,500,572,032     966,362,112   1,979,712
-    32×64   2048   1.967e+04   1.518e+07    WMem        1,869,835,968     966,362,112   1,979,712
-    64×64   4096   1.967e+04   1.518e+07    WMem        1,869,835,968     966,362,112   1,979,712
+    Config   PEs    Energy(μJ)  Latency(cc)  Bottleneck  FMem Reads       WMem Reads    DRAM Reads  EDP
+    8×128    1024   1.170e+04   2.37e+07    DRAM        6,750,145,368     966,362,112   1,979,712    3.28e+05
+    16×128   2048   1.132e+04   1.20e+07    WMem        3,500,572,032     966,362,112   1,979,712    1.61e+05
+    32×128   4096   1.111e+04   1.19e+07    WMem        1,869,835,968     966,362,112   1,979,712    1.58e+05
 
     What changes in the mapping:
       SARows Z_i values increase (more output channels parallelized spatially).
@@ -607,27 +667,14 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=64), MC-CNN 4-laye
         8 rows:  SARows Z_i = 8  → temporal Z = 32/8  = 4
         16 rows: SARows Z_i = 16 → temporal Z = 32/16 = 2
         32 rows: SARows Z_i = 32 → temporal Z = 32/32 = 1 (SATURATED)
-        64 rows: SARows Z_i = 32 → wasted rows (Z already fully covered)
 
     DRAM reads and WMem reads: CONSTANT across all configs (1.98M and 966M).
-    Only FMem reads change: 6.75B → 3.50B → 1.87B → 1.87B (halving with rows, saturates at 32).
+    Only FMem reads change: 6.75B → 3.50B → 1.87B (halving with rows, saturates at 32).
 
-    Energy: slight decrease (~4.8%, 20,659 → 19,675 μJ from 8→32 rows), then flat.
+    Energy: slight decrease 
       Driven entirely by FMem reads reduction (fewer Z temporal iterations →
       fewer intermediate activation re-reads from FeatureMemory).
 
-    Latency: single 2× step from 8→16 rows, then FLAT.
-      8→16:  3.034e+07 → 1.522e+07 cc (2× improvement). Bottleneck is DRAM.
-        At 8 rows, Z temporal iterations = 4, causing upstream stalls that
-        propagate to DRAM streaming.
-      16→32: 1.522e+07 → 1.518e+07 cc (<0.3% improvement). Bottleneck shifts to WMem.
-        Z gets fully parallelized (SARows Z=32) but this doesn't help latency
-        because the WeightMemory bandwidth ceiling to 16 locks the schedule.
-      32→64: IDENTICAL to 32×64. The extra 32 rows are completely wasted.
-
-    KEY INSIGHT: Z=32 saturates at 32 rows. This is even faster saturation than
-      FSRCNN (Z_max=56, saturated at ~56 rows). For activation-dominant networks
-      with small uniform channels, very few rows are needed.
 
     COMPARISON WITH FSRCNN PE ROWS SWEEP:
       FSRCNN: Two-stage saturation (L7 Z=16 saturates at 16 rows, L6 Z=56 secondary).
@@ -644,20 +691,17 @@ Case Study: PE Array Sweep — Increasing PE Cols (fixed rows=16), MC-CNN 4-laye
 
     python3 experiment_runner.py --sweep-arch \
     --workload mccnn --fusion full --variant 4layer \
-    --fmem-sizes 1056 --wmem-sizes 524 \
-    --pe-configs 16x46 16x54 16x69 16x138 16x207 16x414 2>&1
+    --fmem-sizes 522 --wmem-sizes 28 \
+    --pe-configs 16x64 16x128 16x256 --verbose 2>&1 | tee results/DF_CS3_MCCNN.log
 
     SACols mapping: Since all strides=1, X_i = Q = 1242 for all layers.
       SACols = min(pe_cols, X_i) = pe_cols (always, since pe_cols ≤ 1242).
       All layers have IDENTICAL spatial mapping (no heterogeneous stages).
 
-    Config   PEs    Tile  DRAM Q  Energy(μJ)  Latency(cc)  Bottleneck  WMem Reads
-    16×46     736   46     27     2.004e+04   1.783e+07    DRAM        1,134,425,088
-    16×54     864   54     23     2.000e+04   1.522e+07    DRAM          966,362,112
-    16×69    1104   69     18     1.996e+04   1.200e+07    DRAM          756,283,392
-    16×138   2208  138      9     1.989e+04   6.111e+06    DRAM          378,141,696
-    16×207   3312  207      6     1.986e+04   4.150e+06    DRAM          252,094,464
-    16×414   6624  414      3     1.984e+04   2.800e+06    DRAM          126,047,232
+    Config   PEs    Tile  DRAM Q  Energy(μJ)  Latency(cc) EDP
+    16×64     1024  64     19     1.13e+04   1.52e+07     2.05e+05
+    16×128    2048  128     9     1.13e+04   1.20e+07     1.61e+05
+    16×256    4096  256     4     1.13e+04   4.15e+06     5.57e+04
 
     What changes in the mapping:
       SACols X_i/Q values increase (larger tile mapped spatially).
@@ -666,84 +710,157 @@ Case Study: PE Array Sweep — Increasing PE Cols (fixed rows=16), MC-CNN 4-laye
       DRAM reads: CONSTANT at 1.98M.
       WMem reads: DECREASE proportionally with tile (fewer weight re-reads per DRAM pass).
 
-    Energy: very slight decrease (−1.0% total, 20,036 → 19,837 μJ over 46→414 cols).
+    Energy: very slight decrease
       Energy is overwhelmingly dominated by FMem reads (intermediates), which don't change.
-      The WMem energy saving from fewer weight re-reads is marginal (~200 μJ over 9× range).
+      The WMem energy saving from fewer weight re-reads is marginal 
 
     Latency: monotonic decrease, proportional to 1/DRAM_Q.
-      46→414: 1.78e+07 → 2.80e+06 cc (6.4× improvement). Bottleneck is ALWAYS DRAM.
       Each halving of DRAM Q iterations roughly halves latency.
 
 
 
 Case Study: PE Array Sweep — Aspect Ratio (fixed total PEs=2048) ----- MC-CNN 4-layer full fusion
-  DepFiN, FMEM=1056KB, WMEM=524KB
+  DepFiN, FMEM=522KB, WMEM=28KB
 
     python3 experiment_runner.py --sweep-arch \
     --workload mccnn --fusion full --variant 4layer \
-    --fmem-sizes 1056 --wmem-sizes 524 \
-    --pe-configs 2x1024 4x512 8x256 16x128 32x64 64x32 2>&1
+    --fmem-sizes 522 --wmem-sizes 28 \
+    --pe-configs 2x1024 4x512 8x256 16x128 32x64 64x32 128x16 256x8 512x4 1024x2 --verbose 2>&1 | tee results/DF_CS4_MCCNN.log
+
+    Tile = largest divisor of Q=1242 fitting in pe_cols.
+
 
     Auto-selected tile sizes and DRAM Q iterations:
-      Config  Tile  DRAM Q  SARows Z_i  Temporal Z
-      2×1024  621     2     2           16    ← severe Z under-parallelism
-      4×512   414     3     4            8
-      8×256   207     6     8            4
-      16×128   69    18    16            2
-      32×64    54    23    32            1    ← Z fully covered
-      64×32    27    46    32            1    ← same Z, but tile too small
+      Config  Tile  DRAM Q
+      2×1024  621     2   
+      4×512   414     3   
+      8×256   207     6   
+      16×128   69    18   
+      32×64    54    23   
+      64×32    27    46   
+      128×16   9    138
+      256×8    6    207
+      512×4    3    414
+      1024×2   2    621
 
     Results:
-      Config  PEs    Energy(μJ)  Latency(cc)  Bottleneck  FMem Reads       WMem Reads       DRAM Reads    EDP
-      2×1024  2048   2.442e+04   1.081e+07    DRAM        26,315,933,184      84,031,488   1,979,712    3.76e+05
-      4×512   2048   2.181e+04   8.100e+06    DRAM        13,284,988,416     126,047,232   1,979,712    2.60e+05
-      8×256   2048   2.052e+04   8.075e+06    DRAM         6,762,044,160     252,094,464   1,979,712    2.49e+05  ← BEST EDP
-      16×128  2048   1.996e+04   1.200e+07    DRAM         3,500,572,032     756,283,392   1,979,712    3.62e+05
-      32×64   2048   1.967e+04   1.518e+07    WMem         1,869,835,968     966,362,112   1,979,712    4.56e+05
-      64×32   2048   1.987e+04   3.021e+07    WMem         1,869,835,968   1,932,724,224   1,979,712    9.12e+05
+      PE         Energy (μJ)   Latency (cc)    EDP
+      2x1024     1.39e+04      1.08e+07        1.73e+05
+      4x512      1.24e+04      8.10e+06        1.18e+05
+      8x256      1.17e+04      8.07e+06        1.11e+05    ← EDP minimum
+      16x128     1.13e+04      1.20e+07        1.61e+05
+      32x64      1.11e+04      1.52e+07        2.01e+05
+      64x32      1.12e+04      3.02e+07        4.01e+05
+      128x16     1.13e+04      9.06e+07        1.22e+06
+      256x8      1.14e+04      1.36e+08        1.84e+06
+      512x4      1.18e+04      2.72e+08        3.78e+06
+      1024x2     1.22e+04      4.08e+08        5.82e+06
 
     ANALYSIS — Trade-off between rows (Z parallelism) and cols (Q tile size):
 
-      Energy: monotonic decrease from 2×1024 (24,423) to 32×64 (19,675), then
-        TURNAROUND at 64×32 (19,866 μJ).
-        The decrease is driven by FMem reads reduction:
-          2×1024: FMem reads = 26.3B (Z has 16 temporal iterations → massive act re-reads)
-          4×512:  FMem reads = 13.3B (halved)
-          8×256:  FMem reads = 6.8B  (halved)
-          16×128: FMem reads = 3.5B  (halved)
-          32×64:  FMem reads = 1.87B (Z fully covered, minimum FMem reads)
-          64×32:  FMem reads = 1.87B (same — extra rows wasted)
-        The turnaround at 64×32 comes from WMem reads doubling (966M → 1,933M)
-        due to smaller tile (27 vs 54) causing more weight re-reads.
+      Energy:   decreases 2x1024→32x64 (–20.1 %), then nearly flat 32x64→64x32
+            (+0.9 %), then slowly rises 64x32→1024x2 (+8.9 %).
+            Minimum at 32x64 (1.11e+04 μJ).
 
-      Latency: V-shaped with minimum at 4×512 and 8×256 (~8.1M cc).
-        Too few rows (2×1024): Tile=621 (DRAM Q=2), but Z needs 16 temporal iterations.
-          The massive Z loop at each PE causes upstream stalls → 10.8M cc.
-        Sweet spot (4×512, 8×256): Good balance. DRAM Q stays small (3–6), and
-          Z temporal iterations (8–4) are manageable. Bottleneck = DRAM.
-        Too few cols (16×128+): Tile shrinks rapidly. DRAM Q = 18–46.
-          At 32×64, Z is saturated but DRAM Q=23 → bottleneck shifts to WMem (15.2M cc).
-          At 64×32, DRAM Q=46 → WMem latency doubles (30.2M cc).
+      Latency:  minimum at 8x256 (8.07e+06 cc), very close to 4x512 (8.10e+06).
+                Rises steeply with more rows: 1024x2 = 4.08e+08 cc (50× worse).
+                From 8x256→1024x2: latency grows ~50×.
 
-      EDP: 
-        Best at 8×256 (2.49e+05): good balance of Z parallelism and tile coverage.
-        8×256 beats 4×512 on energy (less FMem) while matching on latency.
-        The col-heavy configs (2×1024, 4×512) have higher energy from FMem reads.
-        The row-heavy configs (32×64, 64×32) have exploding latency from small tiles.
+      EDP:      minimum at 8x256 (1.11e+05).
+                4x512 close second (1.18e+05).
+                EDP degrades rapidly beyond 16x128 toward row-heavy configs.
 
-    COMPARISON WITH FSRCNN PE ASPECT RATIO SWEEP:
-      FSRCNN: Best EDP at 4×512. Q=960, Z_max=56. Column-heavy always preferred.
-      MC-CNN: Best EDP at 8×256. Q=1242, Z=32. Also column-heavy preferred.
-      Both activation-dominant workloads favor column-heavy aspect ratios but with
-      slightly different optimal points due to Z dimension differences:
-        - FSRCNN: Z_max=56, so even 4 rows leave 14× Z temporal iterations for L6.
-          Best at 4×512 because tile=480 (DRAM Q=2) with acceptable Z overhead.
-        - MC-CNN: Z=32 (uniform), so 8 rows give only 4× Z iterations (manageable).
-          Best at 8×256 where tile=207 (DRAM Q=6) provides a better energy/latency trade-off.
-      Conclusion: For activation-dominant workloads, column-heavy ratios win.
-      The optimal #rows ≈ sqrt(Z_max) or Z_max/4, enough to limit Z temporal
-      iterations without sacrificing too much tile coverage. Q dimension (1242 here,
-      960 for FSRCNN) is the dominant parallelism axis for latency.
+    Register WMOPs (WReg+AccumIntOut+AccumOut) dominate (~92-78 % of total).
+    → Column-heavy configs (2x1024): FMEM energy 3,564M — 4.8× higher than
+      the floor (738M at rows≥32) due to many Z passes reloading features.
+    → Row-heavy configs (1024x2): WMEM energy 1,796M — 2.3× higher than
+      the floor (778M at 32x64) due to many tile passes reloading weights.
+    → FMEM saturates once rows≥32 (Z0=32, full mapping for this FMEM size).
+    → Energy minimum at 32x64 where FMEM has saturated and WMEM is still low.
+
+    Access counts per level
+  -----------------------
+  DRAM (constant across ALL configs):
+    in_reads = 466,992   w_reads = 27,936   out_writes = 14,943,744
+
+  AccumIntOutReg (constant across ALL configs):
+    int_out_reads = 8,742,090,240   int_out_writes = 8,742,090,240
+
+  AccumOutReg (constant across ALL configs):
+    out_writes = 4,303,798,272   out_reads = 4,303,798,272
+
+  WeightRegister w_reads (constant across ALL configs): 13,045,888,512
+
+  FeatureMemory:
+    PE         in_reads        int_in_reads     int_out_reads  int_out_writes
+    2x1024      67,246,848     6,455,697,408    44,831,232     44,831,232
+    4x512       33,623,424     3,227,848,704    44,831,232     44,831,232
+    8x256       16,811,712     1,613,924,352    44,831,232     44,831,232
+    16x128       8,405,856       806,962,176    44,831,232     44,831,232
+    32x64        4,202,928       403,481,088    44,831,232     44,831,232
+    64x32        4,202,928       403,481,088    44,831,232     44,831,232
+    128x16       4,202,928       403,481,088    44,831,232     44,831,232
+    256x8        4,202,928       403,481,088    44,831,232     44,831,232
+    512x4        4,202,928       403,481,088    44,831,232     44,831,232
+    1024x2       4,202,928       403,481,088    44,831,232     44,831,232
+
+    in_reads:     drop 67M → 4.2M (–93.7 %) as rows increase. Saturates at 32x64.
+    int_in_reads: drop 6,456M → 403M (–93.8 %). Saturates at 32x64 (Z0=32=full).
+    int_out_reads/writes: constant at 44.8M (independent of aspect ratio).
+
+  WeightMemory w_reads:
+    PE         w_reads
+    2x1024      21,007,872
+    4x512       31,511,808
+    8x256       63,023,616
+    16x128     189,070,848
+    32x64      241,590,528
+    64x32      483,181,056
+    128x16   1,449,543,168
+    256x8    2,174,314,752
+    512x4    4,348,629,504
+    1024x2   6,522,944,256
+
+    w_reads scale with spatial passes: each halving of pe_cols roughly
+    doubles w_reads. From 2x1024→1024x2: 310× increase (21M → 6,523M).
+
+  Analysis
+--------
+This sweep reveals the ROWS vs COLS trade-off for MC-CNN at fixed
+PE budget (2048 PEs):
+
+  MORE COLS (column-heavy, e.g. 2x1024):
+  + Larger spatial tile (621) → fewer tile passes → fewer WMEM w_reads (21M)
+  + Low latency per tile pass
+  − Very few rows (2) → Z0 mapped as 2 → 56 Z passes
+  − FMEM int_in_reads explode (6,456M) — features reloaded per Z pass
+  − Total energy 25 % higher than minimum
+
+  MORE ROWS (row-heavy, e.g. 1024x2):
+  + Full Z mapping (32) from rows≥32 → FMEM accesses minimised
+  − Tiny spatial tile (2) → 621 tile passes → WMEM w_reads explode (6,523M)
+  − Latency scales linearly with passes (408M cc at 1024x2)
+  − Energy rises 10 % above minimum due to WMEM overhead
+
+  SWEET SPOT:
+  The EDP-optimal config is 8x256 (EDP=1.11e+05), achieving the best
+  balance: tile=207 keeps WMEM w_reads at 63M while Z0=8 keeps FMEM
+  int_in_reads at 1,614M — neither extreme dominates.
+
+  Energy minimum is at 32x64 (1.11e+04 μJ) where Z0 fully maps (32)
+  saturating FMEM savings, and the tile (54) is still large enough to
+  keep WMEM manageable.
+
+  Latency minimum is at 8x256 (8.07e+06 cc) — nearly identical to
+  4x512 — where large tiles minimise spatial passes.
+
+  The 8x256 config wins on EDP because its latency advantage (8.07M cc)
+  outweighs the slightly higher energy vs 32x64 (+5.4 %).
+
+  Beyond 32x64, latency degrades ~2× per halving of cols while energy
+  savings cease (FMEM already saturated), making row-heavy configs
+  increasingly inefficient: 1024x2 has 50× worse latency than 8x256
+  for only 4.2 % more energy than the minimum.
 
 
 ================================================================================
@@ -784,22 +901,22 @@ DEPFIN CASE STUDIES — VGG16 13-layer full fusion
 
 
 Case Study: Tile Size Sweep with Bandwidth Scaling ----- VGG16 13-layer full fusion
-  DepFiN 16×128 PEs, FMEM=1056KB, WMEM=14400KB
+  DepFiN 16×128 PEs, FMEM=568KB, WMEM=14400KB
   FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)
   NOTE: WMEM = 14400KB to fit all 13 layers' weights (14,710,464 total).
 
     python3 experiment_runner.py --sweep-tile-sizes \
     --workload vgg16 --fusion full --variant 13layer \
-    --wmem-size 14400 --fmem-size 1056 --pe-rows 16 --pe-cols 128 \
+    --wmem-size 14400 --fmem-size 568 --pe-rows 16 --pe-cols 128 \
     --tile-sizes 7 2 1 2>&1
 
     Q=14, divisors={1,2,7,14}
 
     Tile  | DRAM Q iters | Energy(μJ) | Latency(cc) | EDP      | WMem Reads
-    14    | 1            | 7.766e+04  | 2.731e+07   | 3.84e+06 | 388,878,696
-    7     | 2            | 7.758e+04  | 5.024e+07   | 7.11e+06 | 669,634,560
-    2     | 7            | 8.380e+04  | 1.712e+08   | 2.52e+07 | 2,116,903,680   
-    1     | 14           | 9.429e+04  | 3.516e+08   | 5.56e+07 | 4,687,441,920
+    14    | 1            | 7.607e+04  | 2.728e+07   | 3.82e+06 | 388,878,696
+    7     | 2            | 7.724e+04  | 5.024e+07   | 7.09e+06 | 669,634,560
+    2     | 7            | 8.326e+04  | 1.705e+08   | 2.51e+07 | 2,116,903,680   
+    1     | 14           | 9.396e+04  | 3.516e+08   | 5.55e+07 | 4,687,441,920
 
     What changes in the mapping:
       tile=14: SACols maps entire output width: Q=14 out of 14. Input tile=224.
@@ -824,7 +941,7 @@ Case Study: Tile Size Sweep with Bandwidth Scaling ----- VGG16 13-layer full fus
     Latency: 14× worse (2.731e+07 → 3.516e+08 cc). Directly proportional to
       DRAM Q iterations. DRAM is the latency bottleneck at both tiles.
 
-    EDP: 14.5× worse (3.84e+06 → 5.56e+07).
+    EDP: 14.5× worse (3.82e+06 → 5.55e+07).
 
     COMPARISON WITH RESNET18 TILE SWEEP:
       ResNet18: tile=7 vs tile=1, 7× latency increase, +25% energy.
@@ -835,40 +952,38 @@ Case Study: Tile Size Sweep with Bandwidth Scaling ----- VGG16 13-layer full fus
       
 
 Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128) ----- VGG16 13-layer full fusion
-  DepFiN, FMEM=1056KB, WMEM=14400KB, Tile Size 14
+  DepFiN, FMEM=568KB, WMEM=14400KB, Tile Size 14
 
     python3 experiment_runner.py --sweep-arch \
     --workload vgg16 --fusion full --variant 13layer \
-    --fmem-sizes 1056 --wmem-sizes 14400 \
-    --pe-configs 8x128 16x128 32x128 64x128 128x128 256x128 512x128 2>&1
+    --fmem-sizes 568 --wmem-sizes 14400 \
+    --pe-configs  16x128 32x128 64x128 128x128 --tile-size 14 2>&1 | tee DF_CS2_VGG16.log
 
     VGG16 Z dimensions: Z0-Z1=64, Z2-Z3=128, Z4-Z6=256, Z7-Z12=512
 
     Config   | PEs    | FMem Reads    | WMem Reads  | Energy(μJ) | Latency(cc) | EDP
-    8×128    | 1,024  | 1,931,876,352 | 388,878,336 | 7.72e+04   | 4.86e+07    | 6.86e+06
-    16×128   | 2,048  | 972,711,936   | 388,878,336 | 7.64e+04   | 2.43e+07    | 3.41e+06
-    32×128   | 4,096  | 493,129,728   | 388,878,336 | 7.60e+04   | 2.43e+07    | 3.40e+06
-    64×128   | 8,192  | 253,338,624   | 388,878,336 | 7.58e+04   | 2.43e+07    | 3.40e+06
+    16×128   | 2,048  | 972,711,936   | 388,878,336 | 7.61e+04   | 2.43e+07    | 3.41e+06
+    32×128   | 4,096  | 493,129,728   | 388,878,336 | 7.59e+04   | 2.43e+07    | 3.40e+06
+    64×128   | 8,192  | 253,338,624   | 388,878,336 | 7.57e+04   | 2.43e+07    | 3.39e+06
     128×128  | 16,384 | 148,571,136   | 388,878,336 | 7.57e+04   | 2.43e+07    | 3.39e+06
-    256×128  | 32,768 | 107,025,408   | 388,878,336 | 7.57e+04   | 2.43e+07    | 3.39e+06
-    512×128  | 65,536 | 95,284,224    | 388,878,336 | 7.57e+04   | 2.43e+07    | 3.39e+06
 
+    
     DRAM reads: CONSTANT at 14,860,992 across all configs.
     WMem reads: CONSTANT at 388,878,336 across all configs.
     FMem reads: Only FMem changes (halving pattern with doubling rows):
-      8→16: 1,932M → 973M (halved)
       16→32: 973M → 493M (halved)
       32→64: 493M → 253M (halved)
       64→128: 253M → 149M
       128→256: 149M → 107M
-      256→512: 107M → 95M (near minimum)
+    Despite 7.1x FMEM int_in_reads reduction, total Energy drops only ~0.5%
+    because register WMOPs (≈403B total, ~99%) dominate the energy budget.
+    Latency is essentially flat (2.43e+07 cc) — compute-bound, not memory-bound.
 
-    Latency: Single 2× step (8→16 rows), then 2.43e+07 cc.
-      4.86e+07 → 2.43e+07 (2× improvement at 8→16 rows).
-      16→512: Latency CONSTANT. Bottleneck is WeightMemory bandwidth.
-      Adding rows doesn't affect DRAM or WMem streaming schedules.
 
-    Energy: Tiny decrease (~2% total, from 77,200 → 75,700 μJ over 8→512 rows).
+    Latency: 
+      16→512: Latency CONSTANT. 
+
+    Energy: Tiny decrease (~2% total, from 77,200 → 75,700 μJ over 16→512 rows).
       Driven by decreasing FMem reads. More rows → more Z parallelism → fewer
       temporal Z iterations → fewer re-reads of input activations from FMEM.
 
@@ -878,204 +993,172 @@ Case Study: PE Array Sweep — Increasing PE Rows (fixed cols=128) ----- VGG16 1
       bottleneck (at ≥16 rows), row parallelism is useless for latency.
       Energy improvement is marginal because FMem is a tiny fraction of total.
 
+      
 
 Case Study: PE Array Sweep — Increasing PE Cols (fixed rows=16) ----- VGG16 13-layer full fusion
-  VGG16 13-layer full fusion, DepFiN, FMEM=1056KB, WMEM=14400KB
+  VGG16 13-layer full fusion, DepFiN, FMEM=568KB, WMEM=14400KB
 
     python3 experiment_runner.py --sweep-arch \
       --workload vgg16 --fusion full --variant 13layer \
-      --fmem-sizes 1056 --wmem-sizes 14400 \
-      --pe-configs 16x7 16x14 16x28 16x56 16x112 16x128 \
-      --verbose 2>&1
+      --fmem-sizes 568 --wmem-sizes 14400 \
+      --pe-configs 16x128 16x256 16x512 16x1024 \
+      --tile-size 14 \
+      --verbose 2>&1 | tee results/DF_CS3_VGG16.log
 
-    SACols mapping (cols map X_i/Q spatial dims):
-      VGG16 spatial dims per stage group with tile=7 (output→input):
-        Q   = 7   (output, tile of L12 Q=14)
-        X10 = 7   (L10-L12, Q=14, tile=7)
-        X7  = 14  (L7-L9, Q=28, tile=14 after pool4 stride=2)
-        X4  = 28  (L4-L6, Q=56, tile=28 after pool3)
-        X2  = 56  (L2-L3, Q=112, tile=56 after pool2)
-        X0  = 112 (L0-L1, Q=224, tile=112 after pool1)
+      PE         Energy (μJ)   Latency (cc)    EDP
+      16x128     7.61e+04      2.43e+07        3.41e+06
+      16x256     7.61e+04      2.38e+07        3.33e+06
+      16x512     7.61e+04      2.38e+07        3.33e+06
+      16x1024    7.61e+04      2.38e+07        3.33e+06
 
-      SACols allocation = min(pe_cols, X_i) for each stage:
-      Cols  |  Q  | X10 | X7  | X4  | X2  | X0
-      ------+-----+-----+-----+-----+-----+------
-        7   |  7  |  7  |  7  |  7  |   7 |   7
-       14   |  7  |  7  | 14  | 14  |  14 |  14    ← X7 fully covered
-       28   |  7  |  7  | 14  | 28  |  28 |  28    ← X4 fully covered
-       56   |  7  |  7  | 14  | 28  |  56 |  56    ← X2 fully covered
-      112   |  7  |  7  | 14  | 28  |  56 | 112    ← X0 fully covered (all stages full)
-      128   |  7  |  7  | 14  | 28  |  56 | 112    ← same as 112 (X0 max=112)
+      Energy:  0 % change across all configs (identical at 7.61e+04 μJ).
+      Latency: 16x128→16x256  –2.1 %  |  16x256→16x512/1024  0 %.
+      EDP:     16x128→16x256  –2.3 %  |  16x256→16x512/1024  0 %.
 
-    Results:
-      Cols | Energy(μJ) | Latency(cc) | WMem Reads    | FMem Reads    | DRAM Reads
-      -----+------------+-------------+---------------+---------------+------------
-        7  | 83,900     | 1.37e+08    | 2,192,375,808 | 972,711,936   | 14,860,992
-       14  | 79,400     | 6.86e+07    | 1,096,187,904 | 972,711,936   | 14,860,992
-       28  | 77,300     | 3.74e+07    | 597,639,168   | 972,711,936   | 14,860,992
-       56  | 76,600     | 2.70e+07    | 430,940,160   | 972,711,936   | 14,860,992
-      112  | 76,400     | 2.43e+07    | 388,878,336   | 972,711,936   | 14,860,992
-      128  | 76,400     | 2.43e+07    | 388,878,336   | 972,711,936   | 14,860,992
+      WeightMemory w_reads:
+      16x128  → 388,878,336
+      16x256  → 380,233,728   (–2.2 %)
+      16x512  → 380,233,728   (same as 256)
+      16x1024 → 380,233,728   (same as 256)
 
-    Analysis:
-      DRAM reads: CONSTANT (14.86M). FMem reads: CONSTANT (972.7M).
-      Only WMem reads change — cols affect spatial coverage, reducing temporal
-      weight re-reads as more of each layer's spatial dimension fits in SACols.
+      The tile change from 112→224 for only 2 of 13 layers produces a
+      modest –2.2 % reduction in WMEM w_reads (389M → 380M) and –2.1 %
+      latency improvement.  Energy is unmoved because register WMOPs
+      (~99 % of total) are invariant to the tile size.
 
-      LATENCY: Multi-step improvement, NOT a single jump like ResNet18.
-        7→14:   2.00× improvement (137M → 68.6M cc)
-        14→28:  1.83× improvement (68.6M → 37.4M cc)
-        28→56:  1.39× improvement (37.4M → 27.0M cc)
-        56→112: 1.11× improvement (27.0M → 24.3M cc)
-        112→128: identical (X0=112 fully covered, 16 extra cols idle)
-
-      WMem reads: Decreasing as more spatial coverage reduces weight re-reads.
-        7→14: 2,192M → 1,096M (halved, X7 fully covered)
-        14→28: 1,096M → 598M (halved, X4 fully covered)
-        28→56: 598M → 431M (−28%, X2 fully covered)
-        56→112: 431M → 389M (−10%, X0 fully covered)
-        112→128: identical
-
-      ENERGY: Gradual decrease driven by WMem reads.
-        7→128: 83,900 → 76,400 μJ (−8.9%)
-        Breakdown: 7→14: −5.4%, 14→28: −2.6%, 28→56: −0.9%, 56→128: −0.3%
-
-      SATURATION AT 112 COLS: X0=112 is the largest spatial dim across all layers.
-        Beyond 112 cols, extra PEs are idle. 128−112 = 16 wasted columns.
-
-    KEY DIFFERENCE FROM RESNET18:
-      ResNet18: Single 2× latency step at 7→14, then FLAT from 14+.
-        ResNet18 has fewer layers with a more uniform weight distribution,
-        so once X13=14 is fully covered, the bottleneck immediately shifts
-        to DRAM, locking latency.
-      VGG16: Multi-step improvement through 7→14→28→56→112.
-        VGG16 has 13 layers across 5 spatial sizes (14, 28, 56, 112, 224),
-        each contributing significant weight volume. Covering each stage
-        progressively reduces WMem re-reads and therefore latency.
-        The bottleneck remains DRAM throughout, but the per-layer DRAM
-        scheduling improves as more spatial coverage reduces stalls.
+      Conclusion: for VGG16 13-layer full fusion with these memory sizes
+      and --tile-size 14, increasing PE columns beyond 256 yields ZERO
+      additional benefit.  Even the 128→256 step provides only marginal
+      improvement (–2.1 % latency) because only 2 early layers are
+      affected (X0, X1) and register-level energy completely dominates.
 
 
 Case Study: PE Array Sweep — Aspect Ratio (fixed total PEs=2048) ----- VGG16 13-layer full fusion
-  VGG16 13-layer full fusion, DepFiN, FMEM=1056KB, WMEM=14400KB
+  VGG16 13-layer full fusion, DepFiN, FMEM=568KB, WMEM=14400KB
 
     python3 experiment_runner.py --sweep-arch \
       --workload vgg16 --fusion full --variant 13layer \
-      --fmem-sizes 1056 --wmem-sizes 14400 \
-      --pe-configs 4x512 8x256 16x128 32x64 64x32 128x16 256x8 512x4 \
+      --fmem-sizes 568 --wmem-sizes 14400 \
+      --pe-configs 2x1024 4x512 8x256 16x128 32x64 64x32 128x16 256x8 512x4 1024x2\
       --verbose 2>&1 | tee results/DF_vgg16_pe_aspect_ratio_sweep.log
 
+    PE         rows  cols   X0_tile  Q_tile(L12)  Z0_mapped  Z0_passes
+    2x1024       2  1024     224       14            2         32
+    4x512        4   512     224       14            4         16
+    8x256        8   256     224       14            8          8
+    16x128      16   128     112       14           16          4
+    32x64       32    64      56       14           32          2
+    64x32       64    32      32       14           64          1
+    128x16     128    16      16       14           64          1
+    256x8      256     8       8        7           64          1
+    512x4      512     4       4        2           64          1
+    1024x2    1024     2       2        2           64          1
+
+    Z0 saturates at 64 (= full Z0 dim) once rows ≥ 64.
+    X0=224 fits fully at pe_cols ≥ 256. At 128, X0=112 (2 passes).
+    Deep layers: Q=14 fits at pe_cols ≥ 16; at 8, Q→7 (2 passes);
+    at 4, Q→2 (7 passes); at 2, Q→2 (7 passes).
+
+      
     Results:
-      Config  | Energy(μJ) | Latency(cc) | Bottleneck | FMem Reads    | WMem Reads    | DRAM Reads  | EDP
-      --------+------------+-------------+------------+---------------+---------------+-------------+-----------
-      4×512   |  78,700    | 95,107,328  | DRAM       | 3,850,205,184 |   380,233,728 | 14,860,992  | 1.36e+07
-      8×256   |  77,100    | 47,553,664  | DRAM       | 1,931,876,352 |   380,233,728 | 14,860,992  | 6.71e+06
-      16×128  |  76,400    | 24,338,432  | DRAM       |   972,711,936 |   388,878,336 | 14,860,992  | 3.41e+06
-      32×64   |  76,200    | 26,926,080  | DRAM       |   493,129,728 |   430,940,160 | 14,860,992  | 3.77e+06
-      64×32   |  76,700    | 36,831,232  | DRAM       |   253,338,624 |   588,994,560 | 14,860,992  | 5.17e+06
-      128×16  |  78,500    | 65,917,952  | DRAM       |   148,571,136 | 1,054,126,080 | 14,860,992  | 9.38e+06
-      256×8   |  82,500    |126,976,000  | DRAM       |   107,025,408 | 2,025,676,800 | 14,860,992  | 1.85e+07
-      512×4   |  91,500    |261,005,312  | DRAM       |    95,284,224 | 4,183,474,176 | 14,860,992  | 4.06e+07
+      PE         Energy (μJ)   Latency (cc)    EDP
+      2x1024     7.93e+04      1.90e+08        2.72e+07
+      4x512      7.74e+04      9.51e+07        1.34e+07
+      8x256      7.65e+04      4.76e+07        6.68e+06
+      16x128     7.61e+04      2.43e+07        3.41e+06
+      32x64      7.60e+04      2.69e+07        3.77e+06
+      64x32      7.66e+04      3.68e+07        5.17e+06
+      128x16     7.85e+04      6.59e+07        9.38e+06
+      256x8      8.25e+04      1.27e+08        1.85e+07
+      512x4      9.15e+04      2.61e+08        4.06e+07
+      1024x2     1.06e+05      4.80e+08        8.15e+07
 
-    Analysis:
-      NOTE: Unlike the earlier tile_size=1 run, this uses unconstrained tiling.
-      The tool auto-detects tile_size=14 (max divisor of Q=14 ≤ 128), so all
-      spatial dims are processed in a single tile column. This dramatically
-      reduces WMem reads compared to tile=1 (which forced 14× more iterations).
+    Energy:   decreases 2x1024→32x64 (–4.2 %), then rises steeply
+            32x64→1024x2 (+39.5 %).
+            Minimum at 32x64 (7.60e+04 μJ).
 
-      BOTTLENECK: ALL configs are DRAM-bottlenecked (unlike tile=1 where WMem
-      became the bottleneck from 16×128 onward). With tile=14, the weight
-      temporal reuse is much better, so DRAM weight-loading dominates.
+    Latency:  minimum at 16x128 (2.43e+07 cc).
+              2x1024→16x128: halves each step (~2× scaling from Z passes).
+              16x128→32x64: +10.7 % (X0 tile drops 112→56, adding passes).
+              Beyond 64x32: rises steeply. 1024x2 = 4.80e+08 (19.8× worse).
 
-      LATENCY:
-        - 4×512 → 8×256 → 16×128: Latency halves each step (95.1M → 47.6M → 24.3M).
-          Fewer rows = fewer Z parallelism = more DRAM temporal weight passes.
-        - 16×128 → 32×64: Latency INCREASES slightly (24.3M → 26.9M, +10.6%).
-          With 64 cols, some X_i dimensions require extra temporal passes.
-        - 32×64 → 64×32 → 128×16 → 256×8 → 512×4: Latency keeps increasing
-          (26.9M → 36.8M → 65.9M → 127M → 261M) because with fewer cols, DRAM
-          weight streaming requires more temporal passes per layer.
-        - BEST LATENCY: 16×128 (24,338,432 cc).
+    EDP:      minimum at 16x128 (3.41e+06).
+              32x64 close second (3.77e+06, +10.6 %).
+              Degrades rapidly toward both extremes, but much more
+              steeply on the row-heavy side.
+  
 
-      ENERGY:
-        - Decreasing from 4×512 (78,700) to 32×64 (76,200 μJ): −3.2%.
-          Driven by decreasing FMem reads (3,850M → 493M) as more rows provide
-          more Z parallelism and fewer intermediate activation re-reads.
-        - TURNAROUND from 64×32 onward: Energy INCREASES.
-          WMem reads grow: 381M → 431M → 589M → 1,054M → 2,026M → 4,183M.
-          The WMem energy increase overwhelms the continued FMem decrease.
-        - BEST ENERGY: 32×64 (76,200 μJ).
+    FeatureMemory:
+      PE         in_reads      int_in_reads     int_out_reads  int_out_writes
+      2x1024     43,352,064    7,629,963,264    13,447,168     13,447,168
+      4x512      21,676,032    3,814,981,632    13,447,168     13,447,168
+      8x256      10,838,016    1,907,490,816    13,447,168     13,447,168
+      16x128      5,419,008      953,745,408    13,447,168     13,447,168
+      32x64       2,709,504      476,872,704    13,447,168     13,447,168
+      64x32       1,354,752      238,436,352    13,447,168     13,447,168
+      128x16      1,354,752      133,668,864    13,447,168     13,447,168
+      256x8       1,354,752       92,123,136    13,447,168     13,447,168
+      512x4       1,354,752       80,381,952    13,447,168     13,447,168
+      1024x2      1,354,752       80,381,952    13,447,168     13,447,168
 
-      DRAM READS: CONSTANT at 14,860,992 across all configs (weights + activations
-        always read once from DRAM regardless of PE aspect ratio).
+      in_reads:     drop 43M → 1.4M (–96.9 %). Saturates at 64x32 (Z0=64=full).
+      int_in_reads: drop 7,630M → 80M (–98.9 %). Does NOT fully saturate at
+                    64x32 — continues dropping to 512x4 because deeper layers
+                    (Z=128,256,512) still need multiple Z passes at lower rows.
+                    Full saturation at rows≥512.
 
-      FMem READS: Halving pattern with rows (3,850M → 95M).
-        More rows → more Z parallelism → fewer re-reads of intermediate activations.
+    WeightMemory w_reads:
+      PE         w_reads
+      2x1024       380,233,728
+      4x512        380,233,728
+      8x256        380,233,728     ← all 3 identical (all tiles fit at cols≥256)
+      16x128       388,878,336     (+2.3 % — X0=112 not 224, 2 passes for L0-1)
+      32x64        430,940,160     (+13.3 %)
+      64x32        588,994,560     (+54.9 %)
+      128x16     1,054,126,080     (+177.2 %)
+      256x8      2,025,676,800     (+432.6 %)
+      512x4      4,183,474,176     (+1000.3 %)
+      1024x2     7,673,315,328     (+1918.4 %)
 
-      WMem READS: Nearly constant ~380M for 4×512 through 8×256, then increases
-        steadily: 389M (16×128) → 431M (32×64) → 589M (64×32) → 1,054M (128×16)
-        → 2,026M (256×8) → 4,183M (512×4). Fewer cols mean WMem can't fit enough
-        of the X-dimension spatially, requiring temporal weight re-reads.
+      At pe_cols ≥ 256, all VGG16 spatial dims (max 224) fit → constant w_reads.
+      Below 256, tiles shrink progressively and w_reads scale with spatial passes.
+      The rise is dramatic: 2x1024→1024x2 = 20.2× increase.
 
-      BEST EDP: 16×128 (3.41e+06) — best latency with near-best energy.
-        Close second: 32×64 (3.77e+06) — best energy but +10% latency.
+  Analysis
+    --------
+    VGG16's large spatial dimensions (224→112→56→28→14) and deep Z
+    dimensions (up to Z12=512) create a pronounced asymmetry:
 
-    COMPARISON WITH RESNET18 PE ASPECT SWEEP:
-      Both are weight-dominant networks with stride=16 and similar structure.
-      ResNet18 (unconstrained tile): Best EDP at 16×128 / 32×64 (balanced).
-        Bottleneck shifts from DRAM (few rows) to WMem (many rows).
-      VGG16 (unconstrained tile=14): Best EDP at 16×128, all configs DRAM-bottlenecked.
-        VGG16 has 33% more weights (14.7M vs 11M) and deeper Z channels (up to 512),
-        so the DRAM weight-loading pressure is even stronger. The WMem reads
-        pattern is similar but amplified (4,183M at 512×4 vs 983M for ResNet18).
-        Both share the same optimal region: 16×128 to 32×64.
+    1. FMEM saturation is very gradual: Z dims span 64→512 across 13 layers.
+      FMEM in_reads saturate at rows=64 (Z0=64 fully mapped), but
+      int_in_reads continue dropping until rows=512 (covering Z12=512).
+      This gives diminishing but persistent FMEM savings well into
+      row-heavy territory.
 
-  COMBINED ANALYSIS — All four DepFiN sweeps for VGG16:
+    2. WMEM inflation is severe: VGG16's large early layers (224×224) at
+      tiny tiles (2-8 at pe_cols ≤ 8) create extreme spatial pass counts
+      (112 passes at tile=2 for layer 0 alone). WMEM w_reads at 1024x2
+      are 20× vs 2x1024.
 
-    VGG16 13-layer full fusion is archetypal WEIGHT-DOMINANT:
-    Total weights: 14.7M params (33% more than ResNet18's 11M).
-    Total input activations: 150K (tiny: 3×224×224 = 150,528).
-    Weight-to-activation ratio: ~97.7× (ResNet18: ~92×).
+    3. Register WMOPs rise +23 % from column-heavy to row-heavy (130B→160B),
+      larger than ResNet18's +24 % swing, because VGG16 has more layers
+      and more total MACs affected by tile fragmentation.
 
-    Key findings across all 4 case studies:
-    1. TILE SIZE: Binary choice (7 vs 1), tile=7 always wins.
-       No intermediate tiles available due to stride=16 constraint.
-       Weight re-reads scale linearly with DRAM Q iterations.
+    4. The EDP-optimal 16x128 barely edge out 32x64 (3.41M vs 3.77M)
+      because:
+      - 16x128 has 4 Z passes but X0=112=full for most layers
+      - 32x64 has 2 Z passes but X0=56 (4 spatial passes for layer 0)
+      - The latency advantage of fewer passes at 16x128 wins despite
+        slightly higher FMEM energy.
 
-    2. PE ROWS: Latency halves at each row doubling (4→8→16) while DRAM-bound.
-       FMem reads halve with rows but contribute <2% of total energy.
+    5. VGG16's large weight count
+      (14.7M weights) amplifies WMEM reload costs at tiny tiles.
 
-    3. PE COLS: Multi-step latency improvement (unlike ResNet18's single step).
-       This is VGG16's distinguishing feature: 13 layers across 5 spatial sizes
-       (14, 28, 56, 112, 224) mean that each col increase progressively covers
-       more stage groups, reducing weight re-reads across more layers.
-       Saturates at 112 cols (X0 = 112).
-
-    4. ASPECT RATIO: Best EDP at 16×128 (col-balanced), best energy at 32×64.
-       Energy turnaround at 64×32 from WMem read explosion.
-       All configs are DRAM-bottlenecked (unlike tile=1 where WMem dominated).
-
-    COMPARISON WITH RESNET18:
-      Nearly identical behavior in all sweeps except PE cols.
-      Both are weight-dominant with stride=16 and 2 valid tiles.
-      The PE cols difference (multi-step vs single-step latency) reflects
-      VGG16's deeper 5-block structure vs ResNet18's fewer distinct spatial sizes.
-
-    COMPARISON WITH FSRCNN/MC-CNN (activation-dominant):
-      Completely opposite trade-offs:
-        - FSRCNN/MC-CNN: Tile size sweep shows gradual degradation (many tiles).
-          VGG16: Binary choice, 7× latency cliff.
-        - FSRCNN/MC-CNN: PE cols are the dominant parallelism axis (large Q).
-          VGG16: PE cols have limited impact (small Q=14 after stride=16).
-        - FSRCNN/MC-CNN: Column-heavy aspect ratios win (4×512 best for FSRCNN).
-          VGG16: Balanced to slightly col-heavy wins (16×128 best EDP).
-        - FSRCNN/MC-CNN: FMem reads dominate energy (~billions per tile).
-          VGG16: WMem reads dominate energy (weight-reload penalty).
-
-
-================================================================================
+      
+      
+======================================================================================================
 EYERISS CASE STUDIES — ResNet18 17-layer full fusion
-================================================================================
+======================================================================================================
 
   Architecture: Eyeriss-like with unified GlobalBuffer (128KB), no FMEM/WMEM split.
   PE-level registers: WReg (weights), IntReg (intermediates), OutReg (outputs), InReg (inputs).
@@ -1105,6 +1188,14 @@ EYERISS CASE STUDIES — ResNet18 17-layer full fusion
   InReg (101–650) depends on pe_rows (more rows → fewer C/S iterations).
 
 
+Eyeriss Case Study 0: Architecture Sweep GB Size:
+    python3 experiment_runner.py --sweep-arch \
+    --workload resnet --fusion full --variant 17layer \
+    --arch-type eyeriss \
+    --gb-sizes 48 64 128 256 512 1024 \
+    --input-reg 64 --weight-reg 500 --intermediate-reg 500 --output-reg 32 \
+    --tile-size 80 --pe-configs 84x16 2>&1 | tee results/eyeriss_gb_sweep.log
+
 
 Eyeriss Case Study 1: WRegister Size Sweep (400–15000 entries)
   ResNet18 17-layer full fusion, Eyeriss, GB=128KB, tile_size=1
@@ -1114,62 +1205,349 @@ Eyeriss Case Study 1: WRegister Size Sweep (400–15000 entries)
     -w resnet18 -f full -v 17layer \
     --tile-size 1 --gb-size 128 \
     --input-reg 700 --intermediate-reg 300 --output-reg 64 \
-    --weight-reg-sizes 400 1000 2000 4000 8000 15000
+    --weight-reg-sizes 400 902 1000 2000 4000 8000 15000
 
     SUMMARY (A) — Minimum PEs Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      400     512×128      65,536      Yes        7.320e+03    3.042e+06    2.28e+04
-      1000    256×64       16,384      Yes        6.944e+03    3.042e+06    2.15e+04
-      2000    256×32        8,192      Yes        6.779e+03    3.042e+06    2.08e+04
-      4000    256×16        4,096      Yes        6.697e+03    3.059e+06    2.06e+04  ← saturation
-      8000    256×16        4,096      Yes        6.697e+03    3.059e+06    2.06e+04
-      15000   256×16        4,096      Yes        6.697e+03    3.059e+06    2.06e+04
+      900     N/A          N/A         N/A        N/A          N/A             N/A
+      902     256x64       16,384      Yes        5.102e+04    3.042e+06    1.63e+05
+      1800    128×64        8,192      Yes        7.245e+04    3.042e+06    2.29e+05
+      3600    64×64         4,096      Yes        1.173e+05    3.059e+06    3.68e+05
+      7200    64×32         2,048      Yes        2.047e+05    3.422e+06    7.08e+05
 
     SUMMARY (B) — Minimum Latency Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      400     512×128      65,536      Yes        7.320e+03    3.042e+06    2.28e+04
-      1000    256×64       16,384      Yes        6.944e+03    3.042e+06    2.15e+04
-      2000    256×32        8,192      Yes        6.779e+03    3.042e+06    2.08e+04  ← saturation
-      4000    256×32        8,192      Yes        6.779e+03    3.042e+06    2.08e+04
-      8000    256×32        8,192      Yes        6.779e+03    3.042e+06    2.08e+04
-      15000   256×32        8,192      Yes        6.779e+03    3.042e+06    2.08e+04
+      900     N/A          N/A         N/A        N/A          N/A             N/A
+      902     256x64       16,384      Yes        5.102e+04    3.042e+06    1.63e+05      
+      1800    128×64        8,192      Yes        7.245e+04    3.042e+06    2.29e+05
+      3600    64×128        8,192      Yes        1.211e+05    3.042e+06    3.81e+05
+      7200    64×128        8,192      Yes        2.125e+05    3.042e+06    6.60e+05
+
+    SUMMARY (C) — ALL Feasible Configurations per WReg Size:
+      WReg=400: 0 feasible config(s)
+      WReg=902: 2 feasible config(s)
+         PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         256×   64       16,384        Yes      5.103e+04      3.042e+06       1.63e+05
+         512×   32       16,384        Yes      5.062e+04      3.042e+06       1.60e+05
+      WReg=1800:  9 configs  (min PEs= 8,192)
+      WReg=3600: 18 configs  (min PEs= 4,096)
+      WReg=7200: 21 configs  (min PEs= 2,048)
+
+
+    ANALYSIS —
+      Why Tile 7 don't work:
+        DRAM: P:7, Y15:7, Y14:7, Y13:14, X13:2, Y12:14, X12:2, Y11:14, X11:2, Y10:14, X10:2, Y9:28, X9:4, Y8:28, X8:4, Y7:28, X7:4, Y6:28, X6:4, Y5:56, X5:8, Y4:56, X4:8, Y3:56, X3:8, Y2:56, X2:8, Y1:56, X1:8, Y0:112, X0:16
+        SACols: Q:7, Z16:4
+        SARows: S16:3, C16:128
+        SACols_15: X15:7, Z15:4
+        SARows_15: S15:3, C15:128
+        SACols_14: X14:7, Z14:4
+        SARows_14: S14:3, C14:128
+        SACols_13: X13:7, Z13:4
+        SARows_13: S13:3, C13:128
+        SACols_12: X12:7, Z12:4
+        SARows_12: S12:3, C12:128
+        SACols_11: X11:7, Z11:4
+        SARows_11: S11:3, C11:128
+        SACols_10: X10:7, Z10:4
+        SARows_10: S10:3, C10:128
+        SACols_9: X9:7, Z9:4
+        SARows_9: S9:3, C9:128
+        SACols_8: X8:7, Z8:4
+        SARows_8: S8:3, C8:128  
+        SACols_7: X7:7, Z7:4
+        SARows_7: S7:3, C7:128
+        SACols_6: X6:7, Z6:4
+        SARows_6: S6:3, C6:128
+        SACols_5: X5:7, Z5:4
+        SARows_5: S5:3, C5:64, Z5:2
+        SACols_4: X4:7, Z4:4
+        SARows_4: S4:3, C4:64, Z4:2
+        SACols_3: X3:7, Z3:4
+        SARows_3: S3:3, C3:64, Z3:2
+        SACols_2: X2:7, Z2:4
+        SARows_2: S2:3, C2:64, Z2:2
+        SACols_1: X1:7, Z1:4
+        SARows_1: S1:3, C1:64, Z1:2
+        SACols_0: X0:7, Z0:4
+        SARows_0: S0:7, C0:3, Z0:16
+        WRegister: C16:4, R16:3, C15:4, R15:3, C14:4, R14:3, C13:2, R13:3, C12:2, R12:3, C11:2, R11:3, C10:2, R10:3, R9:3, R8:3, R7:3, R6:3, R5:3, R4:3, R3:3, R2:3, R1:3, R0:7
+        IntermediateRegister: Z15:128, Z14:128, Z13:128, Z12:64, Z11:64, Z10:64, Z9:64, Z8:32, Z7:32, Z6:32, Z5:16, Z4:8, Z3:8, Z2:8, Z1:8
+        OutRegister: Z16:128
+    
+        It means that Z must me handled by registers!
+    
+    
+    Latency behavior:
+      Min-latency saturates at 64×128 = 8,192 PEs (3.042e+06 cc) for WReg ≥ 2000.
+      pe_rows=64 is sufficient because ResNet18's layer structure saturates row
+      utilization at 64 rows. Beyond that, more rows don't improve latency.
+      Unlike VGG16 which also saturates at 64 rows, ResNet18 needs fewer PEs
+      for min-latency (8,192 vs 16,384) reflecting its lighter per-layer footprint.
+
+    Energy: Increases with WReg (5.851e+04 → 3.997e+05 μJ at min-PEs across 1K–15K).
+      Within each WReg, higher-rows configs have lower energy at same total PEs.
+      Energy penalty at min-PEs vs min-latency is small (−2% to −3%).
+
+
+Eyeriss Case Study 1_block: WRegister Size Sweep (400–8000 entries)
+  ResNet18 4-layer block fusion (stage4_b2: L13+L14+L15+L16), Eyeriss, GB=128KB, tile_size=1
+  Stage 4 block 2: 256→512→512→512→512, spatial 14×14→7×7→7×7→7×7 (stride-2 at L13)
+  Non-swept regs: InReg=700, IntReg=300, OutReg=64 (generous, non-binding)
+
+    python3 experiment_runner.py --sweep-wreg-pe \
+    -w resnet18 -f block -v stage4_b2 \
+    --tile-size 1 --gb-size 128 \
+    --input-reg 700 --intermediate-reg 300 --output-reg 64 \
+    --weight-reg-sizes 700 1000 2000 4000 8000
+
+    SUMMARY (A) — Minimum PEs Configuration:
+      WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+      400     N/A          N/A         N/A        N/A          N/A             N/A
+      1000    64×256       16,384      Yes        1.312e+04    2.077e+06    2.84e+04
+      2000    64×128        8,192      Yes        1.839e+04    2.077e+06    3.90e+04
+      4000    64×64         4,096      Yes        3.050e+04    2.077e+06    6.43e+04
+      8000    64×32         2,048      Yes        5.551e+04    2.077e+06    1.17e+05
+
+    SUMMARY (B) — Minimum Latency Configuration:
+      WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+      400     N/A          N/A         N/A        N/A          N/A             N/A
+      1000    64×256       16,384      Yes        1.312e+04    2.077e+06    2.84e+04
+      2000    64×128        8,192      Yes        1.839e+04    2.077e+06    3.90e+04
+      4000    64×64         4,096      Yes        3.050e+04    2.077e+06    6.43e+04
+      8000    64×32         2,048      Yes        5.551e+04    2.077e+06    1.17e+05
+
+    NOTE: Summary A = Summary B for all WReg sizes. Every feasible PE config achieves
+    the same latency (2.077e+06 cc). This is because stage4_b2 has very small spatial
+    dimensions (7×7 output, tile=1) and only 4 layers, so there is minimal temporal
+    iteration variation — the dataflow saturates regardless of PE shape.
+
+    SUMMARY (C) — ALL Feasible Configurations per WReg Size:
+      WReg=400: 0 feasible config(s)
+      WReg=1000: 4 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×  256       16,384        Yes      1.312e+04      2.077e+06       2.84e+04
+        128×  128       16,384        Yes      1.212e+04      2.077e+06       2.58e+04
+        256×   64       16,384        Yes      1.170e+04      2.077e+06       2.47e+04
+        512×   32       16,384        Yes      1.163e+04      2.077e+06       2.45e+04
+      WReg=2000: 11 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×  128        8,192        Yes      1.839e+04      2.077e+06       3.90e+04
+        128×   64        8,192        Yes      1.792e+04      2.077e+06       3.78e+04
+        256×   32        8,192        Yes      1.775e+04      2.077e+06       3.74e+04
+        512×   16        8,192        Yes      1.782e+04      2.077e+06       3.74e+04
+         80×  128       10,240        Yes      1.839e+04      2.077e+06       3.90e+04
+        128×   80       10,240        Yes      1.792e+04      2.077e+06       3.78e+04
+        320×   32       10,240        Yes      1.775e+04      2.077e+06       3.74e+04
+         64×  256       16,384        Yes      1.944e+04      2.077e+06       4.17e+04
+        128×  128       16,384        Yes      1.844e+04      2.077e+06       3.91e+04
+        256×   64       16,384        Yes      1.801e+04      2.077e+06       3.80e+04
+        512×   32       16,384        Yes      1.795e+04      2.077e+06       3.78e+04
+      WReg=4000: 20 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×   64        4,096        Yes      3.050e+04      2.077e+06       6.43e+04
+        128×   32        4,096        Yes      3.029e+04      2.077e+06       6.38e+04
+        256×   16        4,096        Yes      3.026e+04      2.077e+06       6.37e+04
+        512×    8        4,096        Yes      3.039e+04      2.077e+06       6.39e+04
+         64×   80        5,120        Yes      3.050e+04      2.077e+06       6.43e+04
+         80×   64        5,120        Yes      3.050e+04      2.077e+06       6.43e+04
+        320×   16        5,120        Yes      3.026e+04      2.077e+06       6.37e+04
+        512×   12        6,144        Yes      3.039e+04      2.077e+06       6.39e+04
+         80×   80        6,400        Yes      3.050e+04      2.077e+06       6.43e+04
+         64×  128        8,192        Yes      3.103e+04      2.077e+06       6.57e+04
+        128×   64        8,192        Yes      3.055e+04      2.077e+06       6.44e+04
+        256×   32        8,192        Yes      3.039e+04      2.077e+06       6.40e+04
+        512×   16        8,192        Yes      3.045e+04      2.077e+06       6.41e+04
+         80×  128       10,240        Yes      3.103e+04      2.077e+06       6.57e+04
+        128×   80       10,240        Yes      3.055e+04      2.077e+06       6.44e+04
+        320×   32       10,240        Yes      3.039e+04      2.077e+06       6.40e+04
+         64×  256       16,384        Yes      3.207e+04      2.077e+06       6.83e+04
+        128×  128       16,384        Yes      3.108e+04      2.077e+06       6.58e+04
+        256×   64       16,384        Yes      3.065e+04      2.077e+06       6.46e+04
+        512×   32       16,384        Yes      3.058e+04      2.077e+06       6.44e+04
+      WReg=8000: 27 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×   32        2,048        Yes      5.551e+04      2.077e+06       1.17e+05
+        128×   16        2,048        Yes      5.543e+04      2.077e+06       1.17e+05
+        256×    8        2,048        Yes      5.547e+04      2.077e+06       1.17e+05
+         80×   32        2,560        Yes      5.551e+04      2.077e+06       1.17e+05
+        320×    8        2,560        Yes      5.547e+04      2.077e+06       1.17e+05
+        256×   12        3,072        Yes      5.547e+04      2.077e+06       1.17e+05
+        320×   12        3,840        Yes      5.547e+04      2.077e+06       1.17e+05
+         64×   64        4,096        Yes      5.578e+04      2.077e+06       1.18e+05
+        128×   32        4,096        Yes      5.556e+04      2.077e+06       1.17e+05
+        256×   16        4,096        Yes      5.553e+04      2.077e+06       1.17e+05
+        512×    8        4,096        Yes      5.566e+04      2.077e+06       1.17e+05
+         64×   80        5,120        Yes      5.578e+04      2.077e+06       1.18e+05
+         80×   64        5,120        Yes      5.578e+04      2.077e+06       1.18e+05
+        320×   16        5,120        Yes      5.553e+04      2.077e+06       1.17e+05
+        512×   12        6,144        Yes      5.566e+04      2.077e+06       1.17e+05
+         80×   80        6,400        Yes      5.578e+04      2.077e+06       1.18e+05
+         64×  128        8,192        Yes      5.630e+04      2.077e+06       1.19e+05
+        128×   64        8,192        Yes      5.583e+04      2.077e+06       1.18e+05
+        256×   32        8,192        Yes      5.566e+04      2.077e+06       1.17e+05
+        512×   16        8,192        Yes      5.573e+04      2.077e+06       1.17e+05
+         80×  128       10,240        Yes      5.630e+04      2.077e+06       1.19e+05
+        128×   80       10,240        Yes      5.583e+04      2.077e+06       1.18e+05
+        320×   32       10,240        Yes      5.566e+04      2.077e+06       1.17e+05
+         64×  256       16,384        Yes      5.735e+04      2.077e+06       1.22e+05
+        128×  128       16,384        Yes      5.635e+04      2.077e+06       1.19e+05
+        256×   64       16,384        Yes      5.592e+04      2.077e+06       1.18e+05
+        512×   32       16,384        Yes      5.586e+04      2.077e+06       1.18e+05
 
     ANALYSIS — WReg is the dominant binding constraint:
-      WReg footprint = Σ(17 layers) of residual C×RxSxZ factors not absorbed by SARows.
-      At pe_rows=256: footprint = 3583 entries. At pe_rows=512: 1795 entries.
-      SACols Z also helps: more cols → Z split across column groups → fewer
-      weight iterations per PE. This is why small WReg needs more cols.
+      With uniform PE grid [4,8,12,16,32,64,80,128,256,320,512]:
 
-      WReg=400: Only 512×128 (65,536 PEs!) works. Even 512 rows leave footprint=1795 > 400,
-        so SACols must take Z=128 to divide it further → needs 128 cols.
-        Cost: 16× more PEs than the saturated point.
+      WReg=400: No feasible configuration. The 4-layer block (256→512→512→512→512)
+        has a large combined weight volume; even at 512×32 = 16,384 PEs the
+        per-PE weight footprint exceeds 400 entries.
 
-      WReg=1000: 256×64 (16,384 PEs). Footprint at 256 rows = 3583, but 64 cols
-        split Z → effective footprint ≈ 3583/4 ≈ 896 < 1000. Only needs 4× over-provisioning.
+      WReg=1000: 4 configs, all at 16,384 PEs (64×256, 128×128, 256×64, 512×32).
+        Only the maximum total-PEs tier works. Higher rows → lower energy
+        (512×32: 1.163e+04 μJ vs 64×256: 1.312e+04 μJ, −11%).
 
-      WReg=2000: 256×32 (8,192 PEs). 3583/2 ≈ 1792 < 2000. 2× cols suffice.
+      WReg=2000: 11 configs, minimum PEs = 8,192 (64×128, 128×64, 256×32, 512×16).
+        Best EDP: 256×32 or 512×16 at 3.74e+04.
 
-      WReg=4000: 256×16 (4,096 PEs). 3583 < 4000 fits with just pe_cols=16.
-        This is the SATURATION POINT: beyond 4000, min PEs stays at 4096.
+      WReg=4000: 20 configs, minimum PEs = 4,096 (64×64, 128×32, 256×16, 512×8).
+        Best EDP: 256×16 at 6.37e+04.
 
-      Conclusion: Doubling WReg from 400→4000 (10×) reduces min PEs by 16× (65K→4K).
-        Each doubling of WReg halves the required pe_cols (128→64→32→16).
-        WReg ≥ 4000 entries is the design sweet spot for ResNet18 17-layer fusion.
+      WReg=8000: 27 configs, minimum PEs = 2,048 (64×32, 128×16, 256×8).
+        Best EDP: 128×16 at 1.17e+05.
 
-    Latency behavior:
-      All configs achieve similar latency (~3.04–3.06M cc). The 256×16 config is
-      marginally slower (3.059M vs 3.042M cc, +0.6%) because fewer cols provide
-      slightly less Z parallelism in SACols. But the difference is negligible.
-      Min-latency saturates at 256×32 (8,192 PEs) for WReg ≥ 2000.
+    Latency behavior — UNIQUE: constant 2.077e+06 cc across ALL feasible configs.
+      Unlike the 17-layer full fusion (which has 3-4 latency tiers), the 4-layer
+      block fusion achieves identical latency regardless of PE shape. This is because:
+      (1) Small spatial dimensions (7×7 output, tile=1) minimize Q/X tiling variation.
+      (2) Only 4 layers of Z=512 — the dataflow can always fully spatialize the
+          available parallelism without temporal iteration overhead.
+      (3) Summary A = Summary B: there is no PE-count vs latency trade-off.
+      Implication: For block fusion, the ONLY design trade-off is PEs vs energy.
+      More PEs = marginally more energy (idle PE overhead) with zero latency benefit.
 
-    Energy: Monotonic decrease 7320→6697 μJ as PEs decrease (−8.5% total).
-      Fewer PEs → fewer idle PE energy → lower total. Energy saturates at WReg=4000.
+    Energy: Monotonically increases with WReg (1.312e+04 → 5.551e+04 μJ at min-PEs).
+      Within each WReg, higher-rows configs consistently have lower energy
+      (512×32 < 256×64 < 128×128 < 64×256 at WReg=1000, −11% spread).
+      This is because wider rows absorb more C/S factors spatially, reducing
+      temporal weight iterations and hence register read/write energy.
 
-    Contrast with FSRCNN: FSRCNN WReg footprint at pe_rows=84 was only 258 entries,
-      so WReg=300 was sufficient. ResNet18 needs WReg ≥ 4000 — a 13× increase —
-      reflecting the 17-layer depth (vs 8) and wider channels (Z up to 512 vs 56).
+    COMPARISON WITH 17-LAYER FULL FUSION (CS1):
+      Block fusion (4 layers):  min PEs = 16,384 @ WReg=1000, 2,048 @ WReg=8000
+      Full fusion (17 layers):  min PEs = 16,384 @ WReg=1000, 2,048 @ WReg=8000
+      Identical min-PEs progression! This is because stage4_b2 contains the
+      widest layers (Z=512) that dominate the 17-layer footprint. The other 13
+      layers (Z=64-256) add register pressure but don't change the PE threshold.
+      Block latency (2.077e+06 cc) is ~32% lower than full fusion (3.042e+06 cc)
+      because of 4× fewer layers to process sequentially.
 
 
+Eyeriss Case Study 1_2layer: WRegister Size Sweep (384–1600 entries)
+  ResNet18 2-layer fusion (s4b2: L18+L19), Eyeriss, GB=128KB, tile_size=1
+  Stage 4 block 2: 512→512→512, spatial 7×7→7×7 (both layers 3×3 conv, no stride)
+  Non-swept regs: InReg=700, IntReg=300, OutReg=64 (generous, non-binding)
+
+    python3 experiment_runner.py --sweep-wreg-pe \
+    -w resnet18 -f 2layer -v s4b2 \
+    --tile-size 1 --gb-size 128 \
+    --input-reg 700 --intermediate-reg 300 --output-reg 64 \
+    --weight-reg-sizes 384 770 1600
+
+    SUMMARY (A) — Minimum PEs Configuration:
+      WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+      384     32×512       16,384      Yes        4.261e+03    1.186e+06    5.43e+03
+      770     32×256        8,192      Yes        4.638e+03    1.186e+06    5.73e+03
+      1600    32×128        4,096      Yes        6.437e+03    1.186e+06    7.82e+03
+
+    SUMMARY (B) — Minimum Latency Configuration:
+      WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+      384     32×512       16,384      Yes        4.261e+03    1.186e+06    5.43e+03
+      770     32×256        8,192      Yes        4.638e+03    1.186e+06    5.73e+03
+      1600    32×128        4,096      Yes        6.437e+03    1.186e+06    7.82e+03
+
+    NOTE: Summary A = Summary B for all WReg sizes. Every feasible PE config achieves
+    the same latency (1.186e+06 cc). Same behavior as block fusion (CS1_block) — the
+    small spatial dimensions (7×7, tile=1) and only 2 layers mean the dataflow saturates
+    regardless of PE shape.
+
+    SUMMARY (C) — ALL Feasible Configurations per WReg Size:
+      WReg=384: 5 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         32×  512       16,384        Yes      4.261e+03      1.186e+06       5.43e+03
+         64×  256       16,384        Yes      3.667e+03      1.186e+06       4.55e+03
+        128×  128       16,384        Yes      3.376e+03      1.186e+06       4.12e+03
+        256×   64       16,384        Yes      3.243e+03      1.186e+06       3.91e+03
+        512×   32       16,384        Yes      3.201e+03      1.186e+06       3.84e+03
+      WReg=770: 14 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         32×  256        8,192        Yes      4.638e+03      1.186e+06       5.73e+03
+         64×  128        8,192        Yes      4.343e+03      1.186e+06       5.29e+03
+        128×   64        8,192        Yes      4.202e+03      1.186e+06       5.08e+03
+        256×   32        8,192        Yes      4.143e+03      1.186e+06       4.98e+03
+        512×   16        8,192        Yes      4.139e+03      1.186e+06       4.97e+03
+         32×  320       10,240        Yes      4.638e+03      1.186e+06       5.73e+03
+         80×  128       10,240        Yes      4.343e+03      1.186e+06       5.29e+03
+        128×   80       10,240        Yes      4.202e+03      1.186e+06       5.08e+03
+        320×   32       10,240        Yes      4.143e+03      1.186e+06       4.98e+03
+         32×  512       16,384        Yes      5.237e+03      1.186e+06       6.61e+03
+         64×  256       16,384        Yes      4.642e+03      1.186e+06       5.73e+03
+        128×  128       16,384        Yes      4.351e+03      1.186e+06       5.30e+03
+        256×   64       16,384        Yes      4.218e+03      1.186e+06       5.09e+03
+        512×   32       16,384        Yes      4.176e+03      1.186e+06       5.02e+03
+      WReg=1600: 24 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         32×  128        4,096        Yes      6.437e+03      1.186e+06       7.82e+03
+         64×   64        4,096        Yes      6.291e+03      1.186e+06       7.60e+03
+        128×   32        4,096        Yes      6.225e+03      1.186e+06       7.50e+03
+        256×   16        4,096        Yes      6.204e+03      1.186e+06       7.47e+03
+        512×    8        4,096        Yes      6.218e+03      1.186e+06       7.48e+03
+         64×   80        5,120        Yes      6.291e+03      1.186e+06       7.60e+03
+         80×   64        5,120        Yes      6.291e+03      1.186e+06       7.60e+03
+        320×   16        5,120        Yes      6.204e+03      1.186e+06       7.47e+03
+        512×   12        6,144        Yes      6.218e+03      1.186e+06       7.48e+03
+         80×   80        6,400        Yes      6.291e+03      1.186e+06       7.60e+03
+         32×  256        8,192        Yes      6.736e+03      1.186e+06       8.26e+03
+         64×  128        8,192        Yes      6.441e+03      1.186e+06       7.83e+03
+        128×   64        8,192        Yes      6.299e+03      1.186e+06       7.61e+03
+        256×   32        8,192        Yes      6.241e+03      1.186e+06       7.52e+03
+        512×   16        8,192        Yes      6.236e+03      1.186e+06       7.51e+03
+         32×  320       10,240        Yes      6.736e+03      1.186e+06       8.26e+03
+         80×  128       10,240        Yes      6.441e+03      1.186e+06       7.83e+03
+        128×   80       10,240        Yes      6.299e+03      1.186e+06       7.61e+03
+        320×   32       10,240        Yes      6.241e+03      1.186e+06       7.52e+03
+         32×  512       16,384        Yes      7.334e+03      1.186e+06       9.15e+03
+         64×  256       16,384        Yes      6.740e+03      1.186e+06       8.27e+03
+        128×  128       16,384        Yes      6.449e+03      1.186e+06       7.84e+03
+        256×   64       16,384        Yes      6.316e+03      1.186e+06       7.63e+03
+        512×   32       16,384        Yes      6.274e+03      1.186e+06       7.56e+03
+
+    ANALYSIS — 2-layer fusion is much cheaper than block/full fusion:
+      With uniform PE grid [4,8,12,16,32,64,80,128,256,320,512]:
+
+      WReg=384: 5 configs, all at 16,384 PEs (32×512, 64×256, 128×128, 256×64, 512×32).
+        Only the maximum total-PEs tier works. Higher rows → lower energy
+        (512×32: 3.201e+03 μJ vs 32×512: 4.261e+03 μJ, −25%).
+
+      WReg=770: 14 configs, minimum PEs = 8,192 (32×256, 64×128, 128×64, 256×32, 512×16).
+        Best EDP: 512×16 at 4.97e+03.
+
+      WReg=1600: 24 configs, minimum PEs = 4,096 (32×128, 64×64, 128×32, 256×16, 512×8).
+        Best EDP: 256×16 at 7.47e+03.
+
+    Latency — constant 1.186e+06 cc across ALL feasible configs (same as block fusion
+      behavior). Summary A = Summary B: no PE-count vs latency trade-off.
+
+    Energy: Monotonically increases with WReg (4.261e+03 → 6.437e+03 μJ at min-PEs).
+      Within each WReg, higher-rows configs consistently have lower energy
+      (512×32 < 256×64 < 128×128 < 64×256 < 32×512, −25% spread at WReg=384).
+
+    COMPARISON WITH BLOCK FUSION (CS1_block, 4 layers, stage4_b2):
+      2-layer fusion: min PEs = 16,384 @ WReg=384, vs block: 16,384 @ WReg=1000
+      2-layer @ WReg=384 matches block @ WReg=1000 in PE requirement!
+      This shows that 2 layers need ~2.6× less WReg per PE than 4 layers.
+      2-layer latency (1.186e+06 cc) is 43% lower than block (2.077e+06 cc).
+      2-layer energy at min-PEs (4.261e+03 μJ) is 67% lower than block (1.312e+04 μJ).
+
+      
 Eyeriss Case Study 2: IntermediateRegister Size Sweep (50–400 entries)
   ResNet18 17-layer full fusion, Eyeriss, GB=128KB, tile_size=1
   Non-swept regs: InReg=700, WReg=4000, OutReg=64
@@ -1272,14 +1650,74 @@ Eyeriss Case Study 3: OutRegister Size Sweep (8–64 entries)
       InReg ≥ 173 (footprint 173 at 256×16, from subagent data)
 
     The binding hierarchy is: WReg >> IntReg > InReg > OutReg.
-    WReg alone determines the PE count when it's undersized (e.g. WReg=400 → 65K PEs),
+    WReg alone determines the PE count when it's undersized (e.g. WReg=400 → N/A),
     because its footprint is 17× larger than IntReg's.
 
     Comparison with FSRCNN:
-      FSRCNN: WReg ≥ 300 sufficient, IntReg/OutReg non-binding. Min PEs = 336 (84×4).
-      ResNet18: WReg ≥ 4000, IntReg ≥ 210, OutReg ≥ 32. Min PEs = 4,096 (256×16).
-      The 12× PE increase reflects deeper fusion (17 vs 8 layers) and wider channels
+      FSRCNN: WReg ≥ 300 sufficient, IntReg/OutReg non-binding. Min PEs = 512 (128×4).
+      ResNet18: WReg ≥ 4000, IntReg ≥ 210, OutReg ≥ 32. Min PEs = 4,096 (64×64).
+      The 8× PE increase reflects deeper fusion (17 vs 8 layers) and wider channels
       (Z up to 512 vs 56). Register requirements scale with network depth and width.
+
+
+Eyeriss Case Study 5: PE Aspect Ratio Sweep (fixed total PEs=16384)
+  ResNet18 17-layer full fusion, Eyeriss, GB=128KB, tile_size=1
+  Registers: InReg=700, WReg=7200, IntReg=300, OutReg=64
+
+    python3 experiment_runner.py --sweep-pe-aspect \
+    --workload resnet18 --fusion full --variant 17layer \
+    --total-pes 16384 \
+    --input-reg 700 --weight-reg 7200 --intermediate-reg 300 --output-reg 64 \
+    --tile-size 1 --gb-size 128 --verbose 2>&1 | tee results/EY_CS5_ResNet18.log
+
+    Infeasible configs: column-heavy (1x4096 through 32x128) and
+    extreme row-heavy (512x8 through 4096x1).
+    
+    
+    Results:
+        PE         Energy (μJ)   Latency (cc)    EDP
+        256x64     5.103e+04      3.042e+06       1.63e+05   
+        512x32     5.062e+04      3.042e+06       1.60e+05  
+        1024x16    5.113e+04      3.042e+06       1.62e+05  
+        2048x8     5.136e+04      3.042e+06       1.62e+05  
+        4096x4     5.136e+04      3.042e+06       1.62e+05  
+        8192x2     5.136e+04      3.042e+06       1.62e+05  
+        16384x1    5.136e+04      3.042e+06       1.62e+05  
+
+    Energy:   decreases 64x64→256x16 (–1.7 %).
+              InReg reads drop 1.19B→0.47B (–60.3 %), driving savings.
+              IntReg R+W rises 4.62B→5.20B (+12.5 %), partially offsetting.
+              WReg reads constant (2.31B).
+
+    Latency:  identical at 3.059e+06 cc. GlobalBuffer is the bottleneck
+              and its access pattern is invariant.
+
+    EDP:      minimum at 256x16 (6.31e+05). Monotonically decreasing
+              toward more rows, same trend as VGG16.
+
+    Per-level access counts (reads):
+      PE         GB Reads    InReg Reads     WReg Reads      IntReg R+W
+      64x64      8,141,056   1,187,364,864   2,314,518,528   4,624,220,160
+      128x32     8,141,056     710,492,160   2,314,518,528   4,816,896,000
+      256x16     8,141,056     472,055,808   2,314,518,528   5,202,247,680
+
+    GlobalBuffer reads: constant (8.1M).
+    WReg reads: constant (2.31B).
+    InReg reads: drop 2.5× (1.19B→0.47B) — more rows map C×S more
+    completely, reducing InReg residuals.
+    IntReg R+W: rise +12.5 % — same mechanism as VGG16 (fewer cols
+    push Z iterations to IntReg level).
+
+    Key insight: ResNet18 and VGG16 share the same 3-config feasibility
+    window at 4096 PEs. Both favour 256x16 (more rows, fewer cols).
+    The underlying reason is identical: Eyeriss's SARows must accommodate
+    C×S×Z factor products, which requires ≥64 rows for deep networks.
+    Meanwhile, WReg capacity (storing C×R residuals for all 17 layers)
+    caps row count at 256 before pe_cols becomes too small to distribute
+    Z across SACols. This dual squeeze leaves a narrow operating region
+    — a fundamental constraint of Eyeriss's fixed register hierarchy
+    that DepFiN's dedicated WMEM avoids entirely.
+
 
 
 ================================================================================
@@ -1298,8 +1736,8 @@ EYERISS CASE STUDIES — VGG16 13-layer full fusion
     All R_i=S_i=3. Stride-2 via MaxPool after L1, L3, L6, L9.
     With tile=1: X0=16, X2=8, X4=4, X7=2, X10=1, Q=1.
 
-  PE grid searched: rows=[84,128,196,256,324,512], cols=[4,8,16,32,64,128]
-    36 combos per register size.
+  PE grid searched: rows=[4,8,12,16,32,64,80,128,256,320,512], cols=[4,8,12,16,32,64,80,128,256,320,512]
+    121 combos per register size (filtered by max_total_pes=17000).
 
   Register footprints at tile_size=1 (measured with unit-sized regs):
     PE Config   InReg   WReg    IntReg  OutReg
@@ -1341,82 +1779,171 @@ EYERISS CASE STUDIES — VGG16 13-layer full fusion
 
 Eyeriss Case Study 1: WRegister Size Sweep (500–20000 entries)
   VGG16 13-layer full fusion, Eyeriss, GB=128KB, tile_size=1
-  Non-swept regs: InReg=750, IntReg=300, OutReg=64 (generous, non-binding)
+  Non-swept regs: InReg=750, IntReg=300, OutReg=128 (generous, non-binding)
 
     python3 experiment_runner.py --sweep-wreg-pe \
     -w vgg16 -f full -v 13layer \
     --tile-size 1 --gb-size 128 \
-    --input-reg 750 --intermediate-reg 300 --output-reg 64 \
-    --weight-reg-sizes 500 1000 2500 5000 10000 20000 \
-    --pe-rows-grid 84 128 196 256 324 512 \
-    --pe-cols-grid 4 8 16 32 64 128
+    --input-reg 750 --intermediate-reg 500 --output-reg 128 \
+    --weight-reg-sizes 500 1000 2500 5000 10000 20000
 
     SUMMARY (A) — Minimum PEs Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      500     512×128      65,536      Yes        4.496e+04    5.455e+06    2.51e+05
-      1000    196×128      25,088      Yes        4.357e+04    5.455e+06    2.43e+05
-      2500    196×32        6,272      Yes        4.158e+04    5.681e+06    2.38e+05
-      5000    196×16        3,136      Yes        4.114e+04    6.715e+06    2.77e+05
-      10000   128×16        2,048      Yes        3.982e+04    1.103e+07    4.41e+05
-      20000    84×16        1,344      Yes        3.916e+04    2.010e+07    7.90e+05
+      500     N/A          N/A         N/A        N/A          N/A             N/A
+      1000    N/A          N/A         N/A        N/A          N/A             N/A
+      2500    64×128        8,192      Yes        6.716e+05    5.681e+06    3.95e+06
+      5000    64×64         4,096      Yes        1.064e+06    6.715e+06    7.25e+06
+      10000   64×32         2,048      Yes        1.882e+06    1.103e+07    2.09e+07
+      20000   64×16         1,024      Yes        3.549e+06    2.010e+07    7.15e+07
 
     SUMMARY (B) — Minimum Latency Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      500     512×128      65,536      Yes        4.496e+04    5.455e+06    2.51e+05
-      1000    196×128      25,088      Yes        4.357e+04    5.455e+06    2.43e+05
-      2500    196×64       12,544      Yes        4.245e+04    5.455e+06    2.35e+05
-      5000    196×64       12,544      Yes        4.245e+04    5.455e+06    2.35e+05  ← sat.
-      10000   196×64       12,544      Yes        4.245e+04    5.455e+06    2.35e+05
-      20000   196×64       12,544      Yes        4.245e+04    5.455e+06    2.35e+05
+      500     N/A          N/A         N/A        N/A          N/A             N/A
+      1000    N/A          N/A         N/A        N/A          N/A             N/A
+      2500    64×256       16,384      Yes        7.023e+05    5.455e+06    4.02e+06
+      5000    64×256       16,384      Yes        1.122e+06    5.455e+06    6.31e+06
+      10000   64×256       16,384      Yes        1.960e+06    5.455e+06    1.09e+07
+      20000   64×256       16,384      Yes        3.638e+06    5.455e+06    2.00e+07
+
+    SUMMARY (C) — ALL Feasible Configurations per WReg Size:
+      WReg=500: 0 feasible config(s)
+      WReg=1000: 0 feasible config(s)
+      WReg=2500: 11 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×  128        8,192        Yes      6.716e+05      5.681e+06       3.95e+06
+        128×   64        8,192        Yes      6.502e+05      5.681e+06       3.78e+06
+        256×   32        8,192        Yes      6.400e+05      5.681e+06       3.68e+06
+        512×   16        8,192        Yes      6.458e+05      5.681e+06       3.70e+06
+         80×  128       10,240        Yes      6.716e+05      5.681e+06       3.95e+06
+        128×   80       10,240        Yes      6.502e+05      5.681e+06       3.78e+06
+        320×   32       10,240        Yes      6.400e+05      5.681e+06       3.68e+06
+         64×  256       16,384        Yes      7.023e+05      5.455e+06       4.02e+06
+        128×  128       16,384        Yes      6.771e+05      5.455e+06       3.82e+06
+        256×   64       16,384        Yes      6.611e+05      5.455e+06       3.69e+06
+        512×   32       16,384        Yes      6.612e+05      5.455e+06       3.67e+06
+      WReg=5000: 20 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×   64        4,096        Yes      1.064e+06      6.715e+06       7.25e+06
+        128×   32        4,096        Yes      1.048e+06      6.715e+06       7.09e+06
+        256×   16        4,096        Yes      1.049e+06      6.715e+06       7.07e+06
+        512×    8        4,096        Yes      1.058e+06      6.715e+06       7.12e+06
+         64×   80        5,120        Yes      1.064e+06      6.715e+06       7.25e+06
+         80×   64        5,120        Yes      1.064e+06      6.715e+06       7.25e+06
+        320×   16        5,120        Yes      1.049e+06      6.715e+06       7.07e+06
+        512×   12        6,144        Yes      1.058e+06      6.715e+06       7.12e+06
+         80×   80        6,400        Yes      1.064e+06      6.715e+06       7.25e+06
+         64×  128        8,192        Yes      1.091e+06      5.681e+06       6.33e+06
+        128×   64        8,192        Yes      1.070e+06      5.681e+06       6.16e+06
+        256×   32        8,192        Yes      1.059e+06      5.681e+06       6.06e+06
+        512×   16        8,192        Yes      1.065e+06      5.681e+06       6.08e+06
+         80×  128       10,240        Yes      1.091e+06      5.681e+06       6.33e+06
+        128×   80       10,240        Yes      1.070e+06      5.681e+06       6.16e+06
+        320×   32       10,240        Yes      1.059e+06      5.681e+06       6.06e+06
+         64×  256       16,384        Yes      1.122e+06      5.455e+06       6.31e+06
+        128×  128       16,384        Yes      1.096e+06      5.455e+06       6.11e+06
+        256×   64       16,384        Yes      1.080e+06      5.455e+06       5.98e+06
+        512×   32       16,384        Yes      1.081e+06      5.455e+06       5.96e+06
+      WReg=10000: 27 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×   32        2,048        Yes      1.882e+06      1.103e+07       2.09e+07
+        128×   16        2,048        Yes      1.877e+06      1.103e+07       2.08e+07
+        256×    8        2,048        Yes      1.882e+06      1.103e+07       2.08e+07
+         80×   32        2,560        Yes      1.882e+06      1.103e+07       2.09e+07
+        320×    8        2,560        Yes      1.882e+06      1.103e+07       2.08e+07
+        256×   12        3,072        Yes      1.882e+06      1.103e+07       2.08e+07
+        320×   12        3,840        Yes      1.882e+06      1.103e+07       2.08e+07
+         64×   64        4,096        Yes      1.903e+06      6.715e+06       1.29e+07
+        128×   32        4,096        Yes      1.887e+06      6.715e+06       1.27e+07
+        256×   16        4,096        Yes      1.888e+06      6.715e+06       1.27e+07
+        512×    8        4,096        Yes      1.896e+06      6.715e+06       1.28e+07
+         64×   80        5,120        Yes      1.903e+06      6.715e+06       1.29e+07
+         80×   64        5,120        Yes      1.903e+06      6.715e+06       1.29e+07
+        320×   16        5,120        Yes      1.888e+06      6.715e+06       1.27e+07
+        512×   12        6,144        Yes      1.896e+06      6.715e+06       1.28e+07
+         80×   80        6,400        Yes      1.903e+06      6.715e+06       1.29e+07
+         64×  128        8,192        Yes      1.930e+06      5.681e+06       1.11e+07
+        128×   64        8,192        Yes      1.908e+06      5.681e+06       1.09e+07
+        256×   32        8,192        Yes      1.898e+06      5.681e+06       1.08e+07
+        512×   16        8,192        Yes      1.904e+06      5.681e+06       1.09e+07
+         80×  128       10,240        Yes      1.930e+06      5.681e+06       1.11e+07
+        128×   80       10,240        Yes      1.908e+06      5.681e+06       1.09e+07
+        320×   32       10,240        Yes      1.898e+06      5.681e+06       1.08e+07
+         64×  256       16,384        Yes      1.960e+06      5.455e+06       1.09e+07
+        128×  128       16,384        Yes      1.935e+06      5.455e+06       1.07e+07
+        256×   64       16,384        Yes      1.919e+06      5.455e+06       1.06e+07
+        512×   32       16,384        Yes      1.919e+06      5.455e+06       1.05e+07
+      WReg=20000: 31 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×   16        1,024        Yes      3.549e+06      2.010e+07       7.15e+07
+        128×    8        1,024        Yes      3.549e+06      2.010e+07       7.14e+07
+         80×   16        1,280        Yes      3.549e+06      2.010e+07       7.15e+07
+        128×   12        1,536        Yes      3.549e+06      2.010e+07       7.14e+07
+         64×   32        2,048        Yes      3.559e+06      1.103e+07       3.94e+07
+        128×   16        2,048        Yes      3.554e+06      1.103e+07       3.93e+07
+        256×    8        2,048        Yes      3.560e+06      1.103e+07       3.93e+07
+         80×   32        2,560        Yes      3.559e+06      1.103e+07       3.94e+07
+        320×    8        2,560        Yes      3.560e+06      1.103e+07       3.93e+07
+        256×   12        3,072        Yes      3.560e+06      1.103e+07       3.93e+07
+        320×   12        3,840        Yes      3.560e+06      1.103e+07       3.93e+07
+         64×   64        4,096        Yes      3.580e+06      6.715e+06       2.42e+07
+        128×   32        4,096        Yes      3.565e+06      6.715e+06       2.40e+07
+        256×   16        4,096        Yes      3.565e+06      6.715e+06       2.40e+07
+        512×    8        4,096        Yes      3.574e+06      6.715e+06       2.40e+07
+         64×   80        5,120        Yes      3.580e+06      6.715e+06       2.42e+07
+         80×   64        5,120        Yes      3.580e+06      6.715e+06       2.42e+07
+        320×   16        5,120        Yes      3.565e+06      6.715e+06       2.40e+07
+        512×   12        6,144        Yes      3.574e+06      6.715e+06       2.40e+07
+         80×   80        6,400        Yes      3.580e+06      6.715e+06       2.42e+07
+         64×  128        8,192        Yes      3.607e+06      5.681e+06       2.06e+07
+        128×   64        8,192        Yes      3.586e+06      5.681e+06       2.05e+07
+        256×   32        8,192        Yes      3.576e+06      5.681e+06       2.04e+07
+        512×   16        8,192        Yes      3.581e+06      5.681e+06       2.04e+07
+         80×  128       10,240        Yes      3.607e+06      5.681e+06       2.06e+07
+        128×   80       10,240        Yes      3.586e+06      5.681e+06       2.05e+07
+        320×   32       10,240        Yes      3.576e+06      5.681e+06       2.04e+07
+         64×  256       16,384        Yes      3.638e+06      5.455e+06       2.00e+07
+        128×  128       16,384        Yes      3.613e+06      5.455e+06       1.99e+07
+        256×   64       16,384        Yes      3.597e+06      5.455e+06       1.97e+07
+        512×   32       16,384        Yes      3.597e+06      5.455e+06       1.97e+07
 
     ANALYSIS — WReg is the dominant binding constraint:
       WReg footprint = Σ(13 layers) of residual C×R factors not absorbed by SARows.
-      At pe_rows=196: footprint = 4,791 at pe_cols=16, or 2,397 at cols=32,
-      1,200 at cols=64, 603 at cols=128.
-      SACols Z helps: more cols → Z split across column groups → fewer
-      weight iterations per PE.
+      With uniform PE grid [4,8,12,16,32,64,80,128,256,320,512]:
 
-      WReg=500: Only 512×128 (65,536 PEs!) works. Even 512 rows leave footprint=603
-        at cols=128. Need maximum cols to divide further → needs 128 cols.
-        Cost: 21× more PEs than the minimum-PEs saturation point.
+      WReg=500/1000: No feasible configuration exists even at maximum grid size.
+        VGG16's 13 conv layers have very large filter counts (up to 512 channels);
+        the combined weight register pressure exceeds these budgets for all
+        PE configurations in the grid.
 
-      WReg=1000: 196×128 (25,088 PEs). Footprint at 196 rows, 128 cols = 603 < 1000. ✓
-        Still needs 128 cols but rows drop from 512 to 196 (rows saturate there).
+      WReg=2500: 11 configs feasible, minimum PEs = 64×128 = 8,192.
+        At 8,192 PEs four row×col combos work: 64×128, 128×64, 256×32, 512×16.
+        All achieve same latency tier (5.681e+06 cc) except 256+ col configs
+        which reach the optimal 5.455e+06 cc. Best EDP: 512×32 at 3.67e+06.
 
-      WReg=2500: 196×32 (6,272 PEs). Footprint 2,397 < 2500 at 32 cols. ✓
-        4× fewer PEs than WReg=1000. Each cols halving needs ~2× WReg to compensate.
+      WReg=5000: 20 configs feasible, minimum PEs = 4,096 (64×64, 128×32, 256×16, 512×8).
+        Two latency tiers: 6.715e+06 cc (≤6,400 PEs) and 5.681e+06/5.455e+06 cc
+        (≥8,192 PEs). Best EDP: 512×32 at 5.96e+06.
 
-      WReg=5000: 196×16 (3,136 PEs). Footprint 4,791 < 5000. ✓
-        This is the min PEs saturation for 196+ rows: beyond 5000, the min-PEs
-        config stays at 196×16 because IntReg/OutReg allow pe_cols=16.
+      WReg=10000: 27 configs feasible, minimum PEs = 2,048 (64×32, 128×16, 256×8).
+        Three latency tiers: 1.103e+07 (≤3,840 PEs), 6.715e+06 (4,096–6,400 PEs),
+        and 5.681e+06/5.455e+06 (≥8,192 PEs). Best EDP: 512×32 at 1.05e+07.
 
-      WReg=10000: 128×16 (2,048 PEs). Now pe_rows can drop below 196 because
-        footprint at 128×16 = 9,579 < 10,000. Smaller rows → fewer PEs but
-        latency degrades (1.103e+07 cc, 2× worse).
-
-      WReg=20000: 84×16 (1,344 PEs). Footprint at 84×16 = 19,155 < 20,000. ✓
-        Minimum achievable PEs, but latency = 2.01e+07 cc (3.7× worse).
+      WReg=20000: 31 configs feasible, minimum PEs = 1,024 (64×16, 128×8).
+        Four latency tiers: 2.010e+07 (≤1,536 PEs), 1.103e+07 (2,048–3,840 PEs),
+        6.715e+06 (4,096–6,400 PEs), 5.681e+06/5.455e+06 (≥8,192 PEs).
+        Best EDP: 256×64 or 512×32 at 1.97e+07.
 
     Latency behavior:
-      Min-latency saturates at 196×64 = 12,544 PEs for WReg ≥ 2500.
-      All 196×64 configs achieve identical 5.455e+06 cc.
-      Below WReg=2500: need 128+ cols, constraining to 196×128 or 512×128.
-      Min-PEs configs (128×16, 84×16) have 2–3.7× worse latency because
-      fewer rows → more temporal Z iterations → slower DRAM streaming.
+      Min-latency saturates at 64×256 = 16,384 PEs (5.455e+06 cc) for WReg ≥ 2500.
+      pe_rows=64 is the smallest row count that reaches this optimal latency
+      when paired with 256 cols. Larger rows (128, 256, 512) also reach 5.455e+06 cc
+      at 64+ cols, but require the same or more total PEs.
 
-    Energy: Monotonic decrease 44,960 → 39,160 μJ as PEs decrease (−12.9%).
-      Fewer PEs → fewer idle PE energy. But min-latency configs (196×64)
-      use more PEs (12,544) and have higher energy (42,450 μJ) — the EDP
-      trade-off favors the min-latency config (EDP 2.35e+05 vs 2.77e+05).
-
-    KEY COMPARISON WITH RESNET18 WReg SWEEP:
-      ResNet18: WReg=4000 saturates at 256×16 = 4,096 PEs.
-      VGG16: WReg=5000 saturates at 196×16 = 3,136 PEs.
-      VGG16 needs MORE WReg to saturate (5000 vs 4000, +25%) because its
-      per-PE weight footprint is 33% larger. But the min PEs is actually
-      FEWER (3,136 vs 4,096) because VGG16 saturates at 196 rows (not 256).
-      This reflects VGG16's layer structure: fewer layers × larger weights per layer
-      vs ResNet18's more layers × projection shortcuts that increase row demand.
+    Energy: Increases monotonically with WReg (6.716e+05 → 3.549e+06 μJ at min-PEs).
+      Within each WReg, higher-rows configs (256, 512) have slightly lower energy
+      than lower-rows configs (64, 80) at the same total PEs, because wider rows
+      absorb more filter factors spatially. The EDP trade-off consistently favors
+      the min-latency tier configs (5.455e+06 cc) over min-PEs configs.
 
 
 Eyeriss Case Study 2: IntermediateRegister Size Sweep (50–500 entries)
@@ -1531,6 +2058,87 @@ Eyeriss Case Study 3: OutRegister Size Sweep (4–64 entries)
       Less PEs for VGG16 because row saturation is at 196 (vs 256 for ResNet18).
 
 
+
+      
+    Eyeriss Case Study 5: PE Aspect Ratio Sweep (fixed total PEs=4096)
+    VGG16 13-layer full fusion, Eyeriss, GB=128KB, tile_size=1
+    Registers: InReg=750, WReg=5000, IntReg=300, OutReg=64
+
+    python3 experiment_runner.py --sweep-pe-aspect \
+    --workload vgg16 --fusion full --variant 13layer \
+    --total-pes 4096 \
+    --input-reg 750 --weight-reg 5000 --intermediate-reg 300 --output-reg 64 \
+    --tile-size 1 --gb-size 128 --verbose 2>&1 | tee results/EY_CS5_VGG16.log
+
+    Infeasible configs: column-heavy (1x4096 through 32x128) and
+    extreme row-heavy (512x8 through 4096x1).
+    Only 3 configs feasible: 64x64, 128x32, 256x16.
+
+    Column-heavy fails: VGG16's large C dimensions (up to C12=512) and
+    R=S=3 require SARows products ≥ C×S×Z_share. With ≤32 rows, the
+    mapping constraints become ill-posed.
+
+    Row-heavy fails: at ≥512 rows, WReg footprint exceeds 5000 entries.
+    With tile_size=1 (Q=1), SACols carry only Z factors. At pe_cols=8,
+    the residual Z iterations at WRegister level exceed capacity.
+
+    Results:
+      PE         Energy (μJ)   Latency (cc)    EDP
+      64x64      9.960e+05     6.715e+06       6.79e+06
+      128x32     9.782e+05     6.715e+06       6.62e+06
+      256x16     9.743e+05     6.715e+06       6.57e+06    ← EDP minimum
+
+    Energy:   decreases 64x64→256x16 (–2.2 %).
+              Driven by InReg reads: 5.64B→1.82B (–67.7 %).
+              IntReg R+W rises slightly: 30.8B→33.8B (+9.6 %).
+              Net effect: fewer InReg accesses win.
+
+    Latency:  identical at 6.715e+06 cc. GlobalBuffer is the bottleneck
+              and its access pattern is invariant across these 3 configs.
+
+    EDP:      minimum at 256x16 (6.57e+06). Monotonically decreasing
+              toward more rows. The trend suggests even higher pe_rows
+              would improve EDP, but WReg capacity limits prevent it.
+
+    Per-level access counts (reads):
+      PE         GB Reads     InReg Reads     WReg Reads      IntReg R+W
+      64x64      40,793,088   5,635,768,320   15,346,630,656  30,808,866,816
+      128x32     40,793,088   3,092,447,232   15,346,630,656  31,791,513,600
+      256x16     40,793,088   1,820,786,688   15,346,630,656  33,756,807,168
+
+    GlobalBuffer reads: constant (40.8M).
+    WReg reads: constant (15.3B).
+    InReg reads: drop 3.1× (5.64B→1.82B) — more rows better map C×S
+    factors, reducing residual InReg iterations.
+    IntReg R+W: rise +9.6 % — fewer cols means fewer Z factors on SACols,
+    pushing more Z iterations to IntReg.
+
+    Key insight: The narrow feasibility window (64–256 rows) reflects
+    VGG16's dual constraint pressure. Large C dimensions (up to 512)
+    demand sufficient rows for SARows mapping, while the enormous weight
+    count (14.7M params) inflates WReg footprints at extreme row counts.
+    256x16 hits the sweet spot: enough rows for C mapping, enough cols
+    to keep WReg footprint within 5000 entries.      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   COMBINED ANALYSIS — All three Eyeriss register types for VGG16:
     pe_cols is the universal PE-reduction lever for all register types,
     identical to the ResNet18 pattern. Doubling pe_cols halves the per-PE
@@ -1572,6 +2180,26 @@ Eyeriss Case Study 3: OutRegister Size Sweep (4–64 entries)
       VGG16's much larger total weight volume (14.7M vs 11M params) requiring
       more GlobalBuffer streaming cycles.
 
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ================================================================================
 EYERISS CASE STUDIES — MC-CNN 4-layer full fusion
@@ -1587,8 +2215,8 @@ EYERISS CASE STUDIES — MC-CNN 4-layer full fusion
     All X_i = Q = 1242 (no strided reduction)
     Total weights: 27,936 params (~55KB)
 
-  PE grid searched: rows=[4,8,12,14,16,28,32,56,84], cols=[4,8,16,32,64,69,128,138]
-    72 combos per register size.
+  PE grid searched: rows=[4,8,12,16,32,64,80,128,256,320,512], cols=[4,8,12,16,32,64,80,128,256,320,512]
+    121 combos per register size (filtered by max_total_pes=17000).
 
   Register footprints at tile_size=69:
     PE Config   InReg   WReg    IntReg  OutReg
@@ -1620,58 +2248,184 @@ Eyeriss Case Study 1: WRegister Size Sweep (100–600 entries)
     -w mccnn -f full -v 4layer \
     --tile-size 69 --gb-size 128 \
     --input-reg 200 --intermediate-reg 100 --output-reg 64 \
-    --weight-reg-sizes 100 200 300 600 \
-    --pe-rows-grid 4 8 12 14 16 28 32 56 84 128 \
-    --pe-cols-grid 4 8 16 32 64 69 128 138
+    --weight-reg-sizes 100 200 300 600
 
     SUMMARY (A) — Minimum PEs Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      100     128x16       2048        No         3.828e+04    1.223e+07    4.70e+05
-      200     56×16        896         No         3.635e+04    2.344e+07    8.56e+05
-      300     28×16        448         No         3.539e+04    4.585e+07    1.63e+06
-      600     12×16        192         No         3.488e+04    9.068e+07    3.18e+06
+      100     128×12       1,536       No         6.649e+04    1.223e+07    8.28e+05
+      200      64×12         768       No         7.730e+04    2.344e+07    1.84e+06
+      300      32×12         384       No         8.983e+04    4.585e+07    4.18e+06
+      600      12×12         144       No         1.315e+05    9.068e+07    1.20e+07
 
     SUMMARY (B) — Minimum Latency Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      100     128x16       2048        No         3.828e+04    1.223e+07    4.70e+05
-      200     56×16        896         No         3.635e+04    2.344e+07    8.56e+05
-      300     56×64        3584        No         3.617e+04    1.223e+07    4.43e+05
-      600     56×64        3584        No         3.617e+04    1.223e+07    4.43e+05
+      100     128×12       1,536       No         6.649e+04    1.223e+07    8.28e+05
+      200     128×12       1,536       No         8.075e+04    1.223e+07    1.00e+06
+      300     128×12       1,536       No         9.501e+04    1.223e+07    1.18e+06
+      600     128×12       1,536       No         1.378e+05    1.223e+07    1.70e+06
 
-    ANALYSIS — WReg is the binding constraint (same as FSRCNN):
+    SUMMARY (C) — ALL Feasible Configurations per WReg Size:
+      WReg=100: 14 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+        128×   12        1,536         No      6.649e+04      1.223e+07       8.28e+05
+        128×   16        2,048         No      6.649e+04      1.223e+07       8.28e+05
+        256×    8        2,048         No      6.649e+04      1.223e+07       8.28e+05
+        512×    4        2,048         No      6.649e+04      1.223e+07       8.28e+05
+        320×    8        2,560         No      6.649e+04      1.223e+07       8.28e+05
+        256×   12        3,072         No      6.896e+04      1.223e+07       8.74e+05
+        320×   12        3,840         No      6.896e+04      1.223e+07       8.74e+05
+        256×   16        4,096         No      6.896e+04      1.223e+07       8.74e+05
+        512×    8        4,096         No      6.896e+04      1.223e+07       8.74e+05
+        320×   16        5,120         No      6.896e+04      1.223e+07       8.74e+05
+        512×   12        6,144         No      7.391e+04      1.223e+07       9.64e+05
+        512×   16        8,192         No      7.391e+04      1.223e+07       9.64e+05
+        256×   64       16,384         No      6.649e+04      1.223e+07       8.28e+05
+        512×   32       16,384         No      6.649e+04      1.223e+07       8.28e+05
+      WReg=200: 24 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         64×   12          768         No      7.730e+04      2.344e+07       1.84e+06
+         80×   12          960         No      7.730e+04      2.344e+07       1.84e+06
+         64×   16        1,024         No      7.730e+04      2.344e+07       1.84e+06
+        128×    8        1,024         No      7.951e+04      2.344e+07       1.88e+06
+        256×    4        1,024         No      7.951e+04      2.344e+07       1.88e+06
+         80×   16        1,280         No      7.730e+04      2.344e+07       1.84e+06
+        320×    4        1,280         No      7.951e+04      2.344e+07       1.88e+06
+        128×   12        1,536         No      8.075e+04      1.223e+07       1.00e+06
+        128×   16        2,048         No      8.075e+04      1.223e+07       1.00e+06
+        256×    8        2,048         No      8.075e+04      1.223e+07       1.00e+06
+        512×    4        2,048         No      8.075e+04      1.223e+07       1.00e+06
+        320×    8        2,560         No      8.075e+04      1.223e+07       1.00e+06
+        256×   12        3,072         No      8.322e+04      1.223e+07       1.05e+06
+        320×   12        3,840         No      8.322e+04      1.223e+07       1.05e+06
+        256×   16        4,096         No      8.322e+04      1.223e+07       1.05e+06
+        512×    8        4,096         No      8.322e+04      1.223e+07       1.05e+06
+        320×   16        5,120         No      8.322e+04      1.223e+07       1.05e+06
+        512×   12        6,144         No      8.817e+04      1.223e+07       1.14e+06
+        128×   64        8,192         No      7.951e+04      1.223e+07       9.80e+05
+        256×   32        8,192         No      7.951e+04      1.223e+07       9.80e+05
+        512×   16        8,192         No      8.817e+04      1.223e+07       1.14e+06
+        320×   32       10,240         No      7.951e+04      1.223e+07       9.80e+05
+        256×   64       16,384         No      8.075e+04      1.223e+07       1.00e+06
+        512×   32       16,384         No      8.075e+04      1.223e+07       1.00e+06
+      WReg=300: 37 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         32×   12          384         No      8.983e+04      4.585e+07       4.18e+06
+         32×   16          512         No      8.983e+04      4.585e+07       4.18e+06
+         64×    8          512         No      9.032e+04      4.585e+07       4.17e+06
+        128×    4          512         No      9.316e+04      4.585e+07       4.29e+06
+         80×    8          640         No      9.032e+04      4.585e+07       4.17e+06
+         64×   12          768         No      9.156e+04      2.344e+07       2.17e+06
+         80×   12          960         No      9.156e+04      2.344e+07       2.17e+06
+         64×   16        1,024         No      9.156e+04      2.344e+07       2.17e+06
+        128×    8        1,024         No      9.377e+04      2.344e+07       2.21e+06
+        256×    4        1,024         No      9.377e+04      2.344e+07       2.21e+06
+         80×   16        1,280         No      9.156e+04      2.344e+07       2.17e+06
+        320×    4        1,280         No      9.377e+04      2.344e+07       2.21e+06
+        128×   12        1,536         No      9.501e+04      1.223e+07       1.18e+06
+        128×   16        2,048         No      9.501e+04      1.223e+07       1.18e+06
+        256×    8        2,048         No      9.501e+04      1.223e+07       1.18e+06
+        512×    4        2,048         No      9.501e+04      1.223e+07       1.18e+06
+        320×    8        2,560         No      9.501e+04      1.223e+07       1.18e+06
+        256×   12        3,072         No      9.748e+04      1.223e+07       1.22e+06
+        320×   12        3,840         No      9.748e+04      1.223e+07       1.22e+06
+         64×   64        4,096         No      9.032e+04      1.223e+07       1.11e+06
+        128×   32        4,096         No      9.316e+04      1.223e+07       1.14e+06
+        256×   16        4,096         No      9.748e+04      1.223e+07       1.22e+06
+        512×    8        4,096         No      9.748e+04      1.223e+07       1.22e+06
+         80×   64        5,120         No      9.032e+04      1.223e+07       1.11e+06
+        320×   16        5,120         No      9.748e+04      1.223e+07       1.22e+06
+        512×   12        6,144         No      1.024e+05      1.223e+07       1.31e+06
+        128×   64        8,192         No      9.377e+04      1.223e+07       1.15e+06
+        256×   32        8,192         No      9.377e+04      1.223e+07       1.15e+06
+        512×   16        8,192         No      1.024e+05      1.223e+07       1.31e+06
+         32×  320       10,240        Yes      8.983e+04      1.223e+07       1.11e+06
+        128×   80       10,240         No      9.316e+04      1.223e+07       1.14e+06
+        320×   32       10,240         No      9.377e+04      1.223e+07       1.15e+06
+         32×  512       16,384        Yes      8.983e+04      1.223e+07       1.11e+06
+         64×  256       16,384        Yes      9.032e+04      1.223e+07       1.11e+06
+        128×  128       16,384         No      9.316e+04      1.223e+07       1.14e+06
+        256×   64       16,384         No      9.501e+04      1.223e+07       1.18e+06
+        512×   32       16,384         No      9.501e+04      1.223e+07       1.18e+06
+      WReg=600: 56 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         12×   12          144         No      1.315e+05      9.068e+07       1.20e+07
+         12×   16          192         No      1.315e+05      9.068e+07       1.20e+07
+         16×   12          192         No      1.315e+05      9.068e+07       1.20e+07
+         16×   16          256         No      1.315e+05      9.068e+07       1.20e+07
+         32×    8          256         No      1.312e+05      9.068e+07       1.20e+07
+         64×    4          256         No      1.323e+05      9.068e+07       1.20e+07
+         80×    4          320         No      1.323e+05      9.068e+07       1.20e+07
+         32×   12          384         No      1.326e+05      4.585e+07       6.14e+06
+         32×   16          512         No      1.326e+05      4.585e+07       6.14e+06
+         64×    8          512         No      1.331e+05      4.585e+07       6.13e+06
+        128×    4          512         No      1.359e+05      4.585e+07       6.25e+06
+         80×    8          640         No      1.331e+05      4.585e+07       6.13e+06
+         64×   12          768         No      1.343e+05      2.344e+07       3.18e+06
+         80×   12          960         No      1.343e+05      2.344e+07       3.18e+06
+         64×   16        1,024         No      1.343e+05      2.344e+07       3.18e+06
+        128×    8        1,024         No      1.366e+05      2.344e+07       3.21e+06
+        256×    4        1,024         No      1.366e+05      2.344e+07       3.21e+06
+         80×   16        1,280         No      1.343e+05      2.344e+07       3.18e+06
+        320×    4        1,280         No      1.366e+05      2.344e+07       3.21e+06
+        128×   12        1,536         No      1.378e+05      1.223e+07       1.70e+06
+        128×   16        2,048         No      1.378e+05      1.223e+07       1.70e+06
+        256×    8        2,048         No      1.378e+05      1.223e+07       1.70e+06
+        512×    4        2,048         No      1.378e+05      1.223e+07       1.70e+06
+         32×   64        2,048         No      1.312e+05      1.272e+07       1.68e+06
+         64×   32        2,048         No      1.323e+05      1.272e+07       1.69e+06
+        320×    8        2,560         No      1.378e+05      1.223e+07       1.70e+06
+         80×   32        2,560         No      1.323e+05      1.272e+07       1.69e+06
+        256×   12        3,072         No      1.403e+05      1.223e+07       1.75e+06
+         12×  320        3,840        Yes      1.315e+05      1.223e+07       1.62e+06
+        320×   12        3,840         No      1.403e+05      1.223e+07       1.75e+06
+         64×   64        4,096         No      1.331e+05      1.223e+07       1.64e+06
+        128×   32        4,096         No      1.359e+05      1.223e+07       1.67e+06
+        256×   16        4,096         No      1.403e+05      1.223e+07       1.75e+06
+        512×    8        4,096         No      1.403e+05      1.223e+07       1.75e+06
+         16×  320        5,120        Yes      1.315e+05      1.223e+07       1.62e+06
+         64×   80        5,120         No      1.323e+05      1.223e+07       1.62e+06
+         80×   64        5,120         No      1.331e+05      1.223e+07       1.64e+06
+        320×   16        5,120         No      1.403e+05      1.223e+07       1.75e+06
+         12×  512        6,144        Yes      1.315e+05      1.223e+07       1.62e+06
+        512×   12        6,144         No      1.452e+05      1.223e+07       1.84e+06
+         80×   80        6,400         No      1.323e+05      1.223e+07       1.62e+06
+         16×  512        8,192        Yes      1.315e+05      1.223e+07       1.62e+06
+         32×  256        8,192        Yes      1.312e+05      1.223e+07       1.61e+06
+         64×  128        8,192         No      1.323e+05      1.223e+07       1.62e+06
+        128×   64        8,192         No      1.366e+05      1.223e+07       1.68e+06
+        256×   32        8,192         No      1.366e+05      1.223e+07       1.68e+06
+        512×   16        8,192         No      1.452e+05      1.223e+07       1.84e+06
+         32×  320       10,240        Yes      1.326e+05      1.223e+07       1.64e+06
+         80×  128       10,240         No      1.323e+05      1.223e+07       1.62e+06
+        128×   80       10,240         No      1.359e+05      1.223e+07       1.67e+06
+        320×   32       10,240         No      1.366e+05      1.223e+07       1.68e+06
+         32×  512       16,384        Yes      1.326e+05      1.223e+07       1.64e+06
+         64×  256       16,384        Yes      1.331e+05      1.223e+07       1.64e+06
+        128×  128       16,384         No      1.359e+05      1.223e+07       1.67e+06
+        256×   64       16,384         No      1.378e+05      1.223e+07       1.70e+06
+        512×   32       16,384         No      1.378e+05      1.223e+07       1.70e+06
+
+    ANALYSIS — WReg is the binding constraint (uniform grid [4..512]):
       WReg footprint = Σ(4 layers) of residual C×R factors not absorbed by SARows.
-      At pe_rows=128: footprint=75 entries at the pe_cols 16.
-      At pe_rows=84: footprint=147 at pe_cols=16, or 291 at pe_cols=8, or 582 at pe_cols=4.
-      At pe_rows=8: footprint=1164 at pe_cols=16.
+      At pe_rows=128: footprint ≈ 75 entries at pe_cols=12. ✓ for all WReg ≥ 100.
+      At pe_rows=64:  footprint ≈ 147 at pe_cols=12 → fits WReg ≥ 200.
+      At pe_rows=32:  footprint ≈ 291 at pe_cols=12 → fits WReg ≥ 300.
+      At pe_rows=12:  footprint ≈ 582 at pe_cols=12 → fits WReg ≥ 600.
 
-      WReg=100: Min PEs = 128×16 = 2048 PEs.
-        At 128 rows, footprint=75 < 100 at pe_cols=16. ✓
-        Smaller rows (84, 56) give larger footprints (147, 291) which don't fit. 
-        The search finds 128×16 as the smallest feasible.
-
-      WReg=200: Min PEs = 56×16 = 896 PEs.
-        At 56 rows, footprint ≈ 147–291 range. pe_cols=16 gives footprint=147 < 200. ✓
-        Smaller rows (28, 32) give larger footprints (291) which still fit, but more
-        rows needed. The search finds 56×16 as the smallest feasible.
-
-      WReg=300: Min PEs = 28×16 = 448 PEs.
-        At 28 rows, pe_cols=16 gives footprint=291 (from interpolation) < 300. ✓
-        This is 2× fewer PEs than WReg=200. Each halving of rows doubles footprint,
-        but WReg=300 can absorb that.
-
-      WReg=600: Min PEs = 12×16 = 192 PEs.
-        At 12 rows, pe_cols=16 gives footprint ≈ 582 < 600. ✓
-        This is a very lean configuration — only 192 PEs for a 4-layer fused network.
+      WReg=100: Min PEs = 128×12 = 1,536. Footprint=75 < 100 ✓
+      WReg=200: Min PEs = 64×12  =   768. Footprint=147 < 200 ✓
+      WReg=300: Min PEs = 32×12  =   384. Footprint=291 < 300 ✓
+      WReg=600: Min PEs = 12×12  =   144. Footprint=582 < 600 ✓
 
     Latency behavior:
-      Min-latency saturates at 56×64 = 3584 PEs for WReg ≥ 300.
-      At WReg=200, only 56×16 is feasible (not enough WReg for more cols at 56 rows
-      because pe_cols=32/64 would change the SACols Z allocation and footprint).
-      Latency = 1.223e+07 cc at 56×64 vs 2.344e+07 at 56×16 (1.9× improvement).
+      Min-latency = 1.223e+07 cc saturates at 128×12 = 1,536 PEs for all WReg sizes.
+      Smaller PE arrays (lower rows) achieve same latency minimum at higher total PEs.
+      All Summary B configs converge to 128×12 because this provides enough
+      rows to absorb weight factors and enough cols for spatial coverage.
 
-    Energy: Lower PEs → slightly lower energy (36,350→34,880 μJ, −4%).
-      The bigger array (56×64) has more idle PEs contributing static energy.
-      But the trade-off with latency makes 56×64 the better EDP choice.
+    Energy: Lower PEs → slightly lower energy (66,490→131,500 μJ as WReg increases
+      from 100→600), reflecting the WReg size cost. Fewer PEs at WReg=600 but
+      higher per-PE register energy due to larger WReg.
 
 
 Eyeriss Case Study 2: IntermediateRegister Size Sweep (15–100 entries)
@@ -1795,6 +2549,78 @@ Eyeriss Case Study 3: OutRegister Size Sweep (8–64 entries)
       The 21× PE reduction reflects 4 layers (vs 17) and Z=32 (vs Z up to 512).
       ResNet18's IntReg and OutReg were genuinely binding; MC-CNN's are not.
 
+Eyeriss Case Study 5: PE Aspect Ratio Sweep (fixed total PEs=2048)
+  MC-CNN 4-layer full fusion, Eyeriss, GB=128KB, tile_size=69
+  Registers: InReg=200, WReg=600, IntReg=100, OutReg=64
+
+    python3 experiment_runner.py --sweep-pe-aspect \
+    --workload mccnn --fusion full --variant 4layer \
+    --total-pes 2048 \
+    --input-reg 200 --weight-reg 600 --intermediate-reg 100 --output-reg 64 \
+    --tile-size 69 --gb-size 128 --verbose 2>&1 | tee results/EY_CS5_MCCNN.log
+
+    Infeasible configs: 1x2048, 2x1024, 4x512, 8x256, 16x128
+    (column-heavy configs fail: MC-CNN's Z=32 cannot fill SARows
+    when pe_rows ≤ 16; constraint factor product C×S×Z < pe_rows)
+
+    Results:
+      PE         Energy (μJ)   Latency (cc)    EDP
+      32x64      1.312e+05     1.272e+07       1.68e+06    ← EDP minimum
+      64x32      1.323e+05     1.272e+07       1.69e+06
+      128x16     1.378e+05     1.223e+07       1.70e+06
+      256x8      1.378e+05     1.223e+07       1.70e+06
+      512x4      1.378e+05     1.223e+07       1.70e+06
+      1024x2     1.452e+05     1.261e+07       1.89e+06
+      2048x1     1.452e+05     1.261e+07       1.89e+06
+
+    Energy:   increases 32x64→2048x1 (+10.7 %).
+              Two plateaus: 128x16=256x8=512x4 (1.378e+05) and
+              1024x2=2048x1 (1.452e+05). Jump at 1024x2 driven by
+              InReg reads doubling (8.74B vs 5.51B).
+              Minimum at 32x64 (1.312e+05 μJ).
+
+    Latency:  three distinct values:
+              32x64, 64x32: 1.272e+07 cc
+              128x16, 256x8, 512x4: 1.223e+07 cc (–3.9 %, best)
+              1024x2, 2048x1: 1.261e+07 cc (+3.1 %)
+              Mid-range configs have lowest latency.
+
+    EDP:      minimum at 32x64 (1.68e+06). Very flat plateau from
+              32x64 through 512x4 (1.68e+06→1.70e+06, +1.2 %).
+              Sharp step at 1024x2 (1.89e+06, +12.5 %).
+
+    Per-level access counts (reads):
+      PE         GB Reads      InReg Reads     WReg Reads    IntReg R+W
+      32x64      195,669,648   4,909,019,904   13,045,888,512  19,008,442,368
+      64x32      195,669,648   4,640,032,512   13,045,888,512  20,443,041,792
+      128x16     195,669,648   5,514,241,536   13,045,888,512  23,312,240,640
+      256x8      195,669,648   5,514,241,536   13,045,888,512  23,312,240,640
+      512x4      195,669,648   5,514,241,536   13,045,888,512  23,312,240,640
+      1024x2     195,669,648   8,742,090,240   13,045,888,512  23,312,240,640
+      2048x1     195,669,648   8,742,090,240   13,045,888,512  23,312,240,640
+
+    GlobalBuffer reads: constant (196M) — tile_size=69 is invariant.
+    WReg reads: constant (13.0B) — weight accesses independent of aspect.
+    InReg reads: vary 4.64B→8.74B. Jump at 1024x2 (rows exceed all dim
+    products, so excess rows add redundant InReg iterations).
+    IntReg R+W: plateau at 23.3B for ≥128 rows; 32x64 and 64x32 lower
+    (19.0B, 20.4B) because more cols distribute Z across SACols.
+
+    Key insight: MC-CNN's uniform Z=32 across all 4 layers means 32 rows
+    suffice to fully map all Z dimensions. Beyond 32 rows, extra rows are
+    wasted on SARows and cause rising InReg and IntReg overhead. The
+    EDP-optimal 32x64 exactly matches 32 rows = Z=32.
+
+
+
+
+
+
+
+
+
+
+      
 
 ================================================================================
 EYERISS CASE STUDIES — FSRCNN 8-layer full fusion
@@ -1818,71 +2644,137 @@ Eyeriss Case Study 1: WRegister Size Sweep (200, 300, 400 bytes) find: A) Minimu
 
     SUMMARY (A) — Minimum PEs Configuration Feasible:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      200     84×160       13,440      Yes        2.904e+04    1.889e+07    5.53e+05
-      300     84×4            336      No         2.880e+04    3.525e+07    1.02e+06
-      400     84×4            336      No         2.880e+04    3.525e+07    1.02e+06
+      200     128×4            512      No         1.203e+05    2.760e+07    3.33e+06
+      300     128×4            512      No         1.310e+05    2.760e+07    3.62e+06
+      400      80×4            320      No         1.412e+05    4.769e+07    6.75e+06
 
     SUMMARY (B) — Minimum Latency Configuration:
       WReg    PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
-      200     84×160       13,440      Yes        2.904e+04    1.889e+07    5.53e+05
-      300     84×16         1,344      No         2.880e+04    1.889e+07    5.46e+05
-      400     84×16         1,344      No         2.880e+04    1.889e+07    5.46e+05
+      200     128×12        1,536      No         1.203e+05    1.889e+07    2.28e+06
+      300     128×12        1,536      No         1.310e+05    1.889e+07    2.48e+06
+      400     128×12        1,536      No         1.416e+05    1.889e+07    2.68e+06
 
-    Out of 100 grid-search configs per WReg size:
-      WReg=200: 1 success  (only 84×160), 99 failures  
-      WReg=300: 10 successes (all at pe_rows=84), 90 failures
-      WReg=400: 11 successes (all at pe_rows=84), 89 failures
+    SUMMARY (C) — ALL Feasible Configurations per WReg Size:
+      WReg=200: 26 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+        128×    4          512         No      1.203e+05      2.760e+07       3.33e+06
+        128×    8        1,024         No      1.203e+05      1.915e+07       2.31e+06
+        256×    4        1,024         No      1.212e+05      1.944e+07       2.37e+06
+        320×    4        1,280         No      1.212e+05      1.944e+07       2.37e+06
+        128×   12        1,536         No      1.203e+05      1.889e+07       2.28e+06
+        128×   16        2,048         No      1.203e+05      1.889e+07       2.28e+06
+        256×    8        2,048         No      1.212e+05      1.889e+07       2.30e+06
+        512×    4        2,048         No      1.229e+05      1.889e+07       2.34e+06
+        320×    8        2,560         No      1.212e+05      1.889e+07       2.30e+06
+        256×   12        3,072         No      1.212e+05      1.889e+07       2.30e+06
+        320×   12        3,840         No      1.212e+05      1.889e+07       2.30e+06
+        128×   32        4,096         No      1.203e+05      1.889e+07       2.28e+06
+        256×   16        4,096         No      1.212e+05      1.889e+07       2.30e+06
+        512×    8        4,096         No      1.229e+05      1.889e+07       2.34e+06
+        320×   16        5,120         No      1.212e+05      1.889e+07       2.30e+06
+        512×   12        6,144         No      1.229e+05      1.889e+07       2.34e+06
+        128×   64        8,192         No      1.203e+05      1.889e+07       2.28e+06
+        256×   32        8,192         No      1.212e+05      1.889e+07       2.30e+06
+        512×   16        8,192         No      1.229e+05      1.889e+07       2.34e+06
+        128×   80       10,240         No      1.203e+05      1.889e+07       2.28e+06
+        320×   32       10,240         No      1.212e+05      1.889e+07       2.30e+06
+         32×  512       16,384        Yes      1.140e+05      1.889e+07       2.17e+06
+         64×  256       16,384        Yes      1.203e+05      1.889e+07       2.28e+06
+        128×  128       16,384         No      1.203e+05      1.889e+07       2.28e+06
+        256×   64       16,384         No      1.212e+05      1.889e+07       2.30e+06
+        512×   32       16,384         No      1.229e+05      1.889e+07       2.34e+06
+      WReg=300: 27 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+        128×    4          512         No      1.310e+05      2.760e+07       3.62e+06
+        128×    8        1,024         No      1.310e+05      1.915e+07       2.51e+06
+        256×    4        1,024         No      1.318e+05      1.944e+07       2.57e+06
+        320×    4        1,280         No      1.318e+05      1.944e+07       2.57e+06
+        128×   12        1,536         No      1.310e+05      1.889e+07       2.48e+06
+        128×   16        2,048         No      1.310e+05      1.889e+07       2.48e+06
+        256×    8        2,048         No      1.318e+05      1.889e+07       2.50e+06
+        512×    4        2,048         No      1.335e+05      1.889e+07       2.54e+06
+        320×    8        2,560         No      1.318e+05      1.889e+07       2.50e+06
+        256×   12        3,072         No      1.318e+05      1.889e+07       2.50e+06
+        320×   12        3,840         No      1.318e+05      1.889e+07       2.50e+06
+        128×   32        4,096         No      1.310e+05      1.889e+07       2.48e+06
+        256×   16        4,096         No      1.318e+05      1.889e+07       2.50e+06
+        512×    8        4,096         No      1.335e+05      1.889e+07       2.54e+06
+        320×   16        5,120         No      1.318e+05      1.889e+07       2.50e+06
+        512×   12        6,144         No      1.335e+05      1.889e+07       2.54e+06
+        128×   64        8,192         No      1.310e+05      1.889e+07       2.48e+06
+        256×   32        8,192         No      1.318e+05      1.889e+07       2.50e+06
+        512×   16        8,192         No      1.335e+05      1.889e+07       2.54e+06
+         32×  320       10,240        Yes      1.243e+05      1.889e+07       2.36e+06
+        128×   80       10,240         No      1.310e+05      1.889e+07       2.48e+06
+        320×   32       10,240         No      1.318e+05      1.889e+07       2.50e+06
+         32×  512       16,384        Yes      1.247e+05      1.889e+07       2.37e+06
+         64×  256       16,384        Yes      1.310e+05      1.889e+07       2.48e+06
+        128×  128       16,384         No      1.310e+05      1.889e+07       2.48e+06
+        256×   64       16,384         No      1.318e+05      1.889e+07       2.50e+06
+        512×   32       16,384         No      1.335e+05      1.889e+07       2.54e+06
+      WReg=400: 36 feasible config(s)
+        PE Config    Total PEs   SACols Z   Energy(μJ)   Latency(cc)     EDP
+         80×    4          320         No      1.412e+05      4.769e+07       6.75e+06
+        128×    4          512         No      1.416e+05      2.760e+07       3.92e+06
+         80×    8          640         No      1.412e+05      2.760e+07       3.91e+06
+         80×   12          960         No      1.412e+05      2.421e+07       3.42e+06
+        128×    8        1,024         No      1.416e+05      1.915e+07       2.72e+06
+        256×    4        1,024         No      1.425e+05      1.944e+07       2.78e+06
+         80×   16        1,280         No      1.412e+05      1.915e+07       2.71e+06
+        320×    4        1,280         No      1.425e+05      1.944e+07       2.78e+06
+        128×   12        1,536         No      1.416e+05      1.889e+07       2.68e+06
+        128×   16        2,048         No      1.416e+05      1.889e+07       2.68e+06
+        256×    8        2,048         No      1.425e+05      1.889e+07       2.70e+06
+        512×    4        2,048         No      1.442e+05      1.889e+07       2.75e+06
+         80×   32        2,560         No      1.412e+05      1.889e+07       2.67e+06
+        320×    8        2,560         No      1.425e+05      1.889e+07       2.70e+06
+        256×   12        3,072         No      1.425e+05      1.889e+07       2.70e+06
+        320×   12        3,840         No      1.425e+05      1.889e+07       2.70e+06
+        128×   32        4,096         No      1.416e+05      1.889e+07       2.68e+06
+        256×   16        4,096         No      1.425e+05      1.889e+07       2.70e+06
+        512×    8        4,096         No      1.442e+05      1.889e+07       2.75e+06
+         80×   64        5,120         No      1.412e+05      1.889e+07       2.67e+06
+        320×   16        5,120         No      1.425e+05      1.889e+07       2.70e+06
+        512×   12        6,144         No      1.442e+05      1.889e+07       2.75e+06
+         80×   80        6,400         No      1.412e+05      1.889e+07       2.67e+06
+         32×  256        8,192        Yes      1.345e+05      1.889e+07       2.55e+06
+        128×   64        8,192         No      1.416e+05      1.889e+07       2.68e+06
+        256×   32        8,192         No      1.425e+05      1.889e+07       2.70e+06
+        512×   16        8,192         No      1.442e+05      1.889e+07       2.75e+06
+         32×  320       10,240        Yes      1.349e+05      1.889e+07       2.56e+06
+         80×  128       10,240         No      1.412e+05      1.889e+07       2.67e+06
+        128×   80       10,240         No      1.416e+05      1.889e+07       2.68e+06
+        320×   32       10,240         No      1.425e+05      1.889e+07       2.70e+06
+         32×  512       16,384        Yes      1.353e+05      1.889e+07       2.57e+06
+         64×  256       16,384        Yes      1.416e+05      1.889e+07       2.68e+06
+        128×  128       16,384         No      1.416e+05      1.889e+07       2.68e+06
+        256×   64       16,384         No      1.425e+05      1.889e+07       2.70e+06
+        512×   32       16,384         No      1.442e+05      1.889e+07       2.75e+06
 
-      With pe_rows < 84, all configs fail:
-        pe_rows=4:  Can't even distribute entirely the dimensions S, and none of the levels below can).
-        pe_rows=8-56: Possible WReg violation (SARows distributes fewer C,S factors → weights can
-                      overflow WReg)
+    Out of 96 grid-search configs per WReg size (11×11=121 minus those exceeding max_total_pes=17000):
+      WReg=200: 26 successes (pe_rows≥128, plus SACols Z at 32×512, 64×256)
+      WReg=300: 27 successes (same + 32×320 SACols Z)
+      WReg=400: 36 successes (adds pe_rows=80 configs)
 
-    ANALYSIS — WReg footprint can depend entirely on pe_rows:
-      If SACols don't distribute Z, what SARows does NOT distribute across rows stays at WReg level (per PE).
-      More rows → more C_i, S_i distributed → smaller per-PE weight footprint.
+    ANALYSIS — WReg footprint depends on pe_rows (uniform grid [4..512]):
+      At pe_rows=128: WReg footprint ≈ 170 (no SACols Z) → fits WReg=200 ✓
+      At pe_rows=80:  WReg footprint ≈ 300 (no SACols Z) → fits WReg=400 ✓, fails WReg=200/300
+      At pe_rows=64:  WReg footprint > 400 → only SACols Z configs work (pe_cols≥160)
+      At pe_rows=32:  WReg footprint ≈ 816 → only SACols Z with very high cols (256+)
 
-      pe_rows   WReg footprint (no SACols Z)   WReg footprint (with SACols Z = 2 x tile_size)
-      8         3244                            1622
-      12        1664                            832
-      14        1628                            814
-      16        1488                            744
-      20        1344                            672
-      28        956                             478
-      32        816                             408
-      56        502                             251
-      84        258                             ≤200 (fits!)
+      Key transitions in the uniform grid:
+        pe_rows=128 is the threshold for WReg=200/300 without SACols Z.
+        pe_rows=80 is the threshold for WReg=400 without SACols Z.
+        Below pe_rows=80, only SACols Z configs (high pe_cols) can satisfy WReg.
 
-      The footprint drops dramatically with pe_rows because SARows absorbs more weight
-      factors (C_i and S_i). SACols Z consistently halves the footprint by splitting
-      Z7 across 2 column groups (pe_cols=160 ≥ 2×tile_size=160).
-
-    ANALYSIS
-      At pe_rows=84:
-        - Without SACols Z: WReg footprint = 258 words
-          → WReg=200: 258 > 200 → FAILS (29% overfit)
-          → WReg=300: 258 < 300 → SUCCEEDS (86% utilization)
-          → WReg=400: 258 < 400 → SUCCEEDS (65% utilization)
-        - With SACols Z (pe_cols=160): WReg footprint ≤ 200 → SUCCEEDS even at WReg=200
-
-      So WReg=200 REQUIRES SACols Z iterations → pe_cols=160 → 84×160 = 13,440 PEs.
-      WReg=300 does NOT require SACols Z → pe_cols can be as small as 4 → 84×4 = 336 PEs.
-      Adding just 100 bytes to WReg (200→300, +50%) enables 97.5% fewer PEs (13,440→336).
-
-      Why WReg=300 and WReg=400 give identical results:
-        The WReg footprint at pe_rows=84 is 258 words. Both 300 and 400 exceed 258.
-        The excess capacity is unused.
-
-    ANALYSIS — Latency behavior across pe_cols (for WReg≥300):
-      With pe_rows=84, all 10 pe_col values succeed. Latency by pe_cols:
-        pe_cols=4:   L=3.525e+07 cc  (DRAM Q = 960/80 × ... many iterations in GB)
-        pe_cols=8:   L=2.140e+07 cc
-        pe_cols=10:  L=2.020e+07 cc
-        pe_cols=16:  L=1.889e+07 cc  ← latency plateau starts
-        pe_cols=20-80: L=1.889e+07 cc  (no further improvement)
-        pe_cols=160: L=1.889e+07 cc  (same, but slightly higher energy: 2.904e+04 vs 2.880e+04)
-      Latency plateaus at pe_cols=16 because 16 columns provide enough spatial coverage
-      for the tile_size=80 workload. Extra columns beyond 16 don't reduce GB iterations.
+    ANALYSIS — Latency behavior across pe_cols:
+      At pe_rows=128, latency by pe_cols:
+        pe_cols=4:   L=2.760e+07 cc
+        pe_cols=8:   L=1.915e+07 cc
+        pe_cols=12:  L=1.889e+07 cc  ← latency plateau starts
+        pe_cols=16+: L=1.889e+07 cc  (no further improvement)
+      Latency plateaus at pe_cols=12 because 12 columns provide enough spatial coverage
+      for the tile_size=80 workload. Extra columns beyond 12 don't reduce GB iterations.
       
 
 
@@ -1974,8 +2866,67 @@ Eyeriss Case Study 3: OutRegister Size Sweep (200, 300, 400 entries) find: A) Mi
         P and Q are not stored in OutReg (constrained to 1) — spatial output
         dimensions are handled in the GlobalBuffer and DRAM levels above.
 
+Eyeriss Case Study 5: PE Aspect Ratio Sweep (fixed total PEs=2048)
+  FSRCNN 8-layer full fusion, Eyeriss, GB=128KB, tile_size=80
+  Registers: InReg=64, WReg=500, IntReg=500, OutReg=32
+
+    python3 experiment_runner.py --sweep-pe-aspect \
+    --workload fsrcnn --fusion full --variant 8layer \
+    --total-pes 2048 \
+    --input-reg 64 --weight-reg 500 --intermediate-reg 500 --output-reg 32 \
+    --tile-size 80 --gb-size 128 --verbose 2>&1 | tee results/EY_CS5_FSRCNN.log
+
+    Infeasible configs: 1x2048, 2x1024, 4x512, 8x256, 16x128, 32x64
+    (column-heavy configs fail because FSRCNN's tiny channel counts
+    Z_i ∈ {1,12,56} cannot fill SARows when pe_rows is small)
+
+    Results:
+      PE         Energy (μJ)   Latency (cc)    EDP
+      64x32      1.517e+05     1.889e+07       2.87e+06    ← EDP minimum
+      128x16     1.523e+05     1.889e+07       2.88e+06
+      256x8      1.531e+05     1.889e+07       2.90e+06
+      512x4      1.548e+05     1.889e+07       2.95e+06
+      1024x2     1.562e+05     1.889e+07       2.98e+06
+      2048x1     1.562e+05     1.918e+07       3.03e+06
+
+    Energy:   monotonically increases 64x32→2048x1 (+3.0 %).
+              Very gentle slope — all configs within 3 % of minimum.
+              Minimum at 64x32 (1.517e+05 μJ).
+
+    Latency:  identical at 1.889e+07 cc for all configs except 2048x1
+              (1.918e+07 cc, +1.5 %). GlobalBuffer is the bottleneck
+              level and its access pattern is invariant to PE aspect ratio.
+
+    EDP:      minimum at 64x32 (2.87e+06), monotonically rising to
+              2048x1 (3.03e+06, +5.6 %). Very flat landscape —
+              aspect ratio has minimal impact on FSRCNN performance.
+
+    Per-level access counts (reads):
+      PE         GB Reads      InReg Reads     WReg Reads    IntReg R+W
+      64x32      302,227,200   4,613,760,000   9,741,772,800   15,178,752,000
+      128x16     302,227,200   5,271,091,200   9,741,772,800   15,178,752,000
+      256x8      302,227,200   6,271,603,200   9,741,772,800   15,178,752,000
+      512x4      302,227,200   8,304,768,000   9,741,772,800   15,178,752,000
+      1024x2     302,227,200   9,741,772,800   9,741,772,800   15,178,752,000
+      2048x1     302,227,200   9,741,772,800   9,741,772,800   15,178,752,000
+
+    GlobalBuffer reads: constant (302M) — tile_size=80 produces identical
+    spatial tiling for all row-heavy configs.
+    WReg reads: constant (9.74B) — all weight iterations are register-level.
+    InReg reads: increase 4.61B→9.74B (+111 %) with more rows. More rows
+    means more C/S factors mapped to SARows, but since rows exceed actual
+    channel dimensions, residual iterations shift to InRegister.
+    IntReg R+W: constant (15.2B) — Z intermediates are invariant.
+
+    Key insight: FSRCNN is so small (Z≤56, C≤56) that even 64 rows already
+    exceed all channel dimensions, making additional rows wasted. The energy
+    difference comes solely from InReg overhead. Aspect ratio is almost
+    irrelevant for this workload.
 
 
+
+
+        
         
 Thesis Experiment Runner
 
@@ -2385,26 +3336,35 @@ FUSION COMPARISON RESULTS — DEPFIN (shared WMEM = max(min_wmem) per case study
 
 
 ================================================================================
-FUSION COMPARISON RESULTS — EYERISS (fixed energy model, no WMEM auto-sizing)
+FUSION COMPARISON RESULTS — EYERISS (WReg auto-sized via binary search, same chip)
 ================================================================================
+
+  Methodology: Same PE array and register sizes across all fusion levels.
+  Only WReg is auto-sized per case study:
+    - CS1 WReg = max(min_feasible_wreg across all singles) → shared
+    - CS2 WReg = max(min_feasible_wreg across all intermediate segments) → shared
+  All other registers (InReg, OutReg, IntReg, GB) are identical to full fusion.
+  This models one physical chip per fusion strategy.
 
   ────────────────────────────────────────────────────────────────────────────
   FSRCNN — Eyeriss (84×16, GB=128KB, tile=80)
   ────────────────────────────────────────────────────────────────────────────
+  CS1 shared WReg = 97 | CS2 shared WReg = 104 | Full WReg = 500
+
   Level                   Energy (μJ)  Latency (cc)        EDP     DRAM Reads   DRAM Writes
   ───────────────────────────────────────────────────────────────────────────────────────────
-  Full Fusion               2.880e+04    3.022e+07    8.74e+05      1,573,992     8,294,400
-  Σ Singles (CS1)            8.482e+03    4.126e+07    5.43e+04     90,738,792    97,459,200
-  Σ Intermediate (CS2)      2.942e+04    3.022e+07    3.18e+05     14,015,592    20,736,000
+  Full Fusion               1.519e+05    3.022e+07    4.60e+06      1,573,992     8,294,400
+  Σ Singles (CS1)            8.618e+03    4.126e+07    5.50e+04     90,738,792    97,459,200
+  Σ Intermediate (CS2)      9.370e+04    3.022e+07    9.38e+05     14,015,592    20,736,000
 
   CS1 Ratios (Full / Σ Singles):
-    Energy:  3.40× worse  (-239.5%)
+    Energy:  17.63× worse  (-1662.7%)
     Latency: 0.73× better (+26.8%)
     DRAM Rd: 0.017× better (+98.3%)
     DRAM Wr: 0.085× better (+91.5%)
 
   CS2 Ratios (Full / Σ Intermediate):
-    Energy:  0.98× better (+2.1%)
+    Energy:  1.62× worse  (-62.1%)
     Latency: 1.00 (no change)
     DRAM Rd: 0.11× better (+88.8%)
     DRAM Wr: 0.40× better (+60.0%)
@@ -2414,20 +3374,22 @@ FUSION COMPARISON RESULTS — EYERISS (fixed energy model, no WMEM auto-sizing)
   ────────────────────────────────────────────────────────────────────────────
   MC-CNN — Eyeriss (56×64, GB=128KB, tile=69)
   ────────────────────────────────────────────────────────────────────────────
+  CS1 shared WReg = 97 | CS2 shared WReg = 192 | Full WReg = 600
+
   Level                   Energy (μJ)  Latency (cc)        EDP     DRAM Reads   DRAM Writes
   ───────────────────────────────────────────────────────────────────────────────────────────
-  Full Fusion               3.617e+04    2.302e+07    8.35e+05        494,928    14,943,744
-  Σ Singles (CS1)            5.263e+03    2.483e+07    3.51e+04     45,326,160    59,774,976
-  Σ Intermediate (CS2)      3.760e+04    2.302e+07    4.63e+05     15,438,672    29,887,488
+  Full Fusion               1.331e+05    2.302e+07    3.08e+06        494,928    14,943,744
+  Σ Singles (CS1)            5.945e+03    2.483e+07    3.97e+04     45,326,160    59,774,976
+  Σ Intermediate (CS2)      8.024e+04    2.302e+07    9.86e+05     15,438,672    29,887,488
 
   CS1 Ratios (Full / Σ Singles):
-    Energy:  6.87× worse  (-587.3%)
+    Energy:  22.39× worse  (-2138.8%)
     Latency: 0.93× better (+7.3%)
     DRAM Rd: 0.011× better (+98.9%)
     DRAM Wr: 0.25× better (+75.0%)
 
   CS2 Ratios (Full / Σ Intermediate):
-    Energy:  0.96× better (+3.8%)
+    Energy:  1.66× worse  (-65.9%)
     Latency: 1.00 (no change)
     DRAM Rd: 0.032× better (+96.8%)
     DRAM Wr: 0.50× better (+50.0%)
@@ -2437,20 +3399,22 @@ FUSION COMPARISON RESULTS — EYERISS (fixed energy model, no WMEM auto-sizing)
   ────────────────────────────────────────────────────────────────────────────
   VGG16 — Eyeriss (196×64, GB=128KB, tile=1)
   ────────────────────────────────────────────────────────────────────────────
+  CS1 shared WReg = 193 | CS2 shared WReg = 576 | Full WReg = 5000
+
   Level                   Energy (μJ)  Latency (cc)        EDP     DRAM Reads   DRAM Writes
   ───────────────────────────────────────────────────────────────────────────────────────────
-  Full Fusion               4.245e+04    8.159e+07    3.51e+06     14,860,992       100,352
-  Σ Singles (CS1)            3.213e+03    8.159e+07    3.67e+04     23,792,320    13,547,520
-  Σ Intermediate (CS2)      4.260e+04    8.159e+07    6.92e+05     16,366,272     6,121,472
+  Full Fusion               1.006e+06    8.159e+07    8.33e+07     14,860,992       100,352
+  Σ Singles (CS1)            1.734e+04    8.159e+07    2.32e+05     23,792,320    13,547,520
+  Σ Intermediate (CS2)      2.532e+05    8.159e+07    4.36e+06     16,366,272     6,121,472
 
   CS1 Ratios (Full / Σ Singles):
-    Energy:  13.2× worse  (-1221.2%)
+    Energy:  58.01× worse  (-5700.8%)
     Latency: 1.00 (no change)
     DRAM Rd: 0.625× better (+37.5%)
     DRAM Wr: 0.007× better (+99.3%)
 
   CS2 Ratios (Full / Σ Intermediate):
-    Energy:  1.00 (no change)
+    Energy:  3.97× worse  (-297.3%)
     Latency: 1.00 (no change)
     DRAM Rd: 0.91× better (+9.2%)
     DRAM Wr: 0.016× better (+98.4%)
@@ -2458,20 +3422,22 @@ FUSION COMPARISON RESULTS — EYERISS (fixed energy model, no WMEM auto-sizing)
   ────────────────────────────────────────────────────────────────────────────
   ResNet18 — Eyeriss (256×32, GB=128KB, tile=1)
   ────────────────────────────────────────────────────────────────────────────
+  CS1 shared WReg = 385 | CS2 shared WReg = 768 | Full WReg = 4000
+
   Level                   Energy (μJ)  Latency (cc)        EDP     DRAM Reads   DRAM Writes
   ───────────────────────────────────────────────────────────────────────────────────────────
-  Full Fusion               6.779e+03    1.745e+07    1.19e+05     11,032,512        25,088
-  Σ Singles (CS1)            7.416e+02    1.501e+07    6.90e+02     12,449,984     2,308,096
-  Σ Intermediate (CS2)      6.870e+03    1.746e+07    1.57e+04     11,760,064       752,640
+  Full Fusion               1.257e+05    1.745e+07    2.22e+06     11,032,512        25,088
+  Σ Singles (CS1)            1.914e+03    1.501e+07    2.21e+03     12,449,984     2,308,096
+  Σ Intermediate (CS2)      4.406e+04    1.746e+07    1.06e+05     11,760,064       752,640
 
   CS1 Ratios (Full / Σ Singles):
-    Energy:  9.14× worse  (-814.1%)
+    Energy:  65.68× worse  (-6467.5%)
     Latency: 1.16× worse  (-16.3%)
     DRAM Rd: 0.886× better (+11.4%)
     DRAM Wr: 0.011× better (+98.9%)
 
   CS2 Ratios (Full / Σ Intermediate):
-    Energy:  0.99× better (+1.3%)
+    Energy:  2.85× worse  (-185.3%)
     Latency: 1.00 (no change)
     DRAM Rd: 0.94× better (+6.2%)
     DRAM Wr: 0.033× better (+96.7%)
@@ -2481,26 +3447,28 @@ FUSION COMPARISON RESULTS — EYERISS (fixed energy model, no WMEM auto-sizing)
 KEY OBSERVATIONS AND ANALYSIS (shared WMEM per case study, workload-specific PEs)
 ================================================================================
 
-  1. DRAM WRITE SAVINGS (CS1): Consistently massive (+75% to +99.2%)
+  1. DRAM WRITE SAVINGS (CS1): Consistently massive (+75% to +99.3%)
      Full fusion eliminates ALL intermediate DRAM writes — only the final
      output is written. This remains the most consistent benefit of fusion.
 
   2. ENERGY: FUSION IS ALWAYS MORE EXPENSIVE (CS1):
-     With shared WMEM per case study, fusion is 1.22× (FSRCNN) to 28.2×
-     (VGG16) more expensive in energy. The fused iteration space creates
-     massive on-chip data movement overhead.
-     Eyeriss results are unchanged (fixed energy model).
+     DepFiN: 1.22× (FSRCNN) to 28.24× (VGG16).
+     Eyeriss (auto WReg): 17.63× (FSRCNN) to 65.68× (ResNet18).
+     Eyeriss energy penalty is much larger because full fusion needs WReg
+     500-5000 while singles only need WReg 97-385. The larger register
+     file has higher energy per access via Accelergy.
 
-  3. LATENCY: MIXED RESULTS WITH SHARED WMEM
-     DepFiN: FSRCNN (+74.7%), MC-CNN (+41.5%), and VGG16 (+0.8%) benefit
-     from fusion. ResNet18 (-13.1%) is slightly worse with fusion.
-     Eyeriss: Modest to good latency savings (+7.3% to +26.8%) except
-     VGG16 and ResNet18 where latency is similar.
+  3. LATENCY: MIXED RESULTS
+     DepFiN: FSRCNN (+74.7%), MC-CNN (+41.5%), VGG16 (+0.8%) benefit from
+     fusion. ResNet18 (-13.1%) is slightly worse.
+     Eyeriss: FSRCNN (+26.8%), MC-CNN (+7.3%) benefit. VGG16 (0.0%) and
+     ResNet18 (-16.3%) show no benefit or regression.
 
   4. INTERMEDIATE FUSION (CS2) VS FULL FUSION:
-     Energy ratios remain close to 1.0 (0.94-1.35×). The big energy and
-     latency gaps are between singles and any level of fusion. Full vs
-     intermediate fusion has marginal difference except DRAM writes.
+     DepFiN CS2 energy savings: +2.9% to -34.6% (worse for deep networks
+     due to larger WMEM Accelergy costs).
+     Eyeriss CS2 energy: always worse (-62.1% to -297.3%) due to higher
+     WReg for full fusion. Latency is identical in all cases.
 
   5. DRAM TRAFFIC IS ARCHITECTURE-INDEPENDENT:
      DRAM reads and writes are IDENTICAL between DepFiN and Eyeriss for
@@ -2512,36 +3480,137 @@ KEY OBSERVATIONS AND ANALYSIS (shared WMEM per case study, workload-specific PEs
   Workload   Arch     Energy      Latency    DRAM Rd    DRAM Wr     Note
   ─────────  ───────  ──────────  ─────────  ─────────  ─────────  ──────────
   FSRCNN     DepFiN    1.22×↑     +74.7%     +98.3%     +91.5%     8/8 ok
-  FSRCNN     Eyeriss   3.40×↑     +26.8%     +98.3%     +91.5%
+  FSRCNN     Eyeriss  17.63×↑     +26.8%     +98.3%     +91.5%     8/8 ok
   MC-CNN     DepFiN    2.54×↑     +41.5%     +98.9%     +75.0%     4/4 ok
-  MC-CNN     Eyeriss   6.87×↑      +7.3%     +98.9%     +75.0%
-  VGG16      DepFiN   28.24×↑      +0.8%     +37.5%     +99.3%     13/13 ok
-  VGG16      Eyeriss  13.2×↑       +0.0%     +37.5%     +99.3%
-  ResNet18   DepFiN   14.18×↑     -13.1%     +11.4%     +98.9%     17/17 ok
-  ResNet18   Eyeriss   9.14×↑     -16.3%     +11.4%     +98.9%
+  MC-CNN     Eyeriss  22.39×↑      +7.3%     +98.9%     +75.0%     4/4 ok
+  VGG16      DepFiN   28.24×↑      +0.8%     +37.5%     +99.3%    13/13 ok
+  VGG16      Eyeriss  58.01×↑      +0.0%     +37.5%     +99.3%    13/13 ok
+  ResNet18   DepFiN   14.18×↑     -13.1%     +11.4%     +98.9%    17/17 ok
+  ResNet18   Eyeriss  65.68×↑     -16.3%     +11.4%     +98.9%    17/17 ok
 
   (×↑ = times worse for energy; + = savings; - = worse)
 
   ────────────────────────────────────────────────────────────────────────────
   SUMMARY TABLE — CS2: Full Fusion vs Σ Intermediate Segments
   ────────────────────────────────────────────────────────────────────────────
-  Workload   Arch     Energy    Latency   DRAM Rd    DRAM Wr
-  ─────────  ───────  ────────  ────────  ─────────  ─────────
-  FSRCNN     DepFiN    +2.9%     +8.8%    +88.8%     +60.0%
-  FSRCNN     Eyeriss   +2.1%     +0.0%    +88.8%     +60.0%
-  MC-CNN     DepFiN    +5.7%     +0.0%    +96.8%     +50.0%
-  MC-CNN     Eyeriss   +3.8%     +0.0%    +96.8%     +50.0%
-  VGG16      DepFiN   -31.8%     +0.0%     +9.2%     +98.4%
-  VGG16      Eyeriss   +0.3%     +0.0%     +9.2%     +98.4%
-  ResNet18   DepFiN   -34.6%     +0.0%     +6.2%     +96.7%
-  ResNet18   Eyeriss   +1.3%     +0.0%     +6.2%     +96.7%
+  Workload   Arch     Energy     Latency   DRAM Rd    DRAM Wr
+  ─────────  ───────  ─────────  ────────  ─────────  ─────────
+  FSRCNN     DepFiN     +2.9%     +8.8%    +88.8%     +60.0%
+  FSRCNN     Eyeriss   -62.1%     +0.0%    +88.8%     +60.0%
+  MC-CNN     DepFiN     +5.7%     +0.0%    +96.8%     +50.0%
+  MC-CNN     Eyeriss   -65.9%     +0.0%    +96.8%     +50.0%
+  VGG16      DepFiN    -31.8%     +0.0%     +9.2%     +98.4%
+  VGG16      Eyeriss  -297.3%     +0.0%     +9.2%     +98.4%
+  ResNet18   DepFiN    -34.6%     +0.0%     +6.2%     +96.7%
+  ResNet18   Eyeriss  -185.3%     +0.0%     +6.2%     +96.7%
 
   Note: DRAM columns are identical across DepFiN/Eyeriss per workload.
   DepFiN CS2 energy is worse for VGG16/ResNet18 because full fusion's
   14366/10738 KB WMEM has much higher Accelergy energy-per-access than
   the intermediate segments' smaller WMEMs.
+  Eyeriss CS2 energy is always worse because full fusion's WReg (500-5000)
+  is much larger than auto-sized intermediate WReg (104-768).
 
 ================================================================================
+
+================================================================================
+FIXED-CONFIG FUSION COMPARISON  (--compare-full-vs-single / --compare-partial-vs-single)
+================================================================================
+
+  Unlike --compare-fusion (which auto-sizes WReg per variant via binary
+  search), these two modes use the EXACT SAME architecture for both the
+  fused and non-fused experiments. This enables a truly fair apple-to-apple
+  comparison on a fixed chip.
+
+  ────────────────────────────────────────────────────────────────────────────
+  --compare-full-vs-single   Full N-layer fusion vs Σ single layers
+  --compare-partial-vs-single  Σ intermediate-level segments vs Σ single layers
+  ────────────────────────────────────────────────────────────────────────────
+
+  Both sides share:
+    • same PE grid (pe_rows × pe_cols)
+    • same GlobalBuffer size (gb_size)
+    • same WReg, InReg, IntReg, OutReg sizes
+    • same tile_size
+
+  The key insight: when WReg is sized for single layers (small), full
+  fusion FAILS because it cannot fit the summed weight volume of N layers.
+  Conversely, when WReg is sized for full fusion, single layers are
+  evaluated on a WReg much larger than they need, which may inflate their
+  energy (Accelergy size-dependent energy-per-access).
+
+  ────────────────────────────────────────────────────────────────────────────
+  RESULTS — ResNet18, Eyeriss 128×128, WReg=920
+  ────────────────────────────────────────────────────────────────────────────
+
+  --compare-full-vs-single -w resnet18 --arch-type eyeriss
+      --pe-rows 128 --pe-cols 128 --weight-reg 920
+      --gb-size 128 --tile-size 1
+      --input-reg 700 --intermediate-reg 300 --output-reg 64
+
+  Level                    Energy (uJ)  Latency (cc)        EDP    DRAM Reads  DRAM Writes
+  Full Fusion (1 ok)       5.400e+04    3.042e+06    1.76e+05    11,032,512       25,088
+  Sum Singles (17 ok)      3.769e+03    3.301e+06    6.18e+02    12,449,984    2,308,096
+
+  RATIOS (Full Fusion / Sum Singles)  — values < 1.0 mean fusion wins
+    Energy:       14.3249  (-1332.5%)  ← full fusion MUCH MORE expensive
+    Latency:       0.9215  (+7.8%)     ← full fusion slightly faster
+    EDP:         285.2059  (-28420.6%) ← massively worse EDP
+    DRAM Reads:    0.8861  (+11.4%)    ← full fusion reads less from DRAM
+    DRAM Writes:   0.0109  (+98.9%)    ← full fusion writes almost nothing to DRAM
+
+  Notes:
+  - WReg=902 (the user's original target) FAILS for full fusion (needs 913).
+  - WReg=920 is the minimum that fits all 17 layers' weights.
+  - Full fusion provides massive DRAM write savings (+98.9%) because
+    intermediate feature maps stay on-chip. DRAM reads also drop 11% because
+    weights are read once and reused across layers.
+  - Energy explodes (14.3×) because all 17 layers' weights must be stored
+    simultaneously in the WReg, forcing very large per-access energy.
+  - With a 128×128 PE grid (16384 PEs), latency is roughly comparable
+    (fusion wins by ~8% due to saved DRAM bandwidth).
+
+  ────────────────────────────────────────────────────────────────────────────
+  RESULTS — ResNet18, Eyeriss 128×128, WReg=384  (Partial Fusion)
+  ────────────────────────────────────────────────────────────────────────────
+
+  --compare-partial-vs-single -w resnet18 --arch-type eyeriss
+      --pe-rows 128 --pe-cols 128 --weight-reg 384
+      --gb-size 128 --tile-size 1
+      --input-reg 700 --intermediate-reg 300 --output-reg 64
+
+  Level                         Energy (uJ)  Latency (cc)        EDP    DRAM Reads  DRAM Writes
+  Sum Partial Fusion (8 ok)     3.928e+04    3.139e+06    1.42e+04    11,760,064      752,640
+  Sum Singles (17 ok)           3.768e+03    3.301e+06    5.89e+02    12,449,984    2,308,096
+
+  RATIOS (Sum Partial Fusion / Sum Singles)  — values < 1.0 mean fusion wins
+    Energy:      10.4235  (-942.4%)   ← partial fusion MUCH WORSE on energy
+    Latency:      0.9508  (+4.9%)     ← partial fusion slightly faster
+    EDP:         24.0992  (-2309.9%)  ← much worse EDP
+    DRAM Reads:   0.9446  (+5.5%)     ← slightly fewer DRAM reads
+    DRAM Writes:  0.3261  (+67.4%)    ← 67% fewer DRAM writes
+
+  Partial-fusion segment breakdown:
+    2layer/s1b1:  E=4.106e+03 uJ, L=1.380e+05 cc
+    2layer/s1b2:  E=6.583e+03 uJ, L=1.597e+05 cc
+    2layer/s2b1:  E=6.883e+03 uJ, L=1.055e+05 cc
+    2layer/s2b2:  E=4.186e+03 uJ, L=9.882e+04 cc
+    2layer/s3b1:  E=5.572e+03 uJ, L=2.463e+05 cc
+    2layer/s3b2:  E=3.580e+03 uJ, L=3.075e+05 cc
+    2layer/s4b1:  E=4.991e+03 uJ, L=8.973e+05 cc
+    2layer/s4b2:  E=3.376e+03 uJ, L=1.186e+06 cc
+
+  Notes:
+  - With WReg=384, all 8 two-layer segments fit (the largest 2-layer segment
+    needs <= 384 weight entries).
+  - Energy penalty is still ~10× because the 2-layer fused WReg still stores
+    two layers' weights simultaneously, increasing per-access cost.
+  - DRAM write savings are good (+67.4%) but not as dramatic as full fusion
+    because only adjacent pairs share intermediates.
+  - Latency benefit is modest (+4.9%) due to the reduced DRAM traffic for
+    intermediates between pairs.
+
+
 """
 
 import os
@@ -2716,6 +3785,12 @@ class ExperimentConfig:
     def __post_init__(self):
         if not self.experiment_id:
             self.experiment_id = f"{self.workload_name}_{self.workload_variant}_{self.timestamp}"
+        # Eyeriss GlobalBuffer bandwidth is a fixed physical property of the buffer,
+        # not dependent on workload tiling.  Bandwidth scaling is a DepFiN-only concept
+        # (FMEM bus width shrinks with smaller tiles).  Force it off for Eyeriss to
+        # avoid inflated latency from an artificial bandwidth reduction.
+        if self.arch_type == "eyeriss":
+            self.scale_bandwidth = False
 
 """Results from a single experiment run."""
 @dataclass
@@ -2843,7 +3918,7 @@ class WorkloadRegistry:
                 },
                 "block": {
                     name: (shape, vgg16_block_couplings[name], 
-                           2 if name in ['block1', 'block2'] else 3)
+                           2 if name in ['block1', 'block2', 'block3', 'block4', 'block5'] else 1)
                     for name, shape in vgg16_block_fused.items()
                 },
                 "full": {
@@ -3175,6 +4250,10 @@ class ExperimentRunner:
         gb_sizes_kb: Optional[List[int]] = None,    # Eyeriss only
         pe_configs: Optional[List[Tuple[int, int]]] = None,  # (rows, cols)
         tile_size: Optional[int] = None,  # Output tile size override (None = auto)
+        input_reg: Optional[int] = None,   # Eyeriss register overrides
+        weight_reg: Optional[int] = None,
+        intermediate_reg: Optional[int] = None,
+        output_reg: Optional[int] = None,
         progress_callback=None,
         verbose: bool = False
     ) -> List[ExperimentResult]:
@@ -3212,6 +4291,17 @@ class ExperimentRunner:
                     pe_cols=pe_c,
                     verbose=verbose,
                 )
+                # Apply register size overrides if provided
+                if input_reg is not None:
+                    config.input_reg_entries = input_reg
+                if weight_reg is not None:
+                    config.weight_reg_entries = weight_reg
+                if intermediate_reg is not None:
+                    config.intermediate_reg_entries = intermediate_reg
+                if output_reg is not None:
+                    config.output_reg_entries = output_reg
+                if tile_size is not None:
+                    config.tile_size = tile_size
                 
                 print(f"[{i+1}/{total}] GB={gb}KB, PE={pe_r}x{pe_c}")
                 
@@ -3829,13 +4919,11 @@ class ExperimentRunner:
         The grid search skips configs exceeding max_total_pes anyway, so large
         candidate values don't cause infeasible-config overhead.
         """
-        # pe_rows_candidates = [4, 8, 12, 14, 16, 28, 32, 56, 64, 84, 128, 256, 512]
-        pe_rows_candidates = [256, 324, 512]
+        # Uniform grid for fair cross-workload comparison (Eyeriss Case Study 1)
+        pe_rows_candidates = [4, 16, 32, 64, 128, 256, 512]
 
-        # PE cols: include base values + tile_size multiples
-        pe_cols_base = [1, 2, 4, 8, 16, 32, 56, 64, 128]
-        pe_cols_tile_multiples = [tile_size, 2*tile_size, 3*tile_size, 4*tile_size]
-        pe_cols_candidates = sorted(set(pe_cols_base + pe_cols_tile_multiples))
+        # PE cols: same uniform grid (tile-size multiples no longer added)
+        pe_cols_candidates = [4, 16, 32, 64, 128, 256, 512]
         
         return pe_rows_candidates, pe_cols_candidates
     
@@ -3878,7 +4966,7 @@ class ExperimentRunner:
             for pe_cols in pe_cols_candidates:
                 total_pes = pe_rows * pe_cols
                 
-                if total_pes > 15512:  # Skip configs that exceed max_total_pes
+                if total_pes > 17000:  # Skip configs that exceed max_total_pes
                     continue
                 
                 config = ExperimentConfig(
@@ -3913,7 +5001,7 @@ class ExperimentRunner:
                     })
         
         if not successful_configs:
-            return None, None
+            return None, None, []
         
         # 1. Find config with minimum total PEs
         min_pes_config = min(successful_configs, key=lambda x: x['total_pes'])
@@ -3923,7 +5011,10 @@ class ExperimentRunner:
         min_latency_configs = [c for c in successful_configs if c['latency'] == min_latency]
         min_latency_config = min(min_latency_configs, key=lambda x: x['total_pes'])
         
-        return min_pes_config, min_latency_config
+        # Sort all successful by total_pes ascending, then latency ascending
+        all_sorted = sorted(successful_configs, key=lambda x: (x['total_pes'], x['latency']))
+        
+        return min_pes_config, min_latency_config, all_sorted
 
 
     """
@@ -3976,6 +5067,7 @@ class ExperimentRunner:
         results = []
         summary_min_pes = []
         summary_min_latency = []
+        summary_all_configs = []
         
         for wreg_size in weight_reg_sizes:
             print(f"\n[WReg={wreg_size}] Searching for optimal PE configurations...")
@@ -3990,11 +5082,17 @@ class ExperimentRunner:
                 tile_size=tile_size,
             )
             
-            # Comprehensive grid search - returns both min_pes and min_latency configs
-            min_pes_config, min_latency_config = self._find_min_pe_grid_search(
+            # Comprehensive grid search - returns min_pes, min_latency, and all feasible configs
+            min_pes_config, min_latency_config, all_configs = self._find_min_pe_grid_search(
                 workload, config_template, tile_size=tile_size, verbose=verbose,
                 pe_rows_candidates=pe_rows_list, pe_cols_candidates=pe_cols_list,
             )
+            
+            # Collect all feasible configs for Summary (C)
+            summary_all_configs.append({
+                'wreg_size': wreg_size,
+                'configs': all_configs,
+            })
             
             if min_pes_config:
                 results.append(min_pes_config['result'])
@@ -4059,6 +5157,23 @@ class ExperimentRunner:
                       f"{z_str:>10} {d['energy']:>14.3e} {d['latency']:>14.3e} {d['edp']:>14.2e}")
             else:
                 print(f"{d['wreg_size']:>10} {'N/A':>10} {'N/A':>10} {'N/A':>12} {'N/A':>10} {'N/A':>14} {'N/A':>14} {'N/A':>14}")
+        
+        # Print summary table - ALL FEASIBLE CONFIGS
+        print(f"\n{'='*120}")
+        print("CASE STUDY 1 SUMMARY (C): ALL Feasible Configurations per WReg Size")
+        print("(Every PE config that produced a valid mapping, sorted by total PEs)")
+        print(f"{'='*120}")
+        for entry in summary_all_configs:
+            wreg_size = entry['wreg_size']
+            configs = entry['configs']
+            print(f"\n  WReg={wreg_size}: {len(configs)} feasible config(s)")
+            if configs:
+                print(f"  {'PE Config':>12} {'Total PEs':>12} {'SACols Z':>10} {'Energy(μJ)':>14} {'Latency(cc)':>14} {'EDP':>14}")
+                print(f"  {'-'*80}")
+                for c in configs:
+                    z_str = "Yes" if c['sacols_z'] else "No"
+                    print(f"  {c['pe_rows']}×{c['pe_cols']:>5} {c['total_pes']:>12,} {z_str:>10} "
+                          f"{c['energy']:>14.3e} {c['latency']:>14.3e} {c['edp']:>14.2e}")
         
         return results
     
@@ -4125,8 +5240,8 @@ class ExperimentRunner:
                 tile_size=tile_size,
             )
             
-            # Comprehensive grid search - returns both min_pes and min_latency configs
-            min_pes_config, min_latency_config = self._find_min_pe_grid_search(
+            # Comprehensive grid search - returns min_pes, min_latency, and all configs
+            min_pes_config, min_latency_config, _all = self._find_min_pe_grid_search(
                 workload, config_template, tile_size=tile_size, verbose=verbose,
                 pe_rows_candidates=pe_rows_list, pe_cols_candidates=pe_cols_list,
             )
@@ -4261,8 +5376,8 @@ class ExperimentRunner:
                 tile_size=tile_size,
             )
             
-            # Comprehensive grid search - returns both min_pes and min_latency configs
-            min_pes_config, min_latency_config = self._find_min_pe_grid_search(
+            # Comprehensive grid search - returns min_pes, min_latency, and all configs
+            min_pes_config, min_latency_config, _all = self._find_min_pe_grid_search(
                 workload, config_template, tile_size=tile_size, verbose=verbose,
                 pe_rows_candidates=pe_rows_list, pe_cols_candidates=pe_cols_list,
             )
@@ -5168,6 +6283,326 @@ class ExperimentRunner:
             'full_result': result_full,
         }
 
+
+    # ------------------------------------------------------------------
+    # FIXED-CONFIG FUSION COMPARISON  (--compare-full-vs-single / --compare-partial-vs-single)
+    # ------------------------------------------------------------------
+    def run_fixed_fusion_comparison(
+        self,
+        network: str,
+        mode: str = "full_vs_single",
+        arch_type: str = "eyeriss",
+        # DepFiN parameters
+        fmem_size_kb: int = 1056,
+        wmem_size_kb: int = 524,
+        # Eyeriss parameters
+        gb_size_kb: int = 128,
+        pe_rows: int = 128,
+        pe_cols: int = 128,
+        input_reg_entries: int = None,
+        weight_reg_entries: int = None,
+        intermediate_reg_entries: int = None,
+        output_reg_entries: int = None,
+        tile_size: Optional[int] = None,
+        intermediate_level_override: Optional[str] = None,
+        verbose: bool = False,
+    ) -> Dict[str, Any]:
+        """
+        Fixed-config fusion comparison for Eyeriss or DepFiN.
+
+        Uses the EXACT SAME architecture for both the fused and non-fused
+        experiments.  No binary search / auto-sizing.
+
+        Three modes:
+          full_vs_single:    Full fusion vs sum of single layers
+          partial_vs_single: Sum of partial (intermediate) fusion vs sum of single layers
+          full_vs_partial:   Full fusion vs sum of partial (intermediate) fusion
+
+
+
+        Example invocations (from CLI):
+          python3 experiment_runner.py --compare-full-vs-single -w resnet18 \\
+              --arch-type eyeriss --pe-rows 128 --pe-cols 128 --weight-reg 902 \\
+              --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 --output-reg 64
+
+          python3 experiment_runner.py --compare-partial-vs-single -w resnet18 \\
+              --arch-type eyeriss --pe-rows 128 --pe-cols 128 --weight-reg 384 \\
+              --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 --output-reg 64
+              
+
+          python3 experiment_runner.py --compare-full-vs-partial -w resnet18 \\
+              --arch-type eyeriss --pe-rows 128 --pe-cols 128 --weight-reg 920 \\
+              --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 --output-reg 64
+
+              # Default (2layer for resnet18):
+              python3 experiment_runner.py --compare-full-vs-partial -w resnet18 ...
+
+              # Override to block:
+              python3 experiment_runner.py --compare-full-vs-partial -w resnet18 --intermediate-level block ...
+
+        """
+        if network not in self.FUSION_COMPARISON_CONFIG:
+            raise ValueError(f"Unknown network: {network}. "
+                             f"Available: {list(self.FUSION_COMPARISON_CONFIG.keys())}")
+
+        cfg = self.FUSION_COMPARISON_CONFIG[network]
+        full_fusion, full_variant = cfg['full']
+        intermediate_level = intermediate_level_override if intermediate_level_override else cfg['intermediate']
+        single_exclude = cfg['single_exclude']
+
+        if input_reg_entries is None:
+            input_reg_entries = _EYERISS_DEFAULTS.input_reg_entries
+        if weight_reg_entries is None:
+            weight_reg_entries = _EYERISS_DEFAULTS.weight_reg_entries
+        if intermediate_reg_entries is None:
+            intermediate_reg_entries = _EYERISS_DEFAULTS.intermediate_out_reg_entries
+        if output_reg_entries is None:
+            output_reg_entries = _EYERISS_DEFAULTS.output_reg_entries
+
+        if mode == "full_vs_single":
+            mode_label = "FULL FUSION vs Sum SINGLES"
+        elif mode == "partial_vs_single":
+            mode_label = "Sum PARTIAL FUSION vs Sum SINGLES"
+        else:  # full_vs_partial
+            mode_label = "FULL FUSION vs Sum PARTIAL FUSION"
+
+        print(f"\n{'='*100}")
+        print(f"FIXED-CONFIG FUSION COMPARISON: {network.upper()} -- {mode_label}")
+        print(f"{'='*100}")
+        if arch_type == "eyeriss":
+            print(f"Architecture: Eyeriss, PE={pe_rows}x{pe_cols} ({pe_rows*pe_cols:,} total)")
+            print(f"  GB={gb_size_kb}KB, WReg={weight_reg_entries}, InReg={input_reg_entries}, "
+                  f"IntReg={intermediate_reg_entries}, OutReg={output_reg_entries}")
+        else:
+            print(f"Architecture: DepFiN, PE={pe_rows}x{pe_cols} ({pe_rows*pe_cols:,} total)")
+            print(f"  FMEM={fmem_size_kb}KB, WMEM={wmem_size_kb}KB")
+        if tile_size is not None:
+            print(f"  Tile size override: {tile_size}")
+        print(f"  ALL experiments use IDENTICAL architecture (fair comparison)")
+        print(f"{'='*100}\n")
+
+        def make_cfg(wk_name, fusion_level, variant, num_layers):
+            return ExperimentConfig(
+                workload_name=wk_name, workload_variant=variant,
+                fusion_level=fusion_level, num_fused_layers=num_layers,
+                arch_type=arch_type,
+                # DepFiN params
+                fmem_size_kB=fmem_size_kb,
+                wmem_size_kB=wmem_size_kb,
+                # Eyeriss params
+                gb_size_kB=gb_size_kb,
+                pe_rows=pe_rows, pe_cols=pe_cols,
+                input_reg_entries=input_reg_entries,
+                weight_reg_entries=weight_reg_entries,
+                intermediate_reg_entries=intermediate_reg_entries,
+                output_reg_entries=output_reg_entries,
+                tile_size=tile_size, verbose=verbose,
+            )
+
+        # ── 1. FUSED side (the "better" fusion level) ──────────────────
+        fused_results = []
+        if mode in ("full_vs_single", "full_vs_partial"):
+            # Full fusion is the "fused side"
+            print(f"--- FULL FUSION: {network}/{full_fusion}/{full_variant} ---")
+            _, _, nlayers_full = self.workload_registry.get_workload(
+                network, full_fusion, full_variant)
+            cfg_full = make_cfg(network, full_fusion, full_variant, nlayers_full)
+            res_full = self.run_single_experiment(cfg_full)
+            fused_results.append((f"{full_fusion}/{full_variant}", res_full))
+            if res_full.success:
+                print(f"  OK Energy: {res_full.energy_uJ:.3e} uJ, "
+                      f"Latency: {res_full.latency_cycles:.3e} cc, "
+                      f"EDP: {res_full.edp:.2e}")
+            else:
+                print(f"  FAILED: {res_full.error_message}")
+        else:
+            # partial_vs_single: partial fusion is the "fused side"
+            print(f"--- PARTIAL FUSION ({intermediate_level}) ---")
+            inter_variants = self.workload_registry.list_workloads(
+                network, intermediate_level)
+            for _, _, iv in inter_variants:
+                _, _, nl = self.workload_registry.get_workload(
+                    network, intermediate_level, iv)
+                cfg_v = make_cfg(network, intermediate_level, iv, nl)
+                res_v = self.run_single_experiment(cfg_v)
+                fused_results.append((f"{intermediate_level}/{iv}", res_v))
+                if res_v.success:
+                    print(f"  OK {iv} ({nl}L): E={res_v.energy_uJ:.3e} uJ, "
+                          f"L={res_v.latency_cycles:.3e} cc, EDP={res_v.edp:.2e}")
+                else:
+                    print(f"  FAIL {iv}: {res_v.error_message}")
+
+        # ── 2. BASELINE side ───────────────────────────────────────────
+        baseline_results = []
+        if mode == "full_vs_partial":
+            # Baseline = sum of partial (intermediate) segments
+            print(f"\n--- BASELINE: PARTIAL FUSION ({intermediate_level}) ---")
+            inter_variants = self.workload_registry.list_workloads(
+                network, intermediate_level)
+            for _, _, iv in inter_variants:
+                _, _, nl = self.workload_registry.get_workload(
+                    network, intermediate_level, iv)
+                cfg_v = make_cfg(network, intermediate_level, iv, nl)
+                res_v = self.run_single_experiment(cfg_v)
+                baseline_results.append((f"{intermediate_level}/{iv}", res_v))
+                if res_v.success:
+                    print(f"  OK {iv} ({nl}L): E={res_v.energy_uJ:.3e} uJ, "
+                          f"L={res_v.latency_cycles:.3e} cc, EDP={res_v.edp:.2e}")
+                else:
+                    print(f"  FAIL {iv}: {res_v.error_message}")
+        else:
+            # full_vs_single or partial_vs_single: baseline = single layers
+            print(f"\n--- BASELINE: SINGLE LAYERS ---")
+            single_variants = self.workload_registry.list_workloads(network, 'single')
+            for _, _, sv in single_variants:
+                if sv in single_exclude:
+                    print(f"  [skip] {sv} (not in fusion)")
+                    continue
+                _, _, nl = self.workload_registry.get_workload(network, 'single', sv)
+                cfg_v = make_cfg(network, 'single', sv, nl)
+                res_v = self.run_single_experiment(cfg_v)
+                baseline_results.append((sv, res_v))
+                if res_v.success:
+                    print(f"  OK {sv}: E={res_v.energy_uJ:.3e} uJ, "
+                          f"L={res_v.latency_cycles:.3e} cc, EDP={res_v.edp:.2e}")
+                else:
+                    print(f"  FAIL {sv}: {res_v.error_message}")
+        # backward compat alias
+        single_results = baseline_results
+
+        # ── AGGREGATE ──────────────────────────────────────────────────
+        def aggregate(results_list):
+            ok = [(v, r) for v, r in results_list if r.success]
+            fail = [(v, r) for v, r in results_list if not r.success]
+            if not ok:
+                return None
+            return {
+                'energy_uJ': sum(r.energy_uJ for _, r in ok),
+                'latency_cycles': sum(r.latency_cycles for _, r in ok),
+                'edp': sum(r.edp for _, r in ok),
+                'dram_reads': sum(r.dram_reads for _, r in ok),
+                'dram_writes': sum(r.dram_writes for _, r in ok),
+                'num_ok': len(ok),
+                'num_failed': len(fail),
+                'failed_variants': [v for v, _ in fail],
+            }
+
+        agg_fused = aggregate(fused_results)
+        agg_baseline = aggregate(baseline_results)
+        # keep old name for return dict
+        agg_singles = agg_baseline
+
+        if mode == "full_vs_single":
+            fused_label = "Full Fusion"
+            baseline_label = "Sum Singles"
+        elif mode == "partial_vs_single":
+            fused_label = "Sum Partial Fusion"
+            baseline_label = "Sum Singles"
+        else:  # full_vs_partial
+            fused_label = "Full Fusion"
+            baseline_label = "Sum Partial Fusion"
+
+        # ── Print comparison table ─────────────────────────────────────
+        print(f"\n{'='*100}")
+        print(f"COMPARISON RESULTS: {network.upper()} -- {mode_label}")
+        print(f"{'='*100}")
+        if arch_type == "eyeriss":
+            print(f"  Architecture: Eyeriss {pe_rows}x{pe_cols}, GB={gb_size_kb}KB, "
+                  f"WReg={weight_reg_entries}, InReg={input_reg_entries}, "
+                  f"IntReg={intermediate_reg_entries}, OutReg={output_reg_entries}")
+        else:
+            print(f"  Architecture: DepFiN {pe_rows}x{pe_cols}, FMEM={fmem_size_kb}KB, "
+                  f"WMEM={wmem_size_kb}KB")
+        print(f"{'='*100}")
+        print(f"{'Level':<25} {'Energy (uJ)':>14} {'Latency (cc)':>14} {'EDP':>14} "
+              f"{'DRAM Reads':>16} {'DRAM Writes':>16}")
+        print(f"{'-'*100}")
+
+        if agg_fused:
+            n_ok = agg_fused['num_ok']
+            n_fail = agg_fused['num_failed']
+            status = f" ({n_ok} ok" + (f", {n_fail} fail" if n_fail else "") + ")"
+            print(f"{fused_label + status:<25} {agg_fused['energy_uJ']:>14.3e} "
+                  f"{agg_fused['latency_cycles']:>14.3e} {agg_fused['edp']:>14.2e} "
+                  f"{agg_fused['dram_reads']:>16,} {agg_fused['dram_writes']:>16,}")
+            if agg_fused['num_failed'] > 0:
+                print(f"  Warning: Failed: {', '.join(agg_fused['failed_variants'])}")
+        else:
+            print(f"{fused_label:<25} {'ALL FAILED':>14}")
+
+        if agg_baseline:
+            n_ok = agg_baseline['num_ok']
+            n_fail = agg_baseline['num_failed']
+            status = f" ({n_ok} ok" + (f", {n_fail} fail" if n_fail else "") + ")"
+            print(f"{baseline_label + status:<25} {agg_baseline['energy_uJ']:>14.3e} "
+                  f"{agg_baseline['latency_cycles']:>14.3e} {agg_baseline['edp']:>14.2e} "
+                  f"{agg_baseline['dram_reads']:>16,} {agg_baseline['dram_writes']:>16,}")
+            if agg_baseline['num_failed'] > 0:
+                print(f"  Warning: Failed: {', '.join(agg_baseline['failed_variants'])}")
+        else:
+            print(f"{baseline_label:<25} {'ALL FAILED':>14}")
+
+        if agg_fused and agg_baseline:
+            print(f"\n{'-'*100}")
+            print(f"RATIOS ({fused_label} / {baseline_label}) -- values < 1.0 mean fusion wins")
+            print(f"{'-'*100}")
+
+            e_ratio = agg_fused['energy_uJ'] / agg_baseline['energy_uJ']
+            l_ratio = agg_fused['latency_cycles'] / agg_baseline['latency_cycles']
+            edp_ratio = agg_fused['edp'] / agg_baseline['edp']
+            dr_ratio = (agg_fused['dram_reads'] / agg_baseline['dram_reads']
+                       if agg_baseline['dram_reads'] > 0 else float('inf'))
+            dw_ratio = (agg_fused['dram_writes'] / agg_baseline['dram_writes']
+                       if agg_baseline['dram_writes'] > 0 else float('inf'))
+
+            print(f"{'Metric':<20} {'Ratio':>10} {'Savings':>12}")
+            print(f"{'-'*45}")
+            print(f"{'Energy':<20} {e_ratio:>10.4f} {(1-e_ratio)*100:>+11.1f}%")
+            print(f"{'Latency':<20} {l_ratio:>10.4f} {(1-l_ratio)*100:>+11.1f}%")
+            print(f"{'EDP':<20} {edp_ratio:>10.4f} {(1-edp_ratio)*100:>+11.1f}%")
+            print(f"{'DRAM Reads':<20} {dr_ratio:>10.4f} {(1-dr_ratio)*100:>+11.1f}%")
+            print(f"{'DRAM Writes':<20} {dw_ratio:>10.4f} {(1-dw_ratio)*100:>+11.1f}%")
+
+            # ── Baseline detail ─────────────────────────────────────
+            print(f"\n{'-'*100}")
+            print(f"BASELINE DETAIL ({baseline_label}):")
+            print(f"{'-'*100}")
+            print(f"{'Layer/Segment':<30} {'Energy (uJ)':>14} {'Latency (cc)':>14} {'EDP':>14} {'Status':>10}")
+            print(f"{'-'*85}")
+            for v, r in baseline_results:
+                if r.success:
+                    print(f"{v:<30} {r.energy_uJ:>14.3e} {r.latency_cycles:>14.3e} "
+                          f"{r.edp:>14.2e} {'OK':>10}")
+                else:
+                    print(f"{v:<30} {'--':>14} {'--':>14} {'--':>14} {'FAIL':>10}")
+
+            # Show fused-side detail when it has multiple segments
+            if len(fused_results) > 1:
+                print(f"\n{'-'*100}")
+                print(f"FUSED-SIDE SEGMENT DETAIL ({fused_label}):")
+                print(f"{'-'*100}")
+                print(f"{'Segment':<30} {'Energy (uJ)':>14} {'Latency (cc)':>14} {'EDP':>14} {'Status':>10}")
+                print(f"{'-'*85}")
+                for v, r in fused_results:
+                    if r.success:
+                        print(f"{v:<30} {r.energy_uJ:>14.3e} {r.latency_cycles:>14.3e} "
+                              f"{r.edp:>14.2e} {'OK':>10}")
+                    else:
+                        print(f"{v:<30} {'--':>14} {'--':>14} {'--':>14} {'FAIL':>10}")
+
+        print(f"\n{'='*100}\n")
+
+        return {
+            'network': network,
+            'mode': mode,
+            'fused_label': fused_label,
+            'fused': agg_fused,
+            'singles': agg_singles,
+            'fused_results': fused_results,
+            'single_results': single_results,
+        }
+
+
     def export_results_csv(self, filename: Optional[str] = None) -> str:
         """Export results to CSV file."""
         if filename is None:
@@ -5310,7 +6745,18 @@ Examples:
                            help="Case Study 5: Sweep PE array aspect ratios with fixed total PEs [Eyeriss]")
     mode_group.add_argument("--compare-fusion", action="store_true",
                            help="Fusion Comparison: Full fusion vs non-fused vs intermediate fusion")
-    
+    mode_group.add_argument("--compare-full-vs-single", action="store_true",
+                           help="Fixed-config: Full fusion vs sum singles (same WReg/PEs)")
+    mode_group.add_argument("--compare-partial-vs-single", action="store_true",
+                           help="Fixed-config: sum partial fusion vs sum singles (same WReg/PEs)")
+    mode_group.add_argument("--compare-full-vs-partial", action="store_true",
+                           help="Fixed-config: Full fusion vs sum partial fusion (same WReg/PEs)")
+
+    # Intermediate level override for fixed-config comparisons
+    parser.add_argument("--intermediate-level", type=str, default=None,
+                       help="Override intermediate fusion level for --compare-*-vs-partial "
+                            "(e.g. 'block' instead of default '2layer' for resnet18)")
+
     # Workload specification
     parser.add_argument("--workload", "-w", type=str,
                        help="Workload network name (fsrcnn, mccnn, vgg16, resnet18)")
@@ -5512,6 +6958,10 @@ def main():
             gb_sizes_kb=args.gb_sizes,
             pe_configs=pe_configs,
             tile_size=args.tile_size,
+            input_reg=args.input_reg,
+            weight_reg=args.weight_reg,
+            intermediate_reg=args.intermediate_reg,
+            output_reg=args.output_reg,
             verbose=args.verbose,
         )
     
@@ -5710,6 +7160,35 @@ def main():
             intermediate_output_reg=args.int_output_reg,
         )
     
+    elif args.compare_full_vs_single or args.compare_partial_vs_single or args.compare_full_vs_partial:
+        if not args.workload:
+            print("Error: requires --workload (fsrcnn, mccnn, vgg16, resnet18)")
+            return
+        if args.compare_full_vs_single:
+            compare_mode = "full_vs_single"
+        elif args.compare_partial_vs_single:
+            compare_mode = "partial_vs_single"
+        else:
+            compare_mode = "full_vs_partial"
+        runner.run_fixed_fusion_comparison(
+            network=args.workload,
+            mode=compare_mode,
+            arch_type=args.arch_type,
+            fmem_size_kb=args.fmem_size,
+            wmem_size_kb=args.wmem_size,
+            gb_size_kb=args.gb_size,
+            pe_rows=args.pe_rows,
+            pe_cols=args.pe_cols,
+            input_reg_entries=args.input_reg,
+            weight_reg_entries=args.weight_reg,
+            intermediate_reg_entries=args.intermediate_reg,
+            output_reg_entries=args.output_reg,
+            tile_size=args.tile_size,
+            intermediate_level_override=args.intermediate_level,
+            verbose=args.verbose,
+        )
+
+
     elif args.single or (args.workload and args.fusion and args.variant):
         if not all([args.workload, args.fusion, args.variant]):
             print("Error: Single run requires --workload, --fusion, and --variant")

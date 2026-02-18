@@ -449,24 +449,24 @@ comp_vgg_16 = {
     # MaxPool 1: 224 -> 112
 
     # --- Block 2: 2 Conv Layers (Output: 112x112) ---
-    'L2': Shape(C=64,  M=128, P=112, Q=112, R=3, S=3), # Conv2_1
+    'L2': Shape(C=64,  M=128, P=112, Q=112, R=3, S=3, Pstride=2, Qstride=2), # Conv2_1
     'L3': Shape(C=128, M=128, P=112, Q=112, R=3, S=3), # Conv2_2
     # MaxPool 2: 112 -> 56
 
     # --- Block 3: 3 Conv Layers (Output: 56x56) ---
-    'L4': Shape(C=128, M=256, P=56, Q=56, R=3, S=3),   # Conv3_1
+    'L4': Shape(C=128, M=256, P=56, Q=56, R=3, S=3, Pstride=2, Qstride=2),   # Conv3_1
     'L5': Shape(C=256, M=256, P=56, Q=56, R=3, S=3),   # Conv3_2
     'L6': Shape(C=256, M=256, P=56, Q=56, R=3, S=3),   # Conv3_3 (commented)
     # MaxPool 3: 56 -> 28
 
     # --- Block 4: 3 Conv Layers (Output: 28x28) --- Should be interesting for fusion
-    'L7': Shape(C=256, M=512, P=28, Q=28, R=3, S=3),   # Conv4_1
+    'L7': Shape(C=256, M=512, P=28, Q=28, R=3, S=3, Pstride=2, Qstride=2),   # Conv4_1
     'L8': Shape(C=512, M=512, P=28, Q=28, R=3, S=3),   # Conv4_2
     'L9': Shape(C=512, M=512, P=28, Q=28, R=3, S=3),   # Conv4_3 (Previously commented)
     # MaxPool 4: 28 -> 14
 
     # --- Block 5: 3 Conv Layers (Output: 14x14) ---
-    'L10': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),  # Conv5_1
+    'L10': Shape(C=512, M=512, P=14, Q=14, R=3, S=3, Pstride=2, Qstride=2),  # Conv5_1
     'L11': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),  # Conv5_2 (Previously commented)
     'L12': Shape(C=512, M=512, P=14, Q=14, R=3, S=3),  # Conv5_3 (Previously commented)
     # MaxPool 5: 14 -> 7. Flatten: 7 * 7 * 512 = 25088
