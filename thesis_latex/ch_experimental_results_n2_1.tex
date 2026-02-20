@@ -44,6 +44,20 @@ to reflect the reduced wordline utilisation at smaller tiles.
 All other parameters are held constant: $16 \times 128$~PEs
 (2\,048 total), FMEM\,=\,1\,056\,KB, WMEM\,=\,524\,KB.
 
+\paragraph{Remark on tile dimensionality.}
+The sweep varies the tile \emph{width} (output dimension~$Q$), which
+is the dimension spatially mapped to PE columns.
+The choice of sweeping width rather than height is not a fundamental
+limitation: in both the DepFiN-Like and the Eyeriss-Like models the
+height dimension~$P$ is handled identically, as a purely temporal
+iteration at the DRAM level, and PE rows are mapped to output channels
+rather than spatial height.
+A sweep over tile height, or over both dimensions jointly, would
+therefore require no modification to either architecture model, only a
+change in the experiment script, and would produce qualitatively
+analogous results through the same mechanism of additional DRAM-level
+passes.
+
 \subsubsection{Results}
 
 Figure~\ref{fig:depfin-cs1} shows the EDP (log scale) as a function of
