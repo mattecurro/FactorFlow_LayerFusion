@@ -1,0 +1,120 @@
+% ============================================================
+%  N.2.5  Eyeriss CS2+CS3 — IntReg & OutReg Sweeps
+% ============================================================
+\subsection{Eyeriss: Intermediate and Output Register Sweeps (CS2, CS3)}
+\label{sec:eyeriss-cs2-cs3}
+
+\subsubsection{Motivation}
+
+The previous section showed that the weight register is the dominant
+sizing constraint for the Eyeriss-Like architecture under full fusion.
+Two additional per-PE registers, however, also contribute to the
+overall register pressure: the \emph{intermediate register} (IntReg),
+which stores intermediate activations passed between consecutive fused
+layers, and the \emph{output register} (OutReg), which accumulates the
+partial sums of the final fused layer before they are written back to
+the GlobalBuffer.
+
+In principle, each register can become the binding constraint if it is
+undersized relative to the per-PE footprint imposed by the spatial
+mapping.
+A register is \emph{binding} when its required footprint exceeds the
+allocated capacity, forcing the PE array to grow (more columns) so
+that the spatial distribution reduces the per-PE share.
+A register is \emph{non-binding} when the footprint already fits
+comfortably, and enlarging it has no effect on the minimum feasible PE
+count.
+
+CS2 and CS3 sweep IntReg and OutReg independently while holding all
+other parameters constant (GlobalBuffer\,=\,128\,KB, tile size, InReg,
+WReg, and OutReg or IntReg respectively).
+The same full grid of PE configurations used in CS1 is evaluated for
+each register size, and the minimum-PE feasible mapping is recorded.
+The goal is to establish which register types are binding for each
+workload and to quantify the \emph{binding hierarchy} among the three
+register types.
+
+\subsubsection{Results}
+
+Figure~\ref{fig:eyeriss-cs2cs3} shows the energy at the minimum-PE
+configuration as a function of IntReg size (top row) and OutReg size
+(bottom row) for all four workloads.
+The subplot titles include the saturation or binding note for each
+workload.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{plots/eyeriss_cs2cs3_intreg_outreg.pdf}
+  \caption{Eyeriss CS2\,+\,CS3 — Energy vs.\ IntReg size (top) and
+    OutReg size (bottom) at the minimum-PE feasible configuration.}
+  \label{fig:eyeriss-cs2cs3}
+\end{figure}
+
+\paragraph{IntReg sweep (CS2).}
+For the activation-dominant workloads, IntReg is non-binding.
+FSRCNN yields the same minimum PE configuration ($128 \times 4$,
+512~PEs) at all three tested sizes (200, 300, 400); energy scales
+linearly with register size
+($1.03 \times 10^{5}$ to $1.36 \times 10^{5}$\,$\mu$J) but no
+additional PEs are needed, confirming that the weight register alone
+determines feasibility.
+MC-CNN saturates at IntReg\,$\ge$\,30: below this threshold
+(IntReg\,=\,15) the footprint of 17~entries exceeds the capacity,
+requiring 4\,096~PEs instead of the usual 1\,024.
+
+For the weight-dominant workloads, IntReg is binding.
+Taking ResNet18 as an example, the per-PE IntReg footprint is
+209~entries at $\text{cols} = 16$.
+At IntReg\,=\,50 the only feasible configurations have at least
+128~PE columns, pushing the minimum array to 32\,768~PEs.
+Doubling IntReg to 100 halves the required columns (64), and
+doubling again to 200 halves them once more (32).
+Saturation is reached at IntReg\,$\ge$\,200, where the IntReg
+footprint fits within the register at the WReg-limited column count.
+VGG16 behaves similarly, saturating at IntReg\,$\ge$\,230.
+
+\paragraph{OutReg sweep (CS3).}
+The output register is the weakest constraint in the binding
+hierarchy.
+For FSRCNN, energy scales linearly with OutReg size
+($9.32 \times 10^{4}$ to $1.12 \times 10^{5}$\,$\mu$J), but the
+minimum PE count is unchanged at 1\,024, confirming that OutReg is
+non-binding.
+MC-CNN is similarly unaffected: energy and latency remain constant
+across all four tested sizes (8 to 64), and the EDP is flat at
+$2.78 \times 10^{6}$\,J$\cdot$cc.
+
+For the weight-dominant workloads, OutReg is weakly binding only at
+very small sizes.
+VGG16 requires 10\,752~PEs at OutReg\,=\,4 but saturates already at
+OutReg\,$\ge$\,16 (4\,096~PEs).
+ResNet18 follows the same pattern: OutReg\,=\,8 needs 16\,384~PEs, but
+OutReg\,$\ge$\,16 saturates at 8\,192~PEs.
+In both cases the saturation threshold is very low, because the
+per-PE OutReg footprint is small (32~entries for VGG16, 8 for
+ResNet18 at $\text{cols} = 16$) compared to the WReg footprint.
+
+\paragraph{Binding hierarchy.}
+Combining the results of CS1, CS2, and CS3, the register binding
+hierarchy for the Eyeriss-Like architecture is:
+%
+\[
+  \text{WReg} \;\gg\; \text{IntReg} \;>\; \text{OutReg}
+\]
+%
+The weight register dominates because it stores the residual factors
+of \emph{all} fused layers, whose cumulative size dwarfs the
+intermediate and output footprints.
+IntReg is a secondary constraint for weight-dominant workloads, where
+large channel counts produce sizable intermediate activations.
+OutReg is the weakest, reaching its saturation threshold at very
+small register sizes.
+
+\paragraph{Key takeaway.}
+When sizing the per-PE registers for the Eyeriss-Like architecture
+under full fusion, the weight register should be dimensioned first,
+as it is the bottleneck for feasibility.
+The intermediate register requires attention only for weight-dominant
+workloads with deep fused groups, while the output register can be
+set to a modest value (16--32 entries) without constraining the
+minimum PE count.
