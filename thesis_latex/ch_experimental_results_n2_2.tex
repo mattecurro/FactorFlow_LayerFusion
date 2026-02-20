@@ -1,0 +1,102 @@
+% ============================================================
+%  N.2.2  DepFiN CS2+CS3 — PE Row and Column Sweeps
+% ============================================================
+\subsection{DepFiN: PE Row and Column Sweeps (CS2, CS3)}
+\label{sec:cs2-cs3}
+
+\subsubsection{Motivation}
+
+The two spatial dimensions of the DepFiN PE array serve different
+purposes: columns are mapped to the output width~$Q$ (determining the
+tile size), while rows are mapped to output channels~$Z$.
+Adding PEs along one dimension therefore has a qualitatively different
+effect from adding them along the other.
+CS2 and CS3 isolate these two effects by sweeping one dimension at a
+time while keeping the other fixed.
+
+\paragraph{CS2 — Row Sweep.}
+The number of PE rows is varied (8, 16, 32 for FSRCNN and MC-CNN;
+16, 32, 64, 128 for VGG16 and ResNet18) while columns are fixed at
+128.
+More rows allow more output channels to be computed in parallel,
+reducing the number of temporal iterations over~$Z$ and, consequently,
+the number of times input activations are re-read from the Feature
+Memory.
+
+\paragraph{CS3 — Column Sweep.}
+The number of PE columns is varied (64, 128, 256 for FSRCNN and
+MC-CNN; 128, 256, 512, 1\,024 for VGG16 and ResNet18) while rows are
+fixed at~16.
+Because columns directly control the tile width, adding columns has
+the same effect studied in the tile size sweep
+(Section~\ref{sec:cs1-tile}): fewer temporal passes over the output
+dimension~$Q$ at the DRAM level and fewer weight re-reads from the
+Weight Memory.
+
+In both sweeps the total PE count doubles with each step (e.g.\
+$8 \times 128 = 1\,024$ to $32 \times 128 = 4\,096$), so a fair
+comparison between CS2 and CS3 at equal total PEs reveals which
+dimension yields a higher return on silicon area.
+
+\subsubsection{Results}
+
+Figure~\ref{fig:depfin-cs2cs3} shows the EDP as a function of PE rows
+(top) and PE columns (bottom) for all four workloads.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{plots/depfin_cs2cs3_row_col_sweep.pdf}
+  \caption{DepFiN CS2\,+\,CS3 — EDP vs.\ PE rows (top row, cols\,=\,128)
+    and PE columns (bottom row, rows\,=\,16).}
+  \label{fig:depfin-cs2cs3}
+\end{figure}
+
+\paragraph{Activation-dominant workloads (FSRCNN, MC-CNN).}
+For these workloads the two dimensions produce markedly different
+returns.
+Taking FSRCNN as an example, the row sweep (CS2) reduces EDP by
+$\approx 2\times$ going from 8 to 16 rows
+($1.16 \times 10^{5} \to 5.98 \times 10^{4}$\,J$\cdot$cc), but
+doubling again to 32~rows yields almost no further improvement
+($5.74 \times 10^{4}$).
+The saturation occurs because, once the number of rows exceeds the
+largest output-channel count in the fused group, the extra rows remain
+idle.
+In contrast, the column sweep (CS3) delivers a sustained reduction:
+from 64 to 256 columns the EDP drops by $\approx 3.3\times$
+($1.08 \times 10^{5} \to 3.27 \times 10^{4}$), with each doubling
+roughly halving the EDP.
+The benefit is sustained because adding columns enlarges the tile,
+which directly reduces the number of DRAM-level passes and the
+associated weight re-reads.
+
+MC-CNN exhibits the same contrast: the row sweep saturates after
+$2\times$ improvement
+($3.28 \times 10^{5} \to 1.58 \times 10^{5}$), while the column
+sweep achieves a $3.7\times$ reduction
+($2.05 \times 10^{5} \to 5.57 \times 10^{4}$).
+
+\paragraph{Weight-dominant workloads (VGG16, ResNet18).}
+Neither sweep produces a meaningful improvement.
+VGG16 EDP varies by less than~$1$\,\% across all row configurations
+($3.41 \times 10^{6}$ to $3.39 \times 10^{6}$) and is essentially
+flat across all column configurations as well ($3.41 \times 10^{6}$ to
+$3.33 \times 10^{6}$).
+ResNet18 is even flatter, with EDP constant at
+$\approx 1.51 \times 10^{5}$ in both sweeps.
+These workloads are dominated by register-level weight operations,
+which account for more than 99\,\% of the total energy and are
+invariant to the PE array shape, so even a x6 reduction of Feature Memory reads is irrelevant.
+      
+Because the output spatial dimensions are small (14 for VGG16, 7 for
+ResNet18), any column count above 128 provides no additional tile
+parallelism, and the latency is already compute-bound.
+
+\paragraph{Key takeaway.}
+For activation-dominant workloads, investing additional PEs in columns
+is substantially more effective than investing them in rows, because
+columns enlarge the tile and reduce DRAM-level iterations, whereas
+rows only reduce output-channel iterations, which saturate quickly.
+For weight-dominant workloads, the PE array shape has negligible impact
+on EDP, as performance is governed by the register-level dataflow
+rather than by spatial parallelism.
