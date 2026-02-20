@@ -40,15 +40,40 @@ dimension yields a higher return on silicon area.
 
 \subsubsection{Results}
 
-Figure~\ref{fig:depfin-cs2cs3} shows the EDP as a function of PE rows
-(top) and PE columns (bottom) for all four workloads.
+Figures~\ref{fig:cs2cs3-fsrcnn}--\ref{fig:cs2cs3-resnet18} show, for
+each workload, the EDP as a function of PE rows (left, cols\,=\,128)
+and PE columns (right, rows\,=\,16).
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{plots/depfin_cs2cs3_row_col_sweep.pdf}
-  \caption{DepFiN CS2\,+\,CS3 — EDP vs.\ PE rows (top row, cols\,=\,128)
-    and PE columns (bottom row, rows\,=\,16).}
-  \label{fig:depfin-cs2cs3}
+  \includegraphics[width=0.85\textwidth]{plots/depfin_cs2cs3_fsrcnn.pdf}
+  \caption{DepFiN CS2\,+\,CS3 — FSRCNN: row sweep (left) and
+    column sweep (right).}
+  \label{fig:cs2cs3-fsrcnn}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{plots/depfin_cs2cs3_mccnn.pdf}
+  \caption{DepFiN CS2\,+\,CS3 — MC-CNN: row sweep (left) and
+    column sweep (right).}
+  \label{fig:cs2cs3-mccnn}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{plots/depfin_cs2cs3_vgg16.pdf}
+  \caption{DepFiN CS2\,+\,CS3 — VGG16: row sweep (left) and
+    column sweep (right).}
+  \label{fig:cs2cs3-vgg16}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{plots/depfin_cs2cs3_resnet18.pdf}
+  \caption{DepFiN CS2\,+\,CS3 — ResNet18: row sweep (left) and
+    column sweep (right).}
+  \label{fig:cs2cs3-resnet18}
 \end{figure}
 
 \paragraph{Activation-dominant workloads (FSRCNN, MC-CNN).}
