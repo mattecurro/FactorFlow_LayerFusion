@@ -1860,6 +1860,7 @@ def main():
     # Eyeriss sweeps
     print("\n[Group 2] Eyeriss register sensitivity sweeps")
     figs.append(plot_eyeriss_cs1())
+    figs.append(plot_eyeriss_cs1_feasibility())
     figs.append(plot_eyeriss_cs2_cs3())
     figs.append(plot_eyeriss_cs5())
 
