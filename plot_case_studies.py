@@ -70,34 +70,6 @@ def _sci_fmt(ax, axis="y"):
 # ====================================================================
 
 # CS1 — Tile Size Sensitivity Sweep (fixed PE grid = 16×128)
-# FMEM BW scales with tile: BW_scaled = BW_base × (tile_size / 128).
-#
-# Results:  Larger tiles always win — best EDP is at the maximum tile for
-#   every workload.  EDP improvement is driven almost entirely by latency
-#   reduction; energy is nearly flat (2–25 % variation across the full
-#   tile range) because the total compute work is tile-independent.
-#
-#   FMEM and WMEM changes with Activation and Weight dominant workloads
-#
-#   FSRCNN  (tile 120→8):  EDP ×15,  energy +2 %,  latency ×15
-#   MC-CNN  (tile  69→3):  EDP ×24,  energy +7 %,  latency ×23
-#   VGG16   (tile  14→1):  EDP ×15,  energy +24 %, latency ×13
-#   ResNet18(tile   7→1):  EDP ×8,   energy +25 %, latency ×7
-#   
-#       PE Utilization: decrease (93.8% → 6.2%)
-#    Energy: slight increase (+6%, from WeightMemory 15 times re-reads)
-#    Latency: increase ~15× (6.16M → 92.4M cc), more temporal iterations in DRAM.
-#    EDP: increase ~15.5× (dominated by latency)
-
-
-#    Why: Smaller tiles mean more DRAM Q iterations (more temporal passes over the
-#    output space). Each pass re-reads ALL weights from WeightMemory to WeightRegister.
-#    The weight data volume is fixed, but it's re-read 15× more often.
-
-#    The ENTIRE +6% in energy increase comes from WeightMemory reads:
-#    tile=120: WMem reads = 81,181,440    (weights fetched 1× per tile pass)
-#    tile=8:   WMem reads = 1,217,721,600 (15× more — weights re-fetched every tile)
-
 DEPFIN_CS1 = {
     "FSRCNN": {
         "tiles": [120, 64, 32, 16, 8],
@@ -856,6 +828,12 @@ def plot_depfin_cs2_cs3():
                             xytext=(0, 10), ha="center", fontsize=7,
                             bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                       ec=COLORS[wl], alpha=0.8, lw=0.5))
+
+        # Add 8% bottom + top margin so data lines don't touch the axes
+        for ax in (ax_row, ax_col):
+            lo, hi = ax.get_ylim()
+            margin = 0.08 * (hi - lo)
+            ax.set_ylim(lo - margin, hi + margin)
 
         fig.tight_layout(rect=[0, 0, 1, 0.95])
         _save(fig, f"depfin_cs2cs3_{wl.lower().replace('-', '')}")

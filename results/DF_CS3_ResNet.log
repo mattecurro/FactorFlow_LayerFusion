@@ -16,10 +16,11 @@ PE configs: ['16x128', '16x256', '16x512', '16x1024']
 
 [1/4] FMEM=266KB, WMEM=10739KB, PE=16x128
 ------ loading Accelergy ------
+WARNING: Accelergy package not found or incompatible, trying a manual import from ACCELERGY_PATH.
 ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
 Creating architecture: Thesis_17Layers_272384KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12Y12X12Z12C13R13S13Y13X13Z13C14R14S14Y14X14Z14C15R15S15Y15X15Z15C16R16S16PQZ16, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],W13: [Z13][C13][R13][S13],W14: [Z14][C14][R14][S14],W15: [Z15][C15][R15][S15],W16: [Z16][C16][R16][S16],, out_coupling: [Z16][P][Q]
-final_layer_dims: {'C16', 'Q', 'Z16', 'S0', 'P', 'Y0', 'S16', 'C0', 'R0', 'X0', 'R16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
-INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x128_PEs: identified intermediate dimensions: {'Y5', 'Z6', 'Z0', 'C1', 'Y6', 'Y7', 'C13', 'Z10', 'C5', 'Z7', 'C7', 'R14', 'S5', 'Z3', 'R6', 'S11', 'S7', 'Y2', 'R8', 'X11', 'C12', 'S6', 'Z14', 'X3', 'S14', 'Z1', 'C15', 'X10', 'Y11', 'C9', 'Y3', 'S12', 'X9', 'X7', 'Y14', 'X2', 'S3', 'R2', 'C2', 'R10', 'S9', 'S4', 'Z13', 'R15', 'Z15', 'Y15', 'Z4', 'S2', 'R3', 'Y13', 'R4', 'Y9', 'Y8', 'R9', 'R1', 'C4', 'R13', 'X8', 'Z8', 'X1', 'S8', 'R5', 'Z9', 'C10', 'R12', 'Y1', 'C3', 'C11', 'Y12', 'Y10', 'R11', 'S1', 'X12', 'Z12', 'X5', 'C6', 'Z2', 'R7', 'S13', 'X14', 'X15', 'C14', 'Z5', 'C8', 'X13', 'X4', 'Z11', 'S15', 'Y4', 'S10', 'X6'}
+final_layer_dims: {'Z16', 'P', 'Y0', 'C16', 'Q', 'X0', 'R0', 'C0', 'R16', 'S0', 'S16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
+INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x128_PEs: identified intermediate dimensions: {'X8', 'S12', 'R7', 'C2', 'C14', 'R1', 'R8', 'X5', 'Y13', 'Y4', 'X3', 'S8', 'Z2', 'Y8', 'C11', 'R2', 'S11', 'S2', 'S1', 'R12', 'X9', 'Z6', 'S7', 'Z10', 'X7', 'C5', 'X14', 'Z0', 'S10', 'X11', 'X12', 'Y9', 'R11', 'X10', 'C3', 'Y7', 'S9', 'X6', 'R4', 'Y14', 'R5', 'C8', 'R6', 'Y2', 'Z12', 'Y15', 'Z4', 'C7', 'C6', 'Z1', 'C1', 'Z3', 'Z9', 'X15', 'C4', 'R3', 'Y10', 'Y1', 'X2', 'Z8', 'X1', 'Y3', 'Z7', 'C12', 'S14', 'C15', 'R13', 'S3', 'C13', 'S4', 'Z11', 'Y12', 'R10', 'R15', 'Y5', 'Y6', 'X13', 'Z14', 'Y11', 'Z15', 'R9', 'S5', 'Z13', 'S15', 'X4', 'S13', 'Z5', 'C9', 'R14', 'C10', 'S6'}
 INFO: Added high constraint for intermediate dimension P in level WeightRegister
 INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
 INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
@@ -18272,7 +18273,7 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 7.516697306971233e-13
 Arch: Thesis_17Layers_272384KB_FMEM_16x128_PEs: spatial utilization is 7.516697306971233e-13
 
-Finished in: 3.847s
+Finished in: 1.193s
 
 Best mapping found with:
 	Wart: 2.443e+111
@@ -18398,8 +18399,8 @@ Max Latency:	1,032,640 cc of level DRAM
   ✓ EDP: 1.51e+05
 [2/4] FMEM=266KB, WMEM=10739KB, PE=16x256
 Creating architecture: Thesis_17Layers_272384KB_FMEM_16x256_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12Y12X12Z12C13R13S13Y13X13Z13C14R14S14Y14X14Z14C15R15S15Y15X15Z15C16R16S16PQZ16, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],W13: [Z13][C13][R13][S13],W14: [Z14][C14][R14][S14],W15: [Z15][C15][R15][S15],W16: [Z16][C16][R16][S16],, out_coupling: [Z16][P][Q]
-final_layer_dims: {'C16', 'Q', 'Z16', 'S0', 'P', 'Y0', 'S16', 'C0', 'R0', 'X0', 'R16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
-INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x256_PEs: identified intermediate dimensions: {'Y5', 'Z6', 'Z0', 'C1', 'Y6', 'Y7', 'C13', 'Z10', 'C5', 'Z7', 'C7', 'R14', 'S5', 'Z3', 'R6', 'S11', 'S7', 'Y2', 'R8', 'X11', 'C12', 'S6', 'Z14', 'X3', 'S14', 'Z1', 'C15', 'X10', 'Y11', 'C9', 'Y3', 'S12', 'X9', 'X7', 'Y14', 'X2', 'S3', 'R2', 'C2', 'R10', 'S9', 'S4', 'Z13', 'R15', 'Z15', 'Y15', 'Z4', 'S2', 'R3', 'Y13', 'R4', 'Y9', 'Y8', 'R9', 'R1', 'C4', 'R13', 'X8', 'Z8', 'X1', 'S8', 'R5', 'Z9', 'C10', 'R12', 'Y1', 'C3', 'C11', 'Y12', 'Y10', 'R11', 'S1', 'X12', 'Z12', 'X5', 'C6', 'Z2', 'R7', 'S13', 'X14', 'X15', 'C14', 'Z5', 'C8', 'X13', 'X4', 'Z11', 'S15', 'Y4', 'S10', 'X6'}
+final_layer_dims: {'Z16', 'P', 'Y0', 'C16', 'Q', 'X0', 'R0', 'C0', 'R16', 'S0', 'S16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
+INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x256_PEs: identified intermediate dimensions: {'X8', 'S12', 'R7', 'C2', 'C14', 'R1', 'R8', 'X5', 'Y13', 'Y4', 'X3', 'S8', 'Z2', 'Y8', 'C11', 'R2', 'S11', 'S2', 'S1', 'R12', 'X9', 'Z6', 'S7', 'Z10', 'X7', 'C5', 'X14', 'Z0', 'S10', 'X11', 'X12', 'Y9', 'R11', 'X10', 'C3', 'Y7', 'S9', 'X6', 'R4', 'Y14', 'R5', 'C8', 'R6', 'Y2', 'Z12', 'Y15', 'Z4', 'C7', 'C6', 'Z1', 'C1', 'Z3', 'Z9', 'X15', 'C4', 'R3', 'Y10', 'Y1', 'X2', 'Z8', 'X1', 'Y3', 'Z7', 'C12', 'S14', 'C15', 'R13', 'S3', 'C13', 'S4', 'Z11', 'Y12', 'R10', 'R15', 'Y5', 'Y6', 'X13', 'Z14', 'Y11', 'Z15', 'R9', 'S5', 'Z13', 'S15', 'X4', 'S13', 'Z5', 'C9', 'R14', 'C10', 'S6'}
 INFO: Added high constraint for intermediate dimension P in level WeightRegister
 INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
 INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
@@ -36715,7 +36716,7 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 5.7347849326867926e-18
 Arch: Thesis_17Layers_272384KB_FMEM_16x256_PEs: spatial utilization is 5.7347849326867926e-18
 
-Finished in: 2.085s
+Finished in: 0.980s
 
 Best mapping found with:
 	Wart: 1.864e+106
@@ -36841,8 +36842,8 @@ Max Latency:	1,032,640 cc of level DRAM
   ✓ EDP: 1.51e+05
 [3/4] FMEM=266KB, WMEM=10739KB, PE=16x512
 Creating architecture: Thesis_17Layers_272384KB_FMEM_16x512_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12Y12X12Z12C13R13S13Y13X13Z13C14R14S14Y14X14Z14C15R15S15Y15X15Z15C16R16S16PQZ16, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],W13: [Z13][C13][R13][S13],W14: [Z14][C14][R14][S14],W15: [Z15][C15][R15][S15],W16: [Z16][C16][R16][S16],, out_coupling: [Z16][P][Q]
-final_layer_dims: {'C16', 'Q', 'Z16', 'S0', 'P', 'Y0', 'S16', 'C0', 'R0', 'X0', 'R16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
-INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x512_PEs: identified intermediate dimensions: {'Y5', 'Z6', 'Z0', 'C1', 'Y6', 'Y7', 'C13', 'Z10', 'C5', 'Z7', 'C7', 'R14', 'S5', 'Z3', 'R6', 'S11', 'S7', 'Y2', 'R8', 'X11', 'C12', 'S6', 'Z14', 'X3', 'S14', 'Z1', 'C15', 'X10', 'Y11', 'C9', 'Y3', 'S12', 'X9', 'X7', 'Y14', 'X2', 'S3', 'R2', 'C2', 'R10', 'S9', 'S4', 'Z13', 'R15', 'Z15', 'Y15', 'Z4', 'S2', 'R3', 'Y13', 'R4', 'Y9', 'Y8', 'R9', 'R1', 'C4', 'R13', 'X8', 'Z8', 'X1', 'S8', 'R5', 'Z9', 'C10', 'R12', 'Y1', 'C3', 'C11', 'Y12', 'Y10', 'R11', 'S1', 'X12', 'Z12', 'X5', 'C6', 'Z2', 'R7', 'S13', 'X14', 'X15', 'C14', 'Z5', 'C8', 'X13', 'X4', 'Z11', 'S15', 'Y4', 'S10', 'X6'}
+final_layer_dims: {'Z16', 'P', 'Y0', 'C16', 'Q', 'X0', 'R0', 'C0', 'R16', 'S0', 'S16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
+INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x512_PEs: identified intermediate dimensions: {'X8', 'S12', 'R7', 'C2', 'C14', 'R1', 'R8', 'X5', 'Y13', 'Y4', 'X3', 'S8', 'Z2', 'Y8', 'C11', 'R2', 'S11', 'S2', 'S1', 'R12', 'X9', 'Z6', 'S7', 'Z10', 'X7', 'C5', 'X14', 'Z0', 'S10', 'X11', 'X12', 'Y9', 'R11', 'X10', 'C3', 'Y7', 'S9', 'X6', 'R4', 'Y14', 'R5', 'C8', 'R6', 'Y2', 'Z12', 'Y15', 'Z4', 'C7', 'C6', 'Z1', 'C1', 'Z3', 'Z9', 'X15', 'C4', 'R3', 'Y10', 'Y1', 'X2', 'Z8', 'X1', 'Y3', 'Z7', 'C12', 'S14', 'C15', 'R13', 'S3', 'C13', 'S4', 'Z11', 'Y12', 'R10', 'R15', 'Y5', 'Y6', 'X13', 'Z14', 'Y11', 'Z15', 'R9', 'S5', 'Z13', 'S15', 'X4', 'S13', 'Z5', 'C9', 'R14', 'C10', 'S6'}
 INFO: Added high constraint for intermediate dimension P in level WeightRegister
 INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
 INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
@@ -55158,7 +55159,7 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 4.3752936803335515e-23
 Arch: Thesis_17Layers_272384KB_FMEM_16x512_PEs: spatial utilization is 4.3752936803335515e-23
 
-Finished in: 2.890s
+Finished in: 1.323s
 
 Best mapping found with:
 	Wart: 1.422e+101
@@ -55284,8 +55285,8 @@ Max Latency:	1,032,640 cc of level DRAM
   ✓ EDP: 1.51e+05
 [4/4] FMEM=266KB, WMEM=10739KB, PE=16x1024
 Creating architecture: Thesis_17Layers_272384KB_FMEM_16x1024_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12Y12X12Z12C13R13S13Y13X13Z13C14R14S14Y14X14Z14C15R15S15Y15X15Z15C16R16S16PQZ16, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],W13: [Z13][C13][R13][S13],W14: [Z14][C14][R14][S14],W15: [Z15][C15][R15][S15],W16: [Z16][C16][R16][S16],, out_coupling: [Z16][P][Q]
-final_layer_dims: {'C16', 'Q', 'Z16', 'S0', 'P', 'Y0', 'S16', 'C0', 'R0', 'X0', 'R16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
-INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x1024_PEs: identified intermediate dimensions: {'Y5', 'Z6', 'Z0', 'C1', 'Y6', 'Y7', 'C13', 'Z10', 'C5', 'Z7', 'C7', 'R14', 'S5', 'Z3', 'R6', 'S11', 'S7', 'Y2', 'R8', 'X11', 'C12', 'S6', 'Z14', 'X3', 'S14', 'Z1', 'C15', 'X10', 'Y11', 'C9', 'Y3', 'S12', 'X9', 'X7', 'Y14', 'X2', 'S3', 'R2', 'C2', 'R10', 'S9', 'S4', 'Z13', 'R15', 'Z15', 'Y15', 'Z4', 'S2', 'R3', 'Y13', 'R4', 'Y9', 'Y8', 'R9', 'R1', 'C4', 'R13', 'X8', 'Z8', 'X1', 'S8', 'R5', 'Z9', 'C10', 'R12', 'Y1', 'C3', 'C11', 'Y12', 'Y10', 'R11', 'S1', 'X12', 'Z12', 'X5', 'C6', 'Z2', 'R7', 'S13', 'X14', 'X15', 'C14', 'Z5', 'C8', 'X13', 'X4', 'Z11', 'S15', 'Y4', 'S10', 'X6'}
+final_layer_dims: {'Z16', 'P', 'Y0', 'C16', 'Q', 'X0', 'R0', 'C0', 'R16', 'S0', 'S16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
+INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x1024_PEs: identified intermediate dimensions: {'X8', 'S12', 'R7', 'C2', 'C14', 'R1', 'R8', 'X5', 'Y13', 'Y4', 'X3', 'S8', 'Z2', 'Y8', 'C11', 'R2', 'S11', 'S2', 'S1', 'R12', 'X9', 'Z6', 'S7', 'Z10', 'X7', 'C5', 'X14', 'Z0', 'S10', 'X11', 'X12', 'Y9', 'R11', 'X10', 'C3', 'Y7', 'S9', 'X6', 'R4', 'Y14', 'R5', 'C8', 'R6', 'Y2', 'Z12', 'Y15', 'Z4', 'C7', 'C6', 'Z1', 'C1', 'Z3', 'Z9', 'X15', 'C4', 'R3', 'Y10', 'Y1', 'X2', 'Z8', 'X1', 'Y3', 'Z7', 'C12', 'S14', 'C15', 'R13', 'S3', 'C13', 'S4', 'Z11', 'Y12', 'R10', 'R15', 'Y5', 'Y6', 'X13', 'Z14', 'Y11', 'Z15', 'R9', 'S5', 'Z13', 'S15', 'X4', 'S13', 'Z5', 'C9', 'R14', 'C10', 'S6'}
 INFO: Added high constraint for intermediate dimension P in level WeightRegister
 INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
 INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
@@ -73601,7 +73602,7 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 3.3380841677349483e-28
 Arch: Thesis_17Layers_272384KB_FMEM_16x1024_PEs: spatial utilization is 3.3380841677349483e-28
 
-Finished in: 2.279s
+Finished in: 1.865s
 
 Best mapping found with:
 	Wart: 1.085e+96
@@ -73725,7 +73726,7 @@ AccumulationOutputRegister:1,032,208 cc Read Drain , 1,032,208 cc Fill Update (T
 		0 Total Stall Cycles
 Max Latency:	1,032,640 cc of level DRAM
   ✓ EDP: 1.51e+05
-Results exported to: results/results_20260216_182050.csv
+Results exported to: results/results_20260220_132401.csv
 
 ================================================================================
 EXPERIMENT SUMMARY

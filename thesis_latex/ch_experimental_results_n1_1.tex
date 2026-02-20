@@ -245,3 +245,19 @@ between the original and modified versions of both architectures.
     \bottomrule
   \end{tabular}
 \end{table}
+
+
+
+
+
+
+My version:
+The spatial architectures chosen for the experiments are DepFin [citation to the paper], Eyeriss [citation to the paper] ("refer to the table of comparison"), we modeled both architectures based on the characteristics and parameters published in [citations to both paper], but since the SAs must be able to perform the computation of a variety of fused CNN workloads, we have manually performed changes on both of architectures, so we will refer to them to DepFin-Like and Eyeriss-Like.
+
+
+DepFin-Like: with respect to the Section ("refer to the correct section in validation"), our version relax the constraint of having a patch of 1 pixel height and 128 pixel wide that is corresponding to the tile size used, this was particularly important in order to able the exploration of different tile sizes per different workloads. We relaxed the constraint of having a structure of 16x128 PEs, we created more versions of DepFin analyzing how changing the number of PEs will or not will affects to the computation results and exploring the aspect ratio of PEs for each workload. We respected the DepthFirst ("refer to the section in background") nature of DepFin, preserving the dataflow,  but with respect to a classic DepFin we will change the mapping thanks to the different tiling adopted through the chosen of tile size.
+
+
+
+Eyeriss-Like: with respect to the ("cite: paper") our version of Eyeriss must address not only to SL/LBL processing ("refer to the section in background"), but fusion, in order to do so we introduced a intermediate register, the unique maintaining the intermediate input and output data and bypassing all the other operands ("refer to the section in background").  We respected the row stationary nature of Eyeriss, maintaing the rows in weight register. 
+Since we respected the row stationary nature of Eyeriss ("refer to the section in the background"), we had to relax the constraint of having a structure 14x12 PEs, with only 168 PEs (14×12), each PE must process a larger fraction of the workload, meaning the WRegister per PE must hold more weight values. For large workloads like VGG16/ResNet18, this makes the register infeasibly large. We created more version of Eyeriss with 4 possible total of PEs: 2048, 4096, 8192, 16184, going above 16384 is unrealistic for low-power edge accelerators; going below 4096 forces WReg to several thousand entries, which is impractical. We will analyze how changing the number of PEs will or will not affects the required sizes of registers per workload and exploring the aspect ratio of PEs for each workload. As stated, we preserved the row stationary dataflow  but we will change the mapping thanks to the different tiling adopted through the chosen of tile size.

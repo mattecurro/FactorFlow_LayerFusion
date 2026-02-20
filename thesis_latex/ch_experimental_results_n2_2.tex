@@ -95,7 +95,7 @@ parallelism, and the latency is already compute-bound.
 \paragraph{Key takeaway.}
 For activation-dominant workloads, investing additional PEs in columns
 is substantially more effective than investing them in rows, because
-columns enlarge the tile and reduce DRAM-level iterations, whereas
+columns enlarge the maximum tile size available and so reduce DRAM-level iterations, whereas
 rows only reduce output-channel iterations, which saturate quickly.
 For weight-dominant workloads, the PE array shape has negligible impact
 on EDP, as performance is governed by the register-level dataflow
