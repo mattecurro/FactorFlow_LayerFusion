@@ -1,0 +1,77 @@
+% ============================================================
+%  N.1.4  Metrics
+% ============================================================
+\subsection{Metrics}
+\label{sec:metrics}
+
+Four metrics are used throughout the experiments to evaluate each
+mapping and architecture configuration.
+
+\paragraph{Energy ($E$).}
+The total energy is the sum of all memory-access energies across every
+level of the hierarchy, plus the compute energy of all multiply-accumulate
+operations:
+%
+\begin{equation}
+  E = \sum_{\ell \in \text{levels}}
+      \bigl(e^{\text{rd}}_\ell \cdot R_\ell
+          + e^{\text{wr}}_\ell \cdot W_\ell\bigr)
+    + \sum_{k \in \text{layers}} e_{\text{mac}} \cdot N_k,
+  \label{eq:energy}
+\end{equation}
+%
+where $e^{\text{rd}}_\ell$ and $e^{\text{wr}}_\ell$ are the per-access
+read and write energies of level~$\ell$ (obtained from Accelergy
+models), $R_\ell$ and $W_\ell$ are the total read and write counts,
+$e_{\text{mac}}$ is the energy of a single MAC, and $N_k$ the number
+of MACs in layer~$k$.
+Energy is reported in micro-joules ($\mu$J).
+
+\paragraph{Latency ($L$).}
+Latency is computed as a bottleneck model: each memory level determines
+its own latency based on the ratio between the data volume it must
+transfer and its available bandwidth, and the overall latency is the
+maximum across all levels (including the compute level):
+%
+\begin{equation}
+  L = \max_{\ell \in \text{levels}} L_\ell.
+  \label{eq:latency}
+\end{equation}
+%
+When multiple fused layers are executed sequentially, per-layer
+latencies are summed within each level before taking the maximum.
+Latency is reported in clock cycles (cc).
+
+\paragraph{Energy-Delay Product (EDP).}
+The EDP combines energy and latency into a single figure of merit that
+penalises both high energy and high latency:
+%
+\begin{equation}
+  \text{EDP} = E \times L,
+  \label{eq:edp}
+\end{equation}
+%
+reported in J$\cdot$cc (energy converted to joules, latency in clock
+cycles).
+When comparing aggregated results (e.g.\ $\Sigma$\,partial segments),
+the EDP is computed from the \emph{summed} energy and \emph{summed}
+latency as in Equation~\eqref{eq:sum-partial}, not as the sum of
+individual per-segment EDPs.
+
+\paragraph{DRAM Traffic.}
+DRAM reads and writes count the number of operand accesses transferred
+between the accelerator and external memory.
+This metric directly reflects the benefit of layer fusion:
+in single-layer execution the output activations of layer~$i$ are
+written to DRAM and then read back as inputs for layer~$i+1$,
+whereas in fused execution intermediate activations are kept
+entirely on-chip (DRAM bypasses \texttt{int\_in} and
+\texttt{int\_out}, as described in
+Section~\ref{sec:depfin-like}), eliminating these transfers.
+The reduction is therefore not due to recomputation, but to the
+\emph{elimination of intermediate data movement} between layers.
+DRAM traffic is particularly informative for distinguishing
+activation-dominant from weight-dominant workloads: for the former,
+intermediate activations constitute the majority of off-chip traffic,
+so fusion yields large savings; for the latter, weight transfers
+dominate and the relative savings are smaller.
