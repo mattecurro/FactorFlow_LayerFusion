@@ -911,6 +911,58 @@ def plot_eyeriss_cs1():
 
 
 # ────────────────────────────────────────────────────────────────────
+#  Figure 4b: Eyeriss CS1 — Inverted: PE budget → min WReg
+# ────────────────────────────────────────────────────────────────────
+def plot_eyeriss_cs1_inverted():
+    """Designer-oriented view: given a PE budget, what is the minimum WReg?"""
+    cs1_wls = ["VGG16", "ResNet18"]
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle("Eyeriss CS1 — Minimum WReg for a Given PE Budget",
+                 fontsize=14, y=1.02)
+
+    for ax, wl in zip(axes, cs1_wls):
+        d = EYERISS_CS1[wl]
+        # Invert: x = total PEs (reversed so large budget is on the left),
+        #         y = min WReg
+        pes  = list(reversed(d["min_pe_total"]))
+        wreg = list(reversed(d["wreg"]))
+        edp  = list(reversed(d["edp"]))
+        cfgs = list(reversed(d["min_pe_config"]))
+
+        # Primary axis: min WReg
+        ax.plot(pes, wreg, "o-", color=COLORS[wl], linewidth=2, label="Min WReg")
+        ax.set_xlabel("PE budget (total PEs)")
+        ax.set_ylabel("Minimum WReg (entries)")
+        ax.set_title(wl, fontsize=13)
+        ax.set_xticks(pes)
+        ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
+        ax.invert_xaxis()  # large budget on the left
+
+        # Secondary axis: EDP
+        ax2 = ax.twinx()
+        ax2.plot(pes, edp, "s--", color="gray", alpha=0.6, linewidth=2, label="EDP")
+        ax2.set_ylabel("EDP  (J·cc)", color="gray")
+        ax2.tick_params(axis="y", labelcolor="gray")
+        _sci_fmt(ax2)
+
+        # Annotate configs
+        for p, w, cfg in zip(pes, wreg, cfgs):
+            ax.annotate(cfg, (p, w), textcoords="offset points",
+                        xytext=(0, 12), ha="center", fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                  ec=COLORS[wl], alpha=0.85, lw=0.6))
+
+        # Legend
+        h1, l1 = ax.get_legend_handles_labels()
+        h2, l2 = ax2.get_legend_handles_labels()
+        ax.legend(h1 + h2, l1 + l2, loc="center right", fontsize=9)
+
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    _save(fig, "eyeriss_cs1_wreg_inverted")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
 #  Figure 5: Eyeriss CS2+CS3 — IntReg & OutReg Binding Hierarchy
 # ────────────────────────────────────────────────────────────────────
 def plot_eyeriss_cs2_cs3():
@@ -1860,7 +1912,7 @@ def main():
     # Eyeriss sweeps
     print("\n[Group 2] Eyeriss register sensitivity sweeps")
     figs.append(plot_eyeriss_cs1())
-    figs.append(plot_eyeriss_cs1_feasibility())
+    figs.append(plot_eyeriss_cs1_inverted())
     figs.append(plot_eyeriss_cs2_cs3())
     figs.append(plot_eyeriss_cs5())
 
