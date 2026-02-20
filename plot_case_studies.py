@@ -70,6 +70,34 @@ def _sci_fmt(ax, axis="y"):
 # ====================================================================
 
 # CS1 — Tile Size Sensitivity Sweep (fixed PE grid = 16×128)
+# FMEM BW scales with tile: BW_scaled = BW_base × (tile_size / 128).
+#
+# Results:  Larger tiles always win — best EDP is at the maximum tile for
+#   every workload.  EDP improvement is driven almost entirely by latency
+#   reduction; energy is nearly flat (2–25 % variation across the full
+#   tile range) because the total compute work is tile-independent.
+#
+#   FMEM and WMEM changes with Activation and Weight dominant workloads
+#
+#   FSRCNN  (tile 120→8):  EDP ×15,  energy +2 %,  latency ×15
+#   MC-CNN  (tile  69→3):  EDP ×24,  energy +7 %,  latency ×23
+#   VGG16   (tile  14→1):  EDP ×15,  energy +24 %, latency ×13
+#   ResNet18(tile   7→1):  EDP ×8,   energy +25 %, latency ×7
+#   
+#       PE Utilization: decrease (93.8% → 6.2%)
+#    Energy: slight increase (+6%, from WeightMemory 15 times re-reads)
+#    Latency: increase ~15× (6.16M → 92.4M cc), more temporal iterations in DRAM.
+#    EDP: increase ~15.5× (dominated by latency)
+
+
+#    Why: Smaller tiles mean more DRAM Q iterations (more temporal passes over the
+#    output space). Each pass re-reads ALL weights from WeightMemory to WeightRegister.
+#    The weight data volume is fixed, but it's re-read 15× more often.
+
+#    The ENTIRE +6% in energy increase comes from WeightMemory reads:
+#    tile=120: WMem reads = 81,181,440    (weights fetched 1× per tile pass)
+#    tile=8:   WMem reads = 1,217,721,600 (15× more — weights re-fetched every tile)
+
 DEPFIN_CS1 = {
     "FSRCNN": {
         "tiles": [120, 64, 32, 16, 8],
@@ -217,39 +245,59 @@ DEPFIN_CS4 = {
 EYERISS_CS1 = {
     "FSRCNN": {
         "wreg": [200, 300, 400],
-        "min_pe_config": ["128x4", "128x4", "80x4"],
-        "min_pe_total": [512, 512, 320],
-        "energy": [1.203e5, 1.310e5, 1.412e5],
-        "latency": [2.760e7, 2.760e7, 4.769e7],
-        "edp": [3.33e6, 3.62e6, 6.75e6],
-        "n_feasible": [26, 27, 36],
+        "min_pe_config": ["256x4", "256x4", "256x4"],
+        "min_pe_total": [1024, 1024, 1024],
+        "energy": [4.883e4, 5.948e4, 7.012e4],
+        "latency": [1.944e7, 1.944e7, 1.944e7],
+        "edp": [9.61e5, 1.17e6, 1.37e6],
+        "n_feasible": [7, 7, 7],
     },
     "MC-CNN": {
         "wreg": [100, 200, 300, 600],
-        "min_pe_config": ["128x12", "64x12", "32x12", "12x12"],
-        "min_pe_total": [1536, 768, 384, 144],
-        "energy": [6.649e4, 7.730e4, 8.983e4, 1.315e5],
-        "latency": [1.223e7, 2.344e7, 4.585e7, 9.068e7],
-        "edp": [8.28e5, 1.84e6, 4.18e6, 1.20e7],
-        "n_feasible": [14, 24, 37, 56],
+        "min_pe_config": ["128x16", "64x16", "64x16", "64x16"],
+        "min_pe_total": [2048, 1024, 1024, 1024],
+        "energy": [4.905e4, 6.099e4, 7.525e4, 1.180e5],
+        "latency": [1.223e7, 2.344e7, 2.344e7, 2.344e7],
+        "edp": [6.05e5, 1.44e6, 1.77e6, 2.78e6],
+        "n_feasible": [6, 7, 7, 7],
     },
     "VGG16": {
-        "wreg": [500, 1000, 2500, 5000, 10000, 20000],
-        "min_pe_config": ["N/A", "N/A", "64x128", "64x64", "64x32", "64x16"],
-        "min_pe_total": [0, 0, 8192, 4096, 2048, 1024],
-        "energy": [None, None, 6.716e5, 1.064e6, 1.882e6, 3.549e6],
-        "latency": [None, None, 5.681e6, 6.715e6, 1.103e7, 2.010e7],
-        "edp": [None, None, 3.95e6, 7.25e6, 2.09e7, 7.15e7],
-        "n_feasible": [0, 0, 11, 20, 27, 31],
+        "wreg": [1200, 2400, 4800],
+        "min_pe_config": ["256x64", "128x64", "128x32"],
+        "min_pe_total": [16384, 8192, 4096],
+        "energy": [3.469e5, 5.416e5, 9.328e5],
+        "latency": [5.455e6, 5.681e6, 6.715e6],
+        "edp": [1.94e6, 3.12e6, 6.29e6],
+        "n_feasible": [2, 6, 8],
     },
     "ResNet18": {
-        "wreg": [400, 902, 1800, 3600, 7200],
-        "min_pe_config": ["N/A", "256x64", "128x64", "64x64", "64x32"],
-        "min_pe_total": [0, 16384, 8192, 4096, 2048],
-        "energy": [None, 5.102e4, 7.245e4, 1.173e5, 2.047e5],
-        "latency": [None, 3.042e6, 3.042e6, 3.059e6, 3.422e6],
-        "edp": [None, 1.63e5, 2.29e5, 3.68e5, 7.08e5],
-        "n_feasible": [0, 2, 9, 18, 21],
+        "wreg": [902, 1800, 3600],
+        "min_pe_config": ["256x64", "128x64", "128x32"],
+        "min_pe_total": [16384, 8192, 4096],
+        "energy": [4.709e4, 6.850e4, 1.140e5],
+        "latency": [3.042e6, 3.042e6, 3.042e6],
+        "edp": [1.48e5, 2.13e5, 3.53e5],
+        "n_feasible": [2, 6, 8],
+    },
+}
+
+# CS1 — WReg Sensitivity Sweep — Summary B (minimum EDP)
+EYERISS_CS1_B = {
+    "VGG16": {
+        "wreg": [1200, 2400, 4800],
+        "minedp_pe_config": ["256x64", "128x128", "128x128"],
+        "minedp_pe_total": [16384, 16384, 16384],
+        "energy": [3.469e5, 5.561e5, 9.587e5],
+        "latency": [5.455e6, 5.455e6, 5.455e6],
+        "edp": [1.94e6, 3.10e6, 5.30e6],
+    },
+    "ResNet18": {
+        "wreg": [902, 1800, 3600],
+        "minedp_pe_config": ["256x64", "128x64", "128x32"],
+        "minedp_pe_total": [16384, 8192, 4096],
+        "energy": [4.709e4, 6.850e4, 1.140e5],
+        "latency": [3.042e6, 3.042e6, 3.042e6],
+        "edp": [1.48e5, 2.13e5, 3.53e5],
     },
 }
 
@@ -257,31 +305,31 @@ EYERISS_CS1 = {
 EYERISS_CS2 = {
     "FSRCNN": {
         "intreg": [200, 300, 400],
-        "energy": [2.880e4, 2.880e4, 2.880e4],
-        "latency": [3.525e7, 3.525e7, 3.525e7],
-        "edp": [1.02e6, 1.02e6, 1.02e6],
-        "note": "Non-binding: all identical",
+        "energy": [1.025e5, 1.191e5, 1.357e5],
+        "latency": [2.760e7, 2.760e7, 2.760e7],
+        "edp": [2.84e6, 3.30e6, 3.75e6],
+        "note": "Non-binding: all identical PE config 128x4",
     },
     "MC-CNN": {
         "intreg": [15, 30, 50, 100],
-        "energy": [None, 3.488e4, 3.488e4, 3.488e4],
-        "latency": [None, 9.068e7, 9.068e7, 9.068e7],
-        "edp": [None, 3.18e6, 3.18e6, 3.18e6],
-        "note": "IntReg=15 infeasible; saturates at >=30",
+        "energy": [1.212e5, 1.180e5, 1.180e5, 1.253e5],
+        "latency": [1.223e7, 2.344e7, 2.344e7, 9.068e7],
+        "edp": [1.49e6, 2.78e6, 2.78e6, 1.14e7],
+        "note": "IntReg=15 needs 4096 PEs; saturates at >=30",
     },
     "VGG16": {
         "intreg": [50, 100, 230, 500],
-        "energy": [4.159e4, 4.048e4, 4.114e4, 4.114e4],
-        "latency": [5.681e6, 6.715e6, 6.715e6, 6.715e6],
-        "edp": [2.42e5, 2.76e5, 2.77e5, 2.77e5],
+        "energy": [9.102e5, 9.082e5, 9.420e5, 1.036e6],
+        "latency": [5.455e6, 5.681e6, 6.715e6, 6.715e6],
+        "edp": [5.04e6, 5.21e6, 6.36e6, 6.99e6],
         "note": "Saturates at IntReg>=230",
     },
     "ResNet18": {
         "intreg": [50, 100, 200, 400, 1000],
-        "energy": [7.113e3, 6.944e3, 6.779e3, 6.697e3, 6.697e3],
-        "latency": [3.042e6, 3.042e6, 3.042e6, 3.059e6, 3.059e6],
-        "edp": [2.22e4, 2.15e4, 2.08e4, 2.06e4, 2.06e4],
-        "note": "Saturates at IntReg>=400",
+        "energy": [1.139e5, 1.136e5, 1.168e5, 1.273e5, 1.589e5],
+        "latency": [3.042e6, 3.042e6, 3.059e6, 3.059e6, 3.059e6],
+        "edp": [3.55e5, 3.52e5, 3.61e5, 3.93e5, 4.90e5],
+        "note": "Saturates at IntReg>=200",
     },
 }
 
@@ -289,31 +337,31 @@ EYERISS_CS2 = {
 EYERISS_CS3 = {
     "FSRCNN": {
         "outreg": [200, 300, 400],
-        "energy": [2.880e4, 2.880e4, 2.880e4],
-        "latency": [3.525e7, 3.525e7, 3.525e7],
-        "edp": [1.02e6, 1.02e6, 1.02e6],
-        "note": "Zero effect: all identical",
+        "energy": [9.320e4, 1.023e5, 1.115e5],
+        "latency": [1.944e7, 1.944e7, 1.944e7],
+        "edp": [1.82e6, 2.00e6, 2.18e6],
+        "note": "Scales linearly with OutReg size",
     },
     "MC-CNN": {
         "outreg": [8, 16, 32, 64],
-        "energy": [3.488e4, 3.488e4, 3.488e4, 3.488e4],
-        "latency": [9.068e7, 9.068e7, 9.068e7, 9.068e7],
-        "edp": [3.18e6, 3.18e6, 3.18e6, 3.18e6],
+        "energy": [1.180e5, 1.180e5, 1.180e5, 1.180e5],
+        "latency": [2.344e7, 2.344e7, 2.344e7, 2.344e7],
+        "edp": [2.78e6, 2.78e6, 2.78e6, 2.78e6],
         "note": "Never binding for min PEs",
     },
     "VGG16": {
         "outreg": [4, 8, 16, 32, 64],
-        "energy": [4.159e4, 4.048e4, 4.026e4, 4.114e4, 4.114e4],
-        "latency": [5.681e6, 6.715e6, 6.715e6, 6.715e6, 6.715e6],
-        "edp": [2.42e5, 2.76e5, 2.72e5, 2.77e5, 2.77e5],
-        "note": "Saturates at OutReg>=32",
+        "energy": [9.922e5, 9.777e5, 9.663e5, 9.663e5, 9.663e5],
+        "latency": [5.455e6, 5.681e6, 6.715e6, 6.715e6, 6.715e6],
+        "edp": [5.49e6, 5.60e6, 6.52e6, 6.52e6, 6.52e6],
+        "note": "Saturates at OutReg>=16",
     },
     "ResNet18": {
         "outreg": [8, 16, 32, 64],
-        "energy": [6.944e3, 6.779e3, 6.697e3, 6.697e3],
-        "latency": [3.042e6, 3.042e6, 3.059e6, 3.059e6],
-        "edp": [2.15e4, 2.08e4, 2.06e4, 2.06e4],
-        "note": "Saturates at OutReg>=32",
+        "energy": [1.242e5, 1.220e5, 1.220e5, 1.220e5],
+        "latency": [3.042e6, 3.059e6, 3.059e6, 3.059e6],
+        "edp": [3.84e5, 3.77e5, 3.77e5, 3.77e5],
+        "note": "Saturates at OutReg>=16",
     },
 }
 
@@ -321,164 +369,286 @@ EYERISS_CS3 = {
 EYERISS_CS5 = {
     "FSRCNN": {
         "total_pes": 2048,
-        "configs": ["64x32", "128x16", "256x8", "512x4", "1024x2", "2048x1"],
-        "energy": [1.517e5, 1.523e5, 1.531e5, 1.548e5, 1.562e5, 1.562e5],
-        "latency": [1.889e7, 1.889e7, 1.889e7, 1.889e7, 1.889e7, 1.918e7],
-        "edp": [2.87e6, 2.88e6, 2.90e6, 2.95e6, 2.98e6, 3.03e6],
-        "best": "64x32",
+        "configs": ["256x8", "512x4", "1024x2", "2048x1"],
+        "energy": [8.077e4, 8.251e4, 8.385e4, 8.385e4],
+        "latency": [1.889e7, 1.889e7, 1.889e7, 1.918e7],
+        "edp": [1.54e6, 1.58e6, 1.61e6, 1.64e6],
+        "best": "256x8",
     },
     "MC-CNN": {
         "total_pes": 2048,
-        "configs": ["32x64", "64x32", "128x16", "256x8",
-                     "512x4", "1024x2", "2048x1"],
-        "energy": [1.312e5, 1.323e5, 1.378e5, 1.378e5,
-                   1.378e5, 1.452e5, 1.452e5],
-        "latency": [1.272e7, 1.272e7, 1.223e7, 1.223e7,
-                    1.223e7, 1.261e7, 1.261e7],
-        "edp": [1.68e6, 1.69e6, 1.70e6, 1.70e6,
-                1.70e6, 1.89e6, 1.89e6],
-        "best": "32x64",
+        "configs": ["128x16", "256x8", "512x4", "1024x2", "2048x1"],
+        "energy": [1.204e5, 1.204e5, 1.204e5, 1.230e5, 1.230e5],
+        "latency": [1.223e7, 1.223e7, 1.223e7, 1.261e7, 1.261e7],
+        "edp": [1.48e6, 1.48e6, 1.48e6, 1.57e6, 1.57e6],
+        "best": "128x16",
     },
     "VGG16": {
-        "total_pes": 4096,
-        "configs": ["64x64", "128x32", "256x16"],
-        "energy": [9.960e5, 9.782e5, 9.743e5],
-        "latency": [6.715e6, 6.715e6, 6.715e6],
-        "edp": [6.79e6, 6.62e6, 6.57e6],
-        "best": "256x16",
+        "total_pes": 16384,
+        "configs": ["256x64", "512x32", "1024x16"],
+        "energy": [3.469e5, 3.478e5, 3.538e5],
+        "latency": [5.455e6, 5.455e6, 5.455e6],
+        "edp": [1.94e6, 1.93e6, 1.96e6],
+        "best": "512x32",
     },
     "ResNet18": {
         "total_pes": 16384,
         "configs": ["256x64", "512x32", "1024x16", "2048x8",
                      "4096x4", "8192x2", "16384x1"],
-        "energy": [5.103e4, 5.062e4, 5.113e4, 5.136e4,
-                   5.136e4, 5.136e4, 5.136e4],
+        "energy": [4.709e4, 4.729e4, 4.791e4, 4.816e4,
+                   4.816e4, 4.816e4, 4.816e4],
         "latency": [3.042e6, 3.042e6, 3.042e6, 3.042e6,
                     3.042e6, 3.042e6, 3.042e6],
-        "edp": [1.63e5, 1.60e5, 1.62e5, 1.62e5,
-                1.62e5, 1.62e5, 1.62e5],
-        "best": "512x32",
+        "edp": [1.48e5, 1.48e5, 1.49e5, 1.50e5,
+                1.50e5, 1.50e5, 1.50e5],
+        "best": "256x64",
     },
 }
 
 # ====================================================================
-#  DATA  –  Fusion Comparisons (Auto-Sized)
+#  DATA  –  Fusion Comparisons (Auto-Sized, Full-Fusion Architecture)
+#  All three modes run on the SAME architecture sized for full fusion.
 # ====================================================================
 
 FUSION_AUTO = {
+    # ── Source: experiment_run_fcomp.py  (Scenario A: full-sized arch) ────
     "DepFiN": {
         "FSRCNN": {
-            "pe": "4x512", "fmem": "1056KB",
-            "full":    {"energy": 1.003e4, "latency": 5.680e6, "edp": 6.50e4,
+            "pe": "16x128", "fmem": "576KB", "wmem": "19KB", "tile": 120,
+            "full":    {"energy": 8.352e3, "latency": 6.156e6, "edp": 5.14e4,
                         "dram_rd": 1_573_992, "dram_wr": 8_294_400},
-            "single":  {"energy": 8.238e3, "latency": 2.244e7, "edp": 3.19e4,
+            "single":  {"energy": 6.536e3, "latency": 1.175e7, "edp": 7.68e4,
                         "dram_rd": 90_738_792, "dram_wr": 97_459_200},
-            "partial": {"energy": 1.033e4, "latency": 6.224e6, "edp": 2.52e4,
+            "partial": {"energy": 9.150e3, "latency": 6.313e6, "edp": 5.81e4,
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
         },
         "MC-CNN": {
-            "pe": "8x256", "fmem": "1056KB",
-            "full":    {"energy": 1.227e4, "latency": 8.074e6, "edp": 1.16e5,
+            "pe": "8x256", "fmem": "522KB", "wmem": "32KB", "tile": 207,
+            "full":    {"energy": 1.177e4, "latency": 7.975e6, "edp": 9.39e4,
                         "dram_rd": 494_928, "dram_wr": 14_943_744},
-            "single":  {"energy": 4.833e3, "latency": 1.381e7, "edp": 1.87e4,
+            "single":  {"energy": 4.224e3, "latency": 1.381e7, "edp": 5.83e4,
                         "dram_rd": 45_326_160, "dram_wr": 59_774_976},
-            "partial": {"energy": 1.301e4, "latency": 8.074e6, "edp": 6.58e4,
+            "partial": {"energy": 1.273e4, "latency": 7.975e6, "edp": 1.02e5,
                         "dram_rd": 15_438_672, "dram_wr": 29_887_488},
         },
         "VGG16": {
-            "pe": "16x128", "fmem": "1056KB",
-            "full":    {"energy": 7.641e4, "latency": 2.433e7, "edp": 3.41e6,
+            "pe": "16x128", "fmem": "568KB", "wmem": "14366KB", "tile": 14,
+            "full":    {"energy": 7.609e4, "latency": 2.728e7, "edp": 2.08e6,
                         "dram_rd": 14_860_992, "dram_wr": 100_352},
-            "single":  {"energy": 2.706e3, "latency": 2.452e7, "edp": 7.49e3,
+            "single":  {"energy": 3.413e3, "latency": 2.252e7, "edp": 8.37e4,
                         "dram_rd": 23_792_320, "dram_wr": 13_547_520},
-            "partial": {"energy": 5.799e4, "latency": 2.432e7, "edp": 5.87e5,
-                        "dram_rd": 16_366_272, "dram_wr": 6_121_472},
+            "partial": {"energy": 5.652e4, "latency": 2.432e7, "edp": 1.37e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
         },
         "ResNet18": {
-            "pe": "16x128", "fmem": "1056KB",
-            "full":    {"energy": 1.090e4, "latency": 7.812e6, "edp": 1.52e5,
+            "pe": "16x128", "fmem": "266KB", "wmem": "10738KB", "tile": 7,
+            "full":    {"energy": 1.083e4, "latency": 8.998e6, "edp": 9.75e4,
                         "dram_rd": 11_032_512, "dram_wr": 25_088},
-            "single":  {"energy": 4.294e2, "latency": 3.809e6, "edp": 1.78e2,
-                        "dram_rd": 5_296_832, "dram_wr": 2_232_832},
-            "partial": {"energy": 8.085e3, "latency": 7.813e6, "edp": 1.41e4,
+            "single":  {"energy": 9.499e2, "latency": 6.905e6, "edp": 6.56e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+            "partial": {"energy": 1.088e4, "latency": 7.814e6, "edp": 8.50e4,
                         "dram_rd": 11_760_064, "dram_wr": 752_640},
         },
     },
     "Eyeriss": {
         "FSRCNN": {
-            "pe": "84x16", "gb": "128KB",
-            "full":    {"energy": 1.519e5, "latency": 3.022e7, "edp": 4.60e6,
+            "pe": "128x16", "gb": "128KB", "wreg": 384,
+            "full":    {"energy": 6.842e4, "latency": 1.889e7, "edp": 1.29e6,
                         "dram_rd": 1_573_992, "dram_wr": 8_294_400},
-            "single":  {"energy": 8.618e3, "latency": 4.126e7, "edp": 5.50e4,
+            "single":  {"energy": 9.606e3, "latency": 3.525e7, "edp": 3.39e5,
                         "dram_rd": 90_738_792, "dram_wr": 97_459_200},
-            "partial": {"energy": 9.370e4, "latency": 3.022e7, "edp": 9.38e5,
+            "partial": {"energy": 6.920e4, "latency": 1.889e7, "edp": 1.31e6,
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
         },
         "MC-CNN": {
-            "pe": "56x64", "gb": "128KB",
-            "full":    {"energy": 1.331e5, "latency": 2.302e7, "edp": 3.08e6,
+            "pe": "256x8", "gb": "128KB", "wreg": 384,
+            "full":    {"energy": 8.955e4, "latency": 1.223e7, "edp": 1.10e6,
                         "dram_rd": 494_928, "dram_wr": 14_943_744},
-            "single":  {"energy": 5.945e3, "latency": 2.483e7, "edp": 3.97e4,
+            "single":  {"energy": 7.488e3, "latency": 1.495e7, "edp": 1.12e5,
                         "dram_rd": 45_326_160, "dram_wr": 59_774_976},
-            "partial": {"energy": 8.024e4, "latency": 2.302e7, "edp": 9.86e5,
+            "partial": {"energy": 9.138e4, "latency": 1.223e7, "edp": 1.12e6,
                         "dram_rd": 15_438_672, "dram_wr": 29_887_488},
         },
         "VGG16": {
-            "pe": "196x64", "gb": "128KB",
-            "full":    {"energy": 1.006e6, "latency": 8.159e7, "edp": 8.33e7,
+            "pe": "512x32", "gb": "128KB", "wreg": 1200,
+            "full":    {"energy": 3.478e5, "latency": 5.455e6, "edp": 1.90e6,
                         "dram_rd": 14_860_992, "dram_wr": 100_352},
-            "single":  {"energy": 1.734e4, "latency": 8.159e7, "edp": 2.32e5,
+            "single":  {"energy": 9.425e3, "latency": 6.922e6, "edp": 6.52e4,
                         "dram_rd": 23_792_320, "dram_wr": 13_547_520},
-            "partial": {"energy": 2.532e5, "latency": 8.159e7, "edp": 4.36e6,
-                        "dram_rd": 16_366_272, "dram_wr": 6_121_472},
+            "partial": {"energy": 2.291e5, "latency": 5.852e6, "edp": 1.34e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
         },
         "ResNet18": {
-            "pe": "256x32", "gb": "128KB",
-            "full":    {"energy": 1.257e5, "latency": 1.745e7, "edp": 2.22e6,
+            "pe": "512x32", "gb": "128KB", "wreg": 902,
+            "full":    {"energy": 4.729e4, "latency": 3.042e6, "edp": 1.44e5,
                         "dram_rd": 11_032_512, "dram_wr": 25_088},
-            "single":  {"energy": 1.914e3, "latency": 1.501e7, "edp": 2.21e3,
+            "single":  {"energy": 1.872e3, "latency": 3.301e6, "edp": 6.18e3,
                         "dram_rd": 12_449_984, "dram_wr": 2_308_096},
-            "partial": {"energy": 4.406e4, "latency": 1.746e7, "edp": 1.06e5,
+            "partial": {"energy": 4.261e4, "latency": 3.118e6, "edp": 1.33e5,
                         "dram_rd": 11_760_064, "dram_wr": 752_640},
         },
     },
 }
 
+
 # ====================================================================
-#  DATA  –  Fusion Comparisons (Fixed-Config, Eyeriss)
+#  DATA  –  Fusion Comparisons (Auto-Sized, Partial-Fusion Architecture)
+#  Partial and Single run on a SMALLER architecture sized for partial
+#  fusion only (less memory).  No full-fusion column.
 # ====================================================================
 
-# ResNet18 — Full vs Single energy ratio across PE configs
-FUSION_FIXED_RESNET18 = {
-    "configs": ["128x128", "512x32", "256x32", "256x16", "128x16"],
-    "total_pes": [16384, 16384, 8192, 4096, 2048],
-    "wreg": [920, 902, 1800, 3600, 7200],
-    "full_energy": [5.400e4, 5.062e4, 7.005e4, 1.137e5, 2.035e5],
-    "single_energy": [3.769e3, 2.643e3, 1.920e3, 1.412e3, 1.368e3],
-    "partial_energy": [3.928e4, 4.972e4, 7.017e4, 1.144e5, 2.046e5],
-    "full_latency": [3.042e6, 3.042e6, 3.042e6, 3.059e6, 3.422e6],
-    "single_latency": [3.301e6, 3.301e6, 3.301e6, 3.301e6, 3.412e6],
-    "energy_ratio_fs": [14.33, 19.15, 36.49, 80.55, 148.77],
-    "energy_ratio_fp": [1.02, 1.02, 1.00, 0.99, 0.99],  # full/partial ~1
-    "latency_ratio": [0.92, 0.92, 0.92, 0.93, 1.00],
+FUSION_PARTIAL_SIZED = {
+    # ── Source: experiment_run_fcomp.py  (Scenario B: partial-sized arch) ─
+    "DepFiN": {
+        "FSRCNN": {
+            "pe": "16x128", "fmem": "248KB", "wmem": "9KB", "tile": 120,
+            "partial": {"energy": 8.519e3, "latency": 6.351e6, "edp": 5.41e4,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 6.390e3, "latency": 1.175e7, "edp": 7.51e4,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "8x256", "fmem": "396KB", "wmem": "22KB", "tile": 207,
+            "partial": {"energy": 1.238e4, "latency": 8.074e6, "edp": 1.00e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 4.123e3, "latency": 1.381e7, "edp": 5.69e4,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "16x128", "fmem": "112KB", "wmem": "4610KB", "tile": 14,
+            "partial": {"energy": 3.705e4, "latency": 2.432e7, "edp": 9.01e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 2.460e3, "latency": 2.452e7, "edp": 6.03e4,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "16x128", "fmem": "48KB", "wmem": "4608KB", "tile": 7,
+            "partial": {"energy": 8.004e3, "latency": 7.813e6, "edp": 6.25e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+            "single":  {"energy": 7.921e2, "latency": 6.905e6, "edp": 5.47e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+    "Eyeriss": {
+        "FSRCNN": {
+            "pe": "128x16", "gb": "128KB", "wreg": 384,
+            "partial": {"energy": 6.920e4, "latency": 1.889e7, "edp": 1.31e6,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 9.606e3, "latency": 3.525e7, "edp": 3.39e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "256x8", "gb": "128KB", "wreg": 384,
+            "partial": {"energy": 9.138e4, "latency": 1.223e7, "edp": 1.12e6,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 7.488e3, "latency": 1.495e7, "edp": 1.12e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "512x32", "gb": "128KB", "wreg": 576,
+            "partial": {"energy": 1.528e5, "latency": 5.852e6, "edp": 8.94e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 9.415e3, "latency": 6.922e6, "edp": 6.52e4,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "512x32", "gb": "128KB", "wreg": 902,
+            "partial": {"energy": 2.950e4, "latency": 3.118e6, "edp": 9.20e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+            "single":  {"energy": 1.871e3, "latency": 3.301e6, "edp": 6.18e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
 }
 
-# VGG16 — Full vs Single across PE configs
+# ====================================================================
+#  DATA  –  Fusion Comparisons (Auto-Sized, Normalized to Full=1.0)
+# ====================================================================
+# For each (arch, workload), every metric is divided by the Full value.
+FUSION_AUTO_NORM = {}
+for _arch, _wls in FUSION_AUTO.items():
+    FUSION_AUTO_NORM[_arch] = {}
+    for _wl, _modes in _wls.items():
+        FUSION_AUTO_NORM[_arch][_wl] = {}
+        for _mode in ("full", "partial", "single"):
+            FUSION_AUTO_NORM[_arch][_wl][_mode] = {
+                _metric: _modes[_mode][_metric] / _modes["full"][_metric]
+                for _metric in ("energy", "latency", "edp")
+            }
+
+# Normalized partial-sized data (Partial = 1.0)
+FUSION_PARTIAL_SIZED_NORM = {}
+for _arch, _wls in FUSION_PARTIAL_SIZED.items():
+    FUSION_PARTIAL_SIZED_NORM[_arch] = {}
+    for _wl, _modes in _wls.items():
+        FUSION_PARTIAL_SIZED_NORM[_arch][_wl] = {}
+        for _mode in ("partial", "single"):
+            FUSION_PARTIAL_SIZED_NORM[_arch][_wl][_mode] = {
+                _metric: _modes[_mode][_metric] / _modes["partial"][_metric]
+                for _metric in ("energy", "latency", "edp")
+            }
+
+# ====================================================================
+#  DATA  –  Fusion Comparisons (Fixed-Config, Eyeriss)
+#  Scenario A = full-sized architecture (wreg sized for Full fusion)
+# ====================================================================
+
+# ResNet18 — Full vs Single energy ratio across PE configs  (Scenario A)
+FUSION_FIXED_RESNET18 = {
+    "configs": ["512x32", "256x32", "256x16"],
+    "total_pes": [16384, 8192, 4096],
+    "wreg": [902, 1800, 3600],          # full-sized wreg
+    "full_energy": [4.729e4, 6.767e4, 1.121e5],
+    "single_energy": [1.872e3, 1.417e3, 1.131e3],
+    "partial_energy": [4.261e4, 6.424e4, 1.094e5],
+    "full_latency": [3.042e6, 3.042e6, 3.059e6],
+    "single_latency": [3.301e6, 3.301e6, 3.301e6],
+    "partial_latency": [3.118e6, 3.118e6, 3.126e6],
+    "energy_ratio_fs": [19.15, 47.75, 99.10],
+    "energy_ratio_fp": [1.11, 1.05, 1.03],  # full/partial ~1
+    "latency_ratio": [0.976, 0.976, 0.92],
+}
+
+# ResNet18 — Partial-sized architecture  (Scenario B)
+# Only configs with distinct ScB data: 512x32, 256x32, 256x16
+FUSION_FIXED_RESNET18_PARTIAL = {
+    "configs": ["512x32", "256x32", "256x16"],
+    "total_pes": [16384, 8192, 4096],
+    "wreg": [384, 770, 1600],                       # partial-sized wreg
+    "partial_energy": [2.950e4, 3.819e4, 5.880e4],
+    "single_energy":  [1.871e3, 1.413e3, 1.118e3],
+    "partial_latency": [3.118e6, 3.118e6, 3.118e6],
+    "single_latency":  [3.301e6, 3.301e6, 3.301e6],
+}
+
+# VGG16 — Full vs Single across PE configs  (Scenario A)
 FUSION_FIXED_VGG16 = {
     "configs": ["512x32", "256x32", "256x16"],
     "total_pes": [16384, 8192, 4096],
-    "wreg": [1200, 2400, 4800],
-    "full_energy": [3.618e5, 5.471e5, 9.398e5],
-    "single_energy": [1.360e4, 9.812e3, 6.707e3],
-    "partial_energy": [2.620e5, 4.044e5, 6.952e5],
-    "full_latency": [5.455e6, 5.681e6, 6.715e6],
-    "single_latency": [6.922e6, 6.922e6, 7.694e6],
-    "energy_ratio_fs": [26.60, 55.76, 140.11],
-    "energy_ratio_fp": [1.38, 1.35, 1.35],
-    "latency_ratio": [0.79, 0.82, 0.87],
+    "wreg": [1200, 2400, 4800],                     # full-sized wreg
+    "full_energy": [3.478e5, 5.491e5, 9.517e5],
+    "single_energy": [9.425e3, 9.443e3, 9.480e3],
+    "partial_energy": [2.291e5, 3.758e5, 6.692e5],
+    "full_latency": [5.455e6, 5.455e6, 5.455e6],
+    "single_latency": [6.922e6, 6.922e6, 6.922e6],
+    "partial_latency": [5.852e6, 5.852e6, 5.852e6],
+    "energy_ratio_fs": [36.90, 58.14, 100.30],
+    "energy_ratio_fp": [1.52, 1.46, 1.42],
+    "latency_ratio": [0.79, 0.79, 0.79],
 }
 
-# MC-CNN — fixed config
+# VGG16 — Partial-sized architecture  (Scenario B)
+FUSION_FIXED_VGG16_PARTIAL = {
+    "configs": ["512x32", "256x32", "256x16"],
+    "total_pes": [16384, 8192, 4096],
+    "wreg": [576, 1200, 2200],                       # partial-sized wreg
+    "partial_energy": [1.528e5, 2.291e5, 3.513e5],
+    "single_energy":  [9.415e3, 9.425e3, 9.449e3],
+    "partial_latency": [5.852e6, 5.852e6, 5.852e6],
+    "single_latency":  [6.922e6, 6.922e6, 6.922e6],
+}
+
+# MC-CNN — fixed config  (wreg=384 for both scenarios → single scenario)
 FUSION_FIXED_MCCNN = {
     "config": "256x8", "total_pes": 2048, "wreg": 384,
     "full":    {"energy": 8.955e4, "latency": 1.223e7},
@@ -488,49 +658,81 @@ FUSION_FIXED_MCCNN = {
     "energy_ratio_fp": 0.98,
 }
 
-# FSRCNN — fixed config
+# FSRCNN — fixed config  (wreg=384 for both scenarios → single scenario)
 FUSION_FIXED_FSRCNN = {
-    "config": "128x16", "total_pes": 2048, "wreg": 384,
-    "full":    {"energy": 6.757e4, "latency": 1.889e7},
-    "single":  {"energy": 8.747e3, "latency": 3.525e7},
-    "partial": {"energy": 6.855e4, "latency": 1.889e7},
-    "energy_ratio_fs": 7.73,
-    "energy_ratio_fp": 0.99,
+    "config": "256x8", "total_pes": 2048, "wreg": 384,
+    "full":    {"energy": 6.842e4, "latency": 1.889e7},
+    "single":  {"energy": 9.606e3, "latency": 3.525e7},
+    "partial": {"energy": 6.920e4, "latency": 1.889e7},
+    "energy_ratio_fs": 7.12,
+    "energy_ratio_fp": 0.989,
 }
 
-# DepFiN fixed-config fusion
+# DepFiN fixed-config fusion  (Scenario A: full-sized fmem/wmem)
 FUSION_FIXED_DEPFIN = {
     "ResNet18": {
         "config": "16x128", "total_pes": 2048,
-        "full":    {"energy": 1.083e4, "latency": 7.812e6},
+        "fmem": "266KB", "wmem": "10738KB",
+        "full":    {"energy": 1.083e4, "latency": 8.998e6},
         "single":  {"energy": 9.499e2, "latency": 6.905e6},
-        "partial": {"energy": 1.142e4, "latency": 1.706e7},
+        "partial": {"energy": 1.088e4, "latency": 7.813e6},
         "energy_ratio_fs": 11.40,
-        "energy_ratio_fp": 0.95,
+        "energy_ratio_fp": 0.996,
     },
     "VGG16": {
         "config": "16x128", "total_pes": 2048,
-        "full":    {"energy": 7.607e4, "latency": 2.433e7},
-        "single":  {"energy": 3.395e3, "latency": 2.452e7},
-        "partial": {"energy": 5.834e4, "latency": 5.204e7},
-        "energy_ratio_fs": 22.41,
-        "energy_ratio_fp": 1.30,
+        "fmem": "528KB", "wmem": "14366KB",
+        "full":    {"energy": 7.609e4, "latency": 2.728e7},
+        "single":  {"energy": 3.413e3, "latency": 2.252e7},
+        "partial": {"energy": 5.652e4, "latency": 2.432e7},
+        "energy_ratio_fs": 19.37,
+        "energy_ratio_fp": 1.34,
     },
     "MC-CNN": {
         "config": "8x256", "total_pes": 2048,
-        "full":    {"energy": 1.177e4, "latency": 8.074e6},
+        "fmem": "522KB", "wmem": "32KB",
+        "full":    {"energy": 1.177e4, "latency": 7.975e6},
         "single":  {"energy": 4.224e3, "latency": 1.381e7},
-        "partial": {"energy": 1.273e4, "latency": 8.074e6},
+        "partial": {"energy": 1.273e4, "latency": 7.975e6},
         "energy_ratio_fs": 2.79,
         "energy_ratio_fp": 0.92,
     },
     "FSRCNN": {
         "config": "16x128", "total_pes": 2048,
-        "full":    {"energy": 8.231e3, "latency": 6.122e6},
-        "single":  {"energy": 6.402e3, "latency": 1.175e7},
-        "partial": {"energy": 9.027e3, "latency": 6.313e6},
+        "fmem": "576KB", "wmem": "19KB",
+        "full":    {"energy": 8.352e3, "latency": 6.156e6},
+        "single":  {"energy": 6.536e3, "latency": 1.175e7},
+        "partial": {"energy": 9.150e3, "latency": 6.313e6},
         "energy_ratio_fs": 1.29,
         "energy_ratio_fp": 0.91,
+    },
+}
+
+# DepFiN fixed-config fusion  (Scenario B: partial-sized fmem/wmem)
+FUSION_FIXED_DEPFIN_PARTIAL = {
+    "ResNet18": {
+        "config": "16x128", "total_pes": 2048,
+        "fmem": "48KB", "wmem": "4609KB",
+        "partial": {"energy": 8.004e3, "latency": 7.813e6},
+        "single":  {"energy": 7.921e2, "latency": 6.905e6},
+    },
+    "VGG16": {
+        "config": "16x128", "total_pes": 2048,
+        "fmem": "112KB", "wmem": "4610KB",
+        "partial": {"energy": 3.705e4, "latency": 2.432e7},
+        "single":  {"energy": 2.460e3, "latency": 2.452e7},
+    },
+    "MC-CNN": {
+        "config": "8x256", "total_pes": 2048,
+        "fmem": "396KB", "wmem": "22KB",
+        "partial": {"energy": 1.238e4, "latency": 8.074e6},
+        "single":  {"energy": 4.123e3, "latency": 1.381e7},
+    },
+    "FSRCNN": {
+        "config": "16x128", "total_pes": 2048,
+        "fmem": "248KB", "wmem": "9KB",
+        "partial": {"energy": 8.519e3, "latency": 6.313e6},
+        "single":  {"energy": 6.390e3, "latency": 1.175e7},
     },
 }
 
@@ -552,7 +754,7 @@ def plot_depfin_cs4():
 
         # EDP on primary y-axis
         ln1 = ax.semilogy(x, d["edp"], "o-", color=COLORS[wl], label="EDP")
-        ax.set_ylabel("EDP  (μJ·cc)")
+        ax.set_ylabel("EDP  (J·cc)")
         ax.set_xticks(x)
         ax.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=8)
         ax.set_title(f"{wl}  (best: {d['best']})")
@@ -583,13 +785,13 @@ def plot_depfin_cs4():
 # ────────────────────────────────────────────────────────────────────
 def plot_depfin_cs1():
     fig, axes = plt.subplots(2, 2, figsize=(13, 9))
-    fig.suptitle("DepFiN — Tile Size Sensitivity  (16×128 PEs) DepFiN 16×128 PEs,\n FMEM=1056KB, WMEM=524KB. \n FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)", fontsize=16, y=0.98)
+    fig.suptitle("DepFiN — Tile Size Sensitivity  (16×128 PEs) DepFiN 16×128 PEs, \n FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)", fontsize=16, y=0.98)
 
     for ax, wl in zip(axes.flat, WORKLOADS):
         d = DEPFIN_CS1[wl]
         ax.semilogy(d["tiles"], d["edp"], "o-", color=COLORS[wl])
         ax.set_xlabel("Tile size")
-        ax.set_ylabel("EDP  (μJ·cc)")
+        ax.set_ylabel("EDP  (J·cc)")
         ax.set_title(wl)
         ax.set_xticks(d["tiles"])
         # mark best
@@ -605,77 +807,127 @@ def plot_depfin_cs1():
 
 
 # ────────────────────────────────────────────────────────────────────
-#  Figure 3: DepFiN CS2+CS3 — Row & Col Sweeps
+#  Figure 3: DepFiN CS2+CS3 — Row & Col Sweeps (one figure per workload)
 # ────────────────────────────────────────────────────────────────────
 def plot_depfin_cs2_cs3():
-    fig, axes = plt.subplots(2, 4, figsize=(18, 8))
-    fig.suptitle("DepFiN — PE Row Sweep (top) and PE Col Sweep (bottom)", fontsize=16, y=0.98)
+    """Generate one 1×2 figure per workload: row sweep (left) + col sweep (right)."""
+    figs = []
+    for wl in WORKLOADS:
+        fig, (ax_row, ax_col) = plt.subplots(1, 2, figsize=(12, 5))
+        fig.suptitle(f"DepFiN — {wl}: PE Row Sweep vs PE Col Sweep",
+                     fontsize=15, y=1.02)
 
-    # Row sweep (top row)
-    for ax, wl in zip(axes[0], WORKLOADS):
-        d = DEPFIN_CS2[wl]
-        ax.plot(d["rows"], d["edp"], "o-", color=COLORS[wl])
-        ax.set_xlabel("PE rows  (cols=128)")
-        ax.set_ylabel("EDP")
-        ax.set_title(f"{wl} rows")
-        ax.set_xticks(d["rows"])
-        _sci_fmt(ax)
+        # CS2: Row sweep (cols fixed = 128)
+        d2 = DEPFIN_CS2[wl]
+        ax_row.plot(d2["rows"], d2["edp"], "o-", color=COLORS[wl], linewidth=2)
+        ax_row.set_xlabel("PE rows  (cols = 128)")
+        ax_row.set_ylabel("EDP  (J·cc)")
+        ax_row.set_title("Row Sweep (CS2)")
+        ax_row.set_xticks(d2["rows"])
+        _sci_fmt(ax_row)
+        # mark best
+        best_i = int(np.argmin(d2["edp"]))
+        ax_row.plot(d2["rows"][best_i], d2["edp"][best_i], "*",
+                    markersize=14, color="gold", markeredgecolor="black", zorder=5)
+        # annotate total PEs
+        for i, (r, edp_val) in enumerate(zip(d2["rows"], d2["edp"])):
+            ax_row.annotate(f"{d2['total_pes'][i]:,} PEs",
+                            (r, edp_val), textcoords="offset points",
+                            xytext=(0, 10), ha="center", fontsize=7,
+                            bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                      ec=COLORS[wl], alpha=0.8, lw=0.5))
 
-    # Col sweep (bottom row)
-    for ax, wl in zip(axes[1], WORKLOADS):
-        d = DEPFIN_CS3[wl]
-        ax.plot(d["cols"], d["edp"], "s-", color=COLORS[wl])
-        ax.set_xlabel("PE cols  (rows=16)")
-        ax.set_ylabel("EDP")
-        ax.set_title(f"{wl} cols")
-        ax.set_xticks(d["cols"])
-        _sci_fmt(ax)
+        # CS3: Col sweep (rows fixed = 16)
+        d3 = DEPFIN_CS3[wl]
+        ax_col.plot(d3["cols"], d3["edp"], "s-", color=COLORS[wl], linewidth=2)
+        ax_col.set_xlabel("PE cols  (rows = 16)")
+        ax_col.set_ylabel("EDP  (J·cc)")
+        ax_col.set_title("Col Sweep (CS3)")
+        ax_col.set_xticks(d3["cols"])
+        _sci_fmt(ax_col)
+        # mark best
+        best_i = int(np.argmin(d3["edp"]))
+        ax_col.plot(d3["cols"][best_i], d3["edp"][best_i], "*",
+                    markersize=14, color="gold", markeredgecolor="black", zorder=5)
+        # annotate total PEs
+        for i, (c, edp_val) in enumerate(zip(d3["cols"], d3["edp"])):
+            ax_col.annotate(f"{d3['total_pes'][i]:,} PEs",
+                            (c, edp_val), textcoords="offset points",
+                            xytext=(0, 10), ha="center", fontsize=7,
+                            bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                      ec=COLORS[wl], alpha=0.8, lw=0.5))
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    _save(fig, "depfin_cs2cs3_row_col_sweep")
-    return fig
+        fig.tight_layout(rect=[0, 0, 1, 0.95])
+        _save(fig, f"depfin_cs2cs3_{wl.lower().replace('-', '')}")
+        figs.append(fig)
+    return figs
 
 
 # ────────────────────────────────────────────────────────────────────
-#  Figure 4: Eyeriss CS1 — WReg Sweep (min-PEs view)
+#  Figure 4: Eyeriss CS1 — WReg Sweep (Summary A + Summary B)
+#  Only VGG16 and ResNet18 (FSRCNN/MC-CNN are trivial).
 # ────────────────────────────────────────────────────────────────────
 def plot_eyeriss_cs1():
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle("Eyeriss — WReg Sensitivity Sweep  (min-PEs config)", fontsize=16, y=0.98)
+    cs1_wls = ["VGG16", "ResNet18"]
+    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+    fig.suptitle("Eyeriss CS1 — WReg Sensitivity: Summary A (min PEs) vs Summary B (min EDP)",
+                 fontsize=14, y=1.02)
 
-    for ax, wl in zip(axes.flat, WORKLOADS):
-        d = EYERISS_CS1[wl]
-        # Filter out None entries
-        mask = [i for i, e in enumerate(d["energy"]) if e is not None]
-        wreg = [d["wreg"][i] for i in mask]
-        energy = [d["energy"][i] for i in mask]
-        edp = [d["edp"][i] for i in mask]
-        n_feas = [d["n_feasible"][i] for i in mask]
-        min_pes = [d["min_pe_total"][i] for i in mask]
+    for ax, wl in zip(axes, cs1_wls):
+        da = EYERISS_CS1[wl]
+        db = EYERISS_CS1_B[wl]
 
-        # Energy on primary y-axis
-        ln1 = ax.semilogy(wreg, energy, "o-", color=COLORS[wl], label="Energy (μJ)")
-        ax.set_xlabel("WReg size")
-        ax.set_ylabel("Energy (μJ)")
-        ax.set_title(wl)
+        # Filter None entries (infeasible WReg sizes)
+        mask_a = [i for i, e in enumerate(da["edp"]) if e is not None]
+        wreg_a = [da["wreg"][i] for i in mask_a]
+        edp_a  = [da["edp"][i] for i in mask_a]
+        cfg_a  = [da["min_pe_config"][i] for i in mask_a]
 
-        # Min PEs on secondary y-axis
-        ax2 = ax.twinx()
-        ln2 = ax2.plot(wreg, min_pes, "D--", color="gray", alpha=0.6, label="Min PEs")
-        ax2.set_ylabel("Min total PEs", color="gray")
-        ax2.tick_params(axis="y", labelcolor="gray")
+        mask_b = [i for i, e in enumerate(db["edp"]) if e is not None]
+        wreg_b = [db["wreg"][i] for i in mask_b]
+        edp_b  = [db["edp"][i] for i in mask_b]
+        cfg_b  = [db.get("minedp_pe_config", db.get("min_pe_config", [""] * len(db["wreg"])))[i] for i in mask_b]
 
-        # Feasibility count as text
-        for i, (w, n) in enumerate(zip(wreg, n_feas)):
-            ax.annotate(f"{n} cfg", (w, energy[i]),
-                       textcoords="offset points", xytext=(0, 12),
-                       fontsize=7, ha="center", color="navy")
+        # Plot both summaries
+        ln1 = ax.plot(wreg_a, edp_a, "o-", color=COLORS[wl],
+                      label="Summary A (min PEs)", linewidth=2, zorder=2)
+        ln2 = ax.plot(wreg_b, edp_b, "s--", color=COLORS[wl], alpha=0.6,
+                      label="Summary B (min EDP)", linewidth=2, zorder=2)
 
-        lns = ln1 + ln2
-        labs = [l.get_label() for l in lns]
-        ax.legend(lns, labs, loc="upper left", fontsize=8)
+        bbox_a = dict(boxstyle="round,pad=0.2", fc="white", ec=COLORS[wl],
+                      alpha=0.85, lw=0.6)
+        bbox_b = dict(boxstyle="round,pad=0.2", fc="white", ec="gray",
+                      alpha=0.85, lw=0.6)
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+        # Annotate PE config for Summary A (above points)
+        for i, (w, edp_val, cfg) in enumerate(zip(wreg_a, edp_a, cfg_a)):
+            ax.annotate(f"{cfg}\n{da['min_pe_total'][mask_a[i]]:,} PEs",
+                       (w, edp_val),
+                       textcoords="offset points", xytext=(0, 18),
+                       fontsize=8, ha="center", color=COLORS[wl],
+                       bbox=bbox_a, zorder=5,
+                       arrowprops=dict(arrowstyle="->", color=COLORS[wl], lw=0.8))
+
+        # Annotate PE config for Summary B (below points, only where different from A)
+        for i, (w, edp_val, cfg) in enumerate(zip(wreg_b, edp_b, cfg_b)):
+            matching_a = [j for j, wa in enumerate(wreg_a) if wa == w]
+            if matching_a and cfg_a[matching_a[0]] == cfg:
+                continue  # same config, skip annotation
+            ax.annotate(f"{cfg}\n{db['minedp_pe_total'][mask_b[i]]:,} PEs",
+                       (w, edp_val),
+                       textcoords="offset points", xytext=(0, -28),
+                       fontsize=8, ha="center", color="gray",
+                       bbox=bbox_b, zorder=5,
+                       arrowprops=dict(arrowstyle="->", color="gray", lw=0.8))
+
+        ax.set_xlabel("WReg size (entries)")
+        ax.set_ylabel("EDP  (J·cc)")
+        ax.set_title(wl, fontsize=13)
+        ax.set_xticks(sorted(set(wreg_a + wreg_b)))
+        ax.legend(fontsize=9, loc="lower right")
+        _sci_fmt(ax)
+
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
     _save(fig, "eyeriss_cs1_wreg_sweep")
     return fig
 
@@ -719,32 +971,61 @@ def plot_eyeriss_cs2_cs3():
 #  Figure 6: Eyeriss CS5 — PE Aspect Ratio
 # ────────────────────────────────────────────────────────────────────
 def plot_eyeriss_cs5():
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle("Eyeriss — PE Aspect Ratio Sweep  (fixed total PEs)", fontsize=16, y=0.98)
+    fig, axes = plt.subplots(2, 4, figsize=(18, 8))
+    fig.subplots_adjust(top=0.90, hspace=0.55, wspace=0.35,
+                        bottom=0.12, left=0.05, right=0.97)
+    fig.suptitle("Eyeriss — PE Aspect Ratio Sweep  (fixed total PEs)",
+                 fontsize=16)
 
-    for ax, wl in zip(axes.flat, WORKLOADS):
+    def _plain_ticks(ax):
+        """Use plain float formatting – no offset, no scientific notation."""
+        ax.yaxis.set_major_formatter(
+            mticker.FuncFormatter(lambda v, _: f"{v:.3g}"))
+
+    for col, wl in enumerate(WORKLOADS):
         d = EYERISS_CS5[wl]
         x = np.arange(len(d["configs"]))
-        ax.plot(x, d["edp"], "o-", color=COLORS[wl], label="EDP")
-        ax.set_ylabel("EDP  (μJ·cc)")
-        ax.set_xticks(x)
-        ax.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=8)
-        ax.set_title(f"{wl}  ({d['total_pes']} PEs, best: {d['best']})")
-        _sci_fmt(ax)
-
-        # Mark best
         best_idx = d["configs"].index(d["best"])
-        ax.plot(best_idx, d["edp"][best_idx], "*", markersize=14,
-                color="gold", markeredgecolor="black", zorder=5)
+        c = COLORS[wl]
 
-        # Energy on twin axis
-        ax2 = ax.twinx()
-        ax2.plot(x, d["energy"], "s--", color="gray", alpha=0.5, label="Energy")
-        ax2.set_ylabel("Energy (μJ)", color="gray")
-        ax2.tick_params(axis="y", labelcolor="gray")
-        _sci_fmt(ax2)
+        # ── Top row: Energy ──
+        ax_e = axes[0, col]
+        ax_e.plot(x, d["energy"], "s-", color=c)
+        ax_e.plot(best_idx, d["energy"][best_idx], "*", markersize=14,
+                  color="gold", markeredgecolor="black", zorder=5)
+        ax_e.set_xticks(x)
+        ax_e.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=7)
+        ax_e.set_title(f"{wl}  ({d['total_pes']} PEs)", fontsize=10)
+        if col == 0:
+            ax_e.set_ylabel("Energy  (μJ)")
+        _plain_ticks(ax_e)
+        # add 8% top margin so high points aren't flush with the edge
+        lo, hi = ax_e.get_ylim()
+        ax_e.set_ylim(lo - 0.01 * lo, hi + 0.08 * (hi - lo))
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+        # ── Bottom row: EDP ──
+        ax_d = axes[1, col]
+        ax_d.plot(x, d["edp"], "o-", color=c)
+        ax_d.plot(best_idx, d["edp"][best_idx], "*", markersize=14,
+                  color="gold", markeredgecolor="black", zorder=5)
+        ax_d.set_xticks(x)
+        ax_d.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=7)
+        ax_d.set_xlabel("PE config  (rows × cols)", fontsize=8)
+        if col == 0:
+            ax_d.set_ylabel("EDP  (μJ · cc)")
+        _plain_ticks(ax_d)
+        # add 8% top margin
+        lo, hi = ax_d.get_ylim()
+        ax_d.set_ylim(lo - 0.01 * lo, hi + 0.08 * (hi - lo))
+
+        # annotate best config
+        ax_d.annotate(f"best: {d['best']}",
+                      xy=(best_idx, d["edp"][best_idx]),
+                      xytext=(0, 18), textcoords="offset points",
+                      fontsize=7, ha="center", color=c, fontweight="bold",
+                      bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                ec=c, alpha=0.85))
+
     _save(fig, "eyeriss_cs5_aspect_ratio")
     return fig
 
@@ -754,7 +1035,7 @@ def plot_eyeriss_cs5():
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_energy():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    fig.suptitle("Auto-Sized Fusion — Energy Comparison", fontsize=16, y=1.0)
+    fig.suptitle("Full-Sized Arch — Energy  (Full vs Partial vs Single)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
         data = FUSION_AUTO[arch]
@@ -766,7 +1047,7 @@ def plot_fusion_auto_energy():
         sing_e = [data[wl]["single"]["energy"] for wl in WORKLOADS]
 
         ax.bar(x - w, full_e, w, label="Full Fusion", color=FUSION_COLORS["Full"], edgecolor="black", linewidth=0.5)
-        ax.bar(x, part_e, w, label="Partial Fusion", color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x, part_e, w, label=r"$\Sigma$ Partial Fusion", color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
         ax.bar(x + w, sing_e, w, label=r"$\Sigma$ Singles", color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
 
         ax.set_yscale("log")
@@ -776,12 +1057,6 @@ def plot_fusion_auto_energy():
         ax.set_title(arch)
         ax.legend(fontsize=9)
 
-        # Add ratio annotations
-        for i, wl in enumerate(WORKLOADS):
-            ratio = data[wl]["full"]["energy"] / data[wl]["single"]["energy"]
-            ax.annotate(f"{ratio:.1f}×", (i - w, full_e[i]),
-                       textcoords="offset points", xytext=(0, 8),
-                       fontsize=7, ha="center", color="darkred", fontweight="bold")
 
     fig.tight_layout()
     _save(fig, "fusion_auto_energy")
@@ -793,7 +1068,7 @@ def plot_fusion_auto_energy():
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_latency():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    fig.suptitle("Auto-Sized Fusion — Latency Comparison", fontsize=16, y=1.0)
+    fig.suptitle("Full-Sized Arch — Latency (Full vs Partial vs Single)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
         data = FUSION_AUTO[arch]
@@ -805,7 +1080,7 @@ def plot_fusion_auto_latency():
         sing_l = [data[wl]["single"]["latency"] for wl in WORKLOADS]
 
         ax.bar(x - w, full_l, w, label="Full Fusion", color=FUSION_COLORS["Full"], edgecolor="black", linewidth=0.5)
-        ax.bar(x, part_l, w, label="Partial Fusion", color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x, part_l, w, label=r"$\Sigma$ Partial Fusion", color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
         ax.bar(x + w, sing_l, w, label=r"$\Sigma$ Singles", color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
 
         ax.set_ylabel("Latency (cc)")
@@ -833,7 +1108,7 @@ def plot_fusion_auto_latency():
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_dram():
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle("Auto-Sized Fusion — DRAM Traffic Reduction", fontsize=16, y=0.98)
+    fig.suptitle("Full-Sized Arch — DRAM Traffic Reduction", fontsize=16, y=0.98)
 
     for col_idx, arch in enumerate(["DepFiN", "Eyeriss"]):
         data = FUSION_AUTO[arch]
@@ -855,6 +1130,7 @@ def plot_fusion_auto_dram():
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(f"{arch} — DRAM Reads")
         ax.legend(fontsize=8)
+        ax.set_ylim(top=ax.get_ylim()[1] * 3)
 
         # DRAM Writes (bottom row)
         ax = axes[1, col_idx]
@@ -871,9 +1147,310 @@ def plot_fusion_auto_dram():
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(f"{arch} — DRAM Writes")
         ax.legend(fontsize=8)
+        ax.set_ylim(top=ax.get_ylim()[1] * 3)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "fusion_auto_dram_traffic")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9b: Normalized Energy (Full Fusion = 1.0)
+# ────────────────────────────────────────────────────────────────────
+def plot_fusion_auto_energy_norm():
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle("Full-Sized Arch — Normalized Energy  (Full = 1.0)", fontsize=16, y=1.0)
+
+    for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
+        data = FUSION_AUTO_NORM[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.25
+
+        full_e = [data[wl]["full"]["energy"] for wl in WORKLOADS]
+        part_e = [data[wl]["partial"]["energy"] for wl in WORKLOADS]
+        sing_e = [data[wl]["single"]["energy"] for wl in WORKLOADS]
+
+        ax.bar(x - w, full_e, w, label="Full Fusion",
+               color=FUSION_COLORS["Full"], edgecolor="black", linewidth=0.5)
+        ax.bar(x, part_e, w, label=r"$\Sigma$ Partial Fusion",
+               color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x + w, sing_e, w, label=r"$\Sigma$ Singles",
+               color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+        ax.set_ylabel("Normalized Energy")
+        ax.set_xticks(x)
+        ax.set_xticklabels(WORKLOADS)
+        ax.set_title(arch)
+        ax.legend(fontsize=9)
+        ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
+        ax.set_ylim(top=1.60)
+
+        # Annotate bar values
+        for i, (f, p, s) in enumerate(zip(full_e, part_e, sing_e)):
+            for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
+                ax.annotate(f"{val:.3f}", (xpos, val),
+                           textcoords="offset points", xytext=(0, 4),
+                           fontsize=7, ha="center", fontweight="bold")
+
+    fig.tight_layout()
+    _save(fig, "fusion_auto_energy_norm")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9c: Normalized Latency (Full Fusion = 1.0)
+# ────────────────────────────────────────────────────────────────────
+def plot_fusion_auto_latency_norm():
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle("Full-Sized Arch — Normalized Latency  (Full = 1.0)", fontsize=16, y=1.0)
+
+    for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
+        data = FUSION_AUTO_NORM[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.25
+
+        full_l = [data[wl]["full"]["latency"] for wl in WORKLOADS]
+        part_l = [data[wl]["partial"]["latency"] for wl in WORKLOADS]
+        sing_l = [data[wl]["single"]["latency"] for wl in WORKLOADS]
+
+        ax.bar(x - w, full_l, w, label="Full Fusion",
+               color=FUSION_COLORS["Full"], edgecolor="black", linewidth=0.5)
+        ax.bar(x, part_l, w, label=r"$\Sigma$ Partial Fusion",
+               color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x + w, sing_l, w, label=r"$\Sigma$ Singles",
+               color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+        ax.set_ylabel("Normalized Latency")
+        ax.set_xticks(x)
+        ax.set_xticklabels(WORKLOADS)
+        ax.set_title(arch)
+        ax.legend(fontsize=9)
+        ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
+        ax.set_ylim(top=2.80)
+
+        for i, (f, p, s) in enumerate(zip(full_l, part_l, sing_l)):
+            for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
+                ax.annotate(f"{val:.3f}", (xpos, val),
+                           textcoords="offset points", xytext=(0, 4),
+                           fontsize=7, ha="center", fontweight="bold")
+
+    fig.tight_layout()
+    _save(fig, "fusion_auto_latency_norm")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9d: Normalized EDP (Full Fusion = 1.0)
+# ────────────────────────────────────────────────────────────────────
+def plot_fusion_auto_edp_norm():
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle("Full-Sized Arch — Normalized EDP  (Full = 1.0)", fontsize=16, y=1.0)
+
+    for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
+        data = FUSION_AUTO_NORM[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.25
+
+        full_edp = [data[wl]["full"]["edp"] for wl in WORKLOADS]
+        part_edp = [data[wl]["partial"]["edp"] for wl in WORKLOADS]
+        sing_edp = [data[wl]["single"]["edp"] for wl in WORKLOADS]
+
+        ax.bar(x - w, full_edp, w, label="Full Fusion",
+               color=FUSION_COLORS["Full"], edgecolor="black", linewidth=0.5)
+        ax.bar(x, part_edp, w, label=r"$\Sigma$ Partial Fusion",
+               color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x + w, sing_edp, w, label=r"$\Sigma$ Singles",
+               color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+        ax.set_ylabel("Normalized EDP")
+        ax.set_xticks(x)
+        ax.set_xticklabels(WORKLOADS)
+        ax.set_title(arch)
+        ax.legend(fontsize=9)
+        ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
+        ax.set_ylim(top=1.70)
+
+        for i, (f, p, s) in enumerate(zip(full_edp, part_edp, sing_edp)):
+            for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
+                ax.annotate(f"{val:.3f}", (xpos, val),
+                           textcoords="offset points", xytext=(0, 4),
+                           fontsize=7, ha="center", fontweight="bold")
+
+    fig.tight_layout()
+    _save(fig, "fusion_auto_edp_norm")
+    return fig
+
+
+# ── helper: build architecture config label for a data entry ────────
+def _arch_cfg_label(arch, entry):
+    """Return a short string describing the memory config."""
+    pe = entry.get("pe", "")
+    if arch == "Eyeriss":
+        return f"PE {pe}, WReg={entry.get('wreg','?')}"
+    else:  # DepFiN
+        return f"PE {pe}, FMEM={entry.get('fmem','?')}, WMEM={entry.get('wmem','?')}"
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9e: Partial-Sized Arch — Energy (Partial vs Single)
+# ────────────────────────────────────────────────────────────────────
+def plot_partial_sized_energy():
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle("Partial-Sized Architecture — Energy  (Partial vs Single)",
+                 fontsize=16, y=1.0)
+
+    for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
+        data_ps = FUSION_PARTIAL_SIZED[arch]
+        data_fs = FUSION_AUTO[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.3
+
+        part_e = [data_ps[wl]["partial"]["energy"] for wl in WORKLOADS]
+        sing_e = [data_ps[wl]["single"]["energy"] for wl in WORKLOADS]
+
+        ax.bar(x - w/2, part_e, w, label="Partial Fusion",
+               color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x + w/2, sing_e, w, label=r"$\Sigma$ Singles",
+               color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+        ax.set_yscale("log")
+        ax.set_ylabel("Energy (μJ)")
+        ax.set_xticks(x)
+        ax.set_xticklabels(WORKLOADS)
+        ax.set_title(arch)
+        ax.legend(fontsize=9)
+
+        # Annotate per-workload arch config below x-axis
+        for i, wl in enumerate(WORKLOADS):
+            cfg = _arch_cfg_label(arch, data_ps[wl])
+            ax.annotate(cfg, (i, 0), xycoords=("data", "axes fraction"),
+                       xytext=(0, -28), textcoords="offset points",
+                       fontsize=5.5, ha="center", color="gray", style="italic")
+
+    fig.tight_layout(rect=[0, 0.04, 1, 1.0])
+    _save(fig, "fusion_partial_sized_energy")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9f: Partial-Sized Arch — Latency (Partial vs Single)
+# ────────────────────────────────────────────────────────────────────
+def plot_partial_sized_latency():
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle("Partial-Sized Architecture — Latency  (Partial vs Single)",
+                 fontsize=16, y=1.0)
+
+    for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
+        data_ps = FUSION_PARTIAL_SIZED[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.3
+
+        part_l = [data_ps[wl]["partial"]["latency"] for wl in WORKLOADS]
+        sing_l = [data_ps[wl]["single"]["latency"] for wl in WORKLOADS]
+
+        ax.bar(x - w/2, part_l, w, label="Partial Fusion",
+               color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x + w/2, sing_l, w, label=r"$\Sigma$ Singles",
+               color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+        ax.set_ylabel("Latency (cc)")
+        ax.set_xticks(x)
+        ax.set_xticklabels(WORKLOADS)
+        ax.set_title(arch)
+        ax.legend(fontsize=9)
+        _sci_fmt(ax)
+
+        for i, wl in enumerate(WORKLOADS):
+            cfg = _arch_cfg_label(arch, data_ps[wl])
+            ax.annotate(cfg, (i, 0), xycoords=("data", "axes fraction"),
+                       xytext=(0, -28), textcoords="offset points",
+                       fontsize=5.5, ha="center", color="gray", style="italic")
+
+    fig.tight_layout(rect=[0, 0.04, 1, 1.0])
+    _save(fig, "fusion_partial_sized_latency")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9g: Partial-Sized Arch — EDP (Partial vs Single)
+# ────────────────────────────────────────────────────────────────────
+def plot_partial_sized_edp():
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig.suptitle("Partial-Sized Architecture — EDP  (Partial vs Single)",
+                 fontsize=16, y=1.0)
+
+    for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
+        data_ps = FUSION_PARTIAL_SIZED[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.3
+
+        part_edp = [data_ps[wl]["partial"]["edp"] for wl in WORKLOADS]
+        sing_edp = [data_ps[wl]["single"]["edp"] for wl in WORKLOADS]
+
+        ax.bar(x - w/2, part_edp, w, label="Partial Fusion",
+               color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+        ax.bar(x + w/2, sing_edp, w, label=r"$\Sigma$ Singles",
+               color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+        ax.set_yscale("log")
+        ax.set_ylabel("EDP (J·cc)")
+        ax.set_xticks(x)
+        ax.set_xticklabels(WORKLOADS)
+        ax.set_title(arch)
+        ax.legend(fontsize=9)
+
+        for i, wl in enumerate(WORKLOADS):
+            cfg = _arch_cfg_label(arch, data_ps[wl])
+            ax.annotate(cfg, (i, 0), xycoords=("data", "axes fraction"),
+                       xytext=(0, -28), textcoords="offset points",
+                       fontsize=5.5, ha="center", color="gray", style="italic")
+
+    fig.tight_layout(rect=[0, 0.04, 1, 1.0])
+    _save(fig, "fusion_partial_sized_edp")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 9h: Partial-Sized Arch — Normalised (Partial = 1.0)
+# ────────────────────────────────────────────────────────────────────
+def plot_partial_sized_norm():
+    metrics = [("energy", "Normalised Energy"), ("latency", "Normalised Latency"),
+               ("edp", "Normalised EDP")]
+    fig, axes = plt.subplots(len(metrics), 2, figsize=(14, 12))
+    fig.suptitle("Partial-Sized Arch — Normalised  (Partial = 1.0)", fontsize=16, y=0.98)
+
+    for col, arch in enumerate(["DepFiN", "Eyeriss"]):
+        data = FUSION_PARTIAL_SIZED_NORM[arch]
+        x = np.arange(len(WORKLOADS))
+        w = 0.3
+        for row, (metric, ylabel) in enumerate(metrics):
+            ax = axes[row, col]
+            part_v = [data[wl]["partial"][metric] for wl in WORKLOADS]
+            sing_v = [data[wl]["single"][metric] for wl in WORKLOADS]
+
+            ax.bar(x - w/2, part_v, w, label="Partial Fusion",
+                   color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+            ax.bar(x + w/2, sing_v, w, label=r"$\Sigma$ Singles",
+                   color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+
+            ax.set_ylabel(ylabel)
+            ax.set_xticks(x)
+            ax.set_xticklabels(WORKLOADS)
+            if row == 0:
+                ax.set_title(arch)
+            ax.legend(fontsize=8)
+            ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
+            max_val = max(max(part_v), max(sing_v))
+            ax.set_ylim(top=max(1.25, max_val * 1.12))
+
+            for i, (p, s) in enumerate(zip(part_v, sing_v)):
+                for val, xpos in [(p, i - w/2), (s, i + w/2)]:
+                    ax.annotate(f"{val:.3f}", (xpos, val),
+                               textcoords="offset points", xytext=(0, 4),
+                               fontsize=7, ha="center", fontweight="bold")
+
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    _save(fig, "fusion_partial_sized_norm")
     return fig
 
 
@@ -883,7 +1460,7 @@ def plot_fusion_auto_dram():
 def plot_fusion_fixed_resnet18():
     d = FUSION_FIXED_RESNET18
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
-    fig.suptitle("ResNet18 Eyeriss — Fixed-Config Fusion Scaling", fontsize=15, y=1.0)
+    fig.suptitle("ResNet18 Eyeriss — Fixed-Config Scaling (Full-Sized Arch)", fontsize=15, y=1.0)
 
     x = np.arange(len(d["configs"]))
     labels = [f"{c}\n({d['total_pes'][i]:,} PEs)\nWReg={d['wreg'][i]}"
@@ -922,7 +1499,7 @@ def plot_fusion_fixed_resnet18():
 def plot_fusion_fixed_vgg16():
     d = FUSION_FIXED_VGG16
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5.5))
-    fig.suptitle("VGG16 Eyeriss — Fixed-Config Fusion Scaling", fontsize=15, y=1.0)
+    fig.suptitle("VGG16 Eyeriss — Fixed-Config Scaling (Full-Sized Arch)", fontsize=15, y=1.0)
 
     x = np.arange(len(d["configs"]))
     labels = [f"{c}\n({d['total_pes'][i]:,} PEs)\nWReg={d['wreg'][i]}"
@@ -960,7 +1537,7 @@ def plot_fusion_fixed_vgg16():
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_fixed_overview():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    fig.suptitle("Fixed-Config Fusion (2048 PEs) — Full vs Partial vs Single",
+    fig.suptitle("Fixed-Config (2048 PEs, Full-Sized Arch) — Full vs Partial vs Single",
                  fontsize=15, y=1.0)
 
     # Eyeriss panel
@@ -1021,12 +1598,151 @@ def plot_fusion_fixed_overview():
 
 
 # ────────────────────────────────────────────────────────────────────
+#  Fixed-Config Scaling — Partial-Sized Architecture (Scenario B)
+# ────────────────────────────────────────────────────────────────────
+def plot_fusion_fixed_resnet18_partial():
+    """ResNet18 Eyeriss: Partial vs Single energy scaling on partial-sized architecture."""
+    d_full = FUSION_FIXED_RESNET18            # ScA (for reference)
+    d_part = FUSION_FIXED_RESNET18_PARTIAL    # ScB
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.5))
+    fig.suptitle("ResNet18 Eyeriss — Partial-Sized Arch  (Partial vs Single)",
+                 fontsize=15, y=1.0)
+
+    n = len(d_part["configs"])
+    x = np.arange(n)
+    labels = [f"{d_part['configs'][i]}\n({d_part['total_pes'][i]:,} PEs)"
+              f"\nWReg={d_part['wreg'][i]}"
+              for i in range(n)]
+
+    # Left: energy comparison
+    w = 0.35
+    ax1.bar(x - w/2, d_part["partial_energy"], w, label="Partial",
+            color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+    ax1.bar(x + w/2, d_part["single_energy"], w, label=r"$\Sigma$ Singles",
+            color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+    ax1.set_yscale("log")
+    ax1.set_ylabel("Energy (μJ)")
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(labels, fontsize=8)
+    ax1.set_title("Absolute Energy")
+    ax1.legend()
+
+    # Right: latency comparison
+    ax2.bar(x - w/2, d_part["partial_latency"], w, label="Partial",
+            color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+    ax2.bar(x + w/2, d_part["single_latency"], w, label=r"$\Sigma$ Singles",
+            color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+    ax2.set_ylabel("Latency (cycles)")
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(labels, fontsize=8)
+    ax2.set_title("Absolute Latency")
+    ax2.legend()
+
+    fig.tight_layout()
+    _save(fig, "fusion_fixed_resnet18_partial_scaling")
+    return fig
+
+
+def plot_fusion_fixed_vgg16_partial():
+    """VGG16 Eyeriss: Partial vs Single energy scaling on partial-sized architecture."""
+    d_part = FUSION_FIXED_VGG16_PARTIAL
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5.5))
+    fig.suptitle("VGG16 Eyeriss — Partial-Sized Arch  (Partial vs Single)",
+                 fontsize=15, y=1.0)
+
+    n = len(d_part["configs"])
+    x = np.arange(n)
+    labels = [f"{d_part['configs'][i]}\n({d_part['total_pes'][i]:,} PEs)"
+              f"\nWReg={d_part['wreg'][i]}"
+              for i in range(n)]
+
+    w = 0.35
+    ax1.bar(x - w/2, d_part["partial_energy"], w, label="Partial",
+            color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+    ax1.bar(x + w/2, d_part["single_energy"], w, label=r"$\Sigma$ Singles",
+            color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+    ax1.set_yscale("log")
+    ax1.set_ylabel("Energy (μJ)")
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(labels, fontsize=9)
+    ax1.set_title("Absolute Energy")
+    ax1.legend()
+
+    ax2.bar(x - w/2, d_part["partial_latency"], w, label="Partial",
+            color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+    ax2.bar(x + w/2, d_part["single_latency"], w, label=r"$\Sigma$ Singles",
+            color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+    ax2.set_ylabel("Latency (cycles)")
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(labels, fontsize=9)
+    ax2.set_title("Absolute Latency")
+    ax2.legend()
+
+    fig.tight_layout()
+    _save(fig, "fusion_fixed_vgg16_partial_scaling")
+    return fig
+
+
+def plot_fusion_fixed_overview_partial():
+    """2048-PE overview: Partial vs Single on partial-sized arch (both architectures)."""
+    fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+    fig.suptitle("Fixed-Config (2048 PEs, Partial-Sized Arch) — Partial vs Single",
+                 fontsize=15, y=0.98)
+
+    # --- Eyeriss panel ---
+    # MC-CNN & FSRCNN have same wreg for both scenarios → use ScA data directly
+    ax = axes[0]
+    eye_wls = ["FSRCNN", "MC-CNN"]
+    eye_dicts = {"FSRCNN": FUSION_FIXED_FSRCNN, "MC-CNN": FUSION_FIXED_MCCNN}
+    x = np.arange(len(eye_wls))
+    w = 0.35
+
+    part_e = [eye_dicts[wl]["partial"]["energy"] for wl in eye_wls]
+    sing_e = [eye_dicts[wl]["single"]["energy"] for wl in eye_wls]
+    ax.bar(x - w/2, part_e, w, label="Partial",
+           color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+    ax.bar(x + w/2, sing_e, w, label="Single",
+           color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+    ax.set_yscale("log")
+    ax.set_ylabel("Energy (μJ)")
+    ax.set_xticks(x)
+    ax.set_xticklabels(eye_wls)
+    ax.set_title("Eyeriss (2048 PEs, WReg=384)\n(same wreg for both scenarios)")
+    ax.legend()
+
+    # --- DepFiN panel ---
+    ax = axes[1]
+    dep_data = FUSION_FIXED_DEPFIN_PARTIAL
+    x = np.arange(len(WORKLOADS))
+    part_e = [dep_data[wl]["partial"]["energy"] for wl in WORKLOADS]
+    sing_e = [dep_data[wl]["single"]["energy"] for wl in WORKLOADS]
+
+    ax.bar(x - w/2, part_e, w, label="Partial",
+           color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
+    ax.bar(x + w/2, sing_e, w, label="Single",
+           color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
+    ax.set_yscale("log")
+    ax.set_ylabel("Energy (μJ)")
+    ax.set_xticks(x)
+    sub = [f"{wl}\nFMEM={dep_data[wl]['fmem']}" for wl in WORKLOADS]
+    ax.set_xticklabels(sub, fontsize=8)
+    ax.set_title("DepFiN (2048 PEs, Partial-Sized Mem)")
+    ax.legend()
+
+    fig.tight_layout()
+    _save(fig, "fusion_fixed_overview_2048pe_partial")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
 #  Figure 13: Cross-Architecture Fusion Energy Ratio Summary
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_cross_arch():
     """Bar chart: Full/Single energy ratio per workload for both architectures (auto-sized)."""
     fig, ax = plt.subplots(figsize=(10, 5))
-    fig.suptitle("Auto-Sized Fusion — Full/Single Energy Ratio", fontsize=15, y=1.0)
+    fig.suptitle("Full-Sized Arch — Full/Single Energy Ratio", fontsize=15, y=1.0)
 
     x = np.arange(len(WORKLOADS))
     w = 0.35
@@ -1109,7 +1825,7 @@ def plot_eyeriss_cs1_feasibility():
 def plot_fusion_latency_savings():
     """Bar chart showing latency savings (%) for Full vs Single, both architectures."""
     fig, ax = plt.subplots(figsize=(10, 5))
-    fig.suptitle("Auto-Sized Fusion — Latency Savings  (Full vs Single)", fontsize=15, y=1.0)
+    fig.suptitle("Full-Sized Arch — Latency Savings  (Full vs Single)", fontsize=15, y=1.0)
 
     x = np.arange(len(WORKLOADS))
     w = 0.35
@@ -1161,12 +1877,11 @@ def main():
     print("[Group 1] DepFiN PE sensitivity sweeps")
     figs.append(plot_depfin_cs4())
     figs.append(plot_depfin_cs1())
-    figs.append(plot_depfin_cs2_cs3())
+    figs.extend(plot_depfin_cs2_cs3())
 
     # Eyeriss sweeps
     print("\n[Group 2] Eyeriss register sensitivity sweeps")
     figs.append(plot_eyeriss_cs1())
-    figs.append(plot_eyeriss_cs1_feasibility())
     figs.append(plot_eyeriss_cs2_cs3())
     figs.append(plot_eyeriss_cs5())
 
@@ -1175,14 +1890,26 @@ def main():
     figs.append(plot_fusion_auto_energy())
     figs.append(plot_fusion_auto_latency())
     figs.append(plot_fusion_auto_dram())
+    figs.append(plot_fusion_auto_energy_norm())
+    figs.append(plot_fusion_auto_latency_norm())
+    figs.append(plot_fusion_auto_edp_norm())
+    figs.append(plot_partial_sized_energy())
+    figs.append(plot_partial_sized_latency())
+    figs.append(plot_partial_sized_edp())
+    figs.append(plot_partial_sized_norm())
     figs.append(plot_fusion_cross_arch())
     figs.append(plot_fusion_latency_savings())
 
     # Fixed-config scaling
-    print("\n[Group 4] Fixed-config fusion scaling")
+    print("\n[Group 4] Fixed-config fusion scaling (full-sized arch)")
     figs.append(plot_fusion_fixed_resnet18())
     figs.append(plot_fusion_fixed_vgg16())
     figs.append(plot_fusion_fixed_overview())
+
+    print("\n[Group 5] Fixed-config fusion scaling (partial-sized arch)")
+    figs.append(plot_fusion_fixed_resnet18_partial())
+    figs.append(plot_fusion_fixed_vgg16_partial())
+    figs.append(plot_fusion_fixed_overview_partial())
 
     print(f"\nDone — {len(figs)} figures generated.")
 

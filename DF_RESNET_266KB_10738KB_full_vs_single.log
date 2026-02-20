@@ -1,0 +1,164 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+
+====================================================================================================
+FIXED-CONFIG FUSION COMPARISON: RESNET18 -- FULL FUSION vs Sum SINGLES
+====================================================================================================
+Architecture: DepFiN, PE=16x128 (2,048 total)
+  FMEM=266KB, WMEM=10738KB
+  Tile size override: 7
+  ALL experiments use IDENTICAL architecture (fair comparison)
+====================================================================================================
+
+  Per-block tile sizes (from full fusion stride propagation):
+    s1b1: tile=56
+    s1b2: tile=56
+    s2b1: tile=28
+    s2b2: tile=28
+    s3b1: tile=14
+    s3b2: tile=14
+    s4b1: tile=7
+    s4b2: tile=7
+--- FULL FUSION: resnet18/full/17layer ---
+------ loading Accelergy ------
+WARNING: Accelergy package not found or incompatible, trying a manual import from ACCELERGY_PATH.
+ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
+[Stride-Aware Tiling] output_tile=7, cumulative_stride=16x16
+  Input tile (X0): 112, Output tile (Q): 7
+[Tile Size Override] tile_size=7, scale_bandwidth=True, fmem_bw=(7, 7)
+Creating architecture: Thesis_17Layers_272384KB_FMEM_16x128_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12Y12X12Z12C13R13S13Y13X13Z13C14R14S14Y14X14Z14C15R15S15Y15X15Z15C16R16S16PQZ16, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],W13: [Z13][C13][R13][S13],W14: [Z14][C14][R14][S14],W15: [Z15][C15][R15][S15],W16: [Z16][C16][R16][S16],, out_coupling: [Z16][P][Q]
+final_layer_dims: {'S16', 'C0', 'P', 'S0', 'C16', 'R16', 'Y0', 'R0', 'Q', 'X0', 'Z16'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'Y12', 'X12', 'Z12', 'C13', 'R13', 'S13', 'Y13', 'X13', 'Z13', 'C14', 'R14', 'S14', 'Y14', 'X14', 'Z14', 'C15', 'R15', 'S15', 'Y15', 'X15', 'Z15', 'C16', 'R16', 'S16', 'P', 'Q', 'Z16']
+INFO: Arch: Thesis_17Layers_272384KB_FMEM_16x128_PEs: identified intermediate dimensions: {'Z1', 'S3', 'C1', 'Z14', 'C5', 'Y2', 'X11', 'C13', 'Y15', 'X12', 'C15', 'Z3', 'X7', 'C6', 'R5', 'X14', 'S6', 'R13', 'C3', 'S4', 'Z7', 'Y4', 'Z2', 'S15', 'R2', 'R4', 'S5', 'Y5', 'Z13', 'Y12', 'C2', 'X9', 'R1', 'R8', 'Y10', 'Y7', 'X5', 'C8', 'Y9', 'S9', 'Y13', 'C7', 'R3', 'Z6', 'R12', 'Z5', 'Y11', 'Y3', 'C14', 'X2', 'Y6', 'R6', 'S8', 'C10', 'S12', 'Y14', 'Z11', 'X15', 'S7', 'R14', 'X8', 'R9', 'R10', 'Z10', 'R15', 'Y1', 'S2', 'C4', 'S1', 'X4', 'X3', 'Z4', 'Z15', 'C11', 'R11', 'Z8', 'X6', 'Z12', 'X10', 'S11', 'Y8', 'X1', 'S14', 'Z0', 'R7', 'S13', 'Z9', 'X13', 'S10', 'C9', 'C12'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  OK Energy: 1.083e+04 uJ, Latency: 8.998e+06 cc, EDP: 1.74e+05
+
+--- BASELINE: SINGLE LAYERS ---
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L0_conv1: E=3.468e+01 uJ, L=6.690e+04 cc, EDP=2.58e+00
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L1_conv2_1_1: E=2.495e+01 uJ, L=1.290e+05 cc, EDP=4.22e+00
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L2_conv2_1_2: E=2.495e+01 uJ, L=1.290e+05 cc, EDP=4.22e+00
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L3_conv2_2_1: E=2.495e+01 uJ, L=1.290e+05 cc, EDP=4.22e+00
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L4_conv2_2_2: E=2.495e+01 uJ, L=1.290e+05 cc, EDP=4.22e+00
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L5_conv3_1_1: E=1.669e+01 uJ, L=1.290e+05 cc, EDP=3.17e+00
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L6_conv3_1_2: E=3.009e+01 uJ, L=2.580e+05 cc, EDP=1.18e+01
+  [skip] L7_conv3_proj (not in fusion)
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L8_conv3_2_1: E=3.009e+01 uJ, L=2.580e+05 cc, EDP=1.18e+01
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L9_conv3_2_2: E=3.009e+01 uJ, L=2.580e+05 cc, EDP=1.18e+01
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L10_conv4_1_1: E=2.945e+01 uJ, L=2.580e+05 cc, EDP=1.18e+01
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L11_conv4_1_2: E=5.725e+01 uJ, L=5.161e+05 cc, EDP=4.63e+01
+  [skip] L12_conv4_proj (not in fusion)
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L13_conv4_2_1: E=5.725e+01 uJ, L=5.161e+05 cc, EDP=4.63e+01
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L14_conv4_2_2: E=5.725e+01 uJ, L=5.161e+05 cc, EDP=4.63e+01
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L15_conv5_1_1: E=7.282e+01 uJ, L=5.161e+05 cc, EDP=5.55e+01
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L16_conv5_1_2: E=1.448e+02 uJ, L=1.032e+06 cc, EDP=2.21e+02
+  [skip] L17_conv5_proj (not in fusion)
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L18_conv5_2_1: E=1.448e+02 uJ, L=1.032e+06 cc, EDP=2.21e+02
+Creating architecture: Thesis_1Layer_272384B_FMEM_16x128_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L19_conv5_2_2: E=1.448e+02 uJ, L=1.032e+06 cc, EDP=2.21e+02
+  [skip] L20_fc (not in fusion)
+
+====================================================================================================
+COMPARISON RESULTS: RESNET18 -- FULL FUSION vs Sum SINGLES
+====================================================================================================
+  Architecture: DepFiN 16x128, FMEM=266KB, WMEM=10738KB
+====================================================================================================
+Level                        Energy (uJ)   Latency (cc)            EDP       DRAM Reads      DRAM Writes
+----------------------------------------------------------------------------------------------------
+Full Fusion (1 ok)             1.083e+04      8.998e+06       9.75e+04       11,032,512           25,088
+Sum Singles (17 ok)            9.499e+02      6.905e+06       6.56e+03       12,449,984        2,308,096
+
+----------------------------------------------------------------------------------------------------
+RATIOS (Full Fusion / Sum Singles) -- values < 1.0 mean fusion wins
+----------------------------------------------------------------------------------------------------
+Metric                    Ratio      Savings
+---------------------------------------------
+Energy                  11.4025     -1040.2%
+Latency                  1.3031       -30.3%
+EDP                     14.8586     -1385.9%
+DRAM Reads               0.8861       +11.4%
+DRAM Writes              0.0109       +98.9%
+
+----------------------------------------------------------------------------------------------------
+BASELINE DETAIL (Sum Singles):
+----------------------------------------------------------------------------------------------------
+Layer/Segment                     Energy (uJ)   Latency (cc)            EDP     Status
+-------------------------------------------------------------------------------------
+L0_conv1                            3.468e+01      6.690e+04       2.58e+00         OK
+L1_conv2_1_1                        2.495e+01      1.290e+05       4.22e+00         OK
+L2_conv2_1_2                        2.495e+01      1.290e+05       4.22e+00         OK
+L3_conv2_2_1                        2.495e+01      1.290e+05       4.22e+00         OK
+L4_conv2_2_2                        2.495e+01      1.290e+05       4.22e+00         OK
+L5_conv3_1_1                        1.669e+01      1.290e+05       3.17e+00         OK
+L6_conv3_1_2                        3.009e+01      2.580e+05       1.18e+01         OK
+L8_conv3_2_1                        3.009e+01      2.580e+05       1.18e+01         OK
+L9_conv3_2_2                        3.009e+01      2.580e+05       1.18e+01         OK
+L10_conv4_1_1                       2.945e+01      2.580e+05       1.18e+01         OK
+L11_conv4_1_2                       5.725e+01      5.161e+05       4.63e+01         OK
+L13_conv4_2_1                       5.725e+01      5.161e+05       4.63e+01         OK
+L14_conv4_2_2                       5.725e+01      5.161e+05       4.63e+01         OK
+L15_conv5_1_1                       7.282e+01      5.161e+05       5.55e+01         OK
+L16_conv5_1_2                       1.448e+02      1.032e+06       2.21e+02         OK
+L18_conv5_2_1                       1.448e+02      1.032e+06       2.21e+02         OK
+L19_conv5_2_2                       1.448e+02      1.032e+06       2.21e+02         OK
+
+====================================================================================================
+
+Results exported to: results/results_20260219_214046.csv
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Total experiments: 18
+Successful: 18
+Failed: 0
+
+────────────────────────────────────────────────────────────────────────────────
+Results by workload:
+────────────────────────────────────────────────────────────────────────────────
+
+RESNET18:
+  full/17layer, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=1.08e+04μJ, L=9.00e+06cc, EDP=1.74e+05
+  single/L0_conv1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=3.47e+01μJ, L=6.69e+04cc, EDP=2.58e+00
+  single/L1_conv2_1_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=2.50e+01μJ, L=1.29e+05cc, EDP=4.22e+00
+  single/L2_conv2_1_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=2.50e+01μJ, L=1.29e+05cc, EDP=4.22e+00
+  single/L3_conv2_2_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=2.50e+01μJ, L=1.29e+05cc, EDP=4.22e+00
+  single/L4_conv2_2_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=2.50e+01μJ, L=1.29e+05cc, EDP=4.22e+00
+  single/L5_conv3_1_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=1.67e+01μJ, L=1.29e+05cc, EDP=3.17e+00
+  single/L6_conv3_1_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=3.01e+01μJ, L=2.58e+05cc, EDP=1.18e+01
+  single/L8_conv3_2_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=3.01e+01μJ, L=2.58e+05cc, EDP=1.18e+01
+  single/L9_conv3_2_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=3.01e+01μJ, L=2.58e+05cc, EDP=1.18e+01
+  single/L10_conv4_1_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=2.95e+01μJ, L=2.58e+05cc, EDP=1.18e+01
+  single/L11_conv4_1_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=5.73e+01μJ, L=5.16e+05cc, EDP=4.63e+01
+  single/L13_conv4_2_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=5.73e+01μJ, L=5.16e+05cc, EDP=4.63e+01
+  single/L14_conv4_2_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=5.73e+01μJ, L=5.16e+05cc, EDP=4.63e+01
+  single/L15_conv5_1_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=7.28e+01μJ, L=5.16e+05cc, EDP=5.55e+01
+  single/L16_conv5_1_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=1.45e+02μJ, L=1.03e+06cc, EDP=2.21e+02
+  single/L18_conv5_2_1, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=1.45e+02μJ, L=1.03e+06cc, EDP=2.21e+02
+  single/L19_conv5_2_2, fmem_size: 266kB, wmem_size: 10738kB, pe_rows: 16, pe_cols: 128 -> E=1.45e+02μJ, L=1.03e+06cc, EDP=2.21e+02

@@ -6,21 +6,23 @@ RESULTS — ResNet18, Eyeriss 16384 PE: 512×32, WReg=902
   
   ── full_vs_single ─────────────────────────────────────────────────────────
  
-  --compare-full-vs-single -w resnet18 --arch-type eyeriss
-      --pe-rows 512 --pe-cols 32 --weight-reg 902
-      --gb-size 128 --tile-size 1
-      --input-reg 700 --intermediate-reg 300 --output-reg 64
+  python3 experiment_runner.py --compare-full-vs-single -w resnet18 --arch-type eyeriss \
+      --pe-rows 512 --pe-cols 32 --weight-reg 902 \
+      --gb-size 128 --tile-size 1 \
+      --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_902B_fusion_vs_single.log
+
+
 
   Level                    Energy (uJ)  Latency (cc)        EDP    DRAM Reads  DRAM Writes
-  Full Fusion (1 ok)       5.062e+04    3.042e+06      1.60e+05    11,032,512       25,088
-  Sum Singles (17 ok)      2.643e+03    3.301e+06      4.33e+02    12,449,984    2,308,096
+  Full Fusion (1 ok)       4.729e+04    3.042e+06      1.44e+05    11,032,512       25,088
+  Sum Singles (17 ok)      1.872e+03    3.301e+06      6.18e+03    12,449,984    2,308,096
 
   RATIOS (Full Fusion / Sum Singles)  — values < 1.0 mean fusion wins
-    Energy:      19.1543  (-1815.4%)  ← full fusion MUCH MORE expensive
-    Latency:      0.9215  (+7.8%)     ← full fusion slightly faster
-    EDP:        370.5536  (-36955.4%) ← massively worse EDP
-    DRAM Reads:   0.8861  (+11.4%)    ← full fusion reads less from DRAM
-    DRAM Writes:  0.0109  (+98.9%)    ← full fusion writes almost nothing to DRAM
+    Energy                  19.1543     -1815.4%
+    Latency                  0.9215        +7.8%
+    EDP                     17.6508     -1665.1%
+    DRAM Reads               0.8861       +11.4%
+    DRAM Writes              0.0109       +98.9%
 
   Single-layer breakdown:
     L0_conv1:       E=1.738e+02 uJ, L=2.007e+05 cc
@@ -65,22 +67,21 @@ RESULTS — ResNet18, Eyeriss 16384 PE: 512×32, WReg=902
 
 
   ── full_vs_partial: 2 layer ────────────────────────────────────────────────────────
+    
 
-  --compare-full-vs-partial -w resnet18 --arch-type eyeriss
-      --pe-rows 512 --pe-cols 32 --weight-reg 902
-      --gb-size 128 --tile-size 1
-      --input-reg 700 --intermediate-reg 300 --output-reg 64
+  python3 experiment_runner.py --compare-full-vs-partial -w resnet18 --arch-type eyeriss       --pe-rows 512 --pe-cols 32 --weight-reg 902      --gb-size 128 --tile-size 1       --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_902B_full_vs_partial.log
 
   Level                         Energy (uJ)  Latency (cc)        EDP         DRAM Reads       DRAM Writes
-  Full Fusion (1 ok)            5.062e+04    3.042e+06           1.60e+05    11,032,512       25,088
-  Sum Partial Fusion (8 ok)     4.972e+04    3.139e+06           1.83e+04    11,760,064      752,640
+  Full Fusion (1 ok)             4.729e+04      3.042e+06       1.44e+05       11,032,512           25,088
+  Sum Partial Fusion (8 ok)      4.261e+04      3.118e+06       1.33e+05       11,760,064          752,640
+
 
   RATIOS (Full Fusion / Sum Partial Fusion)  — values < 1.0 mean full fusion wins
-    Energy:       1.0181  (-1.8%)     ← nearly identical energy
-    Latency:      0.9692  (+3.1%)     ← full fusion slightly faster
-    EDP:          8.7867  (-778.7%)   ← worse EDP for full fusion
-    DRAM Reads:   0.9381  (+6.2%)     ← full fusion reads ~6% less
-    DRAM Writes:  0.0333  (+96.7%)    ← full fusion writes 97% less to DRAM
+    Energy                   1.1098       -11.0%
+    Latency                  0.9758        +2.4%
+    EDP                      1.0830        -8.3%
+    DRAM Reads               0.9381        +6.2%
+    DRAM Writes              0.0333       +96.7%
 
   Notes:
   - This is the most interesting comparison: full vs partial on the SAME
@@ -136,26 +137,22 @@ RESULTS — ResNet18, Eyeriss 16384 PE: 512×32, WReg=902
     
   ── partial_vs_single: 2 layer ────────────────────────────────────────────────────────
 
-  
-  
-  python3 experiment_runner.py --compare-partial-vs-single -w resnet18 \
-      --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 384 \
-      --gb-size 128 --tile-size 1 \
-      --input-reg 700 --intermediate-reg 300 --output-reg 64
-
+    python3 experiment_runner.py --compare-partial-vs-single -w resnet18 --arch-type eyeriss       --pe-rows 512 --pe-cols 32 --weight-reg 384       --gb-size 128 --tile-size 1       --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_384B_partial_vs_single.log
+    
     Partial: 8 runs (2-layer blocks).  Singles: 17 individual layer runs.
 
     Results:
       Level                        Energy (μJ)   Latency (cc)      EDP
-      Sum Partial Fusion (8 ok)     3.662e+04     3.139e+06      1.32e+04
-      Sum Singles (17 ok)           2.642e+03     3.301e+06      4.05e+02
+      Sum Partial Fusion (8 ok)      2.950e+04      3.118e+06       9.20e+04       11,760,064          752,640
+      Sum Singles (17 ok)            1.871e+03      3.301e+06       6.18e+03       12,449,984        2,308,096
 
     Ratios (Sum Partial / Sum Singles) — values < 1.0 mean fusion wins:
-      Energy      13.86×     −1286.3 %
-      Latency      0.95×        +4.9 %
-      EDP         32.53×     −3117.2 %
-      DRAM Reads   0.94×        +5.5 %
-      DRAM Writes  0.33×       +67.4 %
+      Energy                  15.7710     -1477.1%
+      Latency                  0.9444        +5.6%
+      EDP                     14.8937     -1389.4%
+      DRAM Reads               0.9446        +5.5%
+      DRAM Writes              0.3261       +67.4%
+
 
     Baseline Detail (Sum Singles):
       Layer               Energy (μJ)   Latency (cc)      EDP
@@ -237,24 +234,24 @@ RESULTS — ResNet18, Eyeriss 256×32, WReg=1800
 ────────────────────────────────────────────────────────────────────────────
 
   Architecture: 256×32 = 8192 PEs, WReg=1800, GB=128KB
-  --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 1800
-  --gb-size 128 --tile-size 1
-  --input-reg 700 --intermediate-reg 300 --output-reg 64
 
   ── full_vs_single ─────────────────────────────────────────────────────────
 
-  --compare-full-vs-single
+  python3 experiment_runner.py --compare-full-vs-single -w resnet18 --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 1800 \
+  --gb-size 128 --tile-size 1 \
+  --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_1800B_full_vs_single.log
 
-  Level                    Energy (uJ)  Latency (cc)        EDP         DRAM Reads  DRAM Writes
-  Full Fusion (1 ok)       7.005e+04    3.042e+06           2.18e+05    11,032,512       25,088
-  Sum Singles (17 ok)      1.920e+03    3.301e+06           4.30e+02    12,449,984    2,308,096
+  Level                         Energy (uJ)  Latency (cc)        EDP         DRAM Reads  DRAM Writes
+  Full Fusion (1 ok)             6.767e+04      3.042e+06       2.06e+05       11,032,512           25,088
+  Sum Singles (17 ok)            1.417e+03      3.301e+06       4.68e+03       12,449,984        2,308,096
 
   RATIOS (Full Fusion / Sum Singles)  — values < 1.0 mean fusion wins
-    Energy:      36.4914  (-3549.1%)  ← full fusion MUCH MORE expensive
-    Latency:      0.9215  (+7.8%)     ← full fusion slightly faster
-    EDP:        505.6325  (-50463.3%) ← massively worse EDP
-    DRAM Reads:   0.8861  (+11.4%)    ← full fusion reads less from DRAM
-    DRAM Writes:  0.0109  (+98.9%)    ← full fusion writes almost nothing to DRAM
+    Energy                  47.7538     -4675.4%
+    Latency                  0.9215        +7.8%
+    EDP                     44.0055     -4300.5%
+    DRAM Reads               0.8861       +11.4%
+    DRAM Writes              0.0109       +98.9%
+
 
   Single-layer breakdown:
     L0_conv1:       E=1.746e+02 uJ, L=2.007e+05 cc
@@ -284,18 +281,22 @@ RESULTS — ResNet18, Eyeriss 256×32, WReg=1800
     
   ── full_vs_partial (2layer) ───────────────────────────────────────────────
 
-  --compare-full-vs-partial  (intermediate = 2layer, 8 segments)
+  python3 experiment_runner.py --compare-full-vs-partial -w resnet18 --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 1800 \
+  --gb-size 128 --tile-size 1 \
+  --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_1800B_full_vs_partial.log
+
 
   Level                         Energy (uJ)  Latency (cc)        EDP    DRAM Reads  DRAM Writes
-  Full Fusion (1 ok)            7.005e+04    3.042e+06    2.18e+05    11,032,512       25,088
-  Sum Partial Fusion (8 ok)     7.017e+04    3.139e+06    2.65e+04    11,760,064      752,640
+  Full Fusion (1 ok)             6.767e+04      3.042e+06       2.06e+05       11,032,512           25,088
+  Sum Partial Fusion (8 ok)      6.424e+04      3.118e+06       2.00e+05       11,760,064          752,640
 
   RATIOS (Full Fusion / Sum Partial Fusion)  — values < 1.0 mean full fusion wins
-    Energy:       0.9983  (+0.2%)     ← FULL FUSION WINS on energy (barely)
-    Latency:      0.9692  (+3.1%)     ← full fusion slightly faster
-    EDP:          8.2036  (-720.4%)   ← worse EDP for full fusion
-    DRAM Reads:   0.9381  (+6.2%)     ← full fusion reads ~6% less
-    DRAM Writes:  0.0333  (+96.7%)    ← full fusion writes 97% less to DRAM
+    Energy                   1.0533        -5.3%
+    Latency                  0.9758        +2.4%
+    EDP                      1.0278        -2.8%
+    DRAM Reads               0.9381        +6.2%
+    DRAM Writes              0.0333       +96.7%
+      
 
   Partial-fusion 2layer segment breakdown:
     2layer/s1b1:  E=7.722e+03 uJ, L=1.380e+05 cc, EDP=1.09e+03
@@ -352,23 +353,24 @@ RESULTS — ResNet18, Eyeriss 256×32, WReg=1800
 
 
   
-  python3 experiment_runner.py --compare-partial-vs-single -w resnet18  \
-            --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 770  \
-            --gb-size 128 --tile-size 1       --input-reg 700 --intermediate-reg 300 --output-reg 64
+  python3 experiment_runner.py --compare-partial-vs-single -w resnet18 --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 770 \
+  --gb-size 128 --tile-size 1 \
+  --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_770B_partial_vs_single.log
+
   
   Level                        Energy (uJ)   Latency (cc)            EDP       DRAM Reads      DRAM Writes
   ----------------------------------------------------------------------------------------------------
-  Sum Partial Fusion (8 ok)      4.412e+04      3.139e+06       1.64e+04       11,760,064          752,640
-  Sum Singles (17 ok)            1.916e+03      3.301e+06       3.74e+02       12,449,984        2,308,096
+  Sum Partial Fusion (8 ok)      3.819e+04      3.118e+06       1.19e+05       11,760,064          752,640
+  Sum Singles (17 ok)            1.413e+03      3.301e+06       4.66e+03       12,449,984        2,308,096
 
   ----------------------------------------------------------------------------------------------------
   RATIOS (Sum Partial Fusion / Sum Singles) -- values < 1.0 mean fusion wins
   ----------------------------------------------------------------------------------------------------
   Metric                    Ratio      Savings
   ---------------------------------------------
-  Energy                  23.0295     -2202.9%
-  Latency                  0.9508        +4.9%
-  EDP                     43.8576     -4285.8%
+  Energy                  27.0256     -2602.6%
+  Latency                  0.9444        +5.6%
+  EDP                     25.5221     -2452.2%
   DRAM Reads               0.9446        +5.5%
   DRAM Writes              0.3261       +67.4%
             
@@ -441,18 +443,21 @@ RESULTS — ResNet18, Eyeriss 256×32, WReg=1800
 
   ── full_vs_single ─────────────────────────────────────────────────────────
 
-  --compare-full-vs-single
+  python3 experiment_runner.py --compare-full-vs-single --workload resnet18 --arch-type eyeriss --pe-rows 256 --pe-cols 16 --weight-reg 3600 \
+  --gb-size 128 --tile-size 1 \
+  --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_3600B_full_vs_single.log
+
 
   Level                    Energy (uJ)  Latency (cc)        EDP         DRAM Reads  DRAM Writes
-  Full Fusion (1 ok)       1.137e+05    3.059e+06           3.51e+05    11,032,512       25,088
-  Sum Singles (17 ok)      1.412e+03    3.301e+06           4.78e+02    12,449,984    2,308,096
+  Full Fusion (1 ok)             1.121e+05      3.059e+06       3.43e+05       11,032,512           25,088
+  Sum Singles (17 ok)            1.131e+03      3.301e+06       3.74e+03       12,449,984        2,308,096
 
   RATIOS (Full Fusion / Sum Singles)  — values < 1.0 mean fusion wins
-    Energy:      80.5538  (-7955.4%)  ← full fusion MUCH MORE expensive
-    Latency:      0.9265  (+7.4%)     ← full fusion slightly faster
-    EDP:        734.5104  (-73351.0%) ← massively worse EDP
-    DRAM Reads:   0.8861  (+11.4%)    ← full fusion reads less from DRAM
-    DRAM Writes:  0.0109  (+98.9%)    ← full fusion writes almost nothing to DRAM
+  Energy                  99.1044     -9810.4%
+  Latency                  0.9265        +7.4%
+  EDP                     91.8173     -9081.7%
+  DRAM Reads               0.8861       +11.4%
+  DRAM Writes              0.0109       +98.9%
 
   Single-layer breakdown:
     L0_conv1:       E=1.763e+02 uJ, L=2.007e+05 cc
@@ -486,18 +491,20 @@ RESULTS — ResNet18, Eyeriss 256×32, WReg=1800
 
   ── full_vs_partial (2layer) ───────────────────────────────────────────────
 
-  --compare-full-vs-partial  (intermediate = 2layer, 8 segments)
+    python3 experiment_runner.py --compare-full-vs-partial --workload resnet18 --arch-type eyeriss --pe-rows 256 --pe-cols 16 --weight-reg 3600 \
+    --gb-size 128 --tile-size 1 \
+    --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_3600B_full_vs_partial.log
 
   Level                         Energy (uJ)  Latency (cc)        EDP    DRAM Reads  DRAM Writes
-  Full Fusion (1 ok)            1.137e+05    3.059e+06    3.51e+05    11,032,512       25,088
-  Sum Partial Fusion (8 ok)     1.144e+05    3.147e+06    4.40e+04    11,760,064      752,640
+  Full Fusion (1 ok)             1.121e+05      3.059e+06       3.43e+05       11,032,512           25,088
+  Sum Partial Fusion (8 ok)      1.094e+05      3.126e+06       3.42e+05       11,760,064          752,640
 
   RATIOS (Full Fusion / Sum Partial Fusion)  — values < 1.0 mean full fusion wins
-    Energy:       0.9942  (+0.6%)     ← FULL FUSION WINS on energy (slightly)
-    Latency:      0.9719  (+2.8%)     ← full fusion slightly faster
-    EDP:          7.9869  (-698.7%)   ← worse EDP for full fusion
-    DRAM Reads:   0.9381  (+6.2%)     ← full fusion reads ~6% less
-    DRAM Writes:  0.0333  (+96.7%)    ← full fusion writes 97% less to DRAM
+    Energy                   1.0250        -2.5%
+    Latency                  0.9785        +2.2%
+    EDP                      1.0030        -0.3%
+    DRAM Reads               0.9381        +6.2%
+    DRAM Writes              0.0333       +96.7%
 
   Partial-fusion 2layer segment breakdown:
     2layer/s1b1:  E=1.232e+04 uJ, L=1.380e+05 cc, EDP=1.71e+03
@@ -547,21 +554,21 @@ RESULTS — ResNet18, Eyeriss 256×32, WReg=1800
 
   ── partial_vs_single ──────────────────────────────────────────────────────
 
-      --compare-partial-vs-single -w resnet18 --arch-type eyeriss
-      --pe-rows 256 --pe-cols 16 --weight-reg 1600
-      --gb-size 128 --tile-size 1
-      --input-reg 700 --intermediate-reg 300 --output-reg 64
+          python3 experiment_runner.py --compare-partial-vs-single --workload resnet18 --arch-type eyeriss --pe-rows 256 --pe-cols 16 --weight-reg 1600 \
+    --gb-size 128 --tile-size 1 \
+    --input-reg 400 --intermediate-reg 300 --output-reg 64 | tee EY_RESNET_1600B_partial_vs_single.log
+
 
   Level                         Energy (uJ)  Latency (cc)        EDP    DRAM Reads  DRAM Writes
-  Sum Partial Fusion (8 ok)     6.380e+04    3.147e+06    2.43e+04    11,760,064      752,640
-  Sum Singles (17 ok)           1.398e+03    3.301e+06    3.68e+02    12,449,984    2,308,096
+  Sum Partial Fusion (8 ok)      5.880e+04      3.126e+06       1.84e+05       11,760,064          752,640
+  Sum Singles (17 ok)            1.118e+03      3.301e+06       3.69e+03       12,449,984        2,308,096
 
   RATIOS (Sum Partial Fusion / Sum Singles)  — values < 1.0 mean fusion wins
-    Energy:      45.6366  (-4463.7%)  ← partial fusion MUCH WORSE on energy
-    Latency:      0.9533  (+4.7%)     ← partial fusion slightly faster
-    EDP:         65.9746  (-6497.5%)  ← much worse EDP
-    DRAM Reads:   0.9446  (+5.5%)     ← slightly fewer DRAM reads
-    DRAM Writes:  0.3261  (+67.4%)    ← 67% fewer DRAM writes
+    Energy                  52.6108     -5161.1%
+    Latency                  0.9468        +5.3%
+    EDP                     49.8145     -4881.5%
+    DRAM Reads               0.9446        +5.5%
+    DRAM Writes              0.3261       +67.4%
 
   Partial-fusion 2layer segment breakdown:
     2layer/s1b1:  E=7.211e+03 uJ, L=1.380e+05 cc, EDP=1.01e+03
@@ -801,24 +808,24 @@ ________________________________________________________________________________
     ────────────────────────────────────────────────────────────────────────────
      python3 experiment_runner.py --compare-full-vs-single -w vgg16 \
          --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 1200 \
-         --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-         --output-reg 64
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_1200B_full_vs_single.log
      ----------------------------------------------------------------------------------
-     Architecture: Eyeriss 512x32, GB=128KB, WReg=1200, InReg=700, IntReg=300, OutReg=64
+     Architecture: Eyeriss 512x32, GB=128KB, WReg=1200, InReg=400, IntReg=300, OutReg=64
         All experiments use IDENTICAL architecture (fair comparison).
     Full fusion: 1 run (13 layers fused).  Singles: 13 individual layer runs.
 
     Results:
-      Level                   Energy (μJ)   Latency (cc)      EDP
-      Full Fusion (1 ok)       3.618e+05     5.455e+06      2.03e+06
-      Sum Singles (13 ok)      1.360e+04     6.922e+06      8.23e+03
+          Level                   Energy (μJ)   Latency (cc)      EDP
+    Full Fusion (1 ok)             3.478e+05      5.455e+06       1.90e+06       14,860,992          100,352
+    Sum Singles (13 ok)            9.425e+03      6.922e+06       6.52e+04       23,792,320       13,547,520
 
     Ratios (Full Fusion / Sum Singles) — values < 1.0 mean fusion wins:
-      Energy      26.60×     −2560.4 %
-      Latency      0.79×       +21.2 %
-      EDP        246.28×    −24528.4 %
-      DRAM Reads   0.62×       +37.5 %
-      DRAM Writes  0.01×       +99.3 %
+      Energy                  36.8990     -3589.9%
+      Latency                  0.7881       +21.2%
+      EDP                     29.0796     -2808.0%
+      DRAM Reads               0.6246       +37.5%
+      DRAM Writes              0.0074       +99.3%
 
     Baseline Detail (Sum Singles):
       Layer        Energy (μJ)   Latency (cc)      EDP
@@ -858,8 +865,8 @@ ________________________________________________________________________________
     ────────────────────────────────────────────────────────────────────────────
      python3 experiment_runner.py --compare-full-vs-partial -w vgg16 \
          --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 1200 \
-         --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-         --output-reg 64
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_1200B_full_vs_partial.log
      ----------------------------------------------------------------------------------
      
      
@@ -871,16 +878,16 @@ ________________________________________________________________________________
     that don't pair evenly.
 
     Results:
-      Level                        Energy (μJ)   Latency (cc)      EDP
-      Full Fusion (1 ok)            3.618e+05     5.455e+06      2.03e+06
-      Sum Partial Fusion (8 ok)     2.620e+05     5.852e+06      2.05e+05
+        Level                        Energy (μJ)   Latency (cc)      EDP
+      Full Fusion (1 ok)             3.478e+05      5.455e+06       1.90e+06       14,860,992          100,352
+      Sum Partial Fusion (8 ok)      2.291e+05      5.852e+06       1.34e+06       17,670,848        7,426,048
 
     Ratios (Full Fusion / Sum Partial) — values < 1.0 mean fusion wins:
-      Energy       1.38×       −38.1 %
-      Latency      0.93×        +6.8 %
-      EDP          9.87×      −886.5 %
-      DRAM Reads   0.84×       +15.9 %
-      DRAM Writes  0.01×       +98.6 %
+      Energy                   1.5182       -51.8%
+      Latency                  0.9322        +6.8%
+      EDP                      1.4153       -41.5%
+      DRAM Reads               0.8410       +15.9%
+      DRAM Writes              0.0135       +98.6%
 
     Partial Fusion Segment Detail:
       Segment         Energy (μJ)   Latency (cc)      EDP
@@ -913,30 +920,30 @@ ________________________________________________________________________________
     ==================================================================================
 
     ────────────────────────────────────────────────────────────────────────────
-    PARTIAL(2layer) vs SINGLE — Vgg16 Eyeriss 512×32 (16384 PEs), WReg=1200
+    PARTIAL(2layer) vs SINGLE — Vgg16 Eyeriss 512×32 (16384 PEs), WReg=576
     ────────────────────────────────────────────────────────────────────────────
     
-          python3 experiment_runner.py --compare-partial-vs-single -w vgg16 \
-      --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 384 \
-      --gb-size 128 --tile-size 1 \
-      --input-reg 700 --intermediate-reg 300 --output-reg 64
+      python3 experiment_runner.py --compare-partial-vs-single -w vgg16 \
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 576 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_576B_partial_vs_single.log
 
-    Note: WReg=384 (lower than full fusion's 1200) — sized for at most
+    Note: WReg=576 (lower than full fusion's 1200) — sized for at most
     3-layer block-level fusion, not full 13-layer fusion.
 
     Partial: 8 runs (block-level).  Singles: 13 individual layer runs.
 
     Results:
       Level                        Energy (μJ)   Latency (cc)      EDP
-      Sum Partial Fusion (8 ok)     1.622e+05     5.852e+06      1.29e+05
-      Sum Singles (13 ok)           1.359e+04     6.922e+06      8.15e+03
+      Sum Partial Fusion (8 ok)      1.528e+05      5.852e+06       8.94e+05       17,670,848        7,426,048
+      Sum Singles (13 ok)            9.415e+03      6.922e+06       6.52e+04       23,792,320       13,547,520
 
     Ratios (Sum Partial / Sum Singles) — values < 1.0 mean fusion wins:
-      Energy      11.94×     −1094.0 %
-      Latency      0.85×       +15.5 %
-      EDP         15.84×     −1484.1 %
-      DRAM Reads   0.74×       +25.7 %
-      DRAM Writes  0.55×       +45.2 %
+      Energy                  16.2258     -1522.6%
+      Latency                  0.8454       +15.5%
+      EDP                     13.7175     -1271.7%
+      DRAM Reads               0.7427       +25.7%
+      DRAM Writes              0.5481       +45.2%
 
     Baseline Detail (Sum Singles):
       Layer        Energy (μJ)   Latency (cc)      EDP
@@ -1014,23 +1021,23 @@ ________________________________________________________________________________
     FULL vs SINGLE — Vgg16 Eyeriss 256×32 (8192 PEs), WReg=2400
     ────────────────────────────────────────────────────────────────────────────
     python3 experiment_runner.py --compare-full-vs-single -w vgg16 \
-        --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 2400 \
-        --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-        --output-reg 64
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 2400 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_2400B_full_vs_single.log
     ----------------------------------------------------------------------------------
     Architecture: Eyeriss 256x32, GB=128KB, WReg=2400, InReg=700, IntReg=300, OutReg=64
 
     Summary:
     Level                        Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)             5.471e+05      5.681e+06      3.15e+06       14,860,992       100,352
-    Sum Singles (13 ok)            9.812e+03      6.922e+06      5.84e+03       23,792,320    13,547,520
+    Full Fusion (1 ok)             5.491e+05      5.455e+06       3.00e+06       14,860,992          100,352
+    Sum Singles (13 ok)            9.443e+03      6.922e+06       6.54e+04       23,792,320       13,547,520
 
     Ratios (Full / Singles) -- values < 1.0 mean fusion wins:
-        Energy:      55.76x  (-5475.5%)   fusion LOSES massively
-        Latency:      0.82x  (+17.9%)     fusion wins ~18%
-        EDP:        539.39x  (-53838.9%)  fusion LOSES massively
-        DRAM Reads:   0.62x  (+37.5%)     fusion wins ~38%
-        DRAM Writes:  0.007x (+99.3%)     fusion wins ~99%
+        Energy                  58.1443     -5714.4%
+        Latency                  0.7881       +21.2%
+        EDP                     45.8227     -4482.3%
+        DRAM Reads               0.6246       +37.5%
+        DRAM Writes              0.0074       +99.3%
 
     Per-Layer Singles Detail:
         Layer     Energy (uJ)   Latency (cc)         EDP    Status
@@ -1064,20 +1071,21 @@ ________________________________________________________________________________
     FULL vs PARTIAL(2layer) — Vgg16 Eyeriss 256×32 (8192 PEs), WReg=2400
     ────────────────────────────────────────────────────────────────────────────
     python3 experiment_runner.py --compare-full-vs-partial -w vgg16 \
-        --arch-type eyeriss --pe-rows 256 --pe-cols 32 --weight-reg 2400 \
-        --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-        --output-reg 64
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 2400 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_2400B_full_vs_partial.log
     ----------------------------------------------------------------------------------
     Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)                5.471e+05      5.681e+06      3.15e+06       14,860,992       100,352
-    Sum Partial Fusion (8 ok)         4.044e+05      5.952e+06      3.23e+05       17,670,848     7,426,048
+    Full Fusion (1 ok)             5.491e+05      5.455e+06       3.00e+06       14,860,992          100,352
+    Sum Partial Fusion (8 ok)      3.758e+05      5.852e+06       2.20e+06       17,670,848        7,426,048
+
 
     Ratios (Full / Partial) -- values < 1.0 mean full fusion wins:
-        Energy:       1.35x  (-35.3%)    full fusion LOSES ~35%
-        Latency:      0.95x  (+4.6%)     full fusion wins ~5%
-        EDP:          9.75x  (-875.2%)   full fusion LOSES massively
-        DRAM Reads:   0.84x  (+15.9%)    full fusion wins ~16%
-        DRAM Writes:  0.014x (+98.6%)    full fusion wins ~99%
+        Energy                   1.4612       -46.1%
+        Latency                  0.9322        +6.8%
+        EDP                      1.3621       -36.2%
+        DRAM Reads               0.8410       +15.9%
+        DRAM Writes              0.0135       +98.6%
 
     Partial Fusion Segment Detail:
         Segment      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1102,29 +1110,29 @@ ________________________________________________________________________________
     
 
     ────────────────────────────────────────────────────────────────────────────
-    PARTIAL(2layer) vs SINGLE — Vgg16 Eyeriss 256×32 (8192 PEs), WReg=770
+    PARTIAL(2layer) vs SINGLE — Vgg16 Eyeriss 256×32 (8192 PEs), WReg=1200
     ────────────────────────────────────────────────────────────────────────────
-      python3 experiment_runner.py --compare-partial-vs-single -w vgg16 --arch-type eyeriss
-      --pe-rows 256 --pe-cols 32 --weight-reg 770
-      --gb-size 128 --tile-size 1
-      --input-reg 700 --intermediate-reg 300 --output-reg 64 --verbose
+      python3 experiment_runner.py --compare-partial-vs-single -w vgg16 \
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 1200 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_1200B_partial_vs_single.log 
 
       Configuration:
           Architecture: Eyeriss 256x32 (8192 PEs), GB=128KB
-          WReg=770, InReg=700, IntReg=300, OutReg=64, tile_size=1
+          WReg=1200, InReg=400, IntReg=300, OutReg=64, tile_size=1
           Total experiments: 21 (21 OK, 0 failed)
 
       Summary:
           Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-          Sum Partial Fusion (8 ok)         2.051e+05      5.952e+06      1.65e+05       17,670,848     7,426,048
-          Sum Singles (13 ok)               9.765e+03      6.922e+06      5.66e+03       23,792,320    13,547,520
+            Sum Partial Fusion (8 ok)      2.291e+05      5.852e+06       1.34e+06       17,670,848        7,426,048
+            Sum Singles (13 ok)            9.425e+03      6.922e+06       6.52e+04       23,792,320       13,547,520
 
       Ratios (Partial / Singles) -- values < 1.0 mean partial fusion wins:
-          Energy:      21.01x  (-2000.7%)  partial fusion LOSES massively
-          Latency:      0.86x  (+14.0%)    partial fusion wins ~14%
-          EDP:         29.19x  (-2819.3%)  partial fusion LOSES massively
-          DRAM Reads:   0.74x  (+25.7%)    partial fusion wins ~26%
-          DRAM Writes:  0.55x  (+45.2%)    partial fusion wins ~45%
+          Energy                  24.3040     -2330.4%
+          Latency                  0.8454       +15.5%
+          EDP                     20.5469     -1954.7%
+          DRAM Reads               0.7427       +25.7%
+          DRAM Writes              0.5481       +45.2%
 
       Partial Fusion Segment Detail:
           Segment      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1196,23 +1204,23 @@ ________________________________________________________________________________
     ────────────────────────────────────────────────────────────────────────────
 
     python3 experiment_runner.py --compare-full-vs-single -w vgg16 \
-        --arch-type eyeriss --pe-rows 256 --pe-cols 16 --weight-reg 4800 \
-        --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-        --output-reg 64
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 4800 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_4800B_full_vs_single.log
     ----------------------------------------------------------------------------------
     Architecture: Eyeriss 256x16, GB=128KB, WReg=4800, InReg=700, IntReg=300, OutReg=64
 
     
     Level                        Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)             9.398e+05      6.715e+06      6.34e+06       14,860,992       100,352
-    Sum Singles (13 ok)            6.707e+03      7.694e+06      4.77e+03       23,792,320    13,547,520
+      Full Fusion (1 ok)             9.517e+05      5.455e+06       5.19e+06       14,860,992          100,352
+      Sum Singles (13 ok)            9.480e+03      6.922e+06       6.56e+04       23,792,320       13,547,520
 
       Ratios (Full / Singles) -- values < 1.0 mean fusion wins:
-          Energy:     140.11x  (-13911.4%)  fusion LOSES catastrophically
-          Latency:      0.87x  (+12.7%)     fusion wins ~13%
-          EDP:       1328.50x  (-132750.3%) fusion LOSES catastrophically
-          DRAM Reads:   0.62x  (+37.5%)     fusion wins ~38%
-          DRAM Writes:  0.007x (+99.3%)     fusion wins ~99%
+          Energy                 100.3893     -9938.9%
+          Latency                  0.7881       +21.2%
+          EDP                     79.1153     -7811.5%
+          DRAM Reads               0.6246       +37.5%
+          DRAM Writes              0.0074       +99.3%
 
       Per-Layer Singles Detail:
           Layer     Energy (uJ)   Latency (cc)         EDP    Status
@@ -1245,22 +1253,23 @@ ________________________________________________________________________________
     ────────────────────────────────────────────────────────────────────────────
     FULL vs PARTIAL(2layer) — Eyeriss 256×16 (4096 PEs), WReg=4800
     ────────────────────────────────────────────────────────────────────────────
-    python3 experiment_runner.py --compare-full-vs-partial -w vgg16 \
-        --arch-type eyeriss --pe-rows 256 --pe-cols 16 --weight-reg 4800 \
-        --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-        --output-reg 64
+        python3 experiment_runner.py --compare-full-vs-partial -w vgg16 \
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 4800 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_4800B_full_vs_partial.log
     ----------------------------------------------------------------------------------
     
         Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)                9.398e+05      6.715e+06      6.34e+06       14,860,992       100,352
-    Sum Partial Fusion (8 ok)         6.952e+05      6.897e+06      6.71e+05       17,670,848     7,426,048
+    Full Fusion (1 ok)             9.517e+05      5.455e+06       5.19e+06       14,860,992          100,352
+    Sum Partial Fusion (8 ok)      6.692e+05      5.852e+06       3.92e+06       17,670,848        7,426,048
+
 
 Ratios (Full / Partial) -- values < 1.0 mean full fusion wins:
-    Energy:       1.35x  (-35.2%)    full fusion LOSES ~35%
-    Latency:      0.97x  (+2.6%)     full fusion wins ~3%
-    EDP:          9.45x  (-844.9%)   full fusion LOSES massively
-    DRAM Reads:   0.84x  (+15.9%)    full fusion wins ~16%
-    DRAM Writes:  0.014x (+98.6%)    full fusion wins ~99%
+      Energy                   1.4221       -42.2%
+      Latency                  0.9322        +6.8%
+      EDP                      1.3257       -32.6%
+      DRAM Reads               0.8410       +15.9%
+      DRAM Writes              0.0135       +98.6%
 
 Partial Fusion Segment Detail:
     Segment      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1326,26 +1335,26 @@ Analysis:
     
     
     ────────────────────────────────────────────────────────────────────────────
-    PARTIAL(2layer) vs SINGLE — VGG16 Eyeriss 256×16 (4096 PEs), WReg=1600
+    PARTIAL(2layer) vs SINGLE — VGG16 Eyeriss 256×16 (4096 PEs), WReg=2200
     ────────────────────────────────────────────────────────────────────────────
    
     python3 experiment_runner.py --compare-partial-vs-single -w vgg16 \
-        --arch-type eyeriss --pe-rows 256 --pe-cols 16 --weight-reg 1600 \
-        --gb-size 128 --tile-size 1 --input-reg 700 --intermediate-reg 300 \
-        --output-reg 64
+         --arch-type eyeriss --pe-rows 512 --pe-cols 32 --weight-reg 2200 \
+         --gb-size 128 --tile-size 1 --input-reg 400 --intermediate-reg 300 \
+         --output-reg 64 | tee EY_VGG16_4800B_partial_vs_single.log
     ----------------------------------------------------------------------------------
     Architecture: Eyeriss 256x16, GB=128KB, WReg=1600, InReg=700, IntReg=300, OutReg=64
 
         Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-    Sum Partial Fusion (8 ok)         3.039e+05      6.897e+06      2.94e+05       17,670,848     7,426,048
-    Sum Singles (13 ok)               6.528e+03      7.694e+06      4.35e+03       23,792,320    13,547,520
+        Sum Partial Fusion (8 ok)      3.513e+05      5.852e+06       2.06e+06       17,670,848        7,426,048
+        Sum Singles (13 ok)            9.440e+03      6.922e+06       6.53e+04       23,792,320       13,547,520
 
     Ratios (Partial / Singles) -- values < 1.0 mean partial fusion wins:
-        Energy:      46.55x  (-4555.2%)  partial fusion LOSES massively
-        Latency:      0.90x  (+10.4%)    partial fusion wins ~10%
-        EDP:         67.65x  (-6665.4%)  partial fusion LOSES massively
-        DRAM Reads:   0.74x  (+25.7%)    partial fusion wins ~26%
-        DRAM Writes:  0.55x  (+45.2%)    partial fusion wins ~45%
+      Energy                  37.2159     -3621.6%
+      Latency                  0.8454       +15.5%
+      EDP                     31.4628     -3046.3%
+      DRAM Reads               0.7427       +25.7%
+      DRAM Writes              0.5481       +45.2%
 
     Partial Fusion Segment Detail:
         Segment      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1426,20 +1435,21 @@ END OF EYERISS VGG16
     python3 experiment_runner.py --compare-full-vs-single -w mccnn \
         --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
         --gb-size 128 --tile-size 69 --input-reg 34 --intermediate-reg 32 \
-        --output-reg 64
+        --output-reg 64 | tee EY_MCCNN_384B_full_vs_single.log  
     ----------------------------------------------------------------------------------
     Architecture: Eyeriss 256x8, GB=128KB, WReg=384, InReg=34, IntReg=32, OutReg=64
 
         Level                        Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)             8.955e+04      1.223e+07      1.10e+06          494,928    14,943,744
-    Sum Singles (4 ok)             7.488e+03      1.495e+07      2.80e+04       45,326,160    59,774,976
+    Full Fusion (1 ok)             8.955e+04      1.223e+07       1.10e+06          494,928       14,943,744
+    Sum Singles (4 ok)             7.488e+03      1.495e+07       1.12e+05       45,326,160       59,774,976
 
     Ratios (Full / Singles) -- values < 1.0 mean fusion wins:
-        Energy:      11.96x  (-1095.9%)  fusion LOSES ~12x
-        Latency:      0.82x  (+18.2%)    fusion wins ~18%
-        EDP:         39.31x  (-3831.4%)  fusion LOSES massively
-        DRAM Reads:   0.011x (+98.9%)    fusion wins ~99%
-        DRAM Writes:  0.25x  (+75.0%)    fusion wins ~75%
+        Energy                  11.9588     -1095.9%
+        Latency                  0.8180       +18.2%
+        EDP                      9.7820      -878.2%
+        DRAM Reads               0.0109       +98.9%
+        DRAM Writes              0.2500       +75.0%
+
 
     Per-Layer Singles Detail:
         Layer     Energy (uJ)   Latency (cc)         EDP    Status
@@ -1464,22 +1474,24 @@ END OF EYERISS VGG16
     ────────────────────────────────────────────────────────────────────────────
     FULL vs PARTIAL — MCCNN on Eyeriss 256×8 (2048 PEs), WReg=384
     ────────────────────────────────────────────────────────────────────────────
-    python3 experiment_runner.py --compare-full-vs-partial -w mccnn --arch-type eyeriss
-      --pe-rows 256 --pe-cols 8 --weight-reg 384
-      --gb-size 128 --tile-size 69
-      --input-reg 40 --intermediate-reg 40 --output-reg 64 --verbose
+    python3 experiment_runner.py --compare-full-vs-partial -w mccnn \
+        --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
+        --gb-size 128 --tile-size 69 --input-reg 34 --intermediate-reg 32 \
+        --output-reg 64 | tee EY_MCCNN_384B_full_vs_partial.log  
 
 
           Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-          Full Fusion (1 ok)                8.955e+04      1.223e+07      1.10e+06          494,928    14,943,744
-          Sum Partial Fusion (2 ok)         9.138e+04      1.223e+07      6.00e+05       15,438,672    29,887,488
+          Full Fusion (1 ok)             8.955e+04      1.223e+07       1.10e+06          494,928       14,943,744
+          Sum Partial Fusion (2 ok)      9.138e+04      1.223e+07       1.12e+06       15,438,672       29,887,488
+
 
       Ratios (Full / Partial) -- values < 1.0 mean full fusion wins:
-          Energy:       0.98x  (+2.0%)     full fusion wins ~2%
-          Latency:      1.00x  (+0.0%)     essentially identical
-          EDP:          1.84x  (-83.5%)    full fusion LOSES ~84%
-          DRAM Reads:   0.032x (+96.8%)    full fusion wins ~97%
-          DRAM Writes:  0.50x  (+50.0%)    full fusion wins ~50%
+          Energy                   0.9800        +2.0%
+          Latency                  0.9998        +0.0%
+          EDP                      0.9798        +2.0%
+          DRAM Reads               0.0321       +96.8%
+          DRAM Writes              0.5000       +50.0%
+
 
       Partial Fusion Segment Detail:
           Segment      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1502,10 +1514,10 @@ END OF EYERISS VGG16
     ────────────────────────────────────────────────────────────────────────────
     PARTIAL vs SINGLE — MCCNN on Eyeriss 256×8 (2048 PEs), WReg=384
     ────────────────────────────────────────────────────────────────────────────
-        python3 experiment_runner.py --compare-partial-vs-single -w mccnn --arch-type eyeriss
-      --pe-rows 256 --pe-cols 8 --weight-reg 384
-      --gb-size 128 --tile-size 69
-      --input-reg 40 --intermediate-reg 40 --output-reg 64 --verbose
+      python3 experiment_runner.py --compare-partial-vs-single -w mccnn \
+        --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
+        --gb-size 128 --tile-size 69 --input-reg 34 --intermediate-reg 32 \
+        --output-reg 64 | tee EY_MCCNN_384B_partial_vs_single.log  
 
     Configuration:
         Architecture: Eyeriss 256x8 (2048 PEs), GB=128KB
@@ -1514,15 +1526,16 @@ END OF EYERISS VGG16
 
     Summary:
         Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-        Sum Partial Fusion (2 ok)         9.138e+04      1.223e+07      6.00e+05       15,438,672    29,887,488
-        Sum Singles (4 ok)                7.488e+03      1.495e+07      2.80e+04       45,326,160    59,774,976
+        Sum Partial Fusion (2 ok)      9.138e+04      1.223e+07       1.12e+06       15,438,672       29,887,488
+        Sum Singles (4 ok)             7.488e+03      1.495e+07       1.12e+05       45,326,160       59,774,976
 
     Ratios (Partial / Singles) -- values < 1.0 mean partial fusion wins:
-        Energy:      12.20x  (-1120.3%)  partial fusion LOSES ~12x
-        Latency:      0.82x  (+18.2%)    partial fusion wins ~18%
-        EDP:         21.42x  (-2042.0%)  partial fusion LOSES massively
-        DRAM Reads:   0.34x  (+65.9%)    partial fusion wins ~66%
-        DRAM Writes:  0.50x  (+50.0%)    partial fusion wins ~50%
+        Energy                  12.2033     -1120.3%
+        Latency                  0.8181       +18.2%
+        EDP                      9.9839      -898.4%
+        DRAM Reads               0.3406       +65.9%
+        DRAM Writes              0.5000       +50.0%
+
 
     Partial Fusion Segment Detail:
         Segment      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1580,22 +1593,22 @@ END OF EYERISS MCCNN
     FULL vs SINGLE — FSRCNN on Eyeriss 128×16 (2048 PEs), WReg=384
     ────────────────────────────────────────────────────────────────────────────
     python3 experiment_runner.py --compare-full-vs-single -w fsrcnn \
-        --arch-type eyeriss --pe-rows 128 --pe-cols 16 --weight-reg 384 \
-        --gb-size 128 --tile-size 120 --input-reg 34 --intermediate-reg 34 \
-        --output-reg 64
-    ----------------------------------------------------------------------------------
+        --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
+        --gb-size 128 --tile-size 120 --input-reg 34 --intermediate-reg 32 \
+        --output-reg 64 | tee EY_FSRCNN_384B_full_vs_single.log  
+----------------------------------------------------------------------------------
     Architecture: Eyeriss 128x16, GB=128KB, WReg=384, InReg=34, IntReg=34, OutReg=64
 
     Level                        Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-        Full Fusion (1 ok)             6.757e+04      1.889e+07      1.28e+06        1,573,992     8,294,400
-        Sum Singles (8 ok)             8.747e+03      3.525e+07      4.90e+04       90,738,792    97,459,200
+    Full Fusion (1 ok)             6.842e+04      1.889e+07       1.29e+06        1,573,992        8,294,400
+    Sum Singles (8 ok)             9.606e+03      3.525e+07       3.39e+05       90,738,792       97,459,200
 
     Ratios (Full / Singles) -- values < 1.0 mean fusion wins:
-        Energy:       7.73x  (-672.5%)   fusion LOSES ~8x
-        Latency:      0.54x  (+46.4%)    fusion wins ~46%
-        EDP:         26.17x  (-2516.7%)  fusion LOSES massively
-        DRAM Reads:   0.017x (+98.3%)    fusion wins ~98%
-        DRAM Writes:  0.085x (+91.5%)    fusion wins ~92%
+        Energy                   7.1224      -612.2%
+        Latency                  0.5358       +46.4%
+        EDP                      3.8161      -281.6%
+        DRAM Reads               0.0173       +98.3%
+        DRAM Writes              0.0851       +91.5%
 
     Per-Layer Singles Detail:
         Layer                    Energy (uJ)   Latency (cc)         EDP    Status
@@ -1626,10 +1639,10 @@ END OF EYERISS MCCNN
     FULL vs PARTIAL — FSRCNN on Eyeriss 128×16 (2048 PEs), WReg=384
     ────────────────────────────────────────────────────────────────────────────
 
-        python3 experiment_runner.py --compare-full-vs-partial -w fsrcnn --arch-type eyeriss
-      --pe-rows 128 --pe-cols 16 --weight-reg 384
-      --gb-size 128 --tile-size 120
-      --input-reg 40 --intermediate-reg 40 --output-reg 64 --verbose
+          python3 experiment_runner.py --compare-full-vs-partial -w fsrcnn \
+        --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
+        --gb-size 128 --tile-size 120 --input-reg 34 --intermediate-reg 32 \
+        --output-reg 64 | tee EY_FSRCNN_384B_full_vs_partial.log  
 
       Configuration:
           Architecture: Eyeriss 128x16 (2048 PEs), GB=128KB
@@ -1638,15 +1651,15 @@ END OF EYERISS MCCNN
 
       Summary:
           Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-          Full Fusion (1 ok)                6.757e+04      1.889e+07      1.28e+06        1,573,992     8,294,400
-          Sum Partial Fusion (3 ok)         6.855e+04      1.889e+07      4.65e+05       14,015,592    20,736,000
+          Full Fusion (1 ok)             6.842e+04      1.889e+07       1.29e+06        1,573,992        8,294,400
+          Sum Partial Fusion (3 ok)      6.920e+04      1.889e+07       1.31e+06       14,015,592       20,736,000
 
       Ratios (Full / Partial) -- values < 1.0 mean full fusion wins:
-          Energy:       0.99x  (+1.4%)     full fusion wins ~1.4%
-          Latency:      1.00x  (+0.0%)     identical latency
-          EDP:          2.76x  (-176.0%)   full fusion LOSES ~2.8x
-          DRAM Reads:   0.11x  (+88.8%)    full fusion wins ~89%
-          DRAM Writes:  0.40x  (+60.0%)    full fusion wins ~60%
+          Energy                   0.9888        +1.1%
+          Latency                  1.0000        +0.0%
+          EDP                      0.9887        +1.1%
+          DRAM Reads               0.1123       +88.8%
+          DRAM Writes              0.4000       +60.0%
 
       Partial Fusion Segment Detail:
           Segment                      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1673,9 +1686,11 @@ END OF EYERISS MCCNN
     PARTIAL vs SINGLE — FSRCNN on Eyeriss 128×16 (2048 PEs), WReg=384
     ────────────────────────────────────────────────────────────────────────────
 
-      --pe-rows 128 --pe-cols 16 --weight-reg 384
-      --gb-size 128 --tile-size 120
-      --input-reg 40 --intermediate-reg 40 --output-reg 64 --verbose
+          python3 experiment_runner.py --compare-partial-vs-single -w fsrcnn \
+        --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
+        --gb-size 128 --tile-size 120 --input-reg 34 --intermediate-reg 32 \
+        --output-reg 64 | tee EY_FSRCNN_384B_partial_vs_single.log  
+
 
 Configuration:
     Architecture: Eyeriss 128x16 (2048 PEs), GB=128KB
@@ -1684,15 +1699,16 @@ Configuration:
 
     Summary:
         Level                           Energy (uJ)   Latency (cc)           EDP       DRAM Reads   DRAM Writes
-        Sum Partial Fusion (3 ok)         6.855e+04      1.889e+07      4.65e+05       14,015,592    20,736,000
-        Sum Singles (8 ok)                8.747e+03      3.525e+07      4.90e+04       90,738,792    97,459,200
+        Sum Partial Fusion (3 ok)      6.920e+04      1.889e+07       1.31e+06       14,015,592       20,736,000
+        Sum Singles (8 ok)             9.606e+03      3.525e+07       3.39e+05       90,738,792       97,459,200
+
 
     Ratios (Partial / Singles) -- values < 1.0 mean partial fusion wins:
-        Energy:       7.84x  (-683.7%)   partial fusion LOSES ~8x
-        Latency:      0.54x  (+46.4%)    partial fusion wins ~46%
-        EDP:          9.48x  (-848.1%)   partial fusion LOSES ~9.5x
-        DRAM Reads:   0.15x  (+84.6%)    partial fusion wins ~85%
-        DRAM Writes:  0.21x  (+78.7%)    partial fusion wins ~79%
+          Energy                   7.2034      -620.3%
+          Latency                  0.5358       +46.4%
+          EDP                      3.8596      -286.0%
+          DRAM Reads               0.1545       +84.6%
+          DRAM Writes              0.2128       +78.7%
 
     Partial Fusion Segment Detail:
         Segment                      Energy (uJ)   Latency (cc)         EDP    Status
@@ -1757,8 +1773,14 @@ END OF EYERISS FSRCNN
 
 
 
+
+
+
 END OF EYERISS all the workloads
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
 
 
 
@@ -1767,23 +1789,24 @@ END OF EYERISS all the workloads
     ----------------------------------------------------------------------------------
     python3 experiment_runner.py --compare-full-vs-single -w resnet18 \
         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 266 \
-        --wmem-size 10738 --tile-size 7
+        --wmem-size 10738 --tile-size 7 | tee DF_RESNET_266KB_10738KB_full_vs_single.log
     ----------------------------------------------------------------------------------
     Architecture: DepFiN 16x128, FMEM=266KB, WMEM=10738KB
 
     RATIOS (Full Fusion / Singles) — values < 1.0 mean fusion wins
-      Energy:      11.4025   (-1040.2%)   ← fusion ~11× more expensive
-      Latency:      1.1314     (-13.1%)   ← fusion 13% SLOWER
-      EDP:        163.2098  (-16221.0%)
-      DRAM Reads:   0.8861     (+11.4%)
-      DRAM Writes:  0.0109     (+98.9%)
+      Energy                  11.4025     -1040.2%
+      Latency                  1.1314       -13.1%
+      EDP                     12.9003     -1190.0%
+      DRAM Reads               0.8861       +11.4%
+      DRAM Writes              0.0109       +98.9%
+
 
     Full Fusion (1 segment, OK):
-      Energy = 1.083e+04 uJ,  Latency = 7.812e+06 cc,  EDP = 1.51e+05
+      Energy = 1.083e+04 uJ,  Latency = 7.812e+06 cc,  EDP = 8.46e+04
       DRAM Reads = 11,032,512   DRAM Writes = 25,088
 
     Sum Singles (17 layers, all OK):
-      Energy = 9.499e+02 uJ,  Latency = 6.905e+06 cc,  EDP = 9.28e+02
+      Energy = 9.499e+02 uJ,  Latency = 6.905e+06 cc,  EDP = 6.56e+03
       DRAM Reads = 12,449,984   DRAM Writes = 2,308,096
 
     BASELINE SINGLES:
@@ -1804,6 +1827,10 @@ END OF EYERISS all the workloads
       L16_conv5_1_2: E=1.448e+02  L=1.032e+06
       L18_conv5_2_1: E=1.448e+02  L=1.032e+06
       L19_conv5_2_2: E=1.448e+02  L=1.032e+06
+
+
+
+
     ==================================================================================
  
     ==================================================================================
@@ -1811,21 +1838,21 @@ END OF EYERISS all the workloads
     ----------------------------------------------------------------------------------
     python3 experiment_runner.py --compare-full-vs-partial -w resnet18 \
         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 266 \
-        --wmem-size 10738 --tile-size 7
+        --wmem-size 10738 --tile-size 7 | tee DF_RESNET_266KB_10738KB_full_vs_partial.log
     ----------------------------------------------------------------------------------
     RATIOS (Full Fusion / Partial 2layer) — values < 1.0 mean full wins
-      Energy:       0.9484      (+5.2%)   ← FULL WINS by 5.2%
-      Latency:      0.4578     (+54.2%)   ← full 54% faster!
-      EDP:          3.4922    (-249.2%)
-      DRAM Reads:   0.9381      (+6.2%)
-      DRAM Writes:  0.0333     (+96.7%)
+      Energy                   0.9957        +0.4%
+      Latency                  1.1517       -15.2%
+      EDP                      1.1468       -14.7%
+      DRAM Reads               0.9381        +6.2%
+      DRAM Writes              0.0333       +96.7%
 
     Full Fusion (1 segment, OK):
-      Energy = 1.083e+04 uJ,  Latency = 7.812e+06 cc,  EDP = 1.51e+05
+      Energy = 1.083e+04 uJ,  Latency = 8.998e+06 cc,  EDP = 9.75e+04
       DRAM Reads = 11,032,512   DRAM Writes = 25,088
 
     Sum Partial Fusion — 2layer (8 segments, all OK):
-      Energy = 1.142e+04 uJ,  Latency = 1.706e+07 cc,  EDP = 4.33e+04
+      Energy = 1.088e+04 uJ,  Latency = 7.813e+06 cc,  EDP = 8.50e+04
       DRAM Reads = 11,760,064   DRAM Writes = 752,640
 
     PARTIAL SEGMENTS (2layer):
@@ -1839,56 +1866,58 @@ END OF EYERISS all the workloads
       2layer/s4b2:  E=1.275e+03  L=2.065e+06  EDP=4.42e+03  OK
     ==================================================================================
    
-     ==================================================================================
-    PARTIAL(2layer) vs SINGLE — ResNet18 on DepFiN 16×128 (2048 PEs), FMEM=266KB, WMEM=10738KB
+    ===================================================================================
+    PARTIAL(2layer) vs SINGLE — ResNet18 on DepFiN 16×128 (2048 PEs), FMEM=52KB, WMEM=4608KB
     ----------------------------------------------------------------------------------
     python3 experiment_runner.py --compare-partial-vs-single -w resnet18 \
-        --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 266 \
-        --wmem-size 10738 --tile-size 7
+        --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 52 \
+        --wmem-size 4615 --tile-size 7 | tee DF_RESNET_52KB_4615KB_partial_vs_single.log
     ----------------------------------------------------------------------------------
     RATIOS (Partial Fusion / Singles) — values < 1.0 mean fusion wins
-      Energy:      12.0231   (-1102.3%)   ← fusion ~12× more expensive
-      Latency:      2.4712    (-147.1%)   ← fusion 147% SLOWER
-      EDP:         46.7359   (-4573.6%)
-      DRAM Reads:   0.9446      (+5.5%)
-      DRAM Writes:  0.3261     (+67.4%)
+      Energy                  10.1050      -910.5%
+      Latency                  1.1315       -13.1%
+      EDP                     11.4333     -1043.3%
+      DRAM Reads               0.9446        +5.5%
+      DRAM Writes              0.3261       +67.4%
+
 
     Sum Partial Fusion (8 segments, all OK):
-      Energy = 1.142e+04 uJ,  Latency = 1.706e+07 cc,  EDP = 4.33e+04
+      Energy = 8.004e+03 uJ,  Latency = 7.813e+06 cc,  EDP = 6.25e+04
       DRAM Reads = 11,760,064   DRAM Writes = 752,640
 
     Sum Singles (17 layers, all OK):
-      Energy = 9.499e+02 uJ,  Latency = 6.905e+06 cc,  EDP = 9.28e+02
+      Energy = 7.921e+02 uJ,  Latency = 6.905e+06 cc,  EDP = 5.47e+03
       DRAM Reads = 12,449,984   DRAM Writes = 2,308,096
 
     FUSED-SIDE SEGMENTS:
-      2layer/s1b1:  E=1.113e+03  L=1.566e+06  EDP=3.09e+03  OK
-      2layer/s1b2:  E=1.700e+03  L=3.102e+06  EDP=9.23e+03  OK
-      2layer/s2b1:  E=1.639e+03  L=2.068e+06  EDP=6.03e+03  OK
-      2layer/s2b2:  E=1.138e+03  L=2.066e+06  EDP=4.11e+03  OK
-      2layer/s3b1:  E=1.656e+03  L=2.066e+06  EDP=6.06e+03  OK
-      2layer/s3b2:  E=1.163e+03  L=2.065e+06  EDP=4.17e+03  OK
-      2layer/s4b1:  E=1.738e+03  L=2.065e+06  EDP=6.25e+03  OK
-      2layer/s4b2:  E=1.275e+03  L=2.065e+06  EDP=4.42e+03  OK
+      2layer/s1b1                         7.532e+02      1.958e+05       2.18e+03         OK
+      2layer/s1b2                         1.124e+03      3.877e+05       6.52e+03         OK
+      2layer/s2b1                         1.130e+03      5.170e+05       4.26e+03         OK
+      2layer/s2b2                         7.648e+02      5.165e+05       2.91e+03         OK
+      2layer/s3b1                         1.167e+03      1.033e+06       4.30e+03         OK
+      2layer/s3b2                         8.105e+02      1.033e+06       2.96e+03         OK
+      2layer/s4b1                         1.291e+03      2.065e+06       4.48e+03         OK
+      2layer/s4b2                         9.635e+02      2.065e+06       3.21e+03         OK
 
     BASELINE SINGLES:
-      L0_conv1:      E=3.468e+01  L=6.690e+04
-      L1_conv2_1_1:  E=2.495e+01  L=1.290e+05
-      L2_conv2_1_2:  E=2.495e+01  L=1.290e+05
-      L3_conv2_2_1:  E=2.495e+01  L=1.290e+05
-      L4_conv2_2_2:  E=2.495e+01  L=1.290e+05
-      L5_conv3_1_1:  E=1.669e+01  L=1.290e+05
-      L6_conv3_1_2:  E=3.009e+01  L=2.580e+05
-      L8_conv3_2_1:  E=3.009e+01  L=2.580e+05
-      L9_conv3_2_2:  E=3.009e+01  L=2.580e+05
-      L10_conv4_1_1: E=2.945e+01  L=2.580e+05
-      L11_conv4_1_2: E=5.725e+01  L=5.161e+05
-      L13_conv4_2_1: E=5.725e+01  L=5.161e+05
-      L14_conv4_2_2: E=5.725e+01  L=5.161e+05
-      L15_conv5_1_1: E=7.282e+01  L=5.161e+05
-      L16_conv5_1_2: E=1.448e+02  L=1.032e+06
-      L18_conv5_2_1: E=1.448e+02  L=1.032e+06
-      L19_conv5_2_2: E=1.448e+02  L=1.032e+06
+      L0_conv1                            3.176e+01      6.690e+04       2.30e+00         OK
+      L1_conv2_1_1                        2.100e+01      1.290e+05       3.39e+00         OK
+      L2_conv2_1_2                        2.100e+01      1.290e+05       3.39e+00         OK
+      L3_conv2_2_1                        2.100e+01      1.290e+05       3.39e+00         OK
+      L4_conv2_2_2                        2.100e+01      1.290e+05       3.39e+00         OK
+      L5_conv3_1_1                        1.344e+01      1.290e+05       2.43e+00         OK
+      L6_conv3_1_2                        2.362e+01      2.580e+05       8.86e+00         OK
+      L8_conv3_2_1                        2.362e+01      2.580e+05       8.86e+00         OK
+      L9_conv3_2_2                        2.362e+01      2.580e+05       8.86e+00         OK
+      L10_conv4_1_1                       2.366e+01      2.580e+05       8.97e+00         OK
+      L11_conv4_1_2                       4.569e+01      5.161e+05       3.50e+01         OK
+      L13_conv4_2_1                       4.569e+01      5.161e+05       3.50e+01         OK
+      L14_conv4_2_2                       4.569e+01      5.161e+05       3.50e+01         OK
+      L15_conv5_1_1                       6.192e+01      5.161e+05       4.42e+01         OK
+      L16_conv5_1_2                       1.230e+02      1.032e+06       1.76e+02         OK
+      L18_conv5_2_1                       1.230e+02      1.032e+06       1.76e+02         OK
+      L19_conv5_2_2                       1.230e+02      1.032e+06       1.76e+02         OK
+
 
     NOTES:
       - DepFiN vs Eyeriss key difference: latency penalty is much worse.
@@ -1902,19 +1931,31 @@ END OF EYERISS all the workloads
         Reads 11.4%, Writes 98.9% (full), 67.4% (partial).
     ==================================================================================
 
+    
+
+
+
+
+
+
+
+
     ==================================================================================
     DepFiN 16x128 (2,048 PEs), VGG16, FMEM=568KB, WMEM=14366KB, tile=14
     FULL FUSION (13-layer) vs Sum of SINGLE layers
     ==================================================================================
 
-    Full Fusion:   E=7.607e+04 uJ,  L=2.433e+07 cc,  EDP=3.41e+06
-    Sum Singles:   E=3.395e+03 uJ,  L=2.452e+07 cc,  EDP=1.20e+04
+        python3 experiment_runner.py --compare-full-vs-single -w vgg16         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 568   --wmem-size 14366 --tile-size 14 | tee DF_VGG_568KB_14366KB_fusion_vs_single.log
 
-    Energy ratio:   22.4065  (-2140.7%)  — single layers WIN by 22×
-    Latency ratio:   0.9919  (+0.8%)    — fusion barely faster (<1%)
-    EDP ratio:     282.5927             — single layers WIN massively
-    DRAM Reads:      0.6246  (+37.5%)   — fusion saves 37.5% reads
-    DRAM Writes:     0.0074  (+99.3%)   — fusion saves 99.3% writes
+                                     Energy (uJ)   Latency (cc)      EDP           DRAM Reads       DRAM Writes
+      Full Fusion (1 ok)             7.609e+04      2.728e+07       2.08e+06       14,860,992          100,352
+      Sum Singles (13 ok)            3.413e+03      2.252e+07       8.37e+04       23,792,320       13,547,520
+
+    Energy                  22.3651     -1836.5%
+    Latency                  1.112        +1.9%
+    EDP                     24.7951     -1799.5%
+    DRAM Reads               0.6246       +37.5%
+    DRAM Writes              0.0074       +99.3%
 
     Observation: Full fusion is catastrophically worse in energy (22×)
     despite near-identical latency and excellent DRAM write savings.
@@ -1929,14 +1970,19 @@ END OF EYERISS all the workloads
     FULL FUSION (13-layer) vs Sum of PARTIAL FUSION (block-level 2-layer)
     ==================================================================================
 
-    Full Fusion:       E=7.607e+04 uJ,  L=2.433e+07 cc,  EDP=3.41e+06
-    Sum Partial (8):   E=5.834e+04 uJ,  L=5.204e+07 cc,  EDP=9.94e+05
+    python3 experiment_runner.py --compare-full-vs-partial -w vgg16         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 568   --wmem-size 14366 --tile-size 14 | tee DF_VGG_568KB_14366KB_fusion_vs_partial.log
 
-    Energy ratio:    1.3039  (-30.4%)   — partial fusion WINS by 30.4%
-    Latency ratio:   0.4674  (+53.3%)   — full fusion 53% faster!
-    EDP ratio:       3.4258             — partial fusion wins on EDP
-    DRAM Reads:      0.8410  (+15.9%)   — full fusion saves 15.9% reads
-    DRAM Writes:     0.0135  (+98.6%)   — full fusion saves 98.6% writes
+                                  Energy (uJ)   Latency (cc)            EDP       DRAM Reads      DRAM Writes
+    Full Fusion (1 ok)             7.609e+04      2.728e+07       2.08e+06       14,860,992          100,352
+    Sum Partial Fusion (8 ok)      5.652e+04      2.432e+07       1.37e+06       17,670,848        7,426,048
+
+
+    Energy                   1.3428       -34.3%
+    Latency                  1.1201        -0.0%
+    EDP                      1.500       -34.3%
+    DRAM Reads               0.8410       +15.9%
+    DRAM Writes              0.0135       +98.6%
+
 
     Partial baseline detail:
     block1 (2L): E=1.002e+04, L=8.673e+06  OK
@@ -1954,19 +2000,27 @@ END OF EYERISS all the workloads
     DRAM round-trips, but energy penalty remains significant.
     =====================================================================
 
+
+
+    
     =====================================================================
-    DepFiN 16x128 (2,048 PEs), VGG16, FMEM=82KB, WMEM=4610KB, tile=14
+    DepFiN 16x128 (2,048 PEs), VGG16, FMEM=112KB, WMEM=4608KB, tile=14
     Sum of PARTIAL FUSION (block-level 2-layer) vs Sum of SINGLE layers
     =====================================================================
 
-    Sum Partial (8 ok):  E=3.821e+04 uJ,  L=5.204e+07 cc,  EDP=6.27e+05
-    Sum Singles (13 ok): E=2.443e+03 uJ,  L=2.452e+07 cc,  EDP=7.97e+03
+    
+    python3 experiment_runner.py --compare-partial-vs-single -w vgg16         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 112   --wmem-size 4608 --tile-size 14 | tee DF_VGG_112KB_4608KB_partial_vs_single.log
 
-    Energy ratio:   15.6380  (-1463.8%)  — single layers WIN by ~16×
-    Latency ratio:   2.1219  (-112.2%)   — fusion 112% SLOWER
-    EDP ratio:      78.6843              — single layers WIN massively
-    DRAM Reads:      0.7427  (+25.7%)    — fusion saves 25.7% reads
-    DRAM Writes:     0.5481  (+45.2%)    — fusion saves 45.2% writes
+                                   Energy (uJ)   Latency (cc)     EDP             DRAM Reads      DRAM Writes
+    Sum Partial Fusion (8 ok)      3.705e+04      2.432e+07       9.01e+05       17,670,848        7,426,048
+    Sum Singles (13 ok)            2.460e+03      2.452e+07       6.03e+04       23,792,320       13,547,520
+
+    Energy                  15.0636     -1406.4%
+    Latency                  0.9917        +0.8%
+    EDP                     14.9392     -1393.9%
+    DRAM Reads               0.7427       +25.7%
+    DRAM Writes              0.5481       +45.2%
+
 
     All 8 partial segments completed successfully (no FMEM overflow).
 
@@ -1991,18 +2045,25 @@ END OF EYERISS all the workloads
 
     
 
+    
+
+
+
+
+    
+
     =================================================================
     DepFiN 8x256 (2,048 PEs), MCCNN, FMEM=522KB, WMEM=32KB, tile=207
     FULL FUSION (4-layer) vs Sum of SINGLE layers
     =================================================================
 
-    --compare-full-vs-single -w mccnn \
+    python3 experiment_runner.py --compare-full-vs-single -w mccnn \
         --arch-type depfin --pe-rows 8 --pe-cols 256 --fmem-size 522 \
         --wmem-size 32 --tile-size 207 | tee DF_MCCNN_522KB_32KB_full_vs_single.log
 
 Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
-  Full Fusion (1 ok)           1.177e+04     8.074e+06    1.13e+05          494,928    14,943,744
-  Sum Singles (4 ok)           4.224e+03     1.381e+07    1.62e+04       45,326,160    59,774,976
+  Full Fusion (1 ok)           1.177e+04     7.975e6    9.39e4          494,928    14,943,744
+  Sum Singles (4 ok)           4.224e+03     1.381e+07    5.82e+04       45,326,160    59,774,976
 
   RATIOS (Full Fusion / Sum Singles) — values < 1.0 mean fusion wins
     Energy:       2.7871  (-178.7%)   ← single layers WIN by 2.8×
@@ -2021,20 +2082,20 @@ Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Rea
     to the larger tile covering more of Q=1242.
 
     ====================================================================
-    DepFiN 8x256 (2,048 PEs), MCCNN, FMEM=30KB, WMEM=30KB, tile=207
+    DepFiN 8x256 (2,048 PEs), MCCNN, FMEM=522KB, WMEM=30KB, tile=207
     FULL FUSION (4-layer) vs Sum of PARTIAL FUSION (2-layer)
     ====================================================================
 
 
-  --compare-full-vs-partial -w mccnn \
+      python3 experiment_runner.py --compare-full-vs-partial -w mccnn \
         --arch-type depfin --pe-rows 8 --pe-cols 256 --fmem-size 522 \
-        --wmem-size 32 --tile-size 69 | tee DF_MCCNN_522KB_32KB_full_vs_partial.log
+        --wmem-size 32 --tile-size 207 | tee DF_MCCNN_522KB_32KB_full_vs_single.log
 
 
     
     Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)           1.177e+04     8.074e+06    1.13e+05          494,928    14,943,744
-    Sum Partial Fusion (2 ok)    1.273e+04     8.074e+06    6.60e+04       15,438,672    29,887,488
+    Full Fusion (1 ok)           1.177e+04     7.975e+06       9.39e+04          494,928    14,943,744
+    Sum Partial Fusion (2 ok)    1.273e+04     7.975e+06       1.02e+05       15,438,672    29,887,488
 
     RATIOS (Full Fusion / Sum Partial) — values < 1.0 mean full fusion wins
       Energy:       0.9248  (+7.5%)     ← FULL FUSION WINS by 7.5%!
@@ -2067,8 +2128,8 @@ Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Rea
   --compare-partial-vs-single -w mccnn --arch-type depfin --pe-rows 8 --pe-cols 256 --fmem-size 396 --wmem-size 22 --tile-size 207 | tee DF_MCCNN_396KB_22KB_partial_vs_single.log
 
     Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
-    Sum Partial Fusion (2 ok)    1.238e+04     8.074e+06    6.33e+04       15,438,672    29,887,488
-    Sum Singles (4 ok)           4.123e+03     1.381e+07    1.58e+04       45,326,160    59,774,976
+    Sum Partial Fusion (2 ok)    1.238e+04     8.074e+06    1.00e+05       15,438,672    29,887,488
+    Sum Singles (4 ok)           4.123e+03     1.381e+07    5.69e+04       45,326,160    59,774,976
 
     RATIOS (Sum Partial / Sum Singles) — values < 1.0 mean partial fusion wins
       Energy:       3.0032  (-200.3%)   ← single layers WIN by 3.0×
@@ -2097,23 +2158,23 @@ Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Rea
 
 
     ==================================================================================    
-    DepFiN 16x128 (2,048 PEs), FSRCNN, FMEM=72KB, WMEM=19KB, tile=120
+    DepFiN 16x128 (2,048 PEs), FSRCNN, FMEM=576KB, WMEM=19KB, tile=120
     FULL FUSION (8-layer) vs Sum of SINGLE layers
     ==============================================================================
 
         python3 experiment_runner.py  --compare-full-vs-single -w fsrcnn \
-        --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 266 \
-        --wmem-size 19 --tile-size 120 | tee DF_FSRCNN_72KB_19KB_full_vs_single.log
+        --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 576 \
+        --wmem-size 19 --tile-size 120 | tee DF_FSRCNN_576KB_19KB_full_vs_single.log
 
 
 
                             Energy (μJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)         8.231e+03      6.122e+06    5.91e+04      1,573,992     8,294,400
-    Sum Singles (8 ok)         6.402e+03      1.175e+07    1.23e+04     90,738,792    97,459,200
+    Full Fusion (1 ok)         8.352e+03      6.156e+06    5.14e+04      1,573,992     8,294,400
+    Sum Singles (8 ok)         6.536e+03      1.175e+07    7.68e+04     90,738,792    97,459,200
 
-    Energy ratio:    1.2853  (-28.5%)   — single layers WIN by 29.5%
+    Energy ratio:    1.2784  (-27.8%)   — single layers WIN by 27.8%
     Latency ratio:   0.5210  (+47.9%)   — fusion 48% faster!
-    EDP ratio:       4.8583             — single layers WIN on EDP
+    EDP ratio:       4.7280             — single layers WIN on EDP
     DRAM Reads:      0.0173  (+98.3%)   — fusion saves 98.3% reads!
     DRAM Writes:     0.0851  (+91.5%)   — fusion saves 91.5% writes!
 
@@ -2124,20 +2185,21 @@ Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Rea
     effective on DepFiN. Energy penalty is low enough that the
     latency and DRAM benefits may justify fusion in practice.
 
+    
+
     ======================================================================
-    DepFiN 16x128 (2,048 PEs), FSRCNN, FMEM=72KB, WMEM=19KB, tile=120
+    DepFiN 16x128 (2,048 PEs), FSRCNN, FMEM=576KB, WMEM=19KB, tile=120
     FULL FUSION (8-layer) vs Sum of PARTIAL FUSION (3-layer segments)
     ======================================================================
 
 
-
     python3 experiment_runner.py --compare-full-vs-partial -w fsrcnn \
-        --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 266 \
-        --wmem-size 19 --tile-size 120 | tee DF_FSRCNN_72KB_19KB_full_vs_partial.log
+        --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 576 \
+        --wmem-size 19 --tile-size 120 | tee DF_FSRCNN_576KB_19KB_full_vs_partial.log
     
-                                Energy (μJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
-    Full Fusion (1 ok)              8.231e+03      6.122e+06    5.91e+04      1,573,992     8,294,400
-    Sum Partial Fusion (3 ok)       9.027e+03      6.313e+06    2.34e+04     14,015,592    20,736,000
+                                  Energy (μJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
+    Full Fusion (1 ok)              8.352e+03      6.156e+06    5.14e+04      1,573,992     8,294,400
+    Sum Partial Fusion (3 ok)       9.150e+03      6.313e+06    5.81e+04     14,015,592    20,736,000
 
     Energy ratio:    0.9116  (+8.8%)    — FULL FUSION WINS by 8.8%!
     Latency ratio:   0.9697  (+3.0%)    — full fusion 3% faster
@@ -2163,9 +2225,12 @@ Level                        Energy (uJ)   Latency (cc)       EDP       DRAM Rea
     Sum of PARTIAL FUSION (3-layer segments) vs Sum of SINGLE layers
     ======================================================================
 
+    python3 experiment_runner.py --compare-partial-vs-single -w fsrcnn         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 248         --wmem-size 9 --tile-size 120 | tee DF_FSRCNN_576KB_19KB_partial_vs_single.log
+
+
                                  Energy (μJ)   Latency (cc)       EDP       DRAM Reads   DRAM Writes
-    Sum Partial Fusion (3 ok)       8.519e+03      6.313e+06    2.12e+04     14,015,592    20,736,000
-    Sum Singles (8 ok)              6.390e+03      1.175e+07    1.22e+04     90,738,792    97,459,200
+    Sum Partial Fusion (3 ok)       8.519e+03      6.351e+06    5.41e+04     14,015,592    20,736,000
+    Sum Singles (8 ok)              6.390e+03      1.175e+07    7.51e+04     90,738,792    97,459,200
 
     Energy ratio:    1.3330  (-33.3%)   — single layers WIN by 34.5%
     Latency ratio:   0.5372  (+46.3%)   — fusion 46% faster!

@@ -1,0 +1,96 @@
+Creating architecture: Gemmini with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Gemmini (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Eyeriss with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Eyeriss (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: Simba with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: Simba (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+Creating architecture: TPUv1 with coupling: dims: MKN, in_coupling: [K][N], w_coupling: W0: [M][K],, out_coupling: [M][N]
+Creating architecture: TPUv1 (conv) with coupling: dims: NMPQCRS, in_coupling: [N][C][Pstride*P+Rdilation*R][Qstride*Q+Sdilation*S], w_coupling: W0: [M][C][R][S],, out_coupling: [N][M][P][Q]
+
+====================================================================================================
+FIXED-CONFIG FUSION COMPARISON: MCCNN -- FULL FUSION vs Sum SINGLES
+====================================================================================================
+Architecture: DepFiN, PE=8x256 (2,048 total)
+  FMEM=266KB, WMEM=32KB
+  Tile size override: 207
+  ALL experiments use IDENTICAL architecture (fair comparison)
+====================================================================================================
+
+--- FULL FUSION: mccnn/full/4layer ---
+------ loading Accelergy ------
+ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
+[Tile Size Override] tile_size=207, scale_bandwidth=False, fmem_bw=(132, 128)
+Creating architecture: Thesis_4Layers_272384KB_FMEM_8x256_PEs with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3PQZ3, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],, out_coupling: [Z3][P][Q]
+final_layer_dims: {'X0', 'S0', 'P', 'Y0', 'R0', 'C0', 'Q', 'R3', 'C3', 'Z3', 'S3'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'P', 'Q', 'Z3']
+INFO: Arch: Thesis_4Layers_272384KB_FMEM_8x256_PEs: identified intermediate dimensions: {'R1', 'X1', 'C2', 'Z2', 'Y2', 'R2', 'S2', 'Z0', 'Z1', 'C1', 'S1', 'Y1', 'X2'}
+INFO: Added high constraint for intermediate dimension P in level WeightRegister
+INFO: Added high constraint for intermediate dimension R1 in level WeightRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationIntermediateOutputRegister
+INFO: Added high constraint for intermediate dimension P in level AccumulationOutputRegister
+INFO: Added high constraint for intermediate dimension R1 in level AccumulationOutputRegister
+  OK Energy: 1.158e+04 uJ, Latency: 8.074e+06 cc, EDP: 1.11e+05
+
+--- BASELINE: SINGLE LAYERS ---
+Creating architecture: Thesis_1Layer_272384B_FMEM_8x256_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L0: E=5.129e+02 uJ, L=1.245e+06 cc, EDP=6.39e+02
+Creating architecture: Thesis_1Layer_272384B_FMEM_8x256_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L1: E=1.170e+03 uJ, L=4.189e+06 cc, EDP=4.92e+03
+Creating architecture: Thesis_1Layer_272384B_FMEM_8x256_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L2: E=1.170e+03 uJ, L=4.189e+06 cc, EDP=4.92e+03
+Creating architecture: Thesis_1Layer_272384B_FMEM_8x256_PEs with coupling: dims: MPQCRS, in_coupling: [C][P+R][Q+S], w_coupling: W0: [M][C][R][S],, out_coupling: [M][P][Q]
+  OK L3: E=1.170e+03 uJ, L=4.189e+06 cc, EDP=4.92e+03
+
+====================================================================================================
+COMPARISON RESULTS: MCCNN -- FULL FUSION vs Sum SINGLES
+====================================================================================================
+  Architecture: DepFiN 8x256, FMEM=266KB, WMEM=32KB
+====================================================================================================
+Level                        Energy (uJ)   Latency (cc)            EDP       DRAM Reads      DRAM Writes
+----------------------------------------------------------------------------------------------------
+Full Fusion (1 ok)             1.158e+04      8.074e+06       1.11e+05          494,928       14,943,744
+Sum Singles (4 ok)             4.023e+03      1.381e+07       1.54e+04       45,326,160       59,774,976
+
+----------------------------------------------------------------------------------------------------
+RATIOS (Full Fusion / Sum Singles) -- values < 1.0 mean fusion wins
+----------------------------------------------------------------------------------------------------
+Metric                    Ratio      Savings
+---------------------------------------------
+Energy                   2.8778      -187.8%
+Latency                  0.5846       +41.5%
+EDP                      7.2389      -623.9%
+DRAM Reads               0.0109       +98.9%
+DRAM Writes              0.2500       +75.0%
+
+----------------------------------------------------------------------------------------------------
+BASELINE DETAIL (Sum Singles):
+----------------------------------------------------------------------------------------------------
+Layer/Segment                     Energy (uJ)   Latency (cc)            EDP     Status
+-------------------------------------------------------------------------------------
+L0                                  5.129e+02      1.245e+06       6.39e+02         OK
+L1                                  1.170e+03      4.189e+06       4.92e+03         OK
+L2                                  1.170e+03      4.189e+06       4.92e+03         OK
+L3                                  1.170e+03      4.189e+06       4.92e+03         OK
+
+====================================================================================================
+
+Results exported to: results/results_20260219_010204.csv
+
+================================================================================
+EXPERIMENT SUMMARY
+================================================================================
+
+Total experiments: 5
+Successful: 5
+Failed: 0
+
+────────────────────────────────────────────────────────────────────────────────
+Results by workload:
+────────────────────────────────────────────────────────────────────────────────
+
+MCCNN:
+  full/4layer, fmem_size: 266kB, wmem_size: 32kB, pe_rows: 8, pe_cols: 256 -> E=1.16e+04μJ, L=8.07e+06cc, EDP=1.11e+05
+  single/L0, fmem_size: 266kB, wmem_size: 32kB, pe_rows: 8, pe_cols: 256 -> E=5.13e+02μJ, L=1.25e+06cc, EDP=6.39e+02
+  single/L1, fmem_size: 266kB, wmem_size: 32kB, pe_rows: 8, pe_cols: 256 -> E=1.17e+03μJ, L=4.19e+06cc, EDP=4.92e+03
+  single/L2, fmem_size: 266kB, wmem_size: 32kB, pe_rows: 8, pe_cols: 256 -> E=1.17e+03μJ, L=4.19e+06cc, EDP=4.92e+03
+  single/L3, fmem_size: 266kB, wmem_size: 32kB, pe_rows: 8, pe_cols: 256 -> E=1.17e+03μJ, L=4.19e+06cc, EDP=4.92e+03

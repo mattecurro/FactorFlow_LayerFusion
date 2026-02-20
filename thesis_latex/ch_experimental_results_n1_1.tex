@@ -1,0 +1,247 @@
+% ============================================================
+%  N.1.1  Architectures
+% ============================================================
+\subsection{Architectures}
+\label{sec:architectures}
+
+The two spatial architectures selected for the experiments are
+DepFiN~\cite{depfin_paper} and Eyeriss~v1~\cite{eyeriss_paper}.
+Table~\ref{tab:orig-arch-comparison} summarises the key parameters of the
+\emph{original} designs as published in the respective papers.
+
+% ------------------------------------------------------------------
+%  Comparison table: original DepFiN vs original Eyeriss v1
+% ------------------------------------------------------------------
+\begin{table}[htbp]
+  \centering
+  \caption{Comparison of the original DepFiN and Eyeriss~v1 architectures.}
+  \label{tab:orig-arch-comparison}
+  \small
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{Parameter}          & \textbf{DepFiN}                      & \textbf{Eyeriss v1}                 \\
+    \midrule
+    Technology node              & 22\,nm                               & 65\,nm                              \\
+    Clock frequency              & $\sim$930\,MHz                       & 200\,MHz                            \\
+    Dataflow                     & Depth-first (weight-stationary)      & Row-stationary                      \\
+    PE array                     & $16 \times 128 = 2048$               & $12 \times 14 = 168$                \\
+    \addlinespace
+    On-chip memory               & Split FMEM + WMEM                    & Unified GlobalBuffer                \\
+    FMEM / GlobalBuffer size     & 1056\,KB                             & 128\,KB                             \\
+    FMEM wordline                & 1056\,bit (2 banks)                  & 64\,bit                             \\
+    WMEM size                    & 524\,KB                              & ---                                 \\
+    WMEM wordline                & 128\,bit (4 banks)                   & ---                                 \\
+    \addlinespace
+    PE registers                 & WeightReg (384),                     & InputSpad (24),                     \\
+                                 & InputReg (24),                       & WeightSpad (384),                   \\
+                                 & AccumulationReg (32)                 & PsumSpad (32)                       \\
+    Accumulator precision        & 32\,bit                              & 16\,bit                             \\
+    Operand precision            & 8\,bit                               & 16\,bit                             \\
+    \addlinespace
+    DRAM type                    & LPDDR4                               & LPDDR4                              \\
+    DRAM bandwidth               & 12\,B/cycle                          & 8\,B/cycle                          \\
+    FMEM read bandwidth          & 132\,B/cycle                         & ---                                 \\
+    GB bandwidth                 & ---                                  & 32\,B/cycle                         \\
+    \addlinespace
+    Tile size                    & Fixed $1 \times 128$ patch            & Determined by mapping               \\
+    Spatial mapping (cols)       & Output width ($Q$)                   & Output width ($Q$) + channels ($M$) \\
+    Spatial mapping (rows)       & Output channels ($M$)                & Filter ($S$) + channels ($C$, $M$)  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Both architectures were modelled in the FactorFlow framework based on the
+parameters published in~\cite{depfin_paper,eyeriss_paper}.
+However, because the systolic arrays must support a variety of fused CNN
+workloads---not only the single fixed-size layer for which each original design
+was optimised---several modifications were necessary.
+We therefore refer to the modified variants as \textbf{DepFiN-Like} and
+\textbf{Eyeriss-Like} throughout this chapter.
+
+% ------------------------------------------------------------------
+\subsubsection{DepFiN-Like}
+\label{sec:depfin-like}
+
+DepFiN is a depth-first CNN accelerator with a split on-chip memory
+hierarchy: a \emph{Feature Memory} (FMEM) that stores input and output
+activations while bypassing weights, and a \emph{Weight Memory} (WMEM) that
+stores weights while bypassing all activation operands.
+In multi-layer (fused) mode, intermediate activations between consecutive
+layers are kept entirely on-chip---DRAM bypasses the intermediate operands
+(\texttt{int\_in}, \texttt{int\_out})---so that inter-layer data never
+touches external memory.
+Each fused layer receives its own pair of spatial fanout levels:
+\texttt{SACols} distributes the output spatial width ($Q$ or $X_i$) across
+the PE columns, while \texttt{SARows} distributes the output channels
+($M$ or $Z_i$) across the PE rows.
+
+Compared with the original DepFiN design (see
+Section~\ref{sec:validation}), the following modifications were applied:
+
+\begin{enumerate}
+  \item \textbf{Configurable tile size.}
+        The original DepFiN fixes the output tile to a $1 \times 128$
+        pixel patch that fills the 128 PE columns exactly.
+        Our version relaxes this constraint, allowing the output tile
+        size to be set independently for each workload.
+        This is essential for exploring the effect of tile size on
+        energy, latency, and DRAM traffic across workloads with
+        different spatial dimensions (see Section~\ref{sec:cs1-tile}).
+
+  \item \textbf{Variable PE array dimensions.}
+        Instead of the fixed $16 \times 128$ array, we sweep the number
+        of PE rows and columns independently
+        (Sections~\ref{sec:cs2-rows}--\ref{sec:cs3-cols})
+        and explore different aspect ratios at a constant total PE count
+        (Section~\ref{sec:cs4-aspect}).
+
+  \item \textbf{Feature Memory bandwidth.}
+        The FMEM read bandwidth is a fixed physical interface parameter
+        (132\,B/cycle, determined by the 1056-bit wordline).
+        It does \emph{not} scale automatically with the PE array size or
+        the tile size.
+        An optional bandwidth-scaling mode is available---in which the
+        bandwidth is scaled proportionally to
+        $\mathit{tile\_size} / 128$---and is used in the tile-size
+        sensitivity analysis (Section~\ref{sec:cs1-tile}).
+
+  \item \textbf{Mapping.}
+        The depth-first dataflow is preserved: weights are loaded into
+        WMEM for all fused layers, and activations stream through FMEM
+        tile-by-tile.
+        The mapping is determined by assigning spatial factors greedily:
+        \texttt{SACols} receives the highest divisor of the output tile
+        width that fits in the column mesh, and \texttt{SARows} receives
+        the highest divisor of the output channel count that fits in the
+        row mesh.
+        Remaining weight-dimension factors ($C$, $R$, $S$) are assigned
+        to WMEM, and residual tiling factors are pushed to DRAM.
+        When the tile size or PE array dimensions change across case
+        studies, the mapping adapts accordingly.
+\end{enumerate}
+
+% ------------------------------------------------------------------
+\subsubsection{Eyeriss-Like}
+\label{sec:eyeriss-like}
+
+Eyeriss~v1 is a row-stationary accelerator with a unified
+\emph{GlobalBuffer} (128\,KB) that stores input activations and output
+partial sums while bypassing weights (weights are delivered directly
+from DRAM to the per-PE weight registers).
+In the original design each PE contains three register files:
+an \emph{InputSpad} for input activations,
+a \emph{WeightSpad} for filter weights,
+and a \emph{PsumSpad} for partial-sum accumulation.
+The row-stationary dataflow is expressed through the spatial fanout:
+\texttt{SACols} distributes output spatial positions ($Q$) and output
+channels ($M$) across the 14 PE columns, while \texttt{SARows}
+distributes filter rows ($S$), input channels ($C$), and output channels
+($M$) across the 12 PE rows.
+Each PE therefore processes a 1-D convolution row: filter weights remain
+stationary in the weight register while input activations stream through,
+and partial sums accumulate across input channels along the columns.
+
+Compared with the original Eyeriss, the following modifications were
+applied:
+
+\begin{enumerate}
+  \item \textbf{Intermediate register for fusion.}
+        The original Eyeriss has no mechanism for passing intermediate
+        activations between fused layers on-chip.
+        We add a fourth per-PE register file, the
+        \emph{IntermediateOutputRegister}, which stores intermediate
+        activations produced by one layer and consumed by the next.
+        This register bypasses all other operands (inputs, weights,
+        final outputs) and, together with the DRAM bypass of
+        \texttt{int\_in}/\texttt{int\_out}, enables depth-first
+        layer fusion on Eyeriss
+        (see Section~\ref{sec:partial-full-fusion}).
+
+  \item \textbf{Variable PE array dimensions.}
+        With only 168~PEs ($14 \times 12$), each PE must process a
+        disproportionately large share of the workload.
+        For weight-dominant networks such as VGG16 and ResNet18, this
+        forces the per-PE weight register to hold thousands of entries,
+        which is physically impractical.
+        We therefore explore four total PE counts:
+        2\,048, 4\,096, 8\,192, and 16\,384.
+        Going above 16\,384 would exceed realistic budgets for
+        low-power edge accelerators; going below 4\,096 pushes the
+        required weight-register size to several thousand entries per PE,
+        making the design infeasible.
+        The sensitivity of register sizes and EDP to the PE count and
+        aspect ratio is analysed in
+        Sections~\ref{sec:cs1-wreg}--\ref{sec:cs5-aspect}.
+
+  \item \textbf{Register sizing.}
+        Because the Eyeriss feasibility problem is multi-dimensional
+        (InReg, WReg, IntermediateReg, and OutReg must all be
+        satisfiable simultaneously for each workload and PE
+        configuration), the per-PE register sizes are treated as
+        experimental variables.
+        Case studies CS1--CS3 sweep WReg, IntReg, and OutReg in turn
+        while searching for the minimum feasible PE configuration at
+        each size (Section~\ref{sec:cs1-wreg}--\ref{sec:cs2cs3-regs}).
+
+  \item \textbf{Mapping.}
+        The row-stationary dataflow is preserved.
+        Spatial factors are assigned greedily:
+        \texttt{SACols} first allocates the highest divisor of the
+        output tile width, then assigns remaining columns to output
+        channels~$M$;
+        \texttt{SARows} assigns factors to filter rows~$S$, then input
+        channels~$C$, then output channels~$M$.
+        The GlobalBuffer stores the residual tiling of activations
+        (with $P = 1$), and DRAM handles the outermost loops.
+        As with DepFiN-Like, the mapping adapts when tile sizes or PE
+        dimensions change across experiments.
+\end{enumerate}
+
+Table~\ref{tab:modified-arch-comparison} summarises the key differences
+between the original and modified versions of both architectures.
+
+% ------------------------------------------------------------------
+%  Comparison table: original vs modified
+% ------------------------------------------------------------------
+\begin{table}[htbp]
+  \centering
+  \caption{Summary of modifications applied to the original architectures.}
+  \label{tab:modified-arch-comparison}
+  \small
+  \begin{tabular}{l p{5cm} p{5cm}}
+    \toprule
+    \textbf{Aspect}
+      & \textbf{DepFiN $\to$ DepFiN-Like}
+      & \textbf{Eyeriss $\to$ Eyeriss-Like} \\
+    \midrule
+    PE array
+      & $16 \times 128$ (fixed) $\to$ variable rows/cols
+      & $12 \times 14$ (fixed) $\to$ 2\,048--16\,384 total PEs \\
+    \addlinespace
+    Tile size
+      & Fixed $1 \times 128$ $\to$ configurable per workload
+      & Determined by mapping $\to$ configurable per workload \\
+    \addlinespace
+    Registers
+      & Unchanged default sizes
+      & Added IntermediateOutputReg (320 entries);
+        WReg/InReg/OutReg sizes swept as variables \\
+    \addlinespace
+    FMEM / GB bypass
+      & Weights bypassed (unchanged)
+      & Weights bypassed (unchanged) \\
+    \addlinespace
+    DRAM bypass (fusion)
+      & \texttt{int\_in}, \texttt{int\_out} bypassed
+      & \texttt{int\_in}, \texttt{int\_out} bypassed \\
+    \addlinespace
+    Dataflow
+      & Depth-first preserved
+      & Row-stationary preserved \\
+    \addlinespace
+    Technology
+      & 22\,nm, $0.5\times$ scale
+      & 22\,nm, $0.5\times$ scale (orig.\ 65\,nm) \\
+    \bottomrule
+  \end{tabular}
+\end{table}

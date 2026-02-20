@@ -514,8 +514,7 @@ from computations import comp_vgg_16 as vgg16_single_layers
 # Block-based fusion for VGG16 (layers within each block share spatial dimensions)
 # Block 1: L0+L1 (2 layers, 224x224, 64 channels) - uses conv_2layers_coupling
 vgg16_block1_fused = Shape(
-    P=224, Q=224, Z1=64,
-    C1=64, R1=3, S1=3,
+    P=224, Q=224, Z1=64, C1=64, R1=3, S1=3,
     Y0=224, X0=224, Z0=64, R0=3, S0=3, C0=3
 )
     
@@ -541,7 +540,7 @@ vgg16_block4_fused = Shape(
 
 # Block 5: L10+L11 (2 layers, 14x14, 512 channels) - uses conv_2layers_coupling
 vgg16_block5_fused = Shape(
-    P=14, Q=14, Z1=512, C1=512, R1=3, S1=3,
+    P=14, Q=14, Z1=512, C1=512, R1=3, S1=3, 
     Y0=14, X0=14, Z0=512, R0=3, S0=3, C0=512, Pstride0=2, Qstride0=2
 )
 
@@ -674,9 +673,7 @@ resnet18_stage3_b2_fused = Shape(
     # Layer 10 (L11_conv4_1_2): 256->256, 14x14
     Y1=14, X1=14, Z1=256, C1=256, R1=3, S1=3,
     # Layer 9 (L10_conv4_1_1): 128->256, 14x14 (stride 2 from 28x28)
-    Y0=28, X0=28, Z0=256, C0=128, R0=3, S0=3, Pstride0=2, Qstride0=2,
-    
-    
+    Y0=28, X0=28, Z0=256, C0=128, R0=3, S0=3, Pstride0=2, Qstride0=2,  
 )
 
 # Stage 4: L13+L14+L15+L16 (4 layers, 7x7, 512 channels)
