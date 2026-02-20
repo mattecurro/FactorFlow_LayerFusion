@@ -930,7 +930,7 @@ def plot_eyeriss_cs1_inverted():
         cfgs = list(reversed(d["min_pe_config"]))
 
         # Primary axis: min WReg
-        ax.plot(pes, wreg, "o-", color=COLORS[wl], linewidth=2, label="Min WReg")
+        ax.plot(pes, wreg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum WReg (entries)")
         ax.set_title(wl, fontsize=13)
@@ -938,24 +938,12 @@ def plot_eyeriss_cs1_inverted():
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
         ax.invert_xaxis()  # large budget on the left
 
-        # Secondary axis: EDP
-        ax2 = ax.twinx()
-        ax2.plot(pes, edp, "s--", color="gray", alpha=0.6, linewidth=2, label="EDP")
-        ax2.set_ylabel("EDP  (J·cc)", color="gray")
-        ax2.tick_params(axis="y", labelcolor="gray")
-        _sci_fmt(ax2)
-
         # Annotate configs
         for p, w, cfg in zip(pes, wreg, cfgs):
             ax.annotate(cfg, (p, w), textcoords="offset points",
                         xytext=(0, 12), ha="center", fontsize=8,
                         bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                   ec=COLORS[wl], alpha=0.85, lw=0.6))
-
-        # Legend
-        h1, l1 = ax.get_legend_handles_labels()
-        h2, l2 = ax2.get_legend_handles_labels()
-        ax.legend(h1 + h2, l1 + l2, loc="center right", fontsize=9)
 
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     _save(fig, "eyeriss_cs1_wreg_inverted")

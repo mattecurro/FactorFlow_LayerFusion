@@ -23,14 +23,13 @@ PE, opens up smaller PE arrays that may be cheaper to manufacture but
 come at an energy cost, because a larger register is accessed at every
 weight read.
 
-CS1 answers this question by sweeping the WReg size while evaluating a
-full grid of PE configurations ($\text{rows} \times \text{cols}$, up
-to $\sim$17\,000 total PEs) for each WReg value.
+CS1 answers this question by evaluating a full grid of PE
+configurations ($\text{rows} \times \text{cols}$, up to
+$\sim$17\,000 total PEs) at several WReg sizes.
+For each PE budget the experiment identifies the smallest WReg that
+yields at least one feasible mapping.
 The GlobalBuffer (128\,KB), input register, intermediate register, and
 output register are held constant.
-For each WReg size the experiment records the minimum PE count that
-yields a feasible mapping (Summary~A) and the number of feasible
-configurations overall.
 
 \subsubsection{Results}
 
@@ -113,7 +112,6 @@ over the 8\,192 that Summary~A selects.
 Figure~\ref{fig:eyeriss-cs1-inv} presents the same data in the
 designer-oriented direction, with the PE budget on the horizontal axis
 and the minimum WReg on the vertical axis.
-The secondary axis reports the corresponding EDP.
 Reading the curve from left to right (decreasing PE budget), one can
 immediately read off the minimum register size required for a given
 area constraint.
@@ -122,8 +120,7 @@ area constraint.
   \centering
   \includegraphics[width=0.85\textwidth]{plots/eyeriss_cs1_wreg_inverted.pdf}
   \caption{Eyeriss CS1 — Minimum WReg required as a function of PE
-    budget (VGG16 and ResNet18).
-    Secondary axis: resulting EDP.}
+    budget (VGG16 and ResNet18).}
   \label{fig:eyeriss-cs1-inv}
 \end{figure}
 
