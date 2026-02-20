@@ -1,0 +1,143 @@
+% ============================================================
+%  N.1.3  Partial and Full Fusion
+% ============================================================
+\subsection{Partial and Full Fusion}
+\label{sec:partial-full-fusion}
+
+As discussed in Section~\ref{sec:workloads}, full fusion of an entire
+workload can be very demanding even for a fusion-specialised
+accelerator, because the on-chip memory must simultaneously
+accommodate the weights, activations, and intermediate data of all
+fused layers.
+To capture fusion benefits without requiring an architecture that can
+host the full workload at once, we also evaluate \emph{partial fusion},
+in which only a small group of consecutive layers (typically two or
+three) is fused into a single segment.
+Each segment is executed independently, and the total energy and latency
+are obtained by summing over all segments:
+%
+\begin{equation}
+  E_{\text{total}} = \sum_{i} E_{i},
+  \qquad
+  L_{\text{total}} = \sum_{i} L_{i},
+  \qquad
+  \text{EDP} = E_{\text{total}} \times L_{\text{total}}.
+  \label{eq:sum-partial}
+\end{equation}
+%
+Note that the EDP is the product of the summed energy and summed
+latency, not the sum of individual per-segment EDPs, since the
+segments are executed sequentially.
+
+\paragraph{Example: FSRCNN.}
+FSRCNN has 8~convolutional layers.
+Under 2-layer partial fusion the workload is split into four segments,
+each fusing two consecutive layers: L0\,+\,L1, L2\,+\,L3, L4\,+\,L5,
+and L6\,+\,L7.
+Each segment is mapped and executed independently on the same
+architecture, and the results are aggregated with
+Equation~\eqref{eq:sum-partial}.
+In contrast, under full fusion all 8~layers are fused into a single
+execution.
+
+\paragraph{Fusion granularities.}
+Table~\ref{tab:fusion-levels} lists the partial-fusion granularities
+available for each workload.
+For FSRCNN and MC-CNN the intermediate level is 2-layer fusion;
+for VGG16 it follows the network's block boundaries (pairs of layers
+within the same spatial resolution), and for ResNet18 both 2-layer and
+stage-level (residual block) groupings are defined.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Fusion granularities per workload.}
+  \label{tab:fusion-levels}
+  \small
+  \begin{tabular}{l c c l}
+    \toprule
+    \textbf{Workload}
+      & \textbf{Fused layers}
+      & \textbf{Segments}
+      & \textbf{Partial-fusion level} \\
+    \midrule
+    FSRCNN   &  8 & 4 & 2-layer \\
+    MC-CNN   &  4 & 2 & 2-layer \\
+    VGG16    & 13 & 8 & Block (2-layer blocks + solos) \\
+    ResNet18 & 17 & 8 & 2-layer \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ------------------------------------------------------------------
+%  Scenario A and Scenario B
+% ------------------------------------------------------------------
+\subsubsection{Evaluation Scenarios}
+\label{sec:scenarios}
+
+Because the architecture must be sized differently depending on the
+fusion level it supports, we define two evaluation scenarios:
+
+\begin{description}
+  \item[Scenario~A (full-sized architecture).]
+    The on-chip memories and registers are dimensioned to support
+    \emph{full fusion} of the entire workload, i.e.\ they are large
+    enough to hold the weights and intermediate data of all fused layers
+    simultaneously.
+    Three configurations are compared on this same full-sized
+    architecture:
+    (i)~\emph{full fusion}, where all layers are fused into one
+    execution;
+    (ii)~$\Sigma$\,\emph{partial fusion}, where partial-fusion
+    segments are executed independently and their results summed; and
+    (iii)~$\Sigma$\,\emph{singles}, where every layer is executed
+    individually.
+    This provides a fair comparison, as all three strategies use
+    identical hardware.
+
+  \item[Scenario~B (partial-sized architecture).]
+    The on-chip memories and registers are dimensioned only for the
+    largest partial-fusion segment, resulting in a \emph{smaller and
+    less energy-intensive} architecture than Scenario~A.
+    Full fusion is not feasible on this reduced hardware, so only
+    $\Sigma$\,partial fusion and $\Sigma$\,singles are compared.
+    This scenario answers a practical question: if the silicon budget
+    does not permit the large memories required for full fusion, is
+    partial fusion still beneficial compared with single-layer
+    execution on the same smaller chip?
+\end{description}
+
+\noindent
+Table~\ref{tab:scenarios-example} illustrates the memory sizing
+difference between the two scenarios for selected configurations.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Example architecture sizing for Scenario~A and Scenario~B.}
+  \label{tab:scenarios-example}
+  \small
+  \begin{tabular}{l l l l}
+    \toprule
+    \textbf{Configuration}
+      & \textbf{Scenario~A}
+      & \textbf{Scenario~B}
+      & \textbf{Difference} \\
+    \midrule
+    Eyeriss, ResNet18 (512$\times$32)
+      & WReg\,=\,902
+      & WReg\,=\,384
+      & $2.3\times$ smaller \\
+    Eyeriss, VGG16 (512$\times$32)
+      & WReg\,=\,1\,200
+      & WReg\,=\,576
+      & $2.1\times$ smaller \\
+    DepFiN, FSRCNN
+      & FMEM\,=\,576\,KB
+      & FMEM\,=\,248\,KB
+      & $2.3\times$ smaller \\
+    DepFiN, ResNet18
+      & WMEM\,=\,10\,738\,KB
+      & WMEM\,=\,4\,608\,KB
+      & $2.3\times$ smaller \\
+    \bottomrule
+  \end{tabular}
+\end{table}
