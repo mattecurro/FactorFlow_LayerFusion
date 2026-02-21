@@ -71,27 +71,34 @@ size, the minimum-PE configuration that yields a feasible mapping.
 \end{table}
 
 The table reveals the same doubling rule observed for WReg in CS1.
-Taking ResNet18 as an example, the IntReg footprint at a given
-PE configuration equals the sum of intermediate-channel residuals
-across all 16 layer boundaries.
-At $\text{pe\_cols} = 16$ the footprint is approximately 209 entries,
-so IntReg\,=\,400 comfortably fits and represents the saturation
-point: enlarging IntReg beyond 400 no longer reduces the PE count.
-Moving to $\text{pe\_cols} = 32$ halves the per-PE footprint to
-$\sim$104, requiring IntReg\,$\ge$\,200 and $256 \times 32 = 8{,}192$
-PEs.
-At IntReg\,=\,50 the mapper must widen the array to
-$128 \times 128 = 16{,}384$~PEs to push the per-PE footprint low
-enough.
+The mechanism is as follows: the per-PE intermediate footprint equals
+the total residual channel sum across all fused layer boundaries,
+divided by the number of PE columns.
+A smaller IntReg budget therefore forces the mapper to increase the
+column count so that each PE's share of the footprint stays within
+the register capacity.
+
+Taking ResNet18 as an example, the total intermediate footprint
+across 16~layer boundaries is approximately 209~entries when mapped
+onto 16~columns.
+At IntReg\,=\,400 this footprint fits comfortably, so the mapper
+saturates at $256 \times 16 = 4{,}096$~PEs: enlarging IntReg beyond
+400 no longer reduces the PE count.
+Halving the register to IntReg\,=\,200 forces the mapper to double
+the column count to 32, yielding $256 \times 32 = 8{,}192$~PEs,
+because each PE must now hold its share within a tighter budget.
+At IntReg\,=\,50 the array widens further to
+$128 \times 128 = 16{,}384$~PEs.
 Each halving of IntReg therefore roughly doubles the required column
 count, driving a proportional increase in total PEs.
 
 VGG16 follows the same pattern.
-The saturation point is IntReg\,=\,230 at $256 \times 16 = 4{,}096$~PEs,
-reflecting a per-PE intermediate footprint of $\sim$229 entries at
-$\text{pe\_cols} = 16$.
-At IntReg\,=\,100 the array doubles to $256 \times 32 = 8{,}192$~PEs,
-and at IntReg\,=\,50 it reaches $512 \times 32 = 16{,}384$~PEs.
+At IntReg\,=\,230 the mapper saturates at
+$256 \times 16 = 4{,}096$~PEs, corresponding to a per-PE footprint
+of $\sim$229~entries on 16~columns.
+Reducing IntReg to 100 doubles the array to
+$256 \times 32 = 8{,}192$~PEs, and at IntReg\,=\,50 it reaches
+$512 \times 32 = 16{,}384$~PEs.
 
 Figure~\ref{fig:eyeriss-cs2-inv} presents the designer-oriented
 view: the horizontal axis is the PE budget and the vertical axis is

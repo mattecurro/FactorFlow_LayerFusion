@@ -1,0 +1,273 @@
+% ============================================================
+%  N.3.1  Full-Sized Architecture — Fusion Mode Comparison
+% ============================================================
+\subsection{Full-Sized Architecture: Fusion Mode Comparison (Scenario~A)}
+\label{sec:fusion-full-sized}
+
+\subsubsection{Motivation}
+
+The case studies presented in Sections~\ref{sec:eyeriss-cs1}
+through~\ref{sec:eyeriss-cs5} focused on how individual
+architectural parameters, such as register sizes and PE aspect
+ratios, interact with the fusion mapping.
+This section shifts perspective and asks the central question of
+the thesis: \emph{does layer fusion actually improve the end-to-end
+efficiency of a DNN accelerator, and under what conditions?}
+
+To answer this, we define three execution modes on the same
+architecture instance, which is sized to support full fusion of the
+entire workload (Scenario~A):
+\begin{enumerate}
+  \item \textbf{Full fusion.}
+        All convolutional layers are fused into a single mapping.
+        Intermediate activations are kept entirely on chip, reducing
+        DRAM traffic to the network's input and final output only.
+  \item \textbf{Partial fusion (sum).}
+        Consecutive layer pairs are fused independently.
+        The total cost is the sum of all pair-wise fused evaluations.
+        DRAM traffic is reduced for each pair, but intermediate
+        activations between non-adjacent layers still traverse DRAM.
+  \item \textbf{Single-layer (sum).}
+        Each layer is mapped in isolation, and the total cost is
+        the sum of all individual layer evaluations.
+        Every intermediate activation is written to and read back
+        from DRAM.
+\end{enumerate}
+
+The architecture used for each workload is the same full-fusion
+configuration determined by the PE and memory sizing studies
+(Table~\ref{tab:fusion-auto-configs}).
+Running partial and single-layer modes on a full-fusion-sized
+architecture provides a fair comparison because all three modes
+share identical hardware; only the mapping strategy differs.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Architecture configurations used for Scenario~A
+    (full-fusion-sized).
+    Memory sizes refer to the DepFiN feature-memory (fmem) and
+    weight-memory (wmem), or the Eyeriss GlobalBuffer (GB) and
+    per-PE weight register (WReg).}
+  \label{tab:fusion-auto-configs}
+  \begin{tabular}{ll rr rr}
+    \toprule
+    & & \multicolumn{2}{c}{DepFiN} & \multicolumn{2}{c}{Eyeriss} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+    Workload & PEs
+      & fmem & wmem
+      & GB & WReg \\
+    \midrule
+    FSRCNN   & $16 \times 128$ / $128 \times 16$
+      & 576\,KB  & 19\,KB
+      & 128\,KB  & 384 \\
+    MC-CNN   & $8 \times 256$\, / $256 \times 8$
+      & 522\,KB  & 32\,KB
+      & 128\,KB  & 384 \\
+    VGG16    & $16 \times 128$ / $512 \times 32$
+      & 568\,KB  & 14\,366\,KB
+      & 128\,KB  & 1\,200 \\
+    ResNet18 & $16 \times 128$ / $512 \times 32$
+      & 266\,KB  & 10\,738\,KB
+      & 128\,KB  & 902 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The following analysis is organised around three metrics, each
+normalised to the full-fusion value, and concludes with the
+latency savings summary.
+
+\subsubsection{Results}
+
+% ── Energy ──────────────────────────────────────────────────
+\paragraph{Energy (Figure~\ref{fig:fusion-energy-norm}).}
+Full fusion is \emph{always} the most energy-expensive mode,
+for every workload and on both architectures.
+Single-layer execution consumes between $4.5\%$ (VGG16, DepFiN)
+and $78.3\%$ (FSRCNN, DepFiN) of the full-fusion energy, while
+partial fusion sits closer to the full-fusion level, ranging from
+$66.8\%$ (VGG16, Eyeriss) to $109.6\%$ (FSRCNN, DepFiN).
+
+The energy penalty of full fusion arises from the on-chip memory
+overhead.
+Fusing all layers requires substantially larger local storage,
+such as DepFiN's weight memory growing from 19\,KB (single) to
+14\,366\,KB (full) for VGG16, or Eyeriss's WReg rising from
+a few hundred to 1\,200~words per PE.
+Although fusion eliminates most DRAM traffic, every on-chip data
+access passes through these enlarged memories, and the per-access
+energy scales with memory size.
+The energy trade-off is therefore governed by the ratio of
+on-chip-access energy increase to DRAM-access energy saved.
+In all eight architecture--workload combinations tested, the
+enlarged on-chip memories outweigh the DRAM savings, making full
+fusion the most energy-intensive mode.
+
+On Eyeriss, the energy penalty is especially severe: the
+full-to-single energy ratio reaches $36.9\times$ for VGG16 and
+$25.3\times$ for ResNet18, compared to $22.3\times$ and
+$11.4\times$ on DepFiN.
+This disparity reflects the Eyeriss register architecture, where
+each PE replicates the enlarged WReg locally.
+With 16\,384~PEs for VGG16, the aggregate register capacity is
+$1{,}200 \times 16{,}384 = 19.7$~million words, all of which
+contribute to the dynamic energy whenever the weight register is
+accessed.
+DepFiN avoids this replication by housing weights in a shared
+off-PE weight memory.
+
+The activation-dominant workloads (FSRCNN, MC-CNN) exhibit
+smaller energy penalties than the weight-dominant ones (VGG16,
+ResNet18).
+On DepFiN, the FSRCNN full-to-single ratio is only $1.3\times$
+because the fused feature memory (576\,KB) is modest and the
+weight memory remains tiny (19\,KB).
+MC-CNN reaches $2.8\times$ on DepFiN, while on Eyeriss both
+FSRCNN and MC-CNN sit at $6.4\times$ and $10.5\times$
+respectively, reflecting the register replication overhead.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{plots/fusion_auto_energy_norm.pdf}
+  \caption{Scenario~A — Normalised energy (Full~Fusion\,=\,1.0).
+    Bars below 1.0 indicate lower energy than full fusion.
+    Values annotated above each bar.}
+  \label{fig:fusion-energy-norm}
+\end{figure}
+
+% ── Latency ─────────────────────────────────────────────────
+\paragraph{Latency (Figure~\ref{fig:fusion-latency-norm}).}
+Unlike energy, full fusion does deliver latency benefits, but
+their magnitude depends on the workload and architecture.
+
+For the activation-dominant workloads, full fusion is clearly
+faster on both architectures.
+FSRCNN enjoys a $47.6\%$ latency saving on DepFiN and $45.6\%$
+on Eyeriss, while MC-CNN saves $42.3\%$ on DepFiN and $15.7\%$
+on Eyeriss (Figure~\ref{fig:fusion-latency-savings}).
+These workloads have large intermediate-activation volumes
+relative to their weight volumes, so eliminating the DRAM
+round-trips for activations removes the dominant bottleneck from
+the execution timeline.
+
+For the weight-dominant workloads the picture is more nuanced.
+On Eyeriss, full fusion still reduces latency compared to the
+single-layer sum: VGG16 saves $21.2\%$ and ResNet18 saves $7.8\%$.
+On DepFiN, however, full fusion is \emph{slower} than the
+single-layer sum: VGG16 loses $21.1\%$ and ResNet18 loses
+$30.3\%$.
+The key difference is that DepFiN's full-fusion configuration
+must allocate a very large weight memory (10--14\,MB), and the
+mapper requires more temporal passes to fill it.
+The additional scheduling overhead exceeds the latency saved from
+reduced DRAM traffic, producing a net latency increase.
+Eyeriss avoids this penalty because its distributed register
+architecture can parallelize weight loading across PEs.
+
+Partial fusion tracks the full-fusion latency closely in most
+cases: the ratio ranges from $0.87\times$ (ResNet18, DepFiN) to
+$1.03\times$ (ResNet18, Eyeriss), indicating that the latency
+benefit of fusion is captured almost entirely by pairwise fusion,
+with little additional gain from fusing all layers
+simultaneously.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{plots/fusion_auto_latency_norm.pdf}
+  \caption{Scenario~A — Normalised latency (Full~Fusion\,=\,1.0).
+    Bars above 1.0 indicate longer latency than full fusion.}
+  \label{fig:fusion-latency-norm}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.75\textwidth]{plots/fusion_latency_savings.pdf}
+  \caption{Scenario~A — Latency savings of full fusion relative
+    to single-layer execution.
+    Positive values indicate fusion is faster; negative values
+    indicate fusion is slower.}
+  \label{fig:fusion-latency-savings}
+\end{figure}
+
+% ── EDP ─────────────────────────────────────────────────────
+\paragraph{Energy-Delay Product
+  (Figure~\ref{fig:fusion-edp-norm}).}
+The EDP combines energy and latency into a single efficiency
+metric and delivers the most nuanced verdict on fusion.
+
+On DepFiN, full fusion wins on EDP for only one workload:
+FSRCNN, where the large latency saving ($47.6\%$) outweighs the
+modest energy penalty ($1.3\times$), yielding an EDP that is
+$33\%$ lower than the single-layer sum
+(normalised single\,=\,$1.494$).
+For all other DepFiN workloads, single-layer execution dominates:
+MC-CNN's single-layer EDP is $0.621\times$ the full-fusion value,
+ResNet18 is $0.067\times$, and VGG16 is $0.040\times$.
+
+On Eyeriss, the results are starker: the single-layer sum is
+the EDP winner for every workload.
+Even FSRCNN, whose $45.6\%$ latency saving is comparable to
+DepFiN, has a single-layer EDP of $0.288\times$ full fusion
+because the Eyeriss energy penalty is $6.4\times$ rather than
+$1.3\times$.
+The pattern holds consistently: MC-CNN single
+$= 0.113\times$, VGG16 $= 0.034\times$, ResNet18
+$= 0.043\times$.
+
+Partial fusion performs slightly better than full fusion on EDP
+for the weight-dominant workloads, with normalised values of
+$0.659$ (VGG16, DepFiN) and $0.716$ (VGG16, Eyeriss), because
+the smaller per-pair memory requirement reduces the energy
+penalty.
+For the activation-dominant workloads, partial fusion is within
+$1$--$13\%$ of full fusion, offering no meaningful advantage.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{plots/fusion_auto_edp_norm.pdf}
+  \caption{Scenario~A — Normalised EDP (Full~Fusion\,=\,1.0).
+    Bars below 1.0 indicate better efficiency than full fusion.}
+  \label{fig:fusion-edp-norm}
+\end{figure}
+
+% ── DRAM Traffic ────────────────────────────────────────────
+\paragraph{DRAM traffic reduction.}
+The fundamental premise of layer fusion is the elimination of
+intermediate DRAM transfers, and the data confirm that this
+mechanism works as expected.
+Full fusion reduces total DRAM traffic (reads + writes) by
+$94.8\%$ for FSRCNN, $85.3\%$ for MC-CNN, $59.9\%$ for VGG16,
+and $25.1\%$ for ResNet18, relative to single-layer execution.
+These numbers are identical across the two architectures because
+the DRAM access pattern depends on the dataflow mapping, not on
+the on-chip memory technology.
+
+The reduction is largest for the activation-dominant workloads
+because their intermediate activations comprise the overwhelming
+majority of total DRAM traffic in single-layer mode.
+For the weight-dominant workloads, weights dominate the transfer
+volume, and since weights are loaded from DRAM regardless of
+fusion, the relative saving is smaller.
+
+% ── Key Takeaway ────────────────────────────────────────────
+\paragraph{Key takeaway.}
+Full fusion achieves its primary goal, the elimination of
+inter-layer DRAM traffic, delivering reductions of
+$25$--$95\%$ depending on the workload.
+This translates into significant latency improvements for
+activation-dominant workloads ($42$--$48\%$ on DepFiN,
+$16$--$46\%$ on Eyeriss).
+However, the on-chip memory overhead required to support full
+fusion imposes a substantial energy penalty, ranging from
+$1.3\times$ (FSRCNN, DepFiN) to $36.9\times$ (VGG16, Eyeriss),
+which dominates the EDP trade-off.
+As a result, full fusion wins on EDP in only one of the eight
+architecture--workload combinations tested (FSRCNN on DepFiN);
+in all other cases, single-layer execution is more
+energy-efficient overall.
+The implication is that the benefit of fusion is primarily a
+latency benefit: it accelerates execution at the cost of
+increased total energy.
+Whether this trade-off is acceptable depends on whether the
+design priority is throughput (latency-sensitive) or energy
+efficiency (battery or thermal budget).
