@@ -217,12 +217,12 @@ DEPFIN_CS4 = {
 EYERISS_CS1 = {
     "FSRCNN": {
         "wreg": [200, 300, 400],
-        "min_pe_config": ["256x4", "256x4", "256x4"],
-        "min_pe_total": [1024, 1024, 1024],
-        "energy": [4.883e4, 5.948e4, 7.012e4],
-        "latency": [1.944e7, 1.944e7, 1.944e7],
-        "edp": [9.61e5, 1.17e6, 1.37e6],
-        "n_feasible": [7, 7, 7],
+        "min_pe_config": ["128x4", "128x4", "128x4"],
+        "min_pe_total": [512, 512, 512],
+        "energy": [5.052e4, 6.116e4, 7.181e4],
+        "latency": [2.825e7, 2.825e7, 2.825e7],
+        "edp": [1.46e6, 1.76e6, 2.06e6],
+        "n_feasible": [12, 12, 12],
     },
     "MC-CNN": {
         "wreg": [100, 200, 300, 600],
@@ -246,9 +246,9 @@ EYERISS_CS1 = {
         "wreg": [902, 1800, 3600],
         "min_pe_config": ["256x64", "128x64", "128x32"],
         "min_pe_total": [16384, 8192, 4096],
-        "energy": [4.709e4, 6.850e4, 1.140e5],
-        "latency": [3.042e6, 3.042e6, 3.042e6],
-        "edp": [1.48e5, 2.13e5, 3.53e5],
+        "energy": [4.709e4, 6.850e4, 1.119e5],
+        "latency": [3.042e6, 3.042e6, 3.059e6],
+        "edp": [1.48e5, 2.13e5, 3.46e5],
         "n_feasible": [2, 6, 8],
     },
 }
@@ -265,8 +265,8 @@ EYERISS_CS1_B = {
     },
     "ResNet18": {
         "wreg": [902, 1800, 3600],
-        "minedp_pe_config": ["256x64", "128x64", "128x32"],
-        "minedp_pe_total": [16384, 8192, 4096],
+        "minedp_pe_config": ["256x64", "128x64", "128x64"],
+        "minedp_pe_total": [16384, 8192, 8192],
         "energy": [4.709e4, 6.850e4, 1.140e5],
         "latency": [3.042e6, 3.042e6, 3.042e6],
         "edp": [1.48e5, 2.13e5, 3.53e5],
@@ -283,10 +283,10 @@ EYERISS_CS2 = {
         "note": "Non-binding: all identical PE config 128x4",
     },
     "MC-CNN": {
-        "intreg": [15, 30, 50, 100],
-        "energy": [1.212e5, 1.180e5, 1.180e5, 1.253e5],
-        "latency": [1.223e7, 2.344e7, 2.344e7, 9.068e7],
-        "edp": [1.49e6, 2.78e6, 2.78e6, 1.14e7],
+        "intreg": [15, 30, 100],
+        "energy": [1.212e5, 1.180e5, 1.253e5],
+        "latency": [1.223e7, 2.344e7, 2.344e7],
+        "edp": [1.49e6, 2.78e6, 2.78e6],
         "note": "IntReg=15 needs 4096 PEs; saturates at >=30",
     },
     "VGG16": {
@@ -338,22 +338,31 @@ EYERISS_CS3 = {
 }
 
 # CS5 — Eyeriss PE Aspect Ratio Sweep (fixed total PEs)
+# InReg=234, WReg=500, IntReg=200, OutReg=64 for Activation Dominant
 EYERISS_CS5 = {
     "FSRCNN": {
         "total_pes": 2048,
-        "configs": ["256x8", "512x4", "1024x2", "2048x1"],
-        "energy": [8.077e4, 8.251e4, 8.385e4, 8.385e4],
-        "latency": [1.889e7, 1.889e7, 1.889e7, 1.918e7],
-        "edp": [1.54e6, 1.58e6, 1.61e6, 1.64e6],
-        "best": "256x8",
+        "configs": ["8x256", "16x128", "32x64", "64x32",
+                     "128x16", "256x8", "512x4", "1024x2", "2048x1"],
+        "energy": [1.184e5, 1.214e5, 1.225e5, 1.253e5,
+                   1.253e5, 1.253e5, 1.253e5, 1.253e5, 1.253e5],
+        "latency": [1.889e7, 1.889e7, 1.918e7, 1.918e7,
+                    1.918e7, 1.918e7, 1.918e7, 1.918e7, 1.918e7],
+        "edp": [2.39e6, 2.44e6, 2.50e6, 2.56e6,
+                2.56e6, 2.52e6, 2.52e6, 2.52e6, 2.52e6],
+        "best": "8x256",
     },
     "MC-CNN": {
         "total_pes": 2048,
-        "configs": ["128x16", "256x8", "512x4", "1024x2", "2048x1"],
-        "energy": [1.204e5, 1.204e5, 1.204e5, 1.230e5, 1.230e5],
-        "latency": [1.223e7, 1.223e7, 1.223e7, 1.261e7, 1.261e7],
-        "edp": [1.48e6, 1.48e6, 1.48e6, 1.57e6, 1.57e6],
-        "best": "128x16",
+        "configs": ["8x256", "16x128", "32x64", "64x32",
+                     "128x16", "256x8", "512x4", "1024x2", "2048x1"],
+        "energy": [1.588e5, 1.596e5, 1.613e5, 1.646e5,
+                   1.597e5, 1.597e5, 1.597e5, 1.597e5, 1.597e5],
+        "latency": [2.344e7, 1.223e7, 1.821e7, 1.261e7,
+                    1.261e7, 1.261e7, 1.261e7, 1.261e7, 1.261e7],
+        "edp": [3.99e6, 2.09e6, 3.15e6, 2.22e6,
+                2.09e6, 2.09e6, 2.09e6, 2.09e6, 2.09e6],
+        "best": "16x128",
     },
     "VGG16": {
         "total_pes": 16384,
@@ -425,20 +434,20 @@ FUSION_AUTO = {
     "Eyeriss": {
         "FSRCNN": {
             "pe": "128x16", "gb": "128KB", "wreg": 384,
-            "full":    {"energy": 6.842e4, "latency": 1.889e7, "edp": 1.29e6,
+            "full":    {"energy": 7.150e4, "latency": 1.918e7, "edp": 1.37e6,
                         "dram_rd": 1_573_992, "dram_wr": 8_294_400},
-            "single":  {"energy": 9.606e3, "latency": 3.525e7, "edp": 3.39e5,
+            "single":  {"energy": 1.117e4, "latency": 3.525e7, "edp": 3.94e5,
                         "dram_rd": 90_738_792, "dram_wr": 97_459_200},
-            "partial": {"energy": 6.920e4, "latency": 1.889e7, "edp": 1.31e6,
+            "partial": {"energy": 7.203e4, "latency": 1.918e7, "edp": 1.38e6,
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
         },
         "MC-CNN": {
             "pe": "256x8", "gb": "128KB", "wreg": 384,
-            "full":    {"energy": 8.955e4, "latency": 1.223e7, "edp": 1.10e6,
+            "full":    {"energy": 9.217e4, "latency": 1.261e7, "edp": 1.16e6,
                         "dram_rd": 494_928, "dram_wr": 14_943_744},
-            "single":  {"energy": 7.488e3, "latency": 1.495e7, "edp": 1.12e5,
+            "single":  {"energy": 8.784e3, "latency": 1.495e7, "edp": 1.31e5,
                         "dram_rd": 45_326_160, "dram_wr": 59_774_976},
-            "partial": {"energy": 9.138e4, "latency": 1.223e7, "edp": 1.12e6,
+            "partial": {"energy": 9.313e4, "latency": 1.261e7, "edp": 1.17e6,
                         "dram_rd": 15_438_672, "dram_wr": 29_887_488},
         },
         "VGG16": {
@@ -447,7 +456,7 @@ FUSION_AUTO = {
                         "dram_rd": 14_860_992, "dram_wr": 100_352},
             "single":  {"energy": 9.425e3, "latency": 6.922e6, "edp": 6.52e4,
                         "dram_rd": 23_792_320, "dram_wr": 13_547_520},
-            "partial": {"energy": 2.291e5, "latency": 5.852e6, "edp": 1.34e6,
+            "partial": {"energy": 2.325e5, "latency": 5.852e6, "edp": 1.36e6,
                         "dram_rd": 17_670_848, "dram_wr": 7_426_048},
         },
         "ResNet18": {
@@ -456,7 +465,7 @@ FUSION_AUTO = {
                         "dram_rd": 11_032_512, "dram_wr": 25_088},
             "single":  {"energy": 1.872e3, "latency": 3.301e6, "edp": 6.18e3,
                         "dram_rd": 12_449_984, "dram_wr": 2_308_096},
-            "partial": {"energy": 4.261e4, "latency": 3.118e6, "edp": 1.33e5,
+            "partial": {"energy": 4.444e4, "latency": 3.139e6, "edp": 1.40e5,
                         "dram_rd": 11_760_064, "dram_wr": 752_640},
         },
     },
@@ -504,28 +513,28 @@ FUSION_PARTIAL_SIZED = {
     "Eyeriss": {
         "FSRCNN": {
             "pe": "128x16", "gb": "128KB", "wreg": 384,
-            "partial": {"energy": 6.920e4, "latency": 1.889e7, "edp": 1.31e6,
+            "partial": {"energy": 7.203e4, "latency": 1.918e7, "edp": 1.38e6,
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
-            "single":  {"energy": 9.606e3, "latency": 3.525e7, "edp": 3.39e5,
+            "single":  {"energy": 1.117e4, "latency": 3.525e7, "edp": 3.94e5,
                         "dram_rd": 90_738_792, "dram_wr": 97_459_200},
         },
         "MC-CNN": {
             "pe": "256x8", "gb": "128KB", "wreg": 384,
-            "partial": {"energy": 9.138e4, "latency": 1.223e7, "edp": 1.12e6,
+            "partial": {"energy": 9.313e4, "latency": 1.261e7, "edp": 1.17e6,
                         "dram_rd": 15_438_672, "dram_wr": 29_887_488},
-            "single":  {"energy": 7.488e3, "latency": 1.495e7, "edp": 1.12e5,
+            "single":  {"energy": 8.784e3, "latency": 1.495e7, "edp": 1.31e5,
                         "dram_rd": 45_326_160, "dram_wr": 59_774_976},
         },
         "VGG16": {
             "pe": "512x32", "gb": "128KB", "wreg": 576,
-            "partial": {"energy": 1.528e5, "latency": 5.852e6, "edp": 8.94e5,
+            "partial": {"energy": 1.562e5, "latency": 5.852e6, "edp": 9.14e5,
                         "dram_rd": 17_670_848, "dram_wr": 7_426_048},
             "single":  {"energy": 9.415e3, "latency": 6.922e6, "edp": 6.52e4,
                         "dram_rd": 23_792_320, "dram_wr": 13_547_520},
         },
         "ResNet18": {
-            "pe": "512x32", "gb": "128KB", "wreg": 902,
-            "partial": {"energy": 2.950e4, "latency": 3.118e6, "edp": 9.20e4,
+            "pe": "512x32", "gb": "128KB", "wreg": 384,
+            "partial": {"energy": 3.134e4, "latency": 3.139e6, "edp": 9.84e4,
                         "dram_rd": 11_760_064, "dram_wr": 752_640},
             "single":  {"energy": 1.871e3, "latency": 3.301e6, "edp": 6.18e3,
                         "dram_rd": 12_449_984, "dram_wr": 2_308_096},
@@ -572,12 +581,12 @@ FUSION_FIXED_RESNET18 = {
     "wreg": [902, 1800, 3600],          # full-sized wreg
     "full_energy": [4.729e4, 6.767e4, 1.121e5],
     "single_energy": [1.872e3, 1.417e3, 1.131e3],
-    "partial_energy": [4.261e4, 6.424e4, 1.094e5],
+    "partial_energy": [4.444e4, 6.559e4, 1.104e5],
     "full_latency": [3.042e6, 3.042e6, 3.059e6],
     "single_latency": [3.301e6, 3.301e6, 3.301e6],
-    "partial_latency": [3.118e6, 3.118e6, 3.126e6],
+    "partial_latency": [3.139e6, 3.139e6, 3.147e6],
     "energy_ratio_fs": [19.15, 47.75, 99.10],
-    "energy_ratio_fp": [1.11, 1.05, 1.03],  # full/partial ~1
+    "energy_ratio_fp": [1.06, 1.03, 1.02],  # full/partial ~1
     "latency_ratio": [0.976, 0.976, 0.92],
 }
 
@@ -587,9 +596,9 @@ FUSION_FIXED_RESNET18_PARTIAL = {
     "configs": ["512x32", "256x32", "256x16"],
     "total_pes": [16384, 8192, 4096],
     "wreg": [384, 770, 1600],                       # partial-sized wreg
-    "partial_energy": [2.950e4, 3.819e4, 5.880e4],
+    "partial_energy": [3.134e4, 3.953e4, 5.978e4],
     "single_energy":  [1.871e3, 1.413e3, 1.118e3],
-    "partial_latency": [3.118e6, 3.118e6, 3.118e6],
+    "partial_latency": [3.139e6, 3.139e6, 3.147e6],
     "single_latency":  [3.301e6, 3.301e6, 3.301e6],
 }
 
@@ -598,15 +607,15 @@ FUSION_FIXED_VGG16 = {
     "configs": ["512x32", "256x32", "256x16"],
     "total_pes": [16384, 8192, 4096],
     "wreg": [1200, 2400, 4800],                     # full-sized wreg
-    "full_energy": [3.478e5, 5.491e5, 9.517e5],
-    "single_energy": [9.425e3, 9.443e3, 9.480e3],
-    "partial_energy": [2.291e5, 3.758e5, 6.692e5],
-    "full_latency": [5.455e6, 5.455e6, 5.455e6],
-    "single_latency": [6.922e6, 6.922e6, 6.922e6],
-    "partial_latency": [5.852e6, 5.852e6, 5.852e6],
-    "energy_ratio_fs": [36.90, 58.14, 100.30],
-    "energy_ratio_fp": [1.52, 1.46, 1.42],
-    "latency_ratio": [0.79, 0.79, 0.79],
+    "full_energy": [3.478e5, 5.368e5, 9.337e5],
+    "single_energy": [9.425e3, 6.897e3, 5.190e3],
+    "partial_energy": [2.325e5, 3.760e5, 6.678e5],
+    "full_latency": [5.455e6, 5.681e6, 6.715e6],
+    "single_latency": [6.922e6, 6.922e6, 7.694e6],
+    "partial_latency": [5.852e6, 5.952e6, 6.897e6],
+    "energy_ratio_fs": [36.90, 77.83, 179.90],
+    "energy_ratio_fp": [1.50, 1.43, 1.40],
+    "latency_ratio": [0.79, 0.82, 0.87],
 }
 
 # VGG16 — Partial-sized architecture  (Scenario B)
@@ -614,30 +623,30 @@ FUSION_FIXED_VGG16_PARTIAL = {
     "configs": ["512x32", "256x32", "256x16"],
     "total_pes": [16384, 8192, 4096],
     "wreg": [576, 1200, 2200],                       # partial-sized wreg
-    "partial_energy": [1.528e5, 2.291e5, 3.513e5],
-    "single_energy":  [9.415e3, 9.425e3, 9.449e3],
-    "partial_latency": [5.852e6, 5.852e6, 5.852e6],
-    "single_latency":  [6.922e6, 6.922e6, 6.922e6],
+    "partial_energy": [1.562e5, 2.292e5, 3.499e5],
+    "single_energy":  [9.415e3, 6.862e3, 5.044e3],
+    "partial_latency": [5.852e6, 5.952e6, 6.897e6],
+    "single_latency":  [6.922e6, 6.922e6, 7.694e6],
 }
 
 # MC-CNN — fixed config  (wreg=384 for both scenarios → single scenario)
 FUSION_FIXED_MCCNN = {
     "config": "256x8", "total_pes": 2048, "wreg": 384,
-    "full":    {"energy": 8.955e4, "latency": 1.223e7},
-    "single":  {"energy": 7.488e3, "latency": 1.495e7},
-    "partial": {"energy": 9.138e4, "latency": 1.223e7},
-    "energy_ratio_fs": 11.96,
-    "energy_ratio_fp": 0.98,
+    "full":    {"energy": 9.217e4, "latency": 1.261e7},
+    "single":  {"energy": 8.784e3, "latency": 1.495e7},
+    "partial": {"energy": 9.313e4, "latency": 1.261e7},
+    "energy_ratio_fs": 10.49,
+    "energy_ratio_fp": 0.99,
 }
 
 # FSRCNN — fixed config  (wreg=384 for both scenarios → single scenario)
 FUSION_FIXED_FSRCNN = {
-    "config": "256x8", "total_pes": 2048, "wreg": 384,
-    "full":    {"energy": 6.842e4, "latency": 1.889e7},
-    "single":  {"energy": 9.606e3, "latency": 3.525e7},
-    "partial": {"energy": 6.920e4, "latency": 1.889e7},
-    "energy_ratio_fs": 7.12,
-    "energy_ratio_fp": 0.989,
+    "config": "128x16", "total_pes": 2048, "wreg": 384,
+    "full":    {"energy": 7.150e4, "latency": 1.918e7},
+    "single":  {"energy": 1.117e4, "latency": 3.525e7},
+    "partial": {"energy": 7.203e4, "latency": 1.918e7},
+    "energy_ratio_fs": 6.40,
+    "energy_ratio_fp": 0.993,
 }
 
 # DepFiN fixed-config fusion  (Scenario A: full-sized fmem/wmem)

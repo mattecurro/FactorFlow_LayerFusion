@@ -6,43 +6,43 @@
 
 \subsubsection{Motivation}
 
-In the Eyeriss-Like architecture every PE contains a local weight
-register (WReg) that stores the weight residuals of all fused layers,
-i.e.\ the channel and filter-size factors ($C \times R$ per layer) not
-absorbed by the spatial array rows.
-When many layers are fused, the cumulative WReg requirement can become
-the single tightest constraint on feasibility: for ResNet18 (17
-fused layers) the required WReg ranges from roughly 460 to over
-14\,000 entries depending on the PE configuration.
+Every PE in the Eyeriss-Like architecture contains a local weight
+register (WReg) that holds the weight residuals of all fused layers,
+i.e.\ the channel and filter-size factors ($C \times R$ per layer)
+that the spatial array rows cannot absorb.
+Under full fusion the cumulative footprint grows with the number of
+layers and the width of their channels: for ResNet18 (17 fused layers)
+it ranges from roughly 460 to over 14\,000 entries depending on
+the PE configuration, making WReg the single tightest feasibility
+constraint.
 
-A designer choosing a PE count for a given chip area budget needs to
-know: \emph{what is the minimum weight register size that makes the
-fused mapping feasible at that PE count?}
-Conversely, relaxing the WReg, i.e.\ allocating more on-chip SRAM per
-PE, opens up smaller PE arrays that may be cheaper to manufacture but
-come at an energy cost, because a larger register is accessed at every
-weight read.
-
-CS1 answers this question by evaluating a full grid of PE
-configurations ($\text{rows} \times \text{cols}$, up to
-$\sim$17\,000 total PEs) at several WReg sizes.
+The core design question is therefore:
+\emph{given a PE budget, what is the minimum WReg that admits at least
+one feasible fused mapping?}
+A larger register relaxes the constraint and enables smaller, cheaper
+PE arrays, but every weight access then touches a larger SRAM
+structure, inflating energy.
+CS1 quantifies this trade-off by sweeping a grid of PE configurations
+($\text{rows} \times \text{cols}$, up to $\sim$17\,000 total PEs) at
+several WReg sizes.
 For each PE budget the experiment identifies the smallest WReg that
 yields at least one feasible mapping.
 The GlobalBuffer (128\,KB), input register, intermediate register, and
-output register are held constant.
+output register are held constant throughout.
 
 \subsubsection{Results}
 
 \paragraph{Weight-dominant workloads (VGG16, ResNet18).}
-These workloads stress the weight register most heavily.
-Table~\ref{tab:eyeriss-cs1-wreg} presents the results read in the
-designer-oriented direction: for a given PE budget, the table shows the
-minimum WReg size required and the resulting energy and EDP.
+Table~\ref{tab:eyeriss-cs1-wreg} reports the minimum WReg size
+required at three PE budgets, together with the configuration chosen
+by the mapper and the resulting energy, latency, and EDP.
 
 \begin{table}[htbp]
   \centering
   \caption{Eyeriss CS1 — Minimum WReg size for a given PE budget
-    (VGG16 and ResNet18, full fusion).}
+    (VGG16 and ResNet18, full fusion).
+    For each row the PE budget is fixed and the smallest feasible WReg
+    is reported.}
   \label{tab:eyeriss-cs1-wreg}
   \begin{tabular}{llrrrrr}
     \toprule
@@ -56,65 +56,74 @@ minimum WReg size required and the resulting energy and EDP.
     VGG16    & 4\,096  & 4\,800  & $128 \times 32$  & $9.33 \times 10^{5}$
              & $6.72 \times 10^{6}$ & $6.29 \times 10^{6}$ \\
     \midrule
-    ResNet18 & 16\,384 & 902    & $256 \times 64$  & $4.71 \times 10^{4}$
+    ResNet18 & 16\,384 & 902     & $256 \times 64$  & $4.71 \times 10^{4}$
              & $3.04 \times 10^{6}$ & $1.48 \times 10^{5}$ \\
     ResNet18 & 8\,192  & 1\,800  & $128 \times 64$  & $6.85 \times 10^{4}$
              & $3.04 \times 10^{6}$ & $2.13 \times 10^{5}$ \\
-    ResNet18 & 4\,096  & 3\,600  & $128 \times 32$  & $1.14 \times 10^{5}$
-             & $3.04 \times 10^{6}$ & $3.53 \times 10^{5}$ \\
+    ResNet18 & 4\,096  & 3\,600  & $128 \times 32$  & $1.12 \times 10^{5}$
+             & $3.06 \times 10^{6}$ & $3.46 \times 10^{5}$ \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Taking ResNet18 as an example, a designer with a budget of 16\,384~PEs
-needs at least WReg\,=\,902 entries (the tightest feasible point, with
-only 2 valid configurations out of the full grid).
-Halving the PE budget to 8\,192 requires doubling the register to
-WReg\,=\,1\,800, and halving again to 4\,096 demands
+The table reveals a remarkably regular scaling law.
+For ResNet18 a designer with a 16\,384-PE budget needs at least
+WReg\,=\,902 entries, and only two PE configurations out of the entire
+grid are feasible at that size.
+Halving the PE budget to 8\,192 doubles the required register to
+WReg\,=\,1\,800, and halving again to 4\,096 doubles it once more to
 WReg\,=\,3\,600.
-The trade-off is clear: each halving of the PE array roughly doubles
-the minimum WReg, because fewer spatial rows force more weight factors
-to be stored temporally in the register.
+The mechanism is straightforward: fewer spatial rows leave more weight
+factors unabsorbed, and those residuals must be stored temporally in
+the register.
+VGG16 obeys the same doubling rule (1\,200 $\to$ 2\,400 $\to$ 4\,800)
+at proportionally larger WReg values, reflecting its deeper network
+(13 fused layers) and wider channels.
 
-The energy consequence is significant.
-For ResNet18, going from 16\,384~PEs (WReg\,=\,902) to 4\,096~PEs
-(WReg\,=\,3\,600) increases energy by $2.4\times$
-($4.71 \times 10^{4} \to 1.14 \times 10^{5}$\,$\mu$J), because every
-weight access now touches a register that is $4\times$ larger.
-Latency, however, remains nearly constant
-($\approx 3.04 \times 10^{6}$\,cc), indicating that the bottleneck is
-compute-bound rather than memory-bound once a feasible mapping exists.
-The EDP therefore grows in proportion to energy, reaching $2.4\times$
-the optimum at 4\,096~PEs.
+The energy consequence is substantial.
+For ResNet18, moving from the 16\,384-PE point
+($E = 4.71 \times 10^{4}$\,$\mu$J) to the 4\,096-PE point
+($E = 1.12 \times 10^{5}$\,$\mu$J) increases energy by $2.4\times$,
+because each weight access now touches a register that is $4\times$
+larger.
+Latency, however, stays nearly constant
+($\approx 3.04$--$3.06 \times 10^{6}$\,cc), which indicates that the
+computation is not memory-bound once a feasible mapping exists.
+The EDP therefore tracks energy closely, growing by $2.3\times$ over
+the same range.
+VGG16 shows both a steeper energy increase ($2.7\times$) and a
+moderate latency increase ($5.46 \to 6.72 \times 10^{6}$\,cc), so its
+EDP rises by $3.2\times$ from the largest to the smallest PE budget.
 
-VGG16 follows the same pattern but with larger absolute WReg values
-(1\,200 to 4\,800), reflecting its deeper network (13 fused layers)
-and wider channels.
-Its energy increases by $2.7\times$ and EDP by $3.2\times$ from the
-largest to the smallest PE budget.
-
-Figure~\ref{fig:eyeriss-cs1} plots the Summary~A and Summary~B curves
-for these two workloads.
-Summary~B selects the minimum-EDP configuration, which may use more
-PEs than the Summary~A minimum; the two curves diverge for VGG16 at
-WReg\,=\,2\,400, where Summary~B prefers 16\,384~PEs (lower latency)
-over the 8\,192 that Summary~A selects.
+Figure~\ref{fig:eyeriss-cs1} visualises this trade-off through two
+summary curves.
+Summary~A selects, for each WReg, the feasible configuration with the
+fewest PEs, representing the cheapest array that works.
+Summary~B selects the configuration with the lowest EDP, which may use
+a larger array.
+The two curves coincide for ResNet18 at WReg\,=\,902 and
+WReg\,=\,1\,800, where the minimum-PE configuration is also the
+minimum-EDP one.
+They diverge for VGG16 at WReg\,=\,2\,400, where Summary~B prefers
+16\,384~PEs ($128 \times 128$, EDP\,=\,$3.10 \times 10^{6}$) over the
+8\,192-PE minimum that Summary~A picks
+(EDP\,=\,$3.12 \times 10^{6}$): the latency reduction from a larger
+array more than offsets its higher area cost.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.85\textwidth]{plots/eyeriss_cs1_wreg_sweep.pdf}
   \caption{Eyeriss CS1 — EDP vs.\ WReg size for VGG16 and ResNet18.
-    Summary~A: minimum-PE feasible config.
-    Summary~B: minimum-EDP config.}
+    Summary~A: minimum-PE feasible configuration.
+    Summary~B: minimum-EDP configuration.}
   \label{fig:eyeriss-cs1}
 \end{figure}
 
-Figure~\ref{fig:eyeriss-cs1-inv} presents the same data in the
-designer-oriented direction, with the PE budget on the horizontal axis
-and the minimum WReg on the vertical axis.
-Reading the curve from left to right (decreasing PE budget), one can
-immediately read off the minimum register size required for a given
-area constraint.
+Figure~\ref{fig:eyeriss-cs1-inv} inverts the perspective to
+the designer-oriented view: the horizontal axis is the PE budget and
+the vertical axis is the minimum WReg required.
+Reading the curve from left to right, one can directly read off the
+register size that a given area constraint demands.
 
 \begin{figure}[htbp]
   \centering
@@ -126,20 +135,22 @@ area constraint.
 
 \paragraph{Activation-dominant workloads (FSRCNN, MC-CNN).}
 For these workloads the weight register is not the binding constraint.
-FSRCNN achieves feasibility at WReg\,=\,200 with only 1\,024~PEs, and
-increasing WReg to 400 does not reduce the required PE count.
-MC-CNN requires WReg\,$\ge$\,200 for 1\,024~PEs; only at the
-smallest tested value (WReg\,=\,100) does it need 2\,048~PEs.
-Energy still scales linearly with WReg, but the effect is modest
-because the register is small in absolute terms.
+FSRCNN reaches feasibility at WReg\,=\,200 with only 512~PEs
+($128 \times 4$), and raising WReg to 300 or 400 does not reduce the
+required PE count; all three sizes yield 12 feasible configurations.
+MC-CNN requires WReg\,$\ge$\,200 for 1\,024~PEs ($64 \times 16$);
+only at the smallest tested value (WReg\,=\,100) does the minimum
+rise to 2\,048~PEs.
+Energy still scales linearly with register size, but the effect is
+modest because the register is small in absolute terms.
 
-Figure~\ref{fig:eyeriss-cs1-feas} shows the feasibility trade-off for
-all four workloads: the number of valid configurations (bars) and the
-minimum PE count (line) as a function of WReg size.
-The contrast between weight-dominant and activation-dominant workloads
-is striking: VGG16 and ResNet18 gain feasibility steeply with larger
-WReg, while FSRCNN and MC-CNN are already saturated at the smallest
-tested sizes.
+Figure~\ref{fig:eyeriss-cs1-feas} summarises the feasibility picture
+for all four workloads: the bars show how many PE configurations are
+feasible at each WReg size, while the line tracks the minimum PE
+count.
+The contrast is striking: VGG16 and ResNet18 gain feasibility steeply
+as WReg grows (from 2 to 8 configurations), whereas FSRCNN and MC-CNN
+are already saturated at the smallest tested sizes.
 
 \begin{figure}[htbp]
   \centering
@@ -152,9 +163,11 @@ tested sizes.
 
 \paragraph{Key takeaway.}
 The weight register is the critical sizing knob for the Eyeriss-Like
-architecture under full fusion, particularly for weight-dominant
-workloads.
-Halving the PE budget roughly doubles the required WReg, and the
-larger register inflates energy proportionally.
-For activation-dominant workloads the register is non-binding and
-can be set to a small value without affecting feasibility.
+architecture under full fusion.
+For weight-dominant workloads, halving the PE budget roughly doubles
+the required WReg, and the larger register inflates energy in
+proportion, because every weight read touches a physically larger SRAM
+structure.
+Latency is largely unaffected, so EDP tracks energy closely.
+For activation-dominant workloads the register is non-binding and can
+be kept small without limiting feasibility.

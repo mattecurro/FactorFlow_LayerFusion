@@ -1202,7 +1202,7 @@ class EyerissArchConfig:
     pe_rows: int = 12          # Number of rows (SARows mesh)
     
     # === Bandwidth (bytes/cycle) ===
-    dram_bandwidth: int = 8            # DRAM bandwidth
+    dram_bandwidth: int = 8          # DRAM bandwidth
     global_buffer_bandwidth: int = 32  # GlobalBuffer bandwidth
     register_bandwidth: int = 4        # Register bandwidth
     
@@ -1566,12 +1566,15 @@ def compute_eyeriss_mapping_constraints(
     
     Policy:
     - P: all iterations at DRAM
-    - Q: distributed across DRAM, GlobalBuffer, SACols (bottom-up greedy)
+    - SACols (fusion): Z first, then Q/X with remaining columns
+      (Z must be captured spatially because GlobalBuffer bypasses weights;
+       leftover Q/X only costs extra GlobalBuffer passes)
+    - SACols (single layer): M first, then Q
     - SARows: S first, then C, then M/Z (greedy allocation)
     - InRegister: no iterations (all = 1)
     - WRegister: remaining C and R
-    - OutRegister: remaining M
-    - IntermediateReg (fusion): Zi = pe_rows (for layer i < last)
+    - OutRegister: remaining M/Z
+    - IntermediateReg (fusion): Zi remaining after SACols + SARows
     
     For fusion: Xi, Yi follow same policy as Q, P for each layer.
     
@@ -1597,13 +1600,14 @@ def compute_eyeriss_mapping_constraints(
         S_shape = shape.get('S', 1)
         
         remaining_col_mesh = pe_cols
-        # SACols: Q = highest divisor of output_tile_size <= remaining_col_mesh
-        sacols_Q = _highest_divisor_leq(output_tile_size, remaining_col_mesh)
-        remaining_col_mesh = remaining_col_mesh // sacols_Q if sacols_Q > 0 else remaining_col_mesh
-
+        # SACols: M first (GB bypasses weights, so leftover M goes to
+        # the small weight register), then Q with remaining columns.
         sacols_M = _highest_divisor_leq(M_shape, remaining_col_mesh)
         remaining_col_mesh = remaining_col_mesh // sacols_M if sacols_M > 0 else remaining_col_mesh
         remaining_M_shape = M_shape // sacols_M if sacols_M > 0 else M_shape
+
+        sacols_Q = _highest_divisor_leq(output_tile_size, remaining_col_mesh)
+        remaining_col_mesh = remaining_col_mesh // sacols_Q if sacols_Q > 0 else remaining_col_mesh
         
         # GlobalBuffer: Q = output_tile_size / sacols_Q
         gb_Q = output_tile_size // sacols_Q
@@ -1649,13 +1653,14 @@ def compute_eyeriss_mapping_constraints(
         Z_shape = shape.get(f'Z{last_layer}', 1)
         
         remaining_col_mesh = pe_cols
-        # SACols: Q = highest divisor of output_tile_size <= remaining_col_mesh
+        # SACols: Z first (GB bypasses weights, so leftover Z goes to
+        # the small weight register), then Q with remaining columns.
+        sacols_Z = _highest_divisor_leq(Z_shape, remaining_col_mesh)
+        remaining_col_mesh = remaining_col_mesh // sacols_Z if sacols_Z > 0 else remaining_col_mesh
+        remaining_Z_last_layer_shape = Z_shape // sacols_Z if sacols_Z > 0 else Z_shape
+
         sacols_Q = _highest_divisor_leq(output_tile_size, remaining_col_mesh)
         remaining_col_mesh = remaining_col_mesh // sacols_Q if sacols_Q > 0 else remaining_col_mesh
-
-        sacols_Z = _highest_divisor_leq(Z_shape, remaining_col_mesh)
-        remaining_Z_last_layer_shape = Z_shape // sacols_Z if sacols_Z > 0 else Z_shape        
-        
 
         gb_Q = output_tile_size // sacols_Q
         dram_Q = Q_shape // output_tile_size
@@ -1683,14 +1688,14 @@ def compute_eyeriss_mapping_constraints(
                 R_shape_layer = shape.get(R_dim, 1)
                 S_shape_layer = shape.get(S_dim, 1)
                 
-                # Xi follows same policy as Q (output_tile_size, for stride=1)
+                # SACols: Z first (GB bypasses weights), then X with remaining
                 remaining_col_mesh = pe_cols
-                sacols_X = _highest_divisor_leq(output_tile_size, remaining_col_mesh)
-                remaining_col_mesh = remaining_col_mesh // sacols_X if sacols_X > 0 else remaining_col_mesh
-                
                 sacols_Z_i = _highest_divisor_leq(Z_shape, remaining_col_mesh)
                 remaining_col_mesh = remaining_col_mesh // sacols_Z_i if sacols_Z_i > 0 else remaining_col_mesh
                 remaining_Z_shape = Z_shape // sacols_Z_i if sacols_Z_i > 0 else Z_shape
+
+                sacols_X = _highest_divisor_leq(output_tile_size, remaining_col_mesh)
+                remaining_col_mesh = remaining_col_mesh // sacols_X if sacols_X > 0 else remaining_col_mesh
 
 
                 gb_X = output_tile_size // sacols_X

@@ -1198,6 +1198,14 @@ Eyeriss Case Study 1: WRegister Size Sweep (400–15000 entries)
   ResNet18 17-layer full fusion, Eyeriss, GB=128KB, tile_size=1
   Non-swept regs: InReg=400, IntReg=300, OutReg=64 (matching fusion canonical)
 
+GlobalBuffer:   Total Reads = 8,141,056, Total Writes = 2,872,576
+  
+GlobalBuffer:   Total Reads = 8,141,056, Total Writes = 2,872,576
+full/17layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 256, pe_cols: 64 -> E=4.71e+04μJ, L=3.04e+06cc, EDP=1.48e+05
+  full/17layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 512, pe_cols: 32 -> E=4.73e+04μJ, L=3.04e+06cc, EDP=1.48e+05
+
+
+  
     python3 experiment_runner.py --sweep-wreg-pe \
     -w resnet18 -f full -v 17layer \
     --tile-size 1 --gb-size 128 \
@@ -2720,7 +2728,7 @@ Eyeriss Case Study 2: IntermediateRegister Size Sweep (200, 300, 400 entries) fi
     python3 experiment_runner.py --sweep-intreg-pe \
     --workload fsrcnn --fusion full --variant 8layer \
     --intermediate-reg-sizes 200 300 400 \
-    --input-reg 34 --weight-reg 500 --output-reg 64 --tile-size 120
+    --input-reg 234 --weight-reg 500 --output-reg 64 --tile-size 120
 
     PE grid: rows=[4,8,12,14,16,28,32,56,84], cols=[4,8,16,32,56,64,80,160,240,320]
     SACols Z active when pe_cols ≥ 160 (i.e. pe_cols ≥ 2 × tile_size)

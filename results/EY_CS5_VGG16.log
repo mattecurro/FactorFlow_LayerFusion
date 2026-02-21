@@ -13,7 +13,7 @@ CASE STUDY 5: PE Aspect Ratio with Fixed Total PEs
 ================================================================================
 Workload: vgg16/full/13layer
 Total PEs: 16384, GlobalBuffer: 128 KB, Tile: 1
-Registers: InReg=750, WReg=1200, IntReg=300, OutReg=64
+Registers: InReg=400, WReg=1200, IntReg=300, OutReg=204
 Aspect ratios to sweep: ['1x16384', '2x8192', '4x4096', '8x2048', '16x1024', '32x512', '64x256', '128x128', '256x64', '512x32', '1024x16', '2048x8', '4096x4', '8192x2', '16384x1']
 ================================================================================
 
@@ -21,6 +21,7 @@ Aspect ratios to sweep: ['1x16384', '2x8192', '4x4096', '8x2048', '16x1024', '32
 [PE=1x16384] Running experiment...
 ------ loading Accelergy for Eyeriss ------
 ------ loading Accelergy ------
+WARNING: Accelergy package not found or incompatible, trying a manual import from ACCELERGY_PATH.
 ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-plug-ins. Use the Library plug-in instead.', 'Neurosim Plug-In', 'Aladdin_table', 'CactiCache', 'CactiDRAM', 'CactiSRAM']
 [Constrained Eyeriss] 13 layers, tile_size=1
   DRAM: {'Q': 14, 'P': 14, 'X0': 224, 'Y0': 224, 'Z0': 1, 'C0': 1, 'R0': 1, 'S0': 1, 'X1': 224, 'Y1': 224, 'Z1': 1, 'C1': 1, 'R1': 1, 'S1': 1, 'X2': 112, 'Y2': 112, 'Z2': 1, 'C2': 1, 'R2': 1, 'S2': 1, 'X3': 112, 'Y3': 112, 'Z3': 1, 'C3': 1, 'R3': 1, 'S3': 1, 'X4': 56, 'Y4': 56, 'Z4': 1, 'C4': 1, 'R4': 1, 'S4': 1, 'X5': 56, 'Y5': 56, 'Z5': 1, 'C5': 1, 'R5': 1, 'S5': 1, 'X6': 56, 'Y6': 56, 'Z6': 1, 'C6': 1, 'R6': 1, 'S6': 1, 'X7': 28, 'Y7': 28, 'Z7': 1, 'C7': 1, 'R7': 1, 'S7': 1, 'X8': 28, 'Y8': 28, 'Z8': 1, 'C8': 1, 'R8': 1, 'S8': 1, 'X9': 28, 'Y9': 28, 'Z9': 1, 'C9': 1, 'R9': 1, 'S9': 1, 'X10': 14, 'Y10': 14, 'Z10': 1, 'C10': 1, 'R10': 1, 'S10': 1, 'X11': 14, 'Y11': 14, 'Z11': 1, 'C11': 1, 'R11': 1, 'S11': 1, 'Z12': 1, 'C12': 1, 'R12': 1, 'S12': 1}
@@ -40,8 +41,8 @@ ACCELERGY PLUG-INS: ['Library', 'dummy', 'ADC Plug-In', 'DEPRECATED table-based-
   SARows_11: {'S11': 1, 'C11': 1, 'Z11': 1}
   SARows_12: {'S12': 1, 'C12': 1, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_16384x1 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_16384x1: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_16384x1: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -213,7 +214,7 @@ input_FC_size distinct: 6
 Input FC size: 6
 
 Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
     edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
     raise e
@@ -225,7 +226,7 @@ Traceback (most recent call last):
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
 AssertionError: Ill-posed constraints:
 CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_16384x1 -> Level: DRAM: constrained S0 == 1 VS obtained S0: 3, constrained S1 == 1 VS obtained S1: 3, constrained S2 == 1 VS obtained S2: 3, constrained S3 == 1 VS obtained S3: 3, constrained S4 == 1 VS obtained S4: 3, constrained S5 == 1 VS obtained S5: 3, constrained S6 == 1 VS obtained S6: 3, constrained S7 == 1 VS obtained S7: 3, constrained S8 == 1 VS obtained S8: 3, constrained S9 == 1 VS obtained S9: 3, constrained S10 == 1 VS obtained S10: 3, constrained S11 == 1 VS obtained S11: 3, constrained S12 == 1 VS obtained S12: 3
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_16384x1 -> Level: InRegister: memory footprint: 11152 VS memory available: 750
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_16384x1 -> Level: InRegister: memory footprint: 11152 VS memory available: 400
 CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_16384x1 -> Level: WRegister: memory footprint: 11145 VS memory available: 1200
 Input size: 9
 
@@ -264,8 +265,8 @@ Total mem footprint: 11152
 MEMORY CONSTRAINT VIOLATION DEBUG - Level: InRegister
 ================================================================================
 Memory footprint: 11,152 bytes
-Memory available: 750 bytes
-Overflow: 10,402 bytes
+Memory available: 400 bytes
+Overflow: 10,752 bytes
 
 Full architecture mapping:
   DRAM: P:14, Q:14, S12:3, Y11:14, X11:14, S11:3, Y10:14, X10:14, S10:3, Y9:28, X9:28, S9:3, Y8:28, X8:28, S8:3, Y7:28, X7:28, S7:3, Y6:56, X6:56, S6:3, Y5:56, X5:56, S5:3, Y4:56, X4:56, S4:3, Y3:112, X3:112, S3:3, Y2:112, X2:112, S2:3, Y1:224, X1:224, S1:3, Y0:224, X0:224, S0:3
@@ -407,10 +408,10 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 2, 'C11': 1, 'Z11': 1}
   SARows_12: {'S12': 2, 'C12': 1, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_8192x2 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_8192x2: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_8192x2: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4020, in run_single_experiment
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3667, in run_single_experiment
     arch.fitConstraintsToComp(shape, enforce=True)
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/arch.py", line 794, in fitConstraintsToComp
     assert False, f"Arch: {self.name} -> Level: {level.name}: Failed to fit comp to arch because the level's constraint ({dim}: {level.factors_constraints[dim]}) does not divide comp dimension {dim} ({comp[dim]}) exactly. To compensate, consider setting 'Settings.PADDED_MAPPINGS' to True."
@@ -445,8 +446,8 @@ INFO: Added high constraint for intermediate dimension R1 in level OutRegister
   SARows_11: {'S11': 3, 'C11': 1, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 1, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_4096x4 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_4096x4: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_4096x4: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -690,12 +691,12 @@ Total mem footprint: 11152
 MEMORY CONSTRAINT VIOLATION DEBUG - Level: InRegister
 ================================================================================
 Memory footprint: 11,152 bytes
-Memory available: 750 bytes
-Overflow: 10,402 bytes
+Memory available: 400 bytes
+Overflow: 10,752 bytes
 
 Full architecture mapping:
 Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
     edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
     raise e
@@ -706,7 +707,7 @@ Traceback (most recent call last):
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
 AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_4096x4 -> Level: InRegister: memory footprint: 11152 VS memory available: 750
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_4096x4 -> Level: InRegister: memory footprint: 11152 VS memory available: 400
 CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_4096x4 -> Level: WRegister: memory footprint: 11145 VS memory available: 1200
   DRAM: P:14, Q:14, Y11:14, X11:14, Y10:14, X10:14, Y9:28, X9:28, Y8:28, X8:28, Y7:28, X7:28, Y6:56, X6:56, Y5:56, X5:56, Y4:56, X4:56, Y3:112, X3:112, Y2:112, X2:112, Y1:224, X1:224, Y0:224, X0:224
   SACols: Z12:512
@@ -872,8 +873,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 2, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 2, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_2048x8 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_2048x8: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_2048x8: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -982,7 +983,7 @@ DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataf
 ['C8', 'Y8', 'R8', 'X8', 'S8']
 ['C9', 'Y9', 'R9', 'X9', 'S9']
 Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
     edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
     raise e
@@ -993,7 +994,7 @@ Traceback (most recent call last):
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
 AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_2048x8 -> Level: InRegister: memory footprint: 5584 VS memory available: 750
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_2048x8 -> Level: InRegister: memory footprint: 5584 VS memory available: 400
 CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_2048x8 -> Level: WRegister: memory footprint: 5577 VS memory available: 1200
 ['C10', 'Y10', 'R10', 'X10', 'S10']
 ['C11', 'Y11', 'R11', 'X11', 'S11']
@@ -1131,8 +1132,8 @@ Total mem footprint: 5584
 MEMORY CONSTRAINT VIOLATION DEBUG - Level: InRegister
 ================================================================================
 Memory footprint: 5,584 bytes
-Memory available: 750 bytes
-Overflow: 4,834 bytes
+Memory available: 400 bytes
+Overflow: 5,184 bytes
 
 Full architecture mapping:
   DRAM: P:14, Q:14, Y11:14, X11:14, Y10:14, X10:14, Y9:28, X9:28, Y8:28, X8:28, Y7:28, X7:28, Y6:56, X6:56, Y5:56, X5:56, Y4:56, X4:56, Y3:112, X3:112, Y2:112, X2:112, Y1:224, X1:224, Y0:224, X0:224
@@ -1299,8 +1300,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 4, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 4, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_1024x16 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_1024x16: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_1024x16: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -1544,8 +1545,8 @@ Total mem footprint: 2790
 MEMORY CONSTRAINT VIOLATION DEBUG - Level: InRegister
 ================================================================================
 Memory footprint: 2,790 bytes
-Memory available: 750 bytes
-Overflow: 2,040 bytes
+Memory available: 400 bytes
+Overflow: 2,390 bytes
 
 Full architecture mapping:
   DRAM: P:14, Q:14, Y11:14, X11:14, Y10:14, X10:14, Y9:28, X9:28, Y8:28, X8:28, Y7:28, X7:28, Y6:56, X6:56, Y5:56, X5:56, Y4:56, X4:56, Y3:112, X3:112, Y2:112, X2:112, Y1:224, X1:224, Y0:224, X0:224
@@ -1605,7 +1606,7 @@ Input size: 0
 Output size: 0
 
 Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
     edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
     raise e
@@ -1616,7 +1617,7 @@ Traceback (most recent call last):
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
 AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_1024x16 -> Level: InRegister: memory footprint: 2790 VS memory available: 750
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_1024x16 -> Level: InRegister: memory footprint: 2790 VS memory available: 400
 CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_1024x16 -> Level: WRegister: memory footprint: 2787 VS memory available: 1200
 Weight size: 2787
 
@@ -1726,8 +1727,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 8, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 8, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_512x32 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_512x32: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_512x32: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -1903,7 +1904,7 @@ Input size: 153228
 Output size: 100352
 
 Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
     edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
     raise e
@@ -1914,7 +1915,7 @@ Traceback (most recent call last):
   File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
     assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
 AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_512x32 -> Level: InRegister: memory footprint: 1398 VS memory available: 750
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_512x32 -> Level: InRegister: memory footprint: 1398 VS memory available: 400
 CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_512x32 -> Level: WRegister: memory footprint: 1395 VS memory available: 1200
 Weight size: 14710464
 
@@ -1985,8 +1986,8 @@ Total mem footprint: 1398
 MEMORY CONSTRAINT VIOLATION DEBUG - Level: InRegister
 ================================================================================
 Memory footprint: 1,398 bytes
-Memory available: 750 bytes
-Overflow: 648 bytes
+Memory available: 400 bytes
+Overflow: 998 bytes
 
 Full architecture mapping:
   DRAM: P:14, Q:14, Y11:14, X11:14, Y10:14, X10:14, Y9:28, X9:28, Y8:28, X8:28, Y7:28, X7:28, Y6:56, X6:56, Y5:56, X5:56, Y4:56, X4:56, Y3:112, X3:112, Y2:112, X2:112, Y1:224, X1:224, Y0:224, X0:224
@@ -2153,8 +2154,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 16, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 16, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_256x64 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_256x64: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_256x64: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -2238,19 +2239,6 @@ DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataf
 ['C11', 'Y11', 'R11', 'X11', 'S11']
 ['C12', 'P', 'R12', 'Q', 'S12']
 DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
-Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
-    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
-    raise e
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
-    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
-    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
-    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
-AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_256x64 -> Level: WRegister: memory footprint: 1227 VS memory available: 1200
                        array=['P', 'Q', 'Z12', 'C12', 'R12', 'S12', 'Y11', 'X11', 'Z11', 'C11', 'R11', 'S11', 'Y10', 'X10', 'Z10', 'C10', 'R10', 'S10', 'Y9', 'X9', 'Z9', 'C9', 'R9', 'S9', 'Y8', 'X8', 'Z8', 'C8', 'R8', 'S8', 'Y7', 'X7', 'Z7', 'C7', 'R7', 'S7', 'Y6', 'X6', 'Z6', 'C6', 'R6', 'S6', 'Y5', 'X5', 'Z5', 'C5', 'R5', 'S5', 'Y4', 'X4', 'Z4', 'C4', 'R4', 'S4', 'Y3', 'X3', 'Z3', 'C3', 'R3', 'S3', 'Y2', 'X2', 'Z2', 'C2', 'R2', 'S2', 'Y1', 'X1', 'Z1', 'C1', 'R1', 'S1', 'Y0', 'X0', 'Z0', 'C0', 'R0', 'S0'], elements=[] (len=0)
 ['C1', 'Y1', 'R1', 'X1', 'S1']
 ['C2', 'Y2', 'R2', 'X2', 'S2']
@@ -2334,24 +2322,6 @@ Total mem footprint: 702
 
 
 
-tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
-input_FC_size distinct: 0
-Input FC size: 0
-
-Input size: 0
-
-Output size: 0
-
-Weight size: 1227
-
-Intermediate input size: 696
-Total intermediate size (input + output): 0
-
-input_size: 0, output_size: 0, weight_size: 1227, intermediate_size: 0
-Total mem footprint: 1227
-
-
-
 tile_sizes[dim]: [1, 3], self._dim_products[dim]: [224, 1]
 input_FC_size distinct: 1344
 Input FC size: 1344
@@ -2405,6 +2375,65 @@ input_size: 3, output_size: 0, weight_size: 0, intermediate_size: 696
 Total mem footprint: 702
 
 
+
+tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
+input_FC_size distinct: 2
+Input FC size: 2
+
+Input size: 3
+
+Output size: 0
+
+Weight size: 0
+
+Intermediate input size: 696
+Total intermediate size (input + output): 696
+
+input_size: 3, output_size: 0, weight_size: 0, intermediate_size: 696
+Total mem footprint: 702
+
+
+
+
+================================================================================
+MEMORY CONSTRAINT VIOLATION DEBUG - Level: InRegister
+================================================================================
+Memory footprint: 702 bytes
+Memory available: 400 bytes
+Overflow: 302 bytes
+
+Full architecture mapping:
+  DRAM: P:14, Q:14, Y11:14, X11:14, Y10:14, X10:14, Y9:28, X9:28, Y8:28, X8:28, Y7:28, X7:28, Y6:56, X6:56, Y5:56, X5:56, Y4:56, X4:56, Y3:112, X3:112, Y2:112, X2:112, Y1:224, X1:224, Y0:224, X0:224
+  SACols: Z12:256
+  SARows: S12:3, C12:16
+  SACols_11: Z11:256
+  SARows_11: S11:3, C11:16
+  SACols_10: Z10:256
+  SARows_10: S10:3, C10:16
+  SACols_9: Z9:256
+  SARows_9: S9:3, C9:16
+  SACols_8: Z8:256
+  SARows_8: S8:3, C8:16
+  SACols_7: Z7:256
+  SARows_7: S7:3, C7:16
+  SACols_6: Z6:256
+  SARows_6: S6:3, C6:16
+  SACols_5: Z5:256
+  SARows_5: S5:3, C5:16
+  SACols_4: Z4:256
+  SARows_4: S4:3, C4:16
+  SACols_3: Z3:128
+  SARows_3: S3:3, C3:16
+  SACols_2: Z2:128
+  SARows_2: S2:3, C2:16
+  SACols_1: Z1:64
+  SARows_1: S1:3, C1:16
+  SACols_0: Z0:64
+  SARows_0: S0:3, C0:3
+  WRegister: C12:32, R12:3, C11:32, R11:3, C10:32, R10:3, C9:32, R9:3, C8:32, R8:3, C7:16, R7:3, C6:16, R6:3, C5:16, R5:3, C4:8, R4:3, C3:8, R3:3, C2:4, R2:3, C1:4, R1:3, R0:3
+  IntermediateRegister: Z11:2, Z10:2, Z9:2, Z8:2, Z7:2
+  OutRegister: Z12:2
+================================================================================
 
 tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
 input_FC_size distinct: 0
@@ -2501,6 +2530,20 @@ Total mem footprint: 17
 
 
 
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_256x64 -> Level: InRegister: memory footprint: 702 VS memory available: 400
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_256x64 -> Level: WRegister: memory footprint: 1227 VS memory available: 1200
 tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
 input_FC_size distinct: 0
 Input FC size: 0
@@ -2542,8 +2585,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 32, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 32, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_128x128 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_128x128: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_128x128: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -2818,6 +2861,19 @@ Total mem footprint: 1203
 
 
 
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_128x128 -> Level: WRegister: memory footprint: 1203 VS memory available: 1200
 
 ================================================================================
 MEMORY CONSTRAINT VIOLATION DEBUG - Level: WRegister
@@ -2854,19 +2910,6 @@ Full architecture mapping:
   SARows_1: S1:3, C1:32
   SACols_0: Z0:64
   SARows_0: S0:3, C0:3
-Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
-    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
-    raise e
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
-    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
-    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
-    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
-AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_128x128 -> Level: WRegister: memory footprint: 1203 VS memory available: 1200
   WRegister: C12:16, R12:3, C11:16, R11:3, C10:16, R10:3, C9:16, R9:3, C8:16, R8:3, C7:8, R7:3, C6:8, R6:3, C5:8, R5:3, C4:4, R4:3, C3:4, R3:3, C2:2, R2:3, C1:2, R1:3, R0:3
   IntermediateRegister: Z11:4, Z10:4, Z9:4, Z8:4, Z7:4, Z6:2, Z5:2, Z4:2
   OutRegister: Z12:4
@@ -2931,8 +2974,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 64, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 64, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_64x256 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_64x256: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_64x256: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -3514,8 +3557,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 19267584
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 924844032, 4: 231211008, 5: 462422016, 6: 462422016, 7: 115605504, 8: 231211008, 9: 231211008, 10: 57802752, 11: 57802752, 12: 462422016}, total: 5635768320
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 308281344, 4: 77070336, 5: 154140672, 6: 154140672, 7: 38535168, 8: 77070336, 9: 77070336, 10: 19267584, 11: 19267584, 12: 19267584}, 
  total: 1743716352
-Level InRegister total WMOPs from per layer sum: 61,803,584,775.207
-Level InRegister total WMOPs from total reads/writes: 61,803,584,775.207
+Level InRegister total WMOPs from per layer sum: 33,572,160,561.684
+Level InRegister total WMOPs from total reads/writes: 33,572,160,561.684
 End first part of update for level: InRegister
 
 
@@ -3568,8 +3611,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 264,998,320,164.264
-Level WRegister total WMOPs from total reads/writes: 264,998,320,164.264
+Level WRegister total WMOPs from per layer sum: 236,766,895,950.741
+Level WRegister total WMOPs from total reads/writes: 236,766,895,950.741
 End first part of update for level: WRegister
 
 
@@ -3619,8 +3662,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 0}, total: 14884208640
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, 
  total: 16878403584
-Level IntermediateRegister total WMOPs from per layer sum: 372,681,480,632.231
-Level IntermediateRegister total WMOPs from total reads/writes: 365,920,663,459.993
+Level IntermediateRegister total WMOPs from per layer sum: 344,450,056,418.708
+Level IntermediateRegister total WMOPs from total reads/writes: 337,689,239,246.470
 End first part of update for level: IntermediateRegister
 
 
@@ -3672,18 +3715,18 @@ Level OutRegister, Layer 12: total_reads = 443154432, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 443154432}, total: 443154432
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 373,415,594,075.564
-Level OutRegister total WMOPs from total reads/writes: 366,654,776,903.326
+Level OutRegister total WMOPs from per layer sum: 346,569,942,121.086
+Level OutRegister total WMOPs from total reads/writes: 339,809,124,948.848
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2815510130.6142073, 1: 59939348126.16975, 2: 24848782985.279606, 3: 48651884908.73234, 4: 21774250097.606808, 5: 43025659664.30018, 6: 43025659664.30018, 7: 20271996382.34349, 8: 40282572499.23026, 9: 40282572499.23026, 10: 10150672218.688892, 11: 10150672218.688892, 12: 11049171844.198606}
-WMOPs_till_now before compute level: 373,415,594,075.564
-Compute Level Compute total WMOPs from per layer sum: 376268753239.38354
+Compute Level Compute WMOPs_per_layer: {0: 2373242388.365805, 1: 50504302958.203835, 2: 22490021693.288128, 3: 43934362324.74938, 4: 20594869451.611065, 5: 40666898372.3087, 6: 40666898372.3087, 7: 19682306059.34562, 8: 39103191853.23452, 9: 39103191853.23452, 10: 9855827057.189959, 11: 9855827057.189959, 12: 10592161843.875256}
+WMOPs_till_now before compute level: 346,569,942,121.086
+Compute Level Compute total WMOPs from per layer sum: 349423101284.9054
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 749684347314.9475
+Total WMOPs after adding compute level: 695993043405.9912
 END FIRST PART OF UPDATE STATS
 
 
@@ -7772,8 +7815,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 19267584
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 924844032, 4: 231211008, 5: 462422016, 6: 462422016, 7: 115605504, 8: 231211008, 9: 231211008, 10: 57802752, 11: 57802752, 12: 462422016}, total: 5635768320
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 308281344, 4: 77070336, 5: 154140672, 6: 154140672, 7: 38535168, 8: 77070336, 9: 77070336, 10: 19267584, 11: 19267584, 12: 19267584}, 
  total: 1743716352
-Level InRegister total WMOPs from per layer sum: 61,803,601,355.866
-Level InRegister total WMOPs from total reads/writes: 61,803,601,355.866
+Level InRegister total WMOPs from per layer sum: 33,572,177,142.343
+Level InRegister total WMOPs from total reads/writes: 33,572,177,142.343
 End first part of update for level: InRegister
 
 
@@ -7826,8 +7869,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 264,998,336,744.923
-Level WRegister total WMOPs from total reads/writes: 264,998,336,744.923
+Level WRegister total WMOPs from per layer sum: 236,766,912,531.400
+Level WRegister total WMOPs from total reads/writes: 236,766,912,531.400
 End first part of update for level: WRegister
 
 
@@ -7877,8 +7920,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, total: 16878403584
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, 
  total: 16878403584
-Level IntermediateRegister total WMOPs from per layer sum: 379,442,314,385.128
-Level IntermediateRegister total WMOPs from total reads/writes: 365,920,680,040.652
+Level IntermediateRegister total WMOPs from per layer sum: 351,210,890,171.605
+Level IntermediateRegister total WMOPs from total reads/writes: 337,689,255,827.129
 End first part of update for level: IntermediateRegister
 
 
@@ -7930,18 +7973,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 380,192,047,263.426
-Level OutRegister total WMOPs from total reads/writes: 366,670,412,918.949
+Level OutRegister total WMOPs from per layer sum: 353,375,879,825.098
+Level OutRegister total WMOPs from total reads/writes: 339,854,245,480.621
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 49697035389.464806, 4: 22296825337.97304, 5: 43548234904.66641, 6: 43548234904.66641, 7: 20533284002.526608, 8: 40543860119.413376, 9: 40543860119.413376, 10: 10215994123.734673, 11: 10215994123.734673, 12: 11064807859.822334}
-WMOPs_till_now before compute level: 380,192,047,263.426
-Compute Level Compute total WMOPs from per layer sum: 383045206427.24536
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44979512805.48185, 4: 21117444691.9773, 5: 41189473612.674934, 6: 41189473612.674934, 7: 19943593679.528736, 8: 39364479473.41764, 9: 39364479473.41764, 10: 9921148962.235737, 11: 9921148962.235737, 12: 10637282375.64888}
+WMOPs_till_now before compute level: 353,375,879,825.098
+Compute Level Compute total WMOPs from per layer sum: 356229038988.9172
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 763237253690.6711
+Total WMOPs after adding compute level: 709604918814.0148
 END FIRST PART OF UPDATE STATS
 
 
@@ -11314,8 +11357,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 19267584
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 924844032, 4: 231211008, 5: 462422016, 6: 462422016, 7: 115605504, 8: 231211008, 9: 231211008, 10: 57802752, 11: 57802752, 12: 462422016}, total: 5635768320
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 308281344, 4: 77070336, 5: 154140672, 6: 154140672, 7: 38535168, 8: 77070336, 9: 77070336, 10: 19267584, 11: 19267584, 12: 19267584}, 
  total: 1743716352
-Level InRegister total WMOPs from per layer sum: 61,803,601,355.866
-Level InRegister total WMOPs from total reads/writes: 61,803,601,355.866
+Level InRegister total WMOPs from per layer sum: 33,572,177,142.343
+Level InRegister total WMOPs from total reads/writes: 33,572,177,142.343
 End first part of update for level: InRegister
 
 
@@ -11368,8 +11411,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 264,998,336,744.923
-Level WRegister total WMOPs from total reads/writes: 264,998,336,744.923
+Level WRegister total WMOPs from per layer sum: 236,766,912,531.400
+Level WRegister total WMOPs from total reads/writes: 236,766,912,531.400
 End first part of update for level: WRegister
 
 
@@ -11419,8 +11462,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, total: 16878403584
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, 
  total: 16878403584
-Level IntermediateRegister total WMOPs from per layer sum: 379,442,314,385.128
-Level IntermediateRegister total WMOPs from total reads/writes: 365,920,680,040.652
+Level IntermediateRegister total WMOPs from per layer sum: 351,210,890,171.605
+Level IntermediateRegister total WMOPs from total reads/writes: 337,689,255,827.129
 End first part of update for level: IntermediateRegister
 
 
@@ -11472,18 +11515,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 380,192,047,263.426
-Level OutRegister total WMOPs from total reads/writes: 366,670,412,918.949
+Level OutRegister total WMOPs from per layer sum: 353,375,879,825.098
+Level OutRegister total WMOPs from total reads/writes: 339,854,245,480.621
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 49697035389.464806, 4: 22296825337.97304, 5: 43548234904.66641, 6: 43548234904.66641, 7: 20533284002.526608, 8: 40543860119.413376, 9: 40543860119.413376, 10: 10215994123.734673, 11: 10215994123.734673, 12: 11064807859.822334}
-WMOPs_till_now before compute level: 380,192,047,263.426
-Compute Level Compute total WMOPs from per layer sum: 383045206427.24536
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44979512805.48185, 4: 21117444691.9773, 5: 41189473612.674934, 6: 41189473612.674934, 7: 19943593679.528736, 8: 39364479473.41764, 9: 39364479473.41764, 10: 9921148962.235737, 11: 9921148962.235737, 12: 10637282375.64888}
+WMOPs_till_now before compute level: 353,375,879,825.098
+Compute Level Compute total WMOPs from per layer sum: 356229038988.9172
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 763237253690.6711
+Total WMOPs after adding compute level: 709604918814.0148
 END FIRST PART OF UPDATE STATS
 
 
@@ -14533,8 +14576,8 @@ compute_latency from compute level: 1,392,384
 max_latency after compute: 5,454,912, before fanout_level
 
 Final condition:
-Wart: 7.545e+97
-EDP: 2.089e+06 (J*cycle)
+Wart: 8.125e+97
+EDP: 1.943e+06 (J*cycle)
 DRAM ----------> P: 14, Q: 14, Y11: 14, X11: 14, Y10: 14, X10: 14, Y9: 28, X9: 28, Y8: 28, X8: 28, Y7: 28, X7: 28, Y6: 56, X6: 56, Y5: 56, X5: 56, Y4: 56, X4: 56, Y3: 112, X3: 112, Y2: 112, X2: 112, Y1: 224, X1: 224, Y0: 224, X0: 224
 GlobalBuffer --
 SACols --------> Z12: 64
@@ -14897,8 +14940,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 19267584
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 924844032, 4: 231211008, 5: 462422016, 6: 462422016, 7: 115605504, 8: 231211008, 9: 231211008, 10: 57802752, 11: 57802752, 12: 462422016}, total: 5635768320
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 308281344, 4: 77070336, 5: 154140672, 6: 154140672, 7: 38535168, 8: 77070336, 9: 77070336, 10: 19267584, 11: 19267584, 12: 19267584}, 
  total: 1743716352
-Level InRegister total WMOPs from per layer sum: 61,803,601,355.866
-Level InRegister total WMOPs from total reads/writes: 61,803,601,355.866
+Level InRegister total WMOPs from per layer sum: 33,572,177,142.343
+Level InRegister total WMOPs from total reads/writes: 33,572,177,142.343
 End first part of update for level: InRegister
 
 
@@ -14951,8 +14994,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 264,998,336,744.923
-Level WRegister total WMOPs from total reads/writes: 264,998,336,744.923
+Level WRegister total WMOPs from per layer sum: 236,766,912,531.400
+Level WRegister total WMOPs from total reads/writes: 236,766,912,531.400
 End first part of update for level: WRegister
 
 
@@ -15002,8 +15045,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, total: 16878403584
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2157969408, 4: 1078984704, 5: 2003828736, 6: 2003828736, 7: 1001914368, 8: 1926758400, 9: 1926758400, 10: 481689600, 11: 481689600, 12: 0}, 
  total: 16878403584
-Level IntermediateRegister total WMOPs from per layer sum: 379,442,314,385.128
-Level IntermediateRegister total WMOPs from total reads/writes: 365,920,680,040.652
+Level IntermediateRegister total WMOPs from per layer sum: 351,210,890,171.605
+Level IntermediateRegister total WMOPs from total reads/writes: 337,689,255,827.129
 End first part of update for level: IntermediateRegister
 
 
@@ -15055,18 +15098,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 380,192,047,263.426
-Level OutRegister total WMOPs from total reads/writes: 366,670,412,918.949
+Level OutRegister total WMOPs from per layer sum: 353,375,879,825.098
+Level OutRegister total WMOPs from total reads/writes: 339,854,245,480.621
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 49697035389.464806, 4: 22296825337.97304, 5: 43548234904.66641, 6: 43548234904.66641, 7: 20533284002.526608, 8: 40543860119.413376, 9: 40543860119.413376, 10: 10215994123.734673, 11: 10215994123.734673, 12: 11064807859.822334}
-WMOPs_till_now before compute level: 380,192,047,263.426
-Compute Level Compute total WMOPs from per layer sum: 383045206427.24536
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44979512805.48185, 4: 21117444691.9773, 5: 41189473612.674934, 6: 41189473612.674934, 7: 19943593679.528736, 8: 39364479473.41764, 9: 39364479473.41764, 10: 9921148962.235737, 11: 9921148962.235737, 12: 10637282375.64888}
+WMOPs_till_now before compute level: 353,375,879,825.098
+Compute Level Compute total WMOPs from per layer sum: 356229038988.9172
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 763237253690.6711
+Total WMOPs after adding compute level: 709604918814.0148
 END FIRST PART OF UPDATE STATS
 
 
@@ -18172,12 +18215,12 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 0.0011136217508465052
 Arch: Eyeriss_Constrained_13L_tile1_64x256: spatial utilization is 0.0011136217508465052
 
-Finished in: 0.818s
+Finished in: 0.760s
 
 Best mapping found with:
-	Wart: 7.545e+97
-	EDP: 2.089e+06 (J*cycle)
-	Energy: 3.686e+05 (uJ)
+	Wart: 8.125e+97
+	EDP: 1.943e+06 (J*cycle)
+	Energy: 3.483e+05 (uJ)
 	Latency: 5.455e+06 (cc)
 
 Mapping:
@@ -18242,21 +18285,21 @@ InRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 
 InRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 InRegister:	Total Reads = 5,635,768,320, Total Writes = 28,901,376
 DEBUG: Calculating WMOPs for level InRegister with reads=5635768320, writes=28901376
-DEBUG: WMOPs for level InRegister = 47,555,274,151.054, 4.756e+10 pJ
+DEBUG: WMOPs for level InRegister = 25,884,154,780.882, 2.588e+10 pJ
 WRegister:	Per-Layer W_R: [L0: 86,704,128, L1: 1,849,688,064, L2: 924,844,032, L3: 1,849,688,064, L4: 924,844,032, L5: 1,849,688,064, L6: 1,849,688,064, L7: 924,844,032, L8: 1,849,688,064, L9: 1,849,688,064, L10: 462,422,016, L11: 462,422,016, L12: 462,422,016], Total: 15,346,630,656
 WRegister:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Total Reads = 15,346,630,656, Total Writes = 0
 DEBUG: Calculating WMOPs for level WRegister with reads=15346630656, writes=0
-DEBUG: WMOPs for level WRegister = 250,555,424,391.811, 2.506e+11 pJ
+DEBUG: WMOPs for level WRegister = 228,884,305,021.639, 2.289e+11 pJ
 IntermediateRegister:Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0, L12: 0], Total: 0
 IntermediateRegister:Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 IntermediateRegister:Per-Layer Int_Out_R: [L0: 115,605,504, L1: 2,466,250,752, L2: 1,233,125,376, L3: 2,157,969,408, L4: 1,078,984,704, L5: 2,003,828,736, L6: 2,003,828,736, L7: 1,001,914,368, L8: 1,926,758,400, L9: 1,926,758,400, L10: 481,689,600, L11: 481,689,600], Total: 16,878,403,584
 IntermediateRegister:Per-Layer Int_Out_W: [L0: 115,605,504, L1: 2,466,250,752, L2: 1,233,125,376, L3: 2,157,969,408, L4: 1,078,984,704, L5: 2,003,828,736, L6: 2,003,828,736, L7: 1,001,914,368, L8: 1,926,758,400, L9: 1,926,758,400, L10: 481,689,600, L11: 481,689,600], Total: 16,878,403,584
 IntermediateRegister:Total Reads = 16,878,403,584, Total Writes = 16,878,403,584
 DEBUG: Calculating WMOPs for level IntermediateRegister with reads=16878403584, writes=16878403584
-DEBUG: WMOPs for level IntermediateRegister = 364,999,402,032.016, 3.650e+11 pJ
+DEBUG: WMOPs for level IntermediateRegister = 343,328,282,661.844, 3.433e+11 pJ
 OutRegister:	Output Reads = 443,154,432 (reads) + 19,267,584 (drains), Output Writes = 462,422,016 (updates) + 0 (fills)
 OutRegister:	Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0, L12: 0], Total: 0
 OutRegister:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
@@ -18264,9 +18307,9 @@ OutRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6:
 OutRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 OutRegister:	Total Reads = 462,422,016, Total Writes = 462,422,016
 DEBUG: Calculating WMOPs for level OutRegister with reads=462422016, writes=462422016
-DEBUG: WMOPs for level OutRegister = 365,749,134,910.313, 3.657e+11 pJ
+DEBUG: WMOPs for level OutRegister = 345,493,272,315.337, 3.455e+11 pJ
 Totals:		38,378,878,656 R, 17,383,525,376 W, 55,762,404,032 Tot
-Energy:		368,602.294 uJ
+Energy:		348,346.431 uJ
 
 Final Latency per level:
 DRAM:		5,454,912 cc Read Drain , 2,700,096 cc Fill Update (Total across 13 layers), 4.0 Read Bandwidth , 4.0 Write Bandwidth,
@@ -18288,7 +18331,7 @@ OutRegister:	37,644 cc Read Drain , 37,644 cc Fill Update (Total across 13 layer
 		0.958 Max Ideal Read , 0.042 Max Ideal Drain , 1.000 Max Ideal Update , 0.000 Max Ideal Fill , 
 		0 Total Stall Cycles
 Max Latency:	802,816 cc of level DRAM
-  ✓ Energy: 3.686e+05 μJ, Latency: 5.455e+06 cc, EDP: 2.09e+06
+  ✓ Energy: 3.483e+05 μJ, Latency: 5.455e+06 cc, EDP: 1.94e+06
 
 [PE=512x32] Running experiment...
 ------ loading Accelergy for Eyeriss ------
@@ -18310,8 +18353,8 @@ Max Latency:	802,816 cc of level DRAM
   SARows_11: {'S11': 3, 'C11': 128, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 128, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_32x512 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_32x512: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_32x512: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -18893,8 +18936,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 9633792
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 231211008, 6: 231211008, 7: 57802752, 8: 115605504, 9: 115605504, 10: 28901376, 11: 28901376, 12: 462422016}, total: 4248502272
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 77070336, 6: 77070336, 7: 19267584, 8: 38535168, 9: 38535168, 10: 9633792, 11: 9633792, 12: 9633792}, 
  total: 1271660544
-Level InRegister total WMOPs from per layer sum: 46,354,572,420.311
-Level InRegister total WMOPs from total reads/writes: 46,354,572,420.311
+Level InRegister total WMOPs from per layer sum: 25,236,287,727.950
+Level InRegister total WMOPs from total reads/writes: 25,236,287,727.950
 End first part of update for level: InRegister
 
 
@@ -18947,8 +18990,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 249,549,307,809.369
-Level WRegister total WMOPs from total reads/writes: 249,549,307,809.369
+Level WRegister total WMOPs from per layer sum: 228,431,023,117.008
+Level WRegister total WMOPs from total reads/writes: 228,431,023,117.008
 End first part of update for level: WRegister
 
 
@@ -18998,8 +19041,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, total: 17918853120
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, 
  total: 17918853120
-Level IntermediateRegister total WMOPs from per layer sum: 371,048,051,194.518
-Level IntermediateRegister total WMOPs from total reads/writes: 350,471,651,105.098
+Level IntermediateRegister total WMOPs from per layer sum: 349,929,766,502.157
+Level IntermediateRegister total WMOPs from total reads/writes: 329,353,366,412.737
 End first part of update for level: IntermediateRegister
 
 
@@ -19051,18 +19094,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 371,797,784,072.816
-Level OutRegister total WMOPs from total reads/writes: 351,221,383,983.395
+Level OutRegister total WMOPs from per layer sum: 352,094,756,155.649
+Level OutRegister total WMOPs from total reads/writes: 331,518,356,066.229
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42031888359.81475, 6: 42031888359.81475, 7: 20415484986.496807, 8: 39785686846.98755, 9: 39785686846.98755, 10: 10026450805.628214, 11: 10026450805.628214, 12: 10984761077.772831}
-WMOPs_till_now before compute level: 371,797,784,072.816
-Compute Level Compute total WMOPs from per layer sum: 374650943236.63525
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 40852507713.81901, 6: 40852507713.81901, 7: 20120639824.99787, 8: 39195996523.98968, 9: 39195996523.98968, 10: 9879028224.878746, 11: 9879028224.878746, 12: 10594091238.786741}
+WMOPs_till_now before compute level: 352,094,756,155.649
+Compute Level Compute total WMOPs from per layer sum: 354947915319.4688
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 746448727309.4509
+Total WMOPs after adding compute level: 707042671475.1182
 END FIRST PART OF UPDATE STATS
 
 
@@ -23150,8 +23193,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 9633792
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 231211008, 6: 231211008, 7: 57802752, 8: 115605504, 9: 115605504, 10: 28901376, 11: 28901376, 12: 462422016}, total: 4248502272
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 77070336, 6: 77070336, 7: 19267584, 8: 38535168, 9: 38535168, 10: 9633792, 11: 9633792, 12: 9633792}, 
  total: 1271660544
-Level InRegister total WMOPs from per layer sum: 46,354,572,420.311
-Level InRegister total WMOPs from total reads/writes: 46,354,572,420.311
+Level InRegister total WMOPs from per layer sum: 25,236,287,727.950
+Level InRegister total WMOPs from total reads/writes: 25,236,287,727.950
 End first part of update for level: InRegister
 
 
@@ -23204,8 +23247,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 249,549,307,809.369
-Level WRegister total WMOPs from total reads/writes: 249,549,307,809.369
+Level WRegister total WMOPs from per layer sum: 228,431,023,117.008
+Level WRegister total WMOPs from total reads/writes: 228,431,023,117.008
 End first part of update for level: WRegister
 
 
@@ -23255,8 +23298,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, total: 17918853120
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, 
  total: 17918853120
-Level IntermediateRegister total WMOPs from per layer sum: 371,048,051,194.518
-Level IntermediateRegister total WMOPs from total reads/writes: 350,471,651,105.098
+Level IntermediateRegister total WMOPs from per layer sum: 349,929,766,502.157
+Level IntermediateRegister total WMOPs from total reads/writes: 329,353,366,412.737
 End first part of update for level: IntermediateRegister
 
 
@@ -23308,18 +23351,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 371,797,784,072.816
-Level OutRegister total WMOPs from total reads/writes: 351,221,383,983.395
+Level OutRegister total WMOPs from per layer sum: 352,094,756,155.649
+Level OutRegister total WMOPs from total reads/writes: 331,518,356,066.229
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42031888359.81475, 6: 42031888359.81475, 7: 20415484986.496807, 8: 39785686846.98755, 9: 39785686846.98755, 10: 10026450805.628214, 11: 10026450805.628214, 12: 10984761077.772831}
-WMOPs_till_now before compute level: 371,797,784,072.816
-Compute Level Compute total WMOPs from per layer sum: 374650943236.63525
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 40852507713.81901, 6: 40852507713.81901, 7: 20120639824.99787, 8: 39195996523.98968, 9: 39195996523.98968, 10: 9879028224.878746, 11: 9879028224.878746, 12: 10594091238.786741}
+WMOPs_till_now before compute level: 352,094,756,155.649
+Compute Level Compute total WMOPs from per layer sum: 354947915319.4688
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 746448727309.4509
+Total WMOPs after adding compute level: 707042671475.1182
 END FIRST PART OF UPDATE STATS
 
 
@@ -26692,8 +26735,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 9633792
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 231211008, 6: 231211008, 7: 57802752, 8: 115605504, 9: 115605504, 10: 28901376, 11: 28901376, 12: 462422016}, total: 4248502272
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 77070336, 6: 77070336, 7: 19267584, 8: 38535168, 9: 38535168, 10: 9633792, 11: 9633792, 12: 9633792}, 
  total: 1271660544
-Level InRegister total WMOPs from per layer sum: 46,354,572,420.311
-Level InRegister total WMOPs from total reads/writes: 46,354,572,420.311
+Level InRegister total WMOPs from per layer sum: 25,236,287,727.950
+Level InRegister total WMOPs from total reads/writes: 25,236,287,727.950
 End first part of update for level: InRegister
 
 
@@ -26746,8 +26789,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 249,549,307,809.369
-Level WRegister total WMOPs from total reads/writes: 249,549,307,809.369
+Level WRegister total WMOPs from per layer sum: 228,431,023,117.008
+Level WRegister total WMOPs from total reads/writes: 228,431,023,117.008
 End first part of update for level: WRegister
 
 
@@ -26797,8 +26840,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, total: 17918853120
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, 
  total: 17918853120
-Level IntermediateRegister total WMOPs from per layer sum: 371,048,051,194.518
-Level IntermediateRegister total WMOPs from total reads/writes: 350,471,651,105.098
+Level IntermediateRegister total WMOPs from per layer sum: 349,929,766,502.157
+Level IntermediateRegister total WMOPs from total reads/writes: 329,353,366,412.737
 End first part of update for level: IntermediateRegister
 
 
@@ -26850,18 +26893,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 371,797,784,072.816
-Level OutRegister total WMOPs from total reads/writes: 351,221,383,983.395
+Level OutRegister total WMOPs from per layer sum: 352,094,756,155.649
+Level OutRegister total WMOPs from total reads/writes: 331,518,356,066.229
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42031888359.81475, 6: 42031888359.81475, 7: 20415484986.496807, 8: 39785686846.98755, 9: 39785686846.98755, 10: 10026450805.628214, 11: 10026450805.628214, 12: 10984761077.772831}
-WMOPs_till_now before compute level: 371,797,784,072.816
-Compute Level Compute total WMOPs from per layer sum: 374650943236.63525
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 40852507713.81901, 6: 40852507713.81901, 7: 20120639824.99787, 8: 39195996523.98968, 9: 39195996523.98968, 10: 9879028224.878746, 11: 9879028224.878746, 12: 10594091238.786741}
+WMOPs_till_now before compute level: 352,094,756,155.649
+Compute Level Compute total WMOPs from per layer sum: 354947915319.4688
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 746448727309.4509
+Total WMOPs after adding compute level: 707042671475.1182
 END FIRST PART OF UPDATE STATS
 
 
@@ -29911,8 +29954,8 @@ compute_latency from compute level: 1,392,384
 max_latency after compute: 5,454,912, before fanout_level
 
 Final condition:
-Wart: 7.578e+97
-EDP: 2.044e+06 (J*cycle)
+Wart: 7.998e+97
+EDP: 1.936e+06 (J*cycle)
 DRAM ----------> P: 14, Q: 14, Y11: 14, X11: 14, Y10: 14, X10: 14, Y9: 28, X9: 28, Y8: 28, X8: 28, Y7: 28, X7: 28, Y6: 56, X6: 56, Y5: 56, X5: 56, Y4: 56, X4: 56, Y3: 112, X3: 112, Y2: 112, X2: 112, Y1: 224, X1: 224, Y0: 224, X0: 224
 GlobalBuffer --
 SACols --------> Z12: 32
@@ -30275,8 +30318,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 9633792
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 231211008, 6: 231211008, 7: 57802752, 8: 115605504, 9: 115605504, 10: 28901376, 11: 28901376, 12: 462422016}, total: 4248502272
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 77070336, 6: 77070336, 7: 19267584, 8: 38535168, 9: 38535168, 10: 9633792, 11: 9633792, 12: 9633792}, 
  total: 1271660544
-Level InRegister total WMOPs from per layer sum: 46,354,572,420.311
-Level InRegister total WMOPs from total reads/writes: 46,354,572,420.311
+Level InRegister total WMOPs from per layer sum: 25,236,287,727.950
+Level InRegister total WMOPs from total reads/writes: 25,236,287,727.950
 End first part of update for level: InRegister
 
 
@@ -30329,8 +30372,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 249,549,307,809.369
-Level WRegister total WMOPs from total reads/writes: 249,549,307,809.369
+Level WRegister total WMOPs from per layer sum: 228,431,023,117.008
+Level WRegister total WMOPs from total reads/writes: 228,431,023,117.008
 End first part of update for level: WRegister
 
 
@@ -30380,8 +30423,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, total: 17918853120
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2157969408, 6: 2157969408, 7: 1078984704, 8: 2003828736, 9: 2003828736, 10: 500957184, 11: 500957184, 12: 0}, 
  total: 17918853120
-Level IntermediateRegister total WMOPs from per layer sum: 371,048,051,194.518
-Level IntermediateRegister total WMOPs from total reads/writes: 350,471,651,105.098
+Level IntermediateRegister total WMOPs from per layer sum: 349,929,766,502.157
+Level IntermediateRegister total WMOPs from total reads/writes: 329,353,366,412.737
 End first part of update for level: IntermediateRegister
 
 
@@ -30433,18 +30476,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 371,797,784,072.816
-Level OutRegister total WMOPs from total reads/writes: 351,221,383,983.395
+Level OutRegister total WMOPs from per layer sum: 352,094,756,155.649
+Level OutRegister total WMOPs from total reads/writes: 331,518,356,066.229
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42031888359.81475, 6: 42031888359.81475, 7: 20415484986.496807, 8: 39785686846.98755, 9: 39785686846.98755, 10: 10026450805.628214, 11: 10026450805.628214, 12: 10984761077.772831}
-WMOPs_till_now before compute level: 371,797,784,072.816
-Compute Level Compute total WMOPs from per layer sum: 374650943236.63525
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 40852507713.81901, 6: 40852507713.81901, 7: 20120639824.99787, 8: 39195996523.98968, 9: 39195996523.98968, 10: 9879028224.878746, 11: 9879028224.878746, 12: 10594091238.786741}
+WMOPs_till_now before compute level: 352,094,756,155.649
+Compute Level Compute total WMOPs from per layer sum: 354947915319.4688
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 746448727309.4509
+Total WMOPs after adding compute level: 707042671475.1182
 END FIRST PART OF UPDATE STATS
 
 
@@ -33550,12 +33593,12 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 0.0011136217508465052
 Arch: Eyeriss_Constrained_13L_tile1_32x512: spatial utilization is 0.0011136217508465052
 
-Finished in: 0.881s
+Finished in: 0.649s
 
 Best mapping found with:
-	Wart: 7.578e+97
-	EDP: 2.044e+06 (J*cycle)
-	Energy: 3.641e+05 (uJ)
+	Wart: 7.998e+97
+	EDP: 1.936e+06 (J*cycle)
+	Energy: 3.492e+05 (uJ)
 	Latency: 5.455e+06 (cc)
 
 Mapping:
@@ -33620,21 +33663,21 @@ InRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 
 InRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 InRegister:	Total Reads = 4,248,502,272, Total Writes = 28,901,376
 DEBUG: Calculating WMOPs for level InRegister with reads=4248502272, writes=28901376
-DEBUG: WMOPs for level InRegister = 36,028,537,535.925, 3.603e+10 pJ
+DEBUG: WMOPs for level InRegister = 19,664,631,072.735, 1.966e+10 pJ
 WRegister:	Per-Layer W_R: [L0: 86,704,128, L1: 1,849,688,064, L2: 924,844,032, L3: 1,849,688,064, L4: 924,844,032, L5: 1,849,688,064, L6: 1,849,688,064, L7: 924,844,032, L8: 1,849,688,064, L9: 1,849,688,064, L10: 462,422,016, L11: 462,422,016, L12: 462,422,016], Total: 15,346,630,656
 WRegister:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Total Reads = 15,346,630,656, Total Writes = 0
 DEBUG: Calculating WMOPs for level WRegister with reads=15346630656, writes=0
-DEBUG: WMOPs for level WRegister = 239,028,687,776.682, 2.390e+11 pJ
+DEBUG: WMOPs for level WRegister = 222,664,781,313.491, 2.227e+11 pJ
 IntermediateRegister:Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0, L12: 0], Total: 0
 IntermediateRegister:Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 IntermediateRegister:Per-Layer Int_Out_R: [L0: 115,605,504, L1: 2,466,250,752, L2: 1,233,125,376, L3: 2,466,250,752, L4: 1,233,125,376, L5: 2,157,969,408, L6: 2,157,969,408, L7: 1,078,984,704, L8: 2,003,828,736, L9: 2,003,828,736, L10: 500,957,184, L11: 500,957,184], Total: 17,918,853,120
 IntermediateRegister:Per-Layer Int_Out_W: [L0: 115,605,504, L1: 2,466,250,752, L2: 1,233,125,376, L3: 2,466,250,752, L4: 1,233,125,376, L5: 2,157,969,408, L6: 2,157,969,408, L7: 1,078,984,704, L8: 2,003,828,736, L9: 2,003,828,736, L10: 500,957,184, L11: 500,957,184], Total: 17,918,853,120
 IntermediateRegister:Total Reads = 17,918,853,120, Total Writes = 17,918,853,120
 DEBUG: Calculating WMOPs for level IntermediateRegister with reads=17918853120, writes=17918853120
-DEBUG: WMOPs for level IntermediateRegister = 360,527,431,161.832, 3.605e+11 pJ
+DEBUG: WMOPs for level IntermediateRegister = 344,163,524,698.641, 3.442e+11 pJ
 OutRegister:	Output Reads = 423,886,848 (reads) + 38,535,168 (drains), Output Writes = 462,422,016 (updates) + 0 (fills)
 OutRegister:	Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0, L12: 0], Total: 0
 OutRegister:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
@@ -33642,9 +33685,9 @@ OutRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6:
 OutRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 OutRegister:	Total Reads = 462,422,016, Total Writes = 462,422,016
 DEBUG: Calculating WMOPs for level OutRegister with reads=462422016, writes=462422016
-DEBUG: WMOPs for level OutRegister = 361,277,164,040.129, 3.613e+11 pJ
+DEBUG: WMOPs for level OutRegister = 346,328,514,352.133, 3.463e+11 pJ
 Totals:		38,032,062,144 R, 18,423,974,912 W, 56,456,037,056 Tot
-Energy:		364,130.323 uJ
+Energy:		349,181.674 uJ
 
 Final Latency per level:
 DRAM:		5,454,912 cc Read Drain , 2,700,096 cc Fill Update (Total across 13 layers), 4.0 Read Bandwidth , 4.0 Write Bandwidth,
@@ -33666,7 +33709,7 @@ OutRegister:	37,644 cc Read Drain , 37,644 cc Fill Update (Total across 13 layer
 		0.917 Max Ideal Read , 0.083 Max Ideal Drain , 1.000 Max Ideal Update , 0.000 Max Ideal Fill , 
 		0 Total Stall Cycles
 Max Latency:	802,816 cc of level DRAM
-  ✓ Energy: 3.641e+05 μJ, Latency: 5.455e+06 cc, EDP: 2.04e+06
+  ✓ Energy: 3.492e+05 μJ, Latency: 5.455e+06 cc, EDP: 1.94e+06
 
 [PE=1024x16] Running experiment...
 ------ loading Accelergy for Eyeriss ------
@@ -33688,8 +33731,8 @@ Max Latency:	802,816 cc of level DRAM
   SARows_11: {'S11': 3, 'C11': 256, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 256, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_16x1024 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_16x1024: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_16x1024: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -34271,8 +34314,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 4816896
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 115605504, 6: 115605504, 7: 28901376, 8: 57802752, 9: 57802752, 10: 14450688, 11: 14450688, 12: 462422016}, total: 3843883008
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 38535168, 6: 38535168, 7: 9633792, 8: 19267584, 9: 19267584, 10: 4816896, 11: 4816896, 12: 4816896}, 
  total: 1131970560
-Level InRegister total WMOPs from per layer sum: 41,831,929,234.514
-Level InRegister total WMOPs from total reads/writes: 41,831,929,234.514
+Level InRegister total WMOPs from per layer sum: 22,795,988,495.239
+Level InRegister total WMOPs from total reads/writes: 22,795,988,495.239
 End first part of update for level: InRegister
 
 
@@ -34325,8 +34368,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 245,026,664,623.572
-Level WRegister total WMOPs from total reads/writes: 245,026,664,623.572
+Level WRegister total WMOPs from per layer sum: 225,990,723,884.297
+Level WRegister total WMOPs from total reads/writes: 225,990,723,884.297
 End first part of update for level: WRegister
 
 
@@ -34376,8 +34419,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, total: 19074908160
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, 
  total: 19074908160
-Level IntermediateRegister total WMOPs from per layer sum: 374,364,036,614.215
-Level IntermediateRegister total WMOPs from total reads/writes: 345,949,007,919.301
+Level IntermediateRegister total WMOPs from per layer sum: 355,328,095,874.940
+Level IntermediateRegister total WMOPs from total reads/writes: 326,913,067,180.026
 End first part of update for level: IntermediateRegister
 
 
@@ -34429,18 +34472,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 375,113,769,492.512
-Level OutRegister total WMOPs from total reads/writes: 346,698,740,797.598
+Level OutRegister total WMOPs from per layer sum: 357,493,085,528.432
+Level OutRegister total WMOPs from total reads/writes: 329,078,056,833.518
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42841440808.48762, 6: 42841440808.48762, 7: 21140448339.031258, 8: 40190463071.32398, 9: 40190463071.32398, 10: 10127644861.712322, 11: 10127644861.712322, 12: 10944737686.74808}
-WMOPs_till_now before compute level: 375,113,769,492.512
-Compute Level Compute total WMOPs from per layer sum: 377966928656.3318
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 42251750485.48975, 6: 42251750485.48975, 7: 20993025758.281788, 8: 39895617909.82504, 9: 39895617909.82504, 10: 10053933571.337587, 11: 10053933571.337587, 12: 10572495670.355673}
+WMOPs_till_now before compute level: 357,493,085,528.432
+Compute Level Compute total WMOPs from per layer sum: 360346244692.25165
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 753080698148.844
+Total WMOPs after adding compute level: 717839330220.6837
 END FIRST PART OF UPDATE STATS
 
 
@@ -38528,8 +38571,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 4816896
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 115605504, 6: 115605504, 7: 28901376, 8: 57802752, 9: 57802752, 10: 14450688, 11: 14450688, 12: 462422016}, total: 3843883008
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 38535168, 6: 38535168, 7: 9633792, 8: 19267584, 9: 19267584, 10: 4816896, 11: 4816896, 12: 4816896}, 
  total: 1131970560
-Level InRegister total WMOPs from per layer sum: 41,831,929,234.514
-Level InRegister total WMOPs from total reads/writes: 41,831,929,234.514
+Level InRegister total WMOPs from per layer sum: 22,795,988,495.239
+Level InRegister total WMOPs from total reads/writes: 22,795,988,495.239
 End first part of update for level: InRegister
 
 
@@ -38582,8 +38625,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 245,026,664,623.572
-Level WRegister total WMOPs from total reads/writes: 245,026,664,623.572
+Level WRegister total WMOPs from per layer sum: 225,990,723,884.297
+Level WRegister total WMOPs from total reads/writes: 225,990,723,884.297
 End first part of update for level: WRegister
 
 
@@ -38633,8 +38676,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, total: 19074908160
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, 
  total: 19074908160
-Level IntermediateRegister total WMOPs from per layer sum: 374,364,036,614.215
-Level IntermediateRegister total WMOPs from total reads/writes: 345,949,007,919.301
+Level IntermediateRegister total WMOPs from per layer sum: 355,328,095,874.940
+Level IntermediateRegister total WMOPs from total reads/writes: 326,913,067,180.026
 End first part of update for level: IntermediateRegister
 
 
@@ -38686,18 +38729,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 375,113,769,492.512
-Level OutRegister total WMOPs from total reads/writes: 346,698,740,797.598
+Level OutRegister total WMOPs from per layer sum: 357,493,085,528.432
+Level OutRegister total WMOPs from total reads/writes: 329,078,056,833.518
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42841440808.48762, 6: 42841440808.48762, 7: 21140448339.031258, 8: 40190463071.32398, 9: 40190463071.32398, 10: 10127644861.712322, 11: 10127644861.712322, 12: 10944737686.74808}
-WMOPs_till_now before compute level: 375,113,769,492.512
-Compute Level Compute total WMOPs from per layer sum: 377966928656.3318
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 42251750485.48975, 6: 42251750485.48975, 7: 20993025758.281788, 8: 39895617909.82504, 9: 39895617909.82504, 10: 10053933571.337587, 11: 10053933571.337587, 12: 10572495670.355673}
+WMOPs_till_now before compute level: 357,493,085,528.432
+Compute Level Compute total WMOPs from per layer sum: 360346244692.25165
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 753080698148.844
+Total WMOPs after adding compute level: 717839330220.6837
 END FIRST PART OF UPDATE STATS
 
 
@@ -42070,8 +42113,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 4816896
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 115605504, 6: 115605504, 7: 28901376, 8: 57802752, 9: 57802752, 10: 14450688, 11: 14450688, 12: 462422016}, total: 3843883008
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 38535168, 6: 38535168, 7: 9633792, 8: 19267584, 9: 19267584, 10: 4816896, 11: 4816896, 12: 4816896}, 
  total: 1131970560
-Level InRegister total WMOPs from per layer sum: 41,831,929,234.514
-Level InRegister total WMOPs from total reads/writes: 41,831,929,234.514
+Level InRegister total WMOPs from per layer sum: 22,795,988,495.239
+Level InRegister total WMOPs from total reads/writes: 22,795,988,495.239
 End first part of update for level: InRegister
 
 
@@ -42124,8 +42167,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 245,026,664,623.572
-Level WRegister total WMOPs from total reads/writes: 245,026,664,623.572
+Level WRegister total WMOPs from per layer sum: 225,990,723,884.297
+Level WRegister total WMOPs from total reads/writes: 225,990,723,884.297
 End first part of update for level: WRegister
 
 
@@ -42175,8 +42218,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, total: 19074908160
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, 
  total: 19074908160
-Level IntermediateRegister total WMOPs from per layer sum: 374,364,036,614.215
-Level IntermediateRegister total WMOPs from total reads/writes: 345,949,007,919.301
+Level IntermediateRegister total WMOPs from per layer sum: 355,328,095,874.940
+Level IntermediateRegister total WMOPs from total reads/writes: 326,913,067,180.026
 End first part of update for level: IntermediateRegister
 
 
@@ -42228,18 +42271,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 375,113,769,492.512
-Level OutRegister total WMOPs from total reads/writes: 346,698,740,797.598
+Level OutRegister total WMOPs from per layer sum: 357,493,085,528.432
+Level OutRegister total WMOPs from total reads/writes: 329,078,056,833.518
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42841440808.48762, 6: 42841440808.48762, 7: 21140448339.031258, 8: 40190463071.32398, 9: 40190463071.32398, 10: 10127644861.712322, 11: 10127644861.712322, 12: 10944737686.74808}
-WMOPs_till_now before compute level: 375,113,769,492.512
-Compute Level Compute total WMOPs from per layer sum: 377966928656.3318
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 42251750485.48975, 6: 42251750485.48975, 7: 20993025758.281788, 8: 39895617909.82504, 9: 39895617909.82504, 10: 10053933571.337587, 11: 10053933571.337587, 12: 10572495670.355673}
+WMOPs_till_now before compute level: 357,493,085,528.432
+Compute Level Compute total WMOPs from per layer sum: 360346244692.25165
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 753080698148.844
+Total WMOPs after adding compute level: 717839330220.6837
 END FIRST PART OF UPDATE STATS
 
 
@@ -45289,8 +45332,8 @@ compute_latency from compute level: 1,392,384
 max_latency after compute: 5,454,912, before fanout_level
 
 Final condition:
-Wart: 7.511e+97
-EDP: 2.062e+06 (J*cycle)
+Wart: 7.879e+97
+EDP: 1.966e+06 (J*cycle)
 DRAM ----------> P: 14, Q: 14, Y11: 14, X11: 14, Y10: 14, X10: 14, Y9: 28, X9: 28, Y8: 28, X8: 28, Y7: 28, X7: 28, Y6: 56, X6: 56, Y5: 56, X5: 56, Y4: 56, X4: 56, Y3: 112, X3: 112, Y2: 112, X2: 112, Y1: 224, X1: 224, Y0: 224, X0: 224
 GlobalBuffer --
 SACols --------> Z12: 16
@@ -45653,8 +45696,8 @@ Level InRegister, Layer 12: total_reads = 462422016, total_writes = 4816896
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 462422016, 3: 462422016, 4: 115605504, 5: 115605504, 6: 115605504, 7: 28901376, 8: 57802752, 9: 57802752, 10: 14450688, 11: 14450688, 12: 462422016}, total: 3843883008
 Check: Per Layer Total writes: {0: 28901376, 1: 616562688, 2: 154140672, 3: 154140672, 4: 38535168, 5: 38535168, 6: 38535168, 7: 9633792, 8: 19267584, 9: 19267584, 10: 4816896, 11: 4816896, 12: 4816896}, 
  total: 1131970560
-Level InRegister total WMOPs from per layer sum: 41,831,929,234.514
-Level InRegister total WMOPs from total reads/writes: 41,831,929,234.514
+Level InRegister total WMOPs from per layer sum: 22,795,988,495.239
+Level InRegister total WMOPs from total reads/writes: 22,795,988,495.239
 End first part of update for level: InRegister
 
 
@@ -45707,8 +45750,8 @@ Level WRegister, Layer 12: total_reads = 462422016, total_writes = 2359296
 Check: Per Layer Total reads: {0: 86704128, 1: 1849688064, 2: 924844032, 3: 1849688064, 4: 924844032, 5: 1849688064, 6: 1849688064, 7: 924844032, 8: 1849688064, 9: 1849688064, 10: 462422016, 11: 462422016, 12: 462422016}, total: 15346630656
 Check: Per Layer Total writes: {0: 1728, 1: 36864, 2: 73728, 3: 147456, 4: 294912, 5: 589824, 6: 589824, 7: 1179648, 8: 2359296, 9: 2359296, 10: 2359296, 11: 2359296, 12: 2359296}, 
  total: 14710464
-Level WRegister total WMOPs from per layer sum: 245,026,664,623.572
-Level WRegister total WMOPs from total reads/writes: 245,026,664,623.572
+Level WRegister total WMOPs from per layer sum: 225,990,723,884.297
+Level WRegister total WMOPs from total reads/writes: 225,990,723,884.297
 End first part of update for level: WRegister
 
 
@@ -45758,8 +45801,8 @@ Level IntermediateRegister, Layer 12: total_reads = 0, total_writes = 0
 Check: Per Layer Total reads: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, total: 19074908160
 Check: Per Layer Total writes: {0: 115605504, 1: 2466250752, 2: 1233125376, 3: 2466250752, 4: 1233125376, 5: 2466250752, 6: 2466250752, 7: 1233125376, 8: 2157969408, 9: 2157969408, 10: 539492352, 11: 539492352, 12: 0}, 
  total: 19074908160
-Level IntermediateRegister total WMOPs from per layer sum: 374,364,036,614.215
-Level IntermediateRegister total WMOPs from total reads/writes: 345,949,007,919.301
+Level IntermediateRegister total WMOPs from per layer sum: 355,328,095,874.940
+Level IntermediateRegister total WMOPs from total reads/writes: 326,913,067,180.026
 End first part of update for level: IntermediateRegister
 
 
@@ -45811,18 +45854,18 @@ Level OutRegister, Layer 12: total_reads = 462422016, total_writes = 462422016
 Check: Per Layer Total reads: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, total: 462422016
 Check: Per Layer Total writes: {0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 462422016}, 
  total: 462422016
-Level OutRegister total WMOPs from per layer sum: 375,113,769,492.512
-Level OutRegister total WMOPs from total reads/writes: 346,698,740,797.598
+Level OutRegister total WMOPs from per layer sum: 357,493,085,528.432
+Level OutRegister total WMOPs from total reads/writes: 329,078,056,833.518
 End first part of update for level: OutRegister
 
 
 
 Calculating WMOPs for Compute Level
-Compute Level Compute WMOPs_per_layer: {0: 2913492988.182876, 1: 62029649087.63468, 2: 25893933466.012074, 3: 46664342299.76148, 4: 22061227305.91344, 5: 42841440808.48762, 6: 42841440808.48762, 7: 21140448339.031258, 8: 40190463071.32398, 9: 40190463071.32398, 10: 10127644861.712322, 11: 10127644861.712322, 12: 10944737686.74808}
-WMOPs_till_now before compute level: 375,113,769,492.512
-Compute Level Compute total WMOPs from per layer sum: 377966928656.3318
+Compute Level Compute WMOPs_per_layer: {0: 2471225245.934474, 1: 52594603919.66877, 2: 23535172174.020596, 3: 44305581007.770004, 4: 21471536982.915573, 5: 42251750485.48975, 6: 42251750485.48975, 7: 20993025758.281788, 8: 39895617909.82504, 9: 39895617909.82504, 10: 10053933571.337587, 11: 10053933571.337587, 12: 10572495670.355673}
+WMOPs_till_now before compute level: 357,493,085,528.432
+Compute Level Compute total WMOPs from per layer sum: 360346244692.25165
 Compute Level Compute total WMOPs: 5.049689807334779e+115
-Total WMOPs after adding compute level: 753080698148.844
+Total WMOPs after adding compute level: 717839330220.6837
 END FIRST PART OF UPDATE STATS
 
 
@@ -48928,12 +48971,12 @@ level Compute utilization: 1/1=1.0
 utilization after level Compute: 0.0011136217508465052
 Arch: Eyeriss_Constrained_13L_tile1_16x1024: spatial utilization is 0.0011136217508465052
 
-Finished in: 0.850s
+Finished in: 1.432s
 
 Best mapping found with:
-	Wart: 7.511e+97
-	EDP: 2.062e+06 (J*cycle)
-	Energy: 3.686e+05 (uJ)
+	Wart: 7.879e+97
+	EDP: 1.966e+06 (J*cycle)
+	Energy: 3.552e+05 (uJ)
 	Latency: 5.455e+06 (cc)
 
 Mapping:
@@ -48998,21 +49041,21 @@ InRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 
 InRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 InRegister:	Total Reads = 3,843,883,008, Total Writes = 28,901,376
 DEBUG: Calculating WMOPs for level InRegister with reads=3843883008, writes=28901376
-DEBUG: WMOPs for level InRegister = 32,666,572,689.846, 3.267e+10 pJ
+DEBUG: WMOPs for level InRegister = 17,850,603,324.525, 1.785e+10 pJ
 WRegister:	Per-Layer W_R: [L0: 86,704,128, L1: 1,849,688,064, L2: 924,844,032, L3: 1,849,688,064, L4: 924,844,032, L5: 1,849,688,064, L6: 1,849,688,064, L7: 924,844,032, L8: 1,849,688,064, L9: 1,849,688,064, L10: 462,422,016, L11: 462,422,016, L12: 462,422,016], Total: 15,346,630,656
 WRegister:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 WRegister:	Total Reads = 15,346,630,656, Total Writes = 0
 DEBUG: Calculating WMOPs for level WRegister with reads=15346630656, writes=0
-DEBUG: WMOPs for level WRegister = 235,666,722,930.603, 2.357e+11 pJ
+DEBUG: WMOPs for level WRegister = 220,850,753,565.282, 2.209e+11 pJ
 IntermediateRegister:Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0, L12: 0], Total: 0
 IntermediateRegister:Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 IntermediateRegister:Per-Layer Int_Out_R: [L0: 115,605,504, L1: 2,466,250,752, L2: 1,233,125,376, L3: 2,466,250,752, L4: 1,233,125,376, L5: 2,466,250,752, L6: 2,466,250,752, L7: 1,233,125,376, L8: 2,157,969,408, L9: 2,157,969,408, L10: 539,492,352, L11: 539,492,352], Total: 19,074,908,160
 IntermediateRegister:Per-Layer Int_Out_W: [L0: 115,605,504, L1: 2,466,250,752, L2: 1,233,125,376, L3: 2,466,250,752, L4: 1,233,125,376, L5: 2,466,250,752, L6: 2,466,250,752, L7: 1,233,125,376, L8: 2,157,969,408, L9: 2,157,969,408, L10: 539,492,352, L11: 539,492,352], Total: 19,074,908,160
 IntermediateRegister:Total Reads = 19,074,908,160, Total Writes = 19,074,908,160
 DEBUG: Calculating WMOPs for level IntermediateRegister with reads=19074908160, writes=19074908160
-DEBUG: WMOPs for level IntermediateRegister = 365,004,094,921.246, 3.650e+11 pJ
+DEBUG: WMOPs for level IntermediateRegister = 350,188,125,555.924, 3.502e+11 pJ
 OutRegister:	Output Reads = 385,351,680 (reads) + 77,070,336 (drains), Output Writes = 462,422,016 (updates) + 0 (fills)
 OutRegister:	Per-Layer W_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0, L12: 0], Total: 0
 OutRegister:	Per-Layer Int_In_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
@@ -49020,9 +49063,9 @@ OutRegister:	Per-Layer Int_Out_R: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6:
 OutRegister:	Per-Layer Int_Out_W: [L0: 0, L1: 0, L2: 0, L3: 0, L4: 0, L5: 0, L6: 0, L7: 0, L8: 0, L9: 0, L10: 0, L11: 0], Total: 0
 OutRegister:	Total Reads = 462,422,016, Total Writes = 462,422,016
 DEBUG: Calculating WMOPs for level OutRegister with reads=462422016, writes=462422016
-DEBUG: WMOPs for level OutRegister = 365,753,827,799.543, 3.658e+11 pJ
+DEBUG: WMOPs for level OutRegister = 352,353,115,209.417, 3.524e+11 pJ
 Totals:		38,783,497,920 R, 19,580,029,952 W, 58,363,527,872 Tot
-Energy:		368,606.987 uJ
+Energy:		355,206.274 uJ
 
 Final Latency per level:
 DRAM:		5,454,912 cc Read Drain , 2,700,096 cc Fill Update (Total across 13 layers), 4.0 Read Bandwidth , 4.0 Write Bandwidth,
@@ -49044,7 +49087,7 @@ OutRegister:	37,644 cc Read Drain , 37,644 cc Fill Update (Total across 13 layer
 		0.833 Max Ideal Read , 0.167 Max Ideal Drain , 1.000 Max Ideal Update , 0.000 Max Ideal Fill , 
 		0 Total Stall Cycles
 Max Latency:	802,816 cc of level DRAM
-  ✓ Energy: 3.686e+05 μJ, Latency: 5.455e+06 cc, EDP: 2.06e+06
+  ✓ Energy: 3.552e+05 μJ, Latency: 5.455e+06 cc, EDP: 1.97e+06
 
 [PE=2048x8] Running experiment...
 ------ loading Accelergy for Eyeriss ------
@@ -49066,8 +49109,8 @@ Max Latency:	802,816 cc of level DRAM
   SARows_11: {'S11': 3, 'C11': 512, 'Z11': 1}
   SARows_12: {'S12': 3, 'C12': 512, 'Z12': 1}
 Creating architecture: Eyeriss_Constrained_13L_tile1_8x2048 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_8x2048: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_8x2048: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -49289,6 +49332,19 @@ Total mem footprint: 14965388
 
 
 tile_sizes[dim]: [1, 3], self._dim_products[dim]: [1, 1]
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_8x2048 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 input_FC_size distinct: 6
 Input FC size: 6
 
@@ -49353,19 +49409,6 @@ Output size: 0
 Weight size: 0
 
 Intermediate input size: 12
-Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
-    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
-    raise e
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
-    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
-    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
-    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
-AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_8x2048 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 Total intermediate size (input + output): 336
 
 input_size: 0, output_size: 0, weight_size: 0, intermediate_size: 336
@@ -49473,8 +49516,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 512, 'Z11': 2}
   SARows_12: {'S12': 3, 'C12': 512, 'Z12': 2}
 Creating architecture: Eyeriss_Constrained_13L_tile1_4x4096 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_4x4096: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_4x4096: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -49586,6 +49629,19 @@ DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataf
 ['C11', 'Y11', 'R11', 'X11', 'S11']
 ['C12', 'P', 'R12', 'Q', 'S12']
 -------- factorFlow -------- CIAO
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_4x4096 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 Arch after initialization:
 tile_sizes[dim]: [1, 3], self._dim_products[dim]: [224, 1]
 input_FC_size distinct: 1344
@@ -49651,19 +49707,6 @@ Output size: 0
 
 Weight size: 1200
 
-Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
-    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
-    raise e
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
-    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
-    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
-    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
-AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_4x4096 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 Intermediate input size: 36
 Total intermediate size (input + output): 0
 
@@ -49880,8 +49923,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 512, 'Z11': 4}
   SARows_12: {'S12': 3, 'C12': 512, 'Z12': 4}
 Creating architecture: Eyeriss_Constrained_13L_tile1_2x8192 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_2x8192: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_2x8192: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -49971,19 +50014,6 @@ DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataf
 ['C3', 'Y3', 'R3', 'X3', 'S3']
 ['C4', 'Y4', 'R4', 'X4', 'S4']
 ['C5', 'Y5', 'R5', 'X5', 'S5']
-Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
-    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
-    raise e
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
-    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
-    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
-    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
-AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_2x8192 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 ['C6', 'Y6', 'R6', 'X6', 'S6']
 ['C7', 'Y7', 'R7', 'X7', 'S7']
 ['C8', 'Y8', 'R8', 'X8', 'S8']
@@ -50248,6 +50278,19 @@ Full architecture mapping:
 
 tile_sizes[dim]: [1, 1], self._dim_products[dim]: [1, 1]
 input_FC_size distinct: 0
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_2x8192 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 Input FC size: 0
 
 Input size: 0
@@ -50287,8 +50330,8 @@ CONSTRAINTS VIOLATION: Arch...
   SARows_11: {'S11': 3, 'C11': 512, 'Z11': 8}
   SARows_12: {'S12': 3, 'C12': 512, 'Z12': 8}
 Creating architecture: Eyeriss_Constrained_13L_tile1_1x16384 with coupling: dims: C0Y0X0R0S0Z0C1R1S1Y1X1Z1C2R2S2Y2X2Z2C3R3S3Y3X3Z3C4R4S4Y4X4Z4C5R5S5Y5X5Z5C6R6S6Y6X6Z6C7R7S7Y7X7Z7C8R8S8Y8X8Z8C9R9S9Y9X9Z9C10R10S10Y10X10Z10C11R11S11Y11X11Z11C12R12S12PQZ12, in_coupling: [C0][Y0+R0][X0+S0], w_coupling: W0: [Z0][C0][R0][S0],W1: [Z1][C1][R1][S1],W2: [Z2][C2][R2][S2],W3: [Z3][C3][R3][S3],W4: [Z4][C4][R4][S4],W5: [Z5][C5][R5][S5],W6: [Z6][C6][R6][S6],W7: [Z7][C7][R7][S7],W8: [Z8][C8][R8][S8],W9: [Z9][C9][R9][S9],W10: [Z10][C10][R10][S10],W11: [Z11][C11][R11][S11],W12: [Z12][C12][R12][S12],, out_coupling: [Z12][P][Q]
-final_layer_dims: {'X0', 'Y0', 'P', 'R12', 'Z12', 'R0', 'S0', 'C0', 'Q', 'C12', 'S12'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
-INFO: Arch: Eyeriss_Constrained_13L_tile1_1x16384: identified intermediate dimensions: {'R3', 'R2', 'S2', 'R6', 'Z2', 'R7', 'S7', 'C6', 'R8', 'C3', 'Z4', 'X2', 'C10', 'Z8', 'R1', 'S9', 'X5', 'Y11', 'C1', 'S6', 'C7', 'R9', 'R10', 'Y5', 'Y4', 'X4', 'Z9', 'S10', 'C5', 'X10', 'X9', 'S8', 'Z1', 'Z6', 'R5', 'Y7', 'C2', 'Z5', 'X8', 'Z10', 'Y1', 'S3', 'S5', 'X1', 'S4', 'Y8', 'Z0', 'Z7', 'R4', 'Y3', 'R11', 'X7', 'Y6', 'C8', 'S11', 'C11', 'Y2', 'C4', 'Z3', 'X6', 'Y9', 'Z11', 'Y10', 'X3', 'C9', 'X11', 'S1'}
+final_layer_dims: {'X0', 'C12', 'Q', 'Y0', 'C0', 'R12', 'P', 'Z12', 'S12', 'R0', 'S0'}, coupling.dims: ['C0', 'Y0', 'X0', 'R0', 'S0', 'Z0', 'C1', 'R1', 'S1', 'Y1', 'X1', 'Z1', 'C2', 'R2', 'S2', 'Y2', 'X2', 'Z2', 'C3', 'R3', 'S3', 'Y3', 'X3', 'Z3', 'C4', 'R4', 'S4', 'Y4', 'X4', 'Z4', 'C5', 'R5', 'S5', 'Y5', 'X5', 'Z5', 'C6', 'R6', 'S6', 'Y6', 'X6', 'Z6', 'C7', 'R7', 'S7', 'Y7', 'X7', 'Z7', 'C8', 'R8', 'S8', 'Y8', 'X8', 'Z8', 'C9', 'R9', 'S9', 'Y9', 'X9', 'Z9', 'C10', 'R10', 'S10', 'Y10', 'X10', 'Z10', 'C11', 'R11', 'S11', 'Y11', 'X11', 'Z11', 'C12', 'R12', 'S12', 'P', 'Q', 'Z12']
+INFO: Arch: Eyeriss_Constrained_13L_tile1_1x16384: identified intermediate dimensions: {'Z0', 'X2', 'Y6', 'Z6', 'Z1', 'Y9', 'C8', 'R6', 'Y10', 'S11', 'Z9', 'X9', 'S9', 'C3', 'C9', 'Y1', 'Y4', 'Z8', 'C11', 'R3', 'R7', 'C5', 'C10', 'R1', 'X5', 'X3', 'R9', 'R4', 'X7', 'S3', 'X8', 'Y5', 'S7', 'C7', 'X10', 'R2', 'X6', 'R10', 'S2', 'Y3', 'Y2', 'Y7', 'C1', 'C6', 'R8', 'X11', 'R5', 'Z7', 'S8', 'S10', 'Z2', 'S5', 'Y11', 'S6', 'Z11', 'Z4', 'Z3', 'C4', 'C2', 'S1', 'Z5', 'S4', 'R11', 'Y8', 'Z10', 'X4', 'X1'}
 INFO: Added high constraint for intermediate dimension P in level InRegister
 INFO: Added high constraint for intermediate dimension R1 in level InRegister
 INFO: Added high constraint for intermediate dimension P in level WRegister
@@ -50359,19 +50402,6 @@ DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataf
 ['C11', 'Y11', 'R11', 'X11', 'S11']
 ['C12', 'P', 'R12', 'Q', 'S12']
 DEBUG interleave: START - Called from breadthfirst_local.py:600 in optimizeDataflows()
-Traceback (most recent call last):
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 4027, in run_single_experiment
-    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
-    raise e
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
-    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
-    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
-  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
-    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
-AssertionError: Ill-posed constraints:
-CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_1x16384 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
                        array=['P', 'Q', 'Z12', 'C12', 'R12', 'S12', 'Y11', 'X11', 'Z11', 'C11', 'R11', 'S11', 'Y10', 'X10', 'Z10', 'C10', 'R10', 'S10', 'Y9', 'X9', 'Z9', 'C9', 'R9', 'S9', 'Y8', 'X8', 'Z8', 'C8', 'R8', 'S8', 'Y7', 'X7', 'Z7', 'C7', 'R7', 'S7', 'Y6', 'X6', 'Z6', 'C6', 'R6', 'S6', 'Y5', 'X5', 'Z5', 'C5', 'R5', 'S5', 'Y4', 'X4', 'Z4', 'C4', 'R4', 'S4', 'Y3', 'X3', 'Z3', 'C3', 'R3', 'S3', 'Y2', 'X2', 'Z2', 'C2', 'R2', 'S2', 'Y1', 'X1', 'Z1', 'C1', 'R1', 'S1', 'Y0', 'X0', 'Z0', 'C0', 'R0', 'S0'], elements=[] (len=0)
 ['C1', 'Y1', 'R1', 'X1', 'S1']
 ['C2', 'Y2', 'R2', 'X2', 'S2']
@@ -50638,6 +50668,19 @@ Output size: 64
 Weight size: 0
 
 Intermediate input size: 12
+Traceback (most recent call last):
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/experiment_runner.py", line 3674, in run_single_experiment
+    edp, mops, energy, latency, utilization, mapping_time, final_arch = run_engine(
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 79, in run_engine
+    raise e
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/engine.py", line 68, in run_engine
+    arch, wart = optimizeDataflows(arch, comp, bias_read, verbose = Settings.VERBOSE)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 637, in optimizeDataflows
+    arch, wart, moves = factorFlow(arch, comp, bias_read, verbose)
+  File "/home/matteo/Desktop/FactorFlow_LayerFusion/mappers/breadthfirst_local.py", line 329, in factorFlow
+    assert arch.checkFactorsConstraints() and arch.checkDataflowConstraints(), ("Ill-posed constraints:" if not already_initialized else "Improperly initialized arch:") + f"\n{arch.logConstraintsViolations()}"
+AssertionError: Ill-posed constraints:
+CONSTRAINTS VIOLATION: Arch: Eyeriss_Constrained_13L_tile1_1x16384 -> Level: IntermediateRegister: memory footprint: 336 VS memory available: 300
 Total intermediate size (input + output): 0
 
 input_size: 0, output_size: 64, weight_size: 0, intermediate_size: 0
@@ -50653,12 +50696,12 @@ CASE STUDY 5 SUMMARY: PE Aspect Ratio (Fixed Total PEs)
 ================================================================================
     Aspect   Rows   Cols     Energy(μJ)        Latency            EDP     Util
 --------------------------------------------------------------------------------
-    256x64    256     64      3.686e+05      5.455e+06       2.09e+06   0.11%
-    512x32    512     32      3.641e+05      5.455e+06       2.04e+06   0.11%
-   1024x16   1024     16      3.686e+05      5.455e+06       2.06e+06   0.11%
+    256x64    256     64      3.483e+05      5.455e+06       1.94e+06   0.11%
+    512x32    512     32      3.492e+05      5.455e+06       1.94e+06   0.11%
+   1024x16   1024     16      3.552e+05      5.455e+06       1.97e+06   0.11%
 
-Best EDP: 512x32, EDP=2.04e+06
-Results exported to: results/results_20260218_133816.csv
+Best EDP: 512x32, EDP=1.94e+06
+Results exported to: results/results_20260221_083144.csv
 
 ================================================================================
 EXPERIMENT SUMMARY
@@ -50673,6 +50716,6 @@ Results by workload:
 ────────────────────────────────────────────────────────────────────────────────
 
 VGG16:
-  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 256, pe_cols: 64 -> E=3.69e+05μJ, L=5.45e+06cc, EDP=2.09e+06
-  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 512, pe_cols: 32 -> E=3.64e+05μJ, L=5.45e+06cc, EDP=2.04e+06
-  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 1024, pe_cols: 16 -> E=3.69e+05μJ, L=5.45e+06cc, EDP=2.06e+06
+  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 256, pe_cols: 64 -> E=3.48e+05μJ, L=5.45e+06cc, EDP=1.94e+06
+  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 512, pe_cols: 32 -> E=3.49e+05μJ, L=5.45e+06cc, EDP=1.94e+06
+  full/13layer, fmem_size: 1056kB, wmem_size: 524kB, pe_rows: 1024, pe_cols: 16 -> E=3.55e+05μJ, L=5.45e+06cc, EDP=1.97e+06
