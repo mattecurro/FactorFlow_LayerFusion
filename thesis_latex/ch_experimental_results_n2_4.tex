@@ -6,27 +6,31 @@
 
 \subsubsection{Motivation}
 
-Every PE in the Eyeriss-Like architecture contains a local weight
-register (WReg) that holds the weight residuals of all fused layers,
-i.e.\ the channel and filter-size factors ($C \times R$ per layer)
-that the spatial array rows cannot absorb.
-Under full fusion the cumulative footprint grows with the number of
-layers and the width of their channels: for ResNet18 (17 fused layers)
-it ranges from roughly 460 to over 14\,000 entries depending on
-the PE configuration, making WReg the single tightest feasibility
-constraint.
+In the Eyeriss-Like architecture every PE stores its assigned weight
+filters in a local Weight Register (WReg).
+When multiple layers are fused, a single PE must hold the weight
+residuals for \emph{all} fused layers simultaneously, that is, the weight iterations
+that are not spatially absorbed by the SARows mapping.
+The WReg is therefore the largest per-PE register, ranging from
+roughly 460 to over 14\,000 entries depending on the PE configuration,
+and it acts as the binding constraint on feasibility: if the required
+weight footprint exceeds the WReg capacity, no valid mapping exists
+for that PE configuration.
 
-The core design question is therefore:
-\emph{given a PE budget, what is the minimum WReg that admits at least
-one feasible fused mapping?}
-A larger register relaxes the constraint and enables smaller, cheaper
-PE arrays, but every weight access then touches a larger SRAM
-structure, inflating energy.
-CS1 quantifies this trade-off by sweeping a grid of PE configurations
-($\text{rows} \times \text{cols}$, up to $\sim$17\,000 total PEs) at
-several WReg sizes.
-For each PE budget the experiment identifies the smallest WReg that
-yields at least one feasible mapping.
+There is a direct trade-off between WReg size and the minimum number
+of PEs:
+%
+\begin{itemize}
+  \item A higher total PE count means that more weight factors are spatially absored, enabling a \emph{smaller} WReg.
+  \item A smaller total PE count means that each PE must store more residual in its WReg, so it must to be \emph{larger}, at the cost of having higher energy access cost.
+\end{itemize}
+
+This case study answers to the question: \emph{what is the minimum weight register size that makes the
+fused mapping feasible at this given PE count?}
+
+CS1 answers this question by sweeping the WReg size at a given PE configuration ($\text{rows} \times \text{cols}$, up
+to $\sim$16\,384 total PEs), in order to find the minimum WReg size feasible and the resulting energy and EDP.
+
 The GlobalBuffer (128\,KB), input register, intermediate register, and
 output register are held constant throughout.
 
@@ -82,8 +86,8 @@ at proportionally larger WReg values, reflecting its deeper network
 
 The energy consequence is substantial.
 For ResNet18, moving from the 16\,384-PE point
-($E = 4.71 \times 10^{4}$\,$\mu$J) to the 4\,096-PE point
-($E = 1.12 \times 10^{5}$\,$\mu$J) increases energy by $2.4\times$,
+ to the 4\,096-PE point
+ increases energy by $2.4\times$,
 because each weight access now touches a register that is $4\times$
 larger.
 Latency, however, stays nearly constant
@@ -95,7 +99,7 @@ VGG16 shows both a steeper energy increase ($2.7\times$) and a
 moderate latency increase ($5.46 \to 6.72 \times 10^{6}$\,cc), so its
 EDP rises by $3.2\times$ from the largest to the smallest PE budget.
 
-Figure~\ref{fig:eyeriss-cs1} visualises this trade-off through two
+Figure~\ref{fig:eyeriss-cs1} visualizes this trade-off through two
 summary curves.
 Summary~A selects, for each WReg, the feasible configuration with the
 fewest PEs, representing the cheapest array that works.
@@ -110,14 +114,6 @@ They diverge for VGG16 at WReg\,=\,2\,400, where Summary~B prefers
 (EDP\,=\,$3.12 \times 10^{6}$): the latency reduction from a larger
 array more than offsets its higher area cost.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.85\textwidth]{plots/eyeriss_cs1_wreg_sweep.pdf}
-  \caption{Eyeriss CS1 — EDP vs.\ WReg size for VGG16 and ResNet18.
-    Summary~A: minimum-PE feasible configuration.
-    Summary~B: minimum-EDP configuration.}
-  \label{fig:eyeriss-cs1}
-\end{figure}
 
 Figure~\ref{fig:eyeriss-cs1-inv} inverts the perspective to
 the designer-oriented view: the horizontal axis is the PE budget and
@@ -135,33 +131,14 @@ register size that a given area constraint demands.
 
 \paragraph{Activation-dominant workloads (FSRCNN, MC-CNN).}
 For these workloads the weight register is not the binding constraint.
-FSRCNN reaches feasibility at WReg\,=\,200 with only 512~PEs
-($128 \times 4$), and raising WReg to 300 or 400 does not reduce the
-required PE count; all three sizes yield 12 feasible configurations.
-MC-CNN requires WReg\,$\ge$\,200 for 1\,024~PEs ($64 \times 16$);
-only at the smallest tested value (WReg\,=\,100) does the minimum
-rise to 2\,048~PEs.
+FSRCNN and MC-CNN reaches feasibility for 1024 PEs at values of WReg lower than the value of default single layer
+Eyeriss (384), and raising WReg does not reduce the
+required PE count.
 Energy still scales linearly with register size, but the effect is
 modest because the register is small in absolute terms.
 
-Figure~\ref{fig:eyeriss-cs1-feas} summarises the feasibility picture
-for all four workloads: the bars show how many PE configurations are
-feasible at each WReg size, while the line tracks the minimum PE
-count.
-The contrast is striking: VGG16 and ResNet18 gain feasibility steeply
-as WReg grows (from 2 to 8 configurations), whereas FSRCNN and MC-CNN
-are already saturated at the smallest tested sizes.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.85\textwidth]{plots/eyeriss_cs1_wreg_feasibility.pdf}
-  \caption{Eyeriss CS1 — Feasibility vs.\ WReg size for all workloads.
-    Bars: number of feasible PE configurations.
-    Line: minimum total PEs required.}
-  \label{fig:eyeriss-cs1-feas}
-\end{figure}
-
-\paragraph{Key takeaway.}
+\paragraph{Considerations.}
 The weight register is the critical sizing knob for the Eyeriss-Like
 architecture under full fusion.
 For weight-dominant workloads, halving the PE budget roughly doubles

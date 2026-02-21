@@ -291,16 +291,20 @@ EYERISS_CS2 = {
     },
     "VGG16": {
         "intreg": [50, 100, 230, 500],
+        "min_pe_config": ["512x32", "256x32", "256x16", "256x16"],
+        "min_pe_total": [16384, 8192, 4096, 4096],
         "energy": [9.102e5, 9.082e5, 9.420e5, 1.036e6],
         "latency": [5.455e6, 5.681e6, 6.715e6, 6.715e6],
         "edp": [5.04e6, 5.21e6, 6.36e6, 6.99e6],
         "note": "Saturates at IntReg>=230",
     },
     "ResNet18": {
-        "intreg": [50, 100, 200, 400, 1000],
-        "energy": [1.139e5, 1.136e5, 1.168e5, 1.273e5, 1.589e5],
-        "latency": [3.042e6, 3.042e6, 3.059e6, 3.059e6, 3.059e6],
-        "edp": [3.55e5, 3.52e5, 3.61e5, 3.93e5, 4.90e5],
+        "intreg": [50, 200, 400, 1000],
+        "min_pe_config": ["128x128", "256x32", "256x16", "256x16"],
+        "min_pe_total": [16384, 8192, 4096, 4096],
+        "energy": [1.139e5, 1.168e5, 1.273e5, 1.589e5],
+        "latency": [3.042e6, 3.059e6, 3.059e6, 3.059e6],
+        "edp": [3.55e5, 3.61e5, 3.93e5, 4.90e5],
         "note": "Saturates at IntReg>=200",
     },
 }
@@ -323,6 +327,8 @@ EYERISS_CS3 = {
     },
     "VGG16": {
         "outreg": [4, 8, 16, 32, 64],
+        "min_pe_config": ["128x128", "256x32", "128x32", "128x32", "128x32"],
+        "min_pe_total": [16384, 8192, 4096, 4096, 4096],
         "energy": [9.922e5, 9.777e5, 9.663e5, 9.663e5, 9.663e5],
         "latency": [5.455e6, 5.681e6, 6.715e6, 6.715e6, 6.715e6],
         "edp": [5.49e6, 5.60e6, 6.52e6, 6.52e6, 6.52e6],
@@ -330,6 +336,8 @@ EYERISS_CS3 = {
     },
     "ResNet18": {
         "outreg": [8, 16, 32, 64],
+        "min_pe_config": ["256x64", "256x32", "256x16", "256x16"],
+        "min_pe_total": [16384, 8192, 4096, 4096],
         "energy": [1.242e5, 1.220e5, 1.220e5, 1.220e5],
         "latency": [3.042e6, 3.059e6, 3.059e6, 3.059e6],
         "edp": [3.84e5, 3.77e5, 3.77e5, 3.77e5],
@@ -991,6 +999,97 @@ def plot_eyeriss_cs2_cs3():
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "eyeriss_cs2cs3_intreg_outreg")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 5b: Eyeriss CS2 — Inverted: PE budget → min IntReg
+# ────────────────────────────────────────────────────────────────────
+def plot_eyeriss_cs2_inverted():
+    """Designer-oriented view: given a PE budget, what is the minimum IntReg?"""
+    cs2_wls = ["VGG16", "ResNet18"]
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle("Eyeriss CS2 — Minimum IntReg for a Given PE Budget",
+                 fontsize=14, y=1.02)
+
+    for ax, wl in zip(axes, cs2_wls):
+        d = EYERISS_CS2[wl]
+        # Deduplicate saturated points (same min_pe_total)
+        seen = set()
+        pes, ireg, cfgs = [], [], []
+        for pe, ir, cfg in zip(d["min_pe_total"], d["intreg"],
+                               d["min_pe_config"]):
+            if pe not in seen:
+                seen.add(pe)
+                pes.append(pe)
+                ireg.append(ir)
+                cfgs.append(cfg)
+
+        pes  = list(reversed(pes))
+        ireg = list(reversed(ireg))
+        cfgs = list(reversed(cfgs))
+
+        ax.plot(pes, ireg, "o-", color=COLORS[wl], linewidth=2)
+        ax.set_xlabel("PE budget (total PEs)")
+        ax.set_ylabel("Minimum IntReg (entries)")
+        ax.set_title(wl, fontsize=13)
+        ax.set_xticks(pes)
+        ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
+        ax.invert_xaxis()
+
+        for p, ir_val, cfg in zip(pes, ireg, cfgs):
+            ax.annotate(cfg, (p, ir_val), textcoords="offset points",
+                        xytext=(0, 12), ha="center", fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                  ec=COLORS[wl], alpha=0.85, lw=0.6))
+
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    _save(fig, "eyeriss_cs2_intreg_inverted")
+    return fig
+
+
+# ────────────────────────────────────────────────────────────────────
+#  Figure 5c: Eyeriss CS3 — Inverted: PE budget → min OutReg
+# ────────────────────────────────────────────────────────────────────
+def plot_eyeriss_cs3_inverted():
+    """Designer-oriented view: given a PE budget, what is the minimum OutReg?"""
+    cs3_wls = ["VGG16", "ResNet18"]
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle("Eyeriss CS3 — Minimum OutReg for a Given PE Budget",
+                 fontsize=14, y=1.02)
+
+    for ax, wl in zip(axes, cs3_wls):
+        d = EYERISS_CS3[wl]
+        seen = set()
+        pes, oreg, cfgs = [], [], []
+        for pe, orv, cfg in zip(d["min_pe_total"], d["outreg"],
+                                d["min_pe_config"]):
+            if pe not in seen:
+                seen.add(pe)
+                pes.append(pe)
+                oreg.append(orv)
+                cfgs.append(cfg)
+
+        pes  = list(reversed(pes))
+        oreg = list(reversed(oreg))
+        cfgs = list(reversed(cfgs))
+
+        ax.plot(pes, oreg, "o-", color=COLORS[wl], linewidth=2)
+        ax.set_xlabel("PE budget (total PEs)")
+        ax.set_ylabel("Minimum OutReg (entries)")
+        ax.set_title(wl, fontsize=13)
+        ax.set_xticks(pes)
+        ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
+        ax.invert_xaxis()
+
+        for p, or_val, cfg in zip(pes, oreg, cfgs):
+            ax.annotate(cfg, (p, or_val), textcoords="offset points",
+                        xytext=(0, 12), ha="center", fontsize=8,
+                        bbox=dict(boxstyle="round,pad=0.2", fc="white",
+                                  ec=COLORS[wl], alpha=0.85, lw=0.6))
+
+    fig.tight_layout(rect=[0, 0, 1, 0.96])
+    _save(fig, "eyeriss_cs3_outreg_inverted")
     return fig
 
 
@@ -1911,6 +2010,8 @@ def main():
     figs.append(plot_eyeriss_cs1())
     figs.append(plot_eyeriss_cs1_inverted())
     figs.append(plot_eyeriss_cs2_cs3())
+    figs.append(plot_eyeriss_cs2_inverted())
+    figs.append(plot_eyeriss_cs3_inverted())
     figs.append(plot_eyeriss_cs5())
 
     # Fusion comparisons
