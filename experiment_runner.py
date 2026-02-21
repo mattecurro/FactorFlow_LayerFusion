@@ -1670,7 +1670,7 @@ Eyeriss Case Study 5: PE Aspect Ratio Sweep (fixed total PEs=16384)
     python3 experiment_runner.py --sweep-pe-aspect \
     --workload resnet18 --fusion full --variant 17layer \
     --total-pes 16384 \
-    --input-reg 400 --weight-reg 902 --intermediate-reg 300 --output-reg 64 \
+    --input-reg 400 --weight-reg 902 --intermediate-reg 350 --output-reg 64 \
     --tile-size 1 --gb-size 128 --verbose 2>&1 | tee results/EY_CS5_ResNet18.log
 
     Infeasible configs: column-heavy (1x4096 through 32x128) and
@@ -1972,8 +1972,8 @@ Eyeriss Case Study 3: OutRegister Size Sweep (4–64 entries)
     python3 experiment_runner.py --sweep-pe-aspect \
     --workload vgg16 --fusion full --variant 13layer \
     --total-pes 16384 \
-    --input-reg 400 --weight-reg 1200 --intermediate-reg 300 --output-reg 64 \
-    --tile-size 1 --gb-size 128 --verbose 2>&1 | tee results/EY_CS5_VGG16.log
+    --input-reg 400 --weight-reg 1200 --intermediate-reg 350 --output-reg 64 \
+    --tile-size 1 --gb-size 128 2>&1 | tee results/EY_CS5_VGG16.log
 
         PE         Energy (μJ)  Latency (cc)    EDP
         256×64		3.686e+05	5.455e+06	    2.09e+06	

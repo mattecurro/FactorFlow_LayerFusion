@@ -5,8 +5,8 @@
 \label{sec:architectures}
 
 The two spatial architectures selected for the experiments are
-DepFiN~\cite{depfin_paper} and Eyeriss~v1~\cite{eyeriss_paper}.
-Table~\ref{tab:orig-arch-comparison} summarises the key parameters of the
+DepFiN~\cite{goetschalckx2023depfin} and Eyeriss~v1~\cite{eyeriss}.
+Table~\ref{tab:orig-arch-comparison} summarizes the key parameters of the
 \emph{original} designs as published in the respective papers.
 
 % ------------------------------------------------------------------
@@ -43,18 +43,17 @@ Table~\ref{tab:orig-arch-comparison} summarises the key parameters of the
     FMEM read bandwidth          & 132\,B/cycle                         & ---                                 \\
     GB bandwidth                 & ---                                  & 32\,B/cycle                         \\
     \addlinespace
-    Tile size                    & Fixed $1 \times 128$ patch            & Determined by mapping               \\
     Spatial mapping (cols)       & Output width ($Q$)                   & Output width ($Q$) + channels ($M$) \\
     Spatial mapping (rows)       & Output channels ($M$)                & Filter ($S$) + channels ($C$, $M$)  \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-Both architectures were modelled in the FactorFlow framework based on the
-parameters published in~\cite{depfin_paper,eyeriss_paper}.
-However, because the systolic arrays must support a variety of fused CNN
-workloads---not only the single fixed-size layer for which each original design
-was optimised---several modifications were necessary.
+Both architectures were modeled in the FactorFlow framework based on the
+parameters published in~\cite{goetschalckx2023depfin,eyeriss}.
+However, because the spatial architectures must support a variety of fused CNN
+workloads, not only the single fixed-size layer for which each original design
+was optimized, several modifications were necessary.
 We therefore refer to the modified variants as \textbf{DepFiN-Like} and
 \textbf{Eyeriss-Like} throughout this chapter.
 
@@ -67,9 +66,8 @@ hierarchy: a \emph{Feature Memory} (FMEM) that stores input and output
 activations while bypassing weights, and a \emph{Weight Memory} (WMEM) that
 stores weights while bypassing all activation operands.
 In multi-layer (fused) mode, intermediate activations between consecutive
-layers are kept entirely on-chip---DRAM bypasses the intermediate operands
-(\texttt{int\_in}, \texttt{int\_out})---so that inter-layer data never
-touches external memory.
+layers are kept entirely on-chip, DRAM bypasses the intermediate operands
+(\texttt{int\_in}, \texttt{int\_out}), so that inter-layer data never touches external memory.
 Each fused layer receives its own pair of spatial fanout levels:
 \texttt{SACols} distributes the output spatial width ($Q$ or $X_i$) across
 the PE columns, while \texttt{SARows} distributes the output channels
@@ -95,27 +93,10 @@ Section~\ref{sec:validation}), the following modifications were applied:
         and explore different aspect ratios at a constant total PE count
         (Section~\ref{sec:cs4-aspect}).
 
-  \item \textbf{Feature Memory bandwidth.}
-        The FMEM read bandwidth is a fixed physical interface parameter
-        (132\,B/cycle, determined by the 1056-bit wordline).
-        It does \emph{not} scale automatically with the PE array size or
-        the tile size.
-        An optional bandwidth-scaling mode is available---in which the
-        bandwidth is scaled proportionally to
-        $\mathit{tile\_size} / 128$---and is used in the tile-size
-        sensitivity analysis (Section~\ref{sec:cs1-tile}).
-
   \item \textbf{Mapping.}
         The depth-first dataflow is preserved: weights are loaded into
         WMEM for all fused layers, and activations stream through FMEM
         tile-by-tile.
-        The mapping is determined by assigning spatial factors greedily:
-        \texttt{SACols} receives the highest divisor of the output tile
-        width that fits in the column mesh, and \texttt{SARows} receives
-        the highest divisor of the output channel count that fits in the
-        row mesh.
-        Remaining weight-dimension factors ($C$, $R$, $S$) are assigned
-        to WMEM, and residual tiling factors are pushed to DRAM.
         When the tile size or PE array dimensions change across case
         studies, the mapping adapts accordingly.
 \end{enumerate}
@@ -184,20 +165,11 @@ applied:
         each size (Section~\ref{sec:cs1-wreg}--\ref{sec:cs2cs3-regs}).
 
   \item \textbf{Mapping.}
-        The row-stationary dataflow is preserved.
-        Spatial factors are assigned greedily:
-        \texttt{SACols} first allocates the highest divisor of the
-        output tile width, then assigns remaining columns to output
-        channels~$M$;
-        \texttt{SARows} assigns factors to filter rows~$S$, then input
-        channels~$C$, then output channels~$M$.
-        The GlobalBuffer stores the residual tiling of activations
-        (with $P = 1$), and DRAM handles the outermost loops.
-        As with DepFiN-Like, the mapping adapts when tile sizes or PE
+        The row-stationary dataflow is preserved, the mapping adapts when tile sizes or PE
         dimensions change across experiments.
 \end{enumerate}
 
-Table~\ref{tab:modified-arch-comparison} summarises the key differences
+Table~\ref{tab:modified-arch-comparison} summarizes the key differences
 between the original and modified versions of both architectures.
 
 % ------------------------------------------------------------------
@@ -227,37 +199,84 @@ between the original and modified versions of both architectures.
       & Added IntermediateOutputReg (320 entries);
         WReg/InReg/OutReg sizes swept as variables \\
     \addlinespace
-    FMEM / GB bypass
-      & Weights bypassed (unchanged)
-      & Weights bypassed (unchanged) \\
-    \addlinespace
-    DRAM bypass (fusion)
-      & \texttt{int\_in}, \texttt{int\_out} bypassed
-      & \texttt{int\_in}, \texttt{int\_out} bypassed \\
-    \addlinespace
-    Dataflow
-      & Depth-first preserved
-      & Row-stationary preserved \\
-    \addlinespace
     Technology
       & 22\,nm, $0.5\times$ scale
-      & 22\,nm, $0.5\times$ scale (orig.\ 65\,nm) \\
+      & 22\,nm, $0.5\times$ scale \\
     \bottomrule
   \end{tabular}
 \end{table}
 
+% ------------------------------------------------------------------
+\subsubsection{Energy Model}
+\label{sec:energy-model}
 
+All per-access energy values are derived from
+Accelergy~\cite{accelergy} using the CACTI plug-in for SRAMs and DRAM,
+and the Neurosim plug-in for register files.
+Both architectures target the same LPDDR4 DRAM interface (64-bit bus,
+22\,nm technology node with a $0.5\times$ scaling factor to approximate
+a 12\,nm process), yielding an identical DRAM cost of
+32\,pJ\,/\,byte.
+Table~\ref{tab:energy-per-byte} reports the energy per byte at each
+level of the memory hierarchy for a representative configuration of
+each architecture.
 
+% ------------------------------------------------------------------
+%  Energy-per-byte table
+% ------------------------------------------------------------------
+\begin{table}[htbp]
+  \centering
+  \caption{Energy per byte of access at each memory-hierarchy level
+           (pJ\,/\,byte), estimated by Accelergy at 22\,nm with
+           $0.5\times$ technology scaling.
+           DepFiN config: FMEM\,=\,568\,KB, PE\,$16{\times}128$.
+           Eyeriss config: GB\,=\,128\,KB, PE\,$512{\times}32$,
+           WReg\,=\,1200, InReg\,=\,400, IntReg\,=\,350,
+           OutReg\,=\,64.}
+  \label{tab:energy-per-byte}
+  \small
+  \begin{tabular}{l r @{\qquad\qquad} l r}
+    \toprule
+    \multicolumn{2}{c}{\textbf{DepFiN-Like}}
+      & \multicolumn{2}{c}{\textbf{Eyeriss-Like}} \\
+    \cmidrule(lr){1-2} \cmidrule(lr){3-4}
+    Level & pJ\,/\,byte & Level & pJ\,/\,byte \\
+    \midrule
+    DRAM           & 32.00  & DRAM              & 32.00  \\
+    FMEM           &  0.48  & GlobalBuffer      &  0.17  \\
+    AccReg         &  0.20  & WeightReg         & 13.23  \\
+    Compute (MAC)  &  0.22  & InputReg          &  4.48  \\
+                   &        & IntermediateReg   &  3.94  \\
+                   &        & OutputReg         &  0.81  \\
+                   &        & Compute (MAC)     &  0.19  \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
+Two observations follow from the table.
+First, DRAM access energy dominates the on-chip hierarchy by a factor
+of $\sim\!66\times$ over FMEM in DepFiN and $\sim\!194\times$ over
+the GlobalBuffer in Eyeriss.
+Because layer fusion eliminates DRAM traffic for all intermediate
+activations (Section~\ref{sec:partial-full-fusion}), the energy
+saving from fusion scales directly with this DRAM-to-on-chip ratio:
+the higher the assumed DRAM cost, the more fusion wins.
+A sensitivity test with DRAM energy set to 200\,pJ\,/\,byte
+($6.25\times$ the Accelergy estimate) confirms this effect:
+on FSRCNN, DepFiN full fusion saves 73.8\,\% of energy versus
+the unfused baseline, compared with a more modest saving at
+32\,pJ\,/\,byte, because the unfused configuration must pay the
+higher DRAM cost on $\sim$90\,M bytes of intermediate traffic that
+fusion eliminates entirely.
 
-
-My version:
-The spatial architectures chosen for the experiments are DepFin [citation to the paper], Eyeriss [citation to the paper] ("refer to the table of comparison"), we modeled both architectures based on the characteristics and parameters published in [citations to both paper], but since the SAs must be able to perform the computation of a variety of fused CNN workloads, we have manually performed changes on both of architectures, so we will refer to them to DepFin-Like and Eyeriss-Like.
-
-
-DepFin-Like: with respect to the Section ("refer to the correct section in validation"), our version relax the constraint of having a patch of 1 pixel height and 128 pixel wide that is corresponding to the tile size used, this was particularly important in order to able the exploration of different tile sizes per different workloads. We relaxed the constraint of having a structure of 16x128 PEs, we created more versions of DepFin analyzing how changing the number of PEs will or not will affects to the computation results and exploring the aspect ratio of PEs for each workload. We respected the DepthFirst ("refer to the section in background") nature of DepFin, preserving the dataflow,  but with respect to a classic DepFin we will change the mapping thanks to the different tiling adopted through the chosen of tile size.
-
-
-
-Eyeriss-Like: with respect to the ("cite: paper") our version of Eyeriss must address not only to SL/LBL processing ("refer to the section in background"), but fusion, in order to do so we introduced a intermediate register, the unique maintaining the intermediate input and output data and bypassing all the other operands ("refer to the section in background").  We respected the row stationary nature of Eyeriss, maintaing the rows in weight register. 
-Since we respected the row stationary nature of Eyeriss ("refer to the section in the background"), we had to relax the constraint of having a structure 14x12 PEs, with only 168 PEs (14×12), each PE must process a larger fraction of the workload, meaning the WRegister per PE must hold more weight values. For large workloads like VGG16/ResNet18, this makes the register infeasibly large. We created more version of Eyeriss with 4 possible total of PEs: 2048, 4096, 8192, 16184, going above 16384 is unrealistic for low-power edge accelerators; going below 4096 forces WReg to several thousand entries, which is impractical. We will analyze how changing the number of PEs will or will not affects the required sizes of registers per workload and exploring the aspect ratio of PEs for each workload. As stated, we preserved the row stationary dataflow  but we will change the mapping thanks to the different tiling adopted through the chosen of tile size.
+Second, the Eyeriss register hierarchy is notably more expensive than
+DRAM-relative to the DepFiN case.
+In particular, the WeightRegister at 1\,200~entries costs
+13.23\,pJ\,/\,byte, which is already $0.41\times$ the DRAM cost.
+Full fusion on Eyeriss requires very large per-PE registers to hold
+the state of all fused layers simultaneously, so each MAC operation
+incurs a substantial register-energy overhead.
+For some workloads, this overhead can outweigh the DRAM savings,
+causing full fusion to consume \emph{more} total energy than the
+unfused baseline despite eliminating nearly all DRAM traffic
+(see Section~\ref{sec:fusion-comparison}).

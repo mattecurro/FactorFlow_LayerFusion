@@ -487,6 +487,39 @@ FUSION_AUTO = {
 
 
 # ====================================================================
+#  DATA  –  Fusion Comparisons (Auto-Sized, DRAM Energy = 200 pJ/byte)
+#  Same architecture configs as FUSION_AUTO but with DRAM access energy
+#  hardcoded to 200 pJ/byte instead of the Accelergy-derived 32 pJ/byte.
+# ====================================================================
+
+FUSION_AUTO_DRAM_200 = {
+    # ── Source: run_dram200_test.py  (Scenario A, DRAM = 200 pJ/byte) ────
+    "DepFiN": {
+        "FSRCNN": {
+            "pe": "16x128", "fmem": "576KB", "wmem": "19KB", "tile": 120,
+            "full":    {"energy": 1.001e4, "latency": 6.156e6, "edp": 7.03e4,
+                        "dram_rd": 1_573_992, "dram_wr": 8_294_400},
+            "single":  {"energy": 3.815e4, "latency": 1.175e7, "edp": 4.48e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+            "partial": {"energy": 1.452e4, "latency": 6.351e6, "edp": 9.22e4,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+        },
+    },
+    "Eyeriss": {
+        "FSRCNN": {
+            "pe": "128x16", "gb": "128KB", "wreg": 384,
+            "full":    {"energy": 1.146e5, "latency": 1.918e7, "edp": 2.35e6,
+                        "dram_rd": 1_573_992, "dram_wr": 8_294_400},
+            "single":  {"energy": 4.913e4, "latency": 3.525e7, "edp": 1.73e6,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+            "partial": {"energy": 8.101e4, "latency": 1.918e7, "edp": 1.55e6,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+        },
+    },
+}
+
+
+# ====================================================================
 #  DATA  –  Fusion Comparisons (Auto-Sized, Partial-Fusion Architecture)
 #  Partial and Single run on a SMALLER architecture sized for partial
 #  fusion only (less memory).  No full-fusion column.
