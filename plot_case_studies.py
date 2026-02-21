@@ -346,7 +346,9 @@ EYERISS_CS3 = {
 }
 
 # CS5 — Eyeriss PE Aspect Ratio Sweep (fixed total PEs)
-# InReg=234, WReg=500, IntReg=200, OutReg=64 for Activation Dominant
+# FSRCNN/MC-CNN: InReg=234, WReg=500, IntReg=200, OutReg=64
+# VGG16: InReg=400, WReg=1200, IntReg=350, OutReg=64
+# ResNet18: InReg=400, WReg=902, IntReg=350, OutReg=64
 EYERISS_CS5 = {
     "FSRCNN": {
         "total_pes": 2048,
@@ -374,22 +376,26 @@ EYERISS_CS5 = {
     },
     "VGG16": {
         "total_pes": 16384,
-        "configs": ["256x64", "512x32", "1024x16"],
-        "energy": [3.469e5, 3.478e5, 3.538e5],
-        "latency": [5.455e6, 5.455e6, 5.455e6],
-        "edp": [1.94e6, 1.93e6, 1.96e6],
+        "configs": ["256x64", "512x32", "1024x16", "2048x8",
+                     "4096x4", "8192x2", "16384x1"],
+        "energy": [3.654e5, 3.674e5, 3.746e5, 3.804e5,
+                   3.804e5, 3.804e5, 3.804e5],
+        "latency": [5.455e6, 5.455e6, 5.455e6, 5.455e6,
+                    5.455e6, 5.455e6, 5.455e6],
+        "edp": [2.04e6, 2.04e6, 2.07e6, 2.10e6,
+                2.10e6, 2.10e6, 2.10e6],
         "best": "512x32",
     },
     "ResNet18": {
         "total_pes": 16384,
         "configs": ["256x64", "512x32", "1024x16", "2048x8",
                      "4096x4", "8192x2", "16384x1"],
-        "energy": [4.709e4, 4.729e4, 4.791e4, 4.816e4,
-                   4.816e4, 4.816e4, 4.816e4],
+        "energy": [4.993e4, 5.030e4, 5.105e4, 5.134e4,
+                   5.134e4, 5.134e4, 5.134e4],
         "latency": [3.042e6, 3.042e6, 3.042e6, 3.042e6,
                     3.042e6, 3.042e6, 3.042e6],
-        "edp": [1.48e5, 1.48e5, 1.49e5, 1.50e5,
-                1.50e5, 1.50e5, 1.50e5],
+        "edp": [1.57e5, 1.57e5, 1.59e5, 1.60e5,
+                1.60e5, 1.60e5, 1.60e5],
         "best": "256x64",
     },
 }

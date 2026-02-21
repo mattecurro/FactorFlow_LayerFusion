@@ -39,10 +39,10 @@ Latency is constant across all configurations
 ($3.042 \times 10^{6}$\,cc), so the EDP ranking is determined entirely
 by energy.
 The best configuration is $256 \times 64$
-($E = 4.709 \times 10^{4}$\,$\mu$J), and energy increases gently as
+($E = 4.993 \times 10^{4}$\,$\mu$J), and energy increases gently as
 the array becomes more row-heavy, reaching
-$4.816 \times 10^{4}$\,$\mu$J at $2{,}048 \times 8$ and beyond.
-The total variation is only $2.3\%$, indicating that for ResNet18 the
+$5.134 \times 10^{4}$\,$\mu$J at $2{,}048 \times 8$ and beyond.
+The total variation is only $2.8\%$, indicating that for ResNet18 the
 aspect ratio has a negligible impact once feasibility is achieved.
 
 \begin{table}[htbp]
@@ -56,19 +56,19 @@ aspect ratio has a negligible impact once feasibility is achieved.
     Config & Rows & Cols & Energy ($\mu$J) & EDP (J$\cdot$cc) \\
     \midrule
     $256 \times 64$\,$\star$
-           & 256   & 64  & $4.71 \times 10^{4}$ & $1.48 \times 10^{5}$ \\
+           & 256   & 64  & $4.99 \times 10^{4}$ & $1.57 \times 10^{5}$ \\
     $512 \times 32$
-           & 512   & 32  & $4.73 \times 10^{4}$ & $1.48 \times 10^{5}$ \\
+           & 512   & 32  & $5.03 \times 10^{4}$ & $1.57 \times 10^{5}$ \\
     $1024 \times 16$
-           & 1024  & 16  & $4.79 \times 10^{4}$ & $1.49 \times 10^{5}$ \\
+           & 1024  & 16  & $5.11 \times 10^{4}$ & $1.59 \times 10^{5}$ \\
     $2048 \times 8$
-           & 2048  &  8  & $4.82 \times 10^{4}$ & $1.50 \times 10^{5}$ \\
+           & 2048  &  8  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
     $4096 \times 4$
-           & 4096  &  4  & $4.82 \times 10^{4}$ & $1.50 \times 10^{5}$ \\
+           & 4096  &  4  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
     $8192 \times 2$
-           & 8192  &  2  & $4.82 \times 10^{4}$ & $1.50 \times 10^{5}$ \\
+           & 8192  &  2  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
     $16384 \times 1$
-           &16384  &  1  & $4.82 \times 10^{4}$ & $1.50 \times 10^{5}$ \\
+           &16384  &  1  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -81,15 +81,19 @@ Below 64~columns the mapper must fold more $Z$ residuals into the
 weight register, increasing its access cost slightly.
 
 \paragraph{VGG16 (16\,384 PEs).}
-Only three configurations are feasible ($256 \times 64$,
-$512 \times 32$, $1024 \times 16$), all with constant latency
+All seven power-of-two factorisations from $256 \times 64$ to
+$16{,}384 \times 1$ are feasible, all sharing the same latency
 ($5.455 \times 10^{6}$\,cc).
 The best EDP is $512 \times 32$
-($1.93 \times 10^{6}$), closely followed by $256 \times 64$
-($1.94 \times 10^{6}$).
-The narrow feasibility window reflects VGG16's large WReg requirement
-(CS1): extreme row-heavy configs cannot fit the weight residuals
-within the configured register.
+($E = 3.674 \times 10^{5}$\,$\mu$J,
+EDP\,=\,$2.04 \times 10^{6}$), tied with $256 \times 64$.
+Energy rises by $4.1\%$ to $3.804 \times 10^{5}$\,$\mu$J at
+$2{,}048 \times 8$ and plateaus thereafter, mirroring the ResNet18
+behaviour.
+The full feasibility range is achieved thanks to a sufficiently large
+IntReg allocation (350~words), which prevents the
+intermediate-activation constraint from ruling out the more
+row-heavy configurations (cf.\ CS2).
 
 \paragraph{FSRCNN (2\,048 PEs).}
 FSRCNN exhibits a broader feasibility range, with all nine
@@ -123,14 +127,14 @@ Figure~\ref{fig:eyeriss-cs5} presents the energy (top row) and EDP
 (bottom row) for all four workloads.
 Two patterns emerge.
 First, the weight-dominant workloads (VGG16, ResNet18) show nearly
-flat curves with very few feasible points, because the large WReg
-requirement eliminates extreme aspect ratios.
+flat energy and EDP curves across all seven feasible aspect ratios,
+with total variation below $4.1\%$ for VGG16 and $2.8\%$ for
+ResNet18.
 Second, the activation-dominant workloads (FSRCNN, MC-CNN) display
-wider feasibility and a mild preference for column-heavy
-configurations, where the SACols mechanism can distribute channel
-factors more effectively.
+a mild preference for column-heavy configurations, where the SACols
+mechanism can distribute channel factors more effectively.
 In all cases the EDP variation across feasible aspect ratios is
-modest ($< 6\%$ for FSRCNN, $< 2.3\%$ for ResNet18), suggesting
+modest ($< 6\%$ for FSRCNN, $< 4.1\%$ for VGG16), suggesting
 that the aspect ratio is a secondary design knob compared to register
 sizing (CS1--CS3).
 
@@ -148,9 +152,8 @@ Once the register sizes are set to satisfy the fused mapping
 constraints, the PE aspect ratio has limited influence on energy and
 EDP.
 Column-heavy configurations offer a small advantage for workloads with
-narrow channels, while weight-dominant workloads are constrained to a
-narrow band of balanced aspect ratios by the WReg feasibility
-boundary.
+narrow channels, while weight-dominant workloads show nearly flat
+curves regardless of aspect ratio once registers are adequately sized.
 The designer can therefore choose the aspect ratio primarily based
 on physical layout and interconnect considerations, with confidence
 that the energy impact is within a few percent of the optimum.
