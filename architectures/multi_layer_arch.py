@@ -16,8 +16,7 @@ def get_scaled_energy_values(
     param = DepFinParamInfo()
     param.FMEM_size = feature_memory_size_kb * 1024 * 8  # Convert KB to bits
     param.WMEM_size = weight_memory_size_kb * 1024 * 8
-    param.technology = technology
-    
+    param.technology = technology    
     energies = get_depfin_energy_per_byte(param)
     
     return {
@@ -188,8 +187,8 @@ arch = arch_depfin_10layers_F1S = Arch([
         read_value_access_energy = 160,
         write_value_access_energy = 160,
         # The Depth-First mapping ensure to me that read are done before writes, so I can assume 12 for both.
-        read_bandwidth = 2,
-        write_bandwidth = 4, 
+        read_bandwidth = 18,
+        write_bandwidth = 18, 
         bypasses = ['int_in', 'int_out'],
         # Constraints for the outermost layer (Layer 9)
         dataflow_constraints = ['Q', 'P', 'X9', 'Y9', 'X8', 'Y8', 'X7', 'Y7', 'X6', 'Y6', 

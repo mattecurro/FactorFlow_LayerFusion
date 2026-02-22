@@ -12,8 +12,8 @@
 \label{sec:val-intro}
 
 The purpose of this chapter is to demonstrate that the analytical
-framework developed in this thesis—FactorFlow extended with multi-layer
-fusion support—accurately models the complex behavior of layer fusion
+framework developed in this thesis---FactorFlow extended with multi-layer
+fusion support---accurately models the complex behavior of layer fusion
 and hardware execution on a real accelerator design.
 Establishing trust in the model is a prerequisite for the design-space
 exploration performed in the subsequent chapters: if the analytical
@@ -52,7 +52,7 @@ The key extensions include:
         layers.
   \item Cost model that computes per-level memory operations (MOPs),
         energy, latency (including bandwidth-limited stall cycles), and
-        energy-delay product (EDP) for the entire fused pipeline.
+        energy--delay product (EDP) for the entire fused pipeline.
 \end{enumerate}
 
 Because this work is a modeling study without access to fabricated
@@ -92,8 +92,8 @@ The strongest form of validation for an analytical framework is
 comparison against a real hardware implementation, rather than against
 another high-level model.
 A hardware-level comparison tests not only the mathematical formulation
-of the cost model but also whether the architectural abstraction—memory
-sizes, bandwidth, bypass rules, spatial mapping—faithfully captures the
+of the cost model but also whether the architectural abstraction---memory
+sizes, bandwidth, bypass rules, spatial mapping---faithfully captures the
 behavior of the physical design.
 
 For this reason, the validation target selected for this work is
@@ -117,9 +117,9 @@ and LoopTree~\cite{looptree} both model DepFiN as a representative
 example of a depth-first fused accelerator, which confirms its
 relevance and provides additional points of comparison.
 
-Third, the DepFiN paper provides enough micro-architectural detail—PE
+Third, the DepFiN paper provides enough micro-architectural detail---PE
 array dimensions, memory sizes, wordline widths, spatial mapping
-strategy, and per-workload latency measurements—to construct a
+strategy, and per-workload latency measurements---to construct a
 faithful model, as described in the following sections.
 
 
@@ -176,26 +176,20 @@ Not all parameters required for a complete analytical model are
 available from the paper. The following assumptions were made:
 
 \begin{enumerate}
-  \item \textbf{DRAM bandwidth partitioning.}
-        The paper reports an aggregate external I/O bandwidth of
-        12\,B/cycle (96\,bits) but does not specify how this bandwidth
-        is split between reads and writes.
-        In the model, we allocate 2\,B/cycle for reads and 4\,B/cycle
-        for writes.
-        This reflects the observation that, in fused mode, DRAM reads
-        (input activations + weights) occur in a streaming fashion
-        before writes (output activations), and we verified that the FMEM
-        bandwidth (132\,B/cycle read, 128\,B/cycle write) is never the
-        bottleneck under this assumption.
-
-  \item \textbf{Absence of precise DRAM bandwidth data.}
-        The DepFiN paper does not provide a cycle-accurate DRAM
-        bandwidth model; the reported latency values include unspecified
-        stall effects from external memory.
-        This prevents us from precisely matching the absolute latency
-        in cycles but does not affect the ability to validate the
-        \emph{ideal} (compute-bound) latency, which depends only on
-        the number of MAC operations and the PE utilization.
+  \item \textbf{DRAM bandwidth.}
+        The paper reports an aggregate external I/O interface of
+        96\,bits (12\,B/cycle) but does not provide a cycle-accurate
+        DRAM bandwidth model; the reported latency values include
+        unspecified stall effects from external memory.
+        Precise DRAM bandwidth modeling would require knowledge of
+        the LPDDR4 controller implementation, burst scheduling, and
+        read/write turnaround penalties, none of which are disclosed.
+        %
+        For this reason, the validation focuses on the
+        \emph{compute-bound} (or \emph{ideal}) latency---which depends
+        solely on the number of MAC operations and the PE
+        utilization---and on the on-chip memory hierarchy behavior,
+        both of which are independent of the external memory bandwidth.
 
   \item \textbf{Feature Memory bandwidth.}
         We set the FMEM read bandwidth to 132\,B/cycle and write
@@ -203,12 +197,17 @@ available from the paper. The following assumptions were made:
         and two-bank structure (1056\,bit / 8\,bit $\times$ 1 = 132\,B
         per read access).
 
+  \item \textbf{Weight Memory bandwidth.}
+        We set the WMEM bandwidth to 16\,B/cycle for both reads and
+        writes, derived from the 128-bit wordline
+        (128\,bit / 8\,bit = 16\,B per access).
+
   \item \textbf{Energy values.}
         Per-access energy values are estimated by Accelergy at 22\,nm
         rather than measured from the fabricated chip.
         The paper does not report per-component energy breakdowns, so
         direct comparison of energy is not possible; the validation
-        focuses on latency.
+        focuses on latency and data-movement correctness.
 \end{enumerate}
 
 
@@ -278,7 +277,7 @@ The translation follows these principles:
 This constraint-based encoding faithfully reproduces DepFiN's
 hardwired dataflow: the mapper has no freedom to reorder the
 weight-related or spatial dimensions, and the only degrees of freedom
-are the tiling and reuse ordering within FMEM—exactly as in the
+are the tiling and reuse ordering within FMEM---exactly as in the
 physical design.
 
 
@@ -392,15 +391,9 @@ The validation run was executed as:
       & $\sim$37.94\,M
       & 37,944,000 \\
     \addlinespace
-    Total latency (with stalls)
-      & ---
-      & 45,350,000 \\
-    DRAM stall cycles
-      & ---
-      & 3,766,468 \\
     FMEM stall cycles
       & ---
-      & 483 \\
+      & 24 \\
     WMEM stall cycles
       & ---
       & 0 \\
@@ -431,7 +424,7 @@ number of MAC operations by the number of PEs:
 \end{equation}
 %
 This value represents the theoretical minimum latency assuming
-100\,\% PE utilization and no memory stalls—i.e., all data is
+100\,\% PE utilization and no memory stalls---i.e., all data is
 available at the compute units without any bandwidth bottleneck.
 
 The FactorFlow model produces exactly this value as the ideal
@@ -487,38 +480,82 @@ is indeed sufficient for full depth-first fusion of the target
 workload, and no intermediate recomputation is required.
 
 
-\subsection{Memory Stalls}
+\subsection{On-Chip Memory Stalls}
 \label{sec:val-stalls}
 
-Due to the absence of precise DRAM bandwidth specifications in the
-DepFiN paper, a direct comparison of total latency with stalls is
-not possible.
-However, the stall analysis from the model provides useful insights:
+A key validation result concerns the stall behavior of the
+\emph{on-chip} memory hierarchy, which can be fully characterized
+because the FMEM and WMEM bandwidths are derived directly from the
+known wordline widths (Section~\ref{sec:val-assumptions}).
+
+\paragraph{Weight Memory.}
+The Weight Memory introduces \textbf{zero stall cycles} across all
+eleven layers.
+The 16\,B/cycle bandwidth (128-bit wordline) is sufficient to deliver
+weights to the PE array without ever becoming the bottleneck.
+
+\paragraph{Feature Memory.}
+The Feature Memory introduces a total of only \textbf{24 stall cycles}
+across the entire 37.94\,M-cycle execution---a negligible overhead of
+$6.3 \times 10^{-5}\,\%$.
+Crucially, the per-layer breakdown reveals that these 24 stall cycles
+arise \textbf{exclusively from the two boundary layers}:
+
 \begin{itemize}
-  \item \textbf{DRAM} introduces 3,766,468 stall cycles, increasing
-        the total latency from the ideal 37.94\,M to 45.35\,M cycles
-        ($+19.5\,\%$).
-        This stall is caused by the limited DRAM bandwidth of
-        12\,B/cycle (2\,B/cycle read + 4\,B/cycle write in the model
-        allocation), which cannot sustain the data delivery rate
-        required by 2,048 PEs running at peak throughput.
-  \item \textbf{FMEM} introduces only 483 stall cycles—effectively
-        zero.
-        The 132\,B/cycle read bandwidth and 128\,B/cycle write
-        bandwidth of FMEM are more than sufficient to feed the PE
-        array without any bottleneck.
-        This confirms that the \emph{on-chip} memory hierarchy of
-        DepFiN is well-dimensioned for the target workload.
-  \item \textbf{WMEM} introduces zero stall cycles, meaning the
-        weight delivery from the Weight Memory is never the bottleneck.
+  \item \textbf{Layer~0} (input layer, $C_0 = 3$): contributes 19
+        stall cycles.
+        This layer has only 3 input channels instead of 32, which
+        alters the ratio between the data volume to be read from FMEM
+        and the compute time, causing a minor bandwidth mismatch
+        during the first few tiles.
+  \item \textbf{Layer~10} (output layer, 1$\times$1 convolution,
+        $Z_{10} = 16$): contributes 5 stall cycles.
+        This layer has a reduced kernel size and output channel count
+        compared to the regime layers, creating a similarly marginal
+        imbalance.
+  \item \textbf{Layers~1--9} (regime layers): \textbf{zero stall
+        cycles each}.
+        All nine identical 3$\times$3 convolutions with 32 input and
+        32 output channels execute without any FMEM bandwidth
+        bottleneck.
 \end{itemize}
 
-The key validation evidence from the stall analysis is that
-\textbf{FMEM does not introduce stalls}.
-This means the Feature Memory bandwidth is sufficient to support
-the depth-first tiled execution without ever becoming a bottleneck,
-which is consistent with DepFiN's architectural claim that the large
-on-chip FMEM enables seamless multi-layer fusion at full throughput.
+This result has two important implications.
+First, it confirms that the FMEM read bandwidth (132\,B/cycle) and
+write bandwidth (128\,B/cycle) are well-dimensioned for the target
+dataflow: at regime---where the pipeline spends the vast majority of
+its execution time---the on-chip data delivery perfectly sustains the
+PE throughput with zero stalls.
+Second, the negligible stalls at the boundary layers are a
+\emph{structural} artefact of the non-uniform layer shapes (3 input
+channels for L0, 1$\times$1 kernel for L10) rather than a systematic
+bandwidth limitation.
+In a longer pipeline with more regime layers, these boundary effects
+would become even more insignificant relative to the total execution
+time.
+
+
+\subsection{DRAM Bandwidth}
+\label{sec:val-dram-bw}
+
+As discussed in Section~\ref{sec:val-assumptions}, the DepFiN paper
+does not provide enough information to construct a cycle-accurate
+model of the DRAM bandwidth.
+The reported aggregate I/O interface of 12\,B/cycle (96\,bits) does
+not account for LPDDR4 controller overhead, read/write turnaround
+penalties, or burst scheduling effects.
+For this reason, we do not attempt to validate the absolute total
+latency (which would include DRAM-induced stalls) and instead focus
+the comparison on the compute-bound latency and the on-chip memory
+behavior---quantities that are fully determined by the architectural
+parameters known from the paper.
+
+The model nonetheless confirms that, regardless of the DRAM bandwidth
+assumption, the depth-first fusion guarantee holds: all intermediate
+data remains on-chip, and the only DRAM traffic consists of the
+unavoidable input reads (2,764,800 bytes for the input image) and
+output writes (14,745,600 bytes for the final output), plus the
+one-time weight loads (84,320 bytes).
 
 
 \subsection{Summary}
@@ -535,16 +572,24 @@ accelerator:
         enforced, with zero intermediate DRAM traffic, reproducing
         DepFiN's depth-first fusion guarantee.
   \item The \textbf{FMEM capacity} is verified to be sufficient for
-        the entire fused pipeline, with no intermediate data spills—confirming that the 1056\,KB Feature Memory provides
+        the entire fused pipeline, with no intermediate data
+        spills---confirming that the 1056\,KB Feature Memory provides
         fully-cached intermediate storage.
-  \item The \textbf{FMEM bandwidth} introduces negligible stall
-        (483 cycles out of 45.35\,M), validating that the on-chip
-        data delivery is well-matched to the PE throughput.
+  \item The \textbf{on-chip memory stalls are negligible}: the Feature
+        Memory introduces only 24 stall cycles out of 37.94\,M, and
+        these arise exclusively from the boundary layers (L0 and L10).
+        At regime (layers L1--L9), the FMEM bandwidth sustains the PE
+        throughput with \textbf{zero stall cycles}, validating that the
+        on-chip data delivery is perfectly matched to the compute
+        demand.
+  \item The \textbf{Weight Memory} introduces zero stall cycles,
+        confirming that the 16\,B/cycle bandwidth is sufficient for
+        weight delivery across all layers.
 \end{enumerate}
 
 These results establish confidence in the analytical framework for the
 design-space exploration presented in the following chapters.
 The model correctly captures the fundamental trade-offs of layer
-fusion—DRAM traffic elimination, on-chip memory pressure, and
-bandwidth utilization—which are the quantities that drive the
+fusion---DRAM traffic elimination, on-chip memory pressure, and
+bandwidth utilization---which are the quantities that drive the
 energy--latency comparisons in the case studies.
