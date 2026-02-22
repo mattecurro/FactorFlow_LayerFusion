@@ -1,0 +1,231 @@
+% ============================================================
+%  2.4  The Mapping Problem
+% ============================================================
+\section{The Mapping Problem}
+\label{sec:bg-mapping}
+
+Given a DNN workload expressed as a loop nest
+(Section~\ref{sec:bg-workloads}) and a spatial architecture described as
+a hierarchy of levels (Section~\ref{sec:bg-hw-accel}), a
+\textbf{mapping} is a complete specification of how the computation is
+partitioned, scheduled, and assigned to the hardware.
+Concretely, a mapping answers three questions:
+\begin{enumerate}
+  \item \textbf{Where} does each operand tile reside in the memory
+    hierarchy?
+  \item \textbf{When} and \textbf{how} does data move between levels,
+    and which multicast or reduction opportunities are exploited?
+  \item \textbf{Which PE} computes \textbf{which MAC}, and in what
+    temporal order?
+\end{enumerate}
+
+The set of all mappings that satisfy the resource and user constraints
+of a given workload--architecture pair is called the
+\textbf{map-space}~$\mathcal{MS}$.
+The \textbf{mapping problem} is to find a mapping
+$m^{*}\!\in\mathcal{MS}$ that minimizes a target metric---typically
+energy, latency, or the energy-delay product (EDP):
+\begin{equation}
+\label{eq:mapping-problem}
+m^{*} = \arg\min_{m\in\mathcal{MS}} \; \text{EDP}(m).
+\end{equation}
+
+\noindent
+This optimization is difficult for two reasons.
+First, the map-space is combinatorially large
+(Section~\ref{sec:bg-mapspace} quantifies this).
+Second, energy and latency are dominated by \emph{data movement}
+rather than by computation: accessing off-chip DRAM costs hundreds of
+times the energy of a PE-local register read, so the objective function
+is highly sensitive to how effectively a mapping exploits data reuse.
+
+
+% ------------------------------------------------------------
+\subsection{Three Degrees of Freedom}
+\label{sec:mapping-dof}
+% ------------------------------------------------------------
+
+Every mapping is fully characterized by three orthogonal choices made
+\emph{independently at each level} of the architecture hierarchy.
+
+% ---- TILING ----
+\subsubsection{Tiling}
+\label{sec:tiling}
+
+To fit a workload's tensors into the limited on-chip memories of a
+spatial architecture, the loop nest is \emph{tiled}: each loop
+dimension~$d$ with extent~$|d|$ is split into sub-ranges distributed
+across the levels of the hierarchy.
+Formally, the extent is factorized into its prime factors, and each
+prime-power copy is assigned to exactly one level.
+The product of the factors assigned to a level and all levels below it
+determines the \emph{tile size} at that level---the number of elements
+along dimension~$d$ that the level must store simultaneously.
+
+Tiling choices directly determine the storage requirements at each
+memory level.
+A mapping is \emph{valid} only if every tile fits within the capacity
+of the memory level that must hold it.
+In practice, the objective is not merely to fit tiles, but to fill
+each memory as fully as possible, thereby maximizing the amount of
+data that is reused before being evicted.
+
+\paragraph{Example.}
+Consider a dimension $M = 128 = 2^7$ in a three-level hierarchy
+(DRAM -- GlobalBuffer -- Register).
+One valid tiling assigns factors~$2^3$ to DRAM, $2^2$ to the
+GlobalBuffer, and $2^2$ to the Register, giving tile sizes of
+$128$, $16$, and~$4$ respectively.
+Each register tile of 4~elements is reused across the 4 iterations
+at that level before a new tile is loaded from the GlobalBuffer; each
+GlobalBuffer tile of 16~elements is reused across 8 iterations before
+fetching from DRAM.
+
+% ---- PARALLELISM ----
+\subsubsection{Parallelism Strategy}
+\label{sec:parallelism}
+
+Spatial fanout levels replicate all subsequent levels into a mesh of
+concurrent instances.
+A mapping must specify which loop dimension(s) are \emph{spatially
+unrolled} across each fanout level and how many iterations each
+instance executes.
+This is modeled identically to tiling: the prime-factor copies of a
+dimension are distributed across all levels, including the spatial
+ones.
+The product of factors at a spatial level gives the number of
+instances executing in parallel along that dimension.
+
+The parallelism strategy interacts with data reuse through
+\emph{multicast} and \emph{reduction}.
+When a fanout level unrolls a dimension orthogonal to an operand,
+all instances need the same data tile.
+If the hardware supports spatial multicast, a single read from
+the outer memory feeds all instances, multiplying the effective
+reuse by the fanout mesh size.
+Conversely, when the unrolled dimension is coupled to the output,
+multiple instances produce partial sums for the same output tile;
+spatial reduction support allows these to be accumulated in a single
+write.
+
+When the unrolled dimension is \emph{affine} for an operand---that
+is, it appears in a sum of indices like $p + r$---adjacent instances
+access \emph{overlapping} but not identical input tiles.
+With \emph{selective multicast} support, the architecture can read
+the union of all required tiles once and distribute the appropriate
+sub-tiles to each instance.
+Without it, each instance issues its own independent read, multiplying
+bandwidth demand.
+
+% ---- LOOP ORDERING ----
+\subsubsection{Loop Ordering (Dataflow)}
+\label{sec:loop-ordering}
+
+At each memory level, the loops assigned to that level can be
+\emph{permuted} without affecting correctness.
+The chosen permutation constitutes the level's \textbf{dataflow} and
+is the primary lever that controls which reuse mechanisms are
+activated.
+
+\paragraph{Key principle.}
+On a memory level, the operands that remain \emph{constant} across
+the innermost iterations are kept stationary in that memory, avoiding
+redundant reads.
+The innermost loops therefore determine which operand is stationary.
+
+The following reuse patterns arise from the interaction between loop
+ordering and the coupling structure:
+
+\begin{enumerate}
+  \item \textbf{Stationarity (temporal reuse).}
+    When the innermost iterated dimension at a memory level is
+    \emph{orthogonal} to an operand
+    (cf.~Definition~\ref{def:coupled-orthogonal}), that operand's tile
+    does not change across consecutive iterations and is thus fully
+    reused---it is \emph{stationary}.
+    In the standard 2D convolution, where each dimension is orthogonal
+    to exactly one of the three operands (Table~\ref{tab:coupling-conv}),
+    one can make at most one operand stationary per memory level.
+    The three classical dataflows arise from this choice:
+    \begin{itemize}
+      \item \emph{Weight-stationary}: innermost loops iterate over
+        dimensions orthogonal to the weights (e.g., $P$, $Q$, $N$),
+        keeping the weight tile resident.
+      \item \emph{Input-stationary}: innermost loops iterate over
+        dimensions orthogonal to the inputs (e.g., $M$), keeping the
+        input tile resident.
+      \item \emph{Output-stationary}: innermost loops iterate over
+        dimensions orthogonal to the outputs (e.g., $C$, $R$, $S$),
+        keeping the partial-sum tile resident and accumulating into it.
+    \end{itemize}
+
+  \item \textbf{Halo reuse (temporal, affine).}
+    When the innermost iterated dimension is \emph{affine} for an
+    operand---that is, it participates in a sum of indices such as
+    $p + r$ (Definition~\ref{def:affine-dim})---consecutive tiles
+    \emph{overlap} due to the sliding-window access pattern.
+    Only the non-overlapping slice, called the \emph{halo}, needs to
+    be fetched from the outer memory; the remainder is reused from the
+    previous iteration.
+    The size of the overlap depends on the affine coefficients (strides
+    and dilations) and the tile sizes.
+
+    Halo reuse is only possible when none of the dimensions involved in
+    the sum of indices are spatially parallelized at any level below
+    the current one; otherwise, the overlapping data would reside in a
+    different hardware instance and cannot be reused.
+
+  \item \textbf{Spatial reuse.}
+    On a \emph{fanout} level, loop order is irrelevant---only the
+    \emph{choice of parallelized dimensions} matters.
+    Parallelizing a dimension orthogonal to an operand enables
+    \emph{multicast}; parallelizing a dimension coupled to the output
+    enables \emph{reduction}.
+    With affine dimensions, overlapping tiles across instances create
+    additional multicast or reduction opportunities when selective
+    support is available.
+\end{enumerate}
+
+
+% ------------------------------------------------------------
+\subsection{Interaction of the Three Degrees of Freedom}
+\label{sec:dof-interaction}
+% ------------------------------------------------------------
+
+Tiling, parallelism, and loop ordering are not independent in their
+effect on performance:
+
+\begin{itemize}
+  \item \textbf{Tiling + parallelism} jointly determine what data must
+    be where and when.
+    The tile sizes at each level define the storage footprint, while the
+    parallelism strategy determines how many copies of inner levels
+    concurrently share an outer memory's bandwidth.
+
+  \item \textbf{Loop ordering} then schedules the temporal sequence of
+    data transfers and decides which reuse mechanism fires at each
+    memory level.
+    A specific loop order can only exploit stationarity or halo reuse
+    if the tiling has allocated enough iterations to the relevant
+    dimension at that level.
+\end{itemize}
+
+At any memory level, the permutation of the loops determines which
+reuse fires:
+\begin{enumerate}[(i)]
+  \item \emph{Stationarity} is locked by the set of innermost loops
+    that are orthogonal to an operand.
+  \item \emph{Halo reuse} depends on the position of the first
+    \emph{coupled} loop and whether it involves an affine dimension.
+  \item On \emph{spatial} levels, loop order does not change behavior;
+    only the choice of parallelized dimensions matters.
+\end{enumerate}
+
+\noindent
+This interplay means that evaluating a mapping requires considering all
+three decisions simultaneously, which is precisely why the mapping
+problem is so challenging:
+the search space is the Cartesian product of all tiling configurations,
+all parallelism assignments, and all loop permutations at every level.
+Section~\ref{sec:bg-mapspace} quantifies the resulting combinatorial
+explosion.

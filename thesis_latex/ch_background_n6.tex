@@ -1,0 +1,255 @@
+% ==================================================================
+%  Section 2.6 – Cost Modeling
+% ==================================================================
+\section{Cost Modeling}
+\label{sec:bg-cost-model}
+
+Sections~\ref{sec:bg-mapping} and~\ref{sec:bg-mapspace} established that the
+mapping problem requires choosing one mapping out of a combinatorially large
+space and that the optimal choice depends on the \emph{cost} of each mapping.
+This section formalizes how that cost is estimated.
+
+A \textbf{cost model} is a function that takes an architecture description and
+a mapping and returns one or more scalar figures of merit—typically energy,
+latency, or a compound metric—without actually fabricating the chip or
+running the workload on real hardware.
+Two fundamentally different strategies exist.
+
+\begin{itemize}
+  \item \textbf{Simulation-based} models (e.g.\ cycle-accurate simulators)
+        execute the data movement and compute operations on a software model of
+        the hardware, tracking every memory access and pipeline event.
+        They can be highly accurate, but their runtime grows with the number
+        of operations in the workload, making them impractical when millions
+        of mappings need to be evaluated.
+  \item \textbf{Analytical} models compute the cost in closed form (or
+        near--closed form) from the mapping's tiling factors, loop ordering,
+        and the architecture's parameters.
+        Their runtime is independent of the workload size, enabling rapid
+        exploration of large map spaces.
+        The trade-off is that simplifications—such as assuming perfect
+        double-buffering or ignoring interconnect congestion—introduce
+        approximation error.
+\end{itemize}
+
+Because map-space exploration (Section~\ref{sec:bg-mapspace}) requires
+evaluating a cost function for a very large number of candidate mappings,
+analytical models are the predominant choice in modern DNN mapping
+frameworks~\cite{parashar2019timeloop, wu2019accelergy, kwon2020maestro,
+mei2021zigzag}.
+The remainder of this section describes the three building blocks of such
+models: the \emph{memory-access count}, the \emph{energy model}, and the
+\emph{latency model}, together with the compound metrics derived from them.
+
+% ------------------------------------------------------------------
+\subsection{Memory-Operation Count}
+\label{sec:mop-count}
+
+The starting point of any analytical cost model is to determine how many
+\emph{memory operations} (MOPs) each level of the hierarchy performs for a
+given mapping.
+A memory operation is a single scalar read or write to a storage level;
+the total count depends on the tiling, loop ordering, and bypass
+configuration of the mapping (Sections~\ref{sec:tiling}--\ref{sec:loop-ordering}).
+
+Consider a memory level~$\ell$ that stores operands $\mathcal{O} \subseteq
+\{\text{in}, \text{w}, \text{out}\}$ (the remaining operands bypass the
+level).
+At each iteration of the loops mapped on~$\ell$, a \emph{tile} of every
+stored operand must be read from~$\ell$ and supplied to the levels below;
+partial results are written back from below.
+The total number of \emph{reads} and \emph{writes} at~$\ell$ can be
+expressed as:
+\begin{equation}
+\label{eq:mops}
+\text{reads}_\ell \;=\; \sum_{o \in \mathcal{O}}
+  \frac{\text{tile}_{o}}{\text{reuse}_{o,\ell}}
+  \;\cdot\; \prod_{k \in \mathcal{L}_\ell} f_k,
+\qquad
+\text{writes}_\ell \;=\; \text{fills}_\ell + \text{updates}_\ell,
+\end{equation}
+where $f_k$ are the tiling factors on level~$\ell$, the product ranges over
+the loops~$\mathcal{L}_\ell$ mapped there, and $\text{reuse}_{o,\ell}$
+captures temporal reuse from stationarity and halo overlap
+(Section~\ref{sec:loop-ordering}).
+\emph{Fills}—data moved into the level from above—and \emph{updates}—partial
+sums drained from below—are tracked separately so that read and write
+bandwidths can be individually bounded.
+
+Additionally, MOPs occurring at a fanout level (Section~\ref{sec:sa-abstraction})
+are accounted for through \emph{multicast} and \emph{reduction}:
+when an operand is spatially reused across PEs, a single read from the
+level above can serve multiple instances (multicast), and corresponding
+partial sums from multiple PEs may be aggregated before being written back
+(reduction).
+
+% ------------------------------------------------------------------
+\subsection{Energy Model}
+\label{sec:energy-model}
+
+Given the MOP counts, the total energy is obtained by weighting each
+access with the per-access energy of the corresponding storage level:
+\begin{equation}
+\label{eq:energy}
+E \;=\;
+  \underbrace{\sum_{\ell}\bigl(
+    e_{\ell}^{\text{rd}}\cdot\text{reads}_\ell \;+\;
+    e_{\ell}^{\text{wr}}\cdot\text{writes}_\ell
+  \bigr)}_{\text{data-movement energy}}
+  \;+\;
+  \underbrace{\sum_{\ell} e_{\ell}^{\text{leak}}\cdot L}_{\text{leakage}}
+  \;+\;
+  \underbrace{e^{\text{MAC}}\cdot\text{MACs}}_{\text{compute energy}},
+\end{equation}
+where $e_{\ell}^{\text{rd}}$ and $e_{\ell}^{\text{wr}}$ are the per-scalar
+read and write energies at level~$\ell$ (in pJ), $e_{\ell}^{\text{leak}}$
+is the leakage power per clock cycle, $L$ is the total execution latency,
+and $e^{\text{MAC}}$ is the energy of a single multiply-accumulate operation.
+The summation runs over all memory levels and the compute level.
+
+The per-access energies are technology-dependent constants that characterize
+the hardware.
+They can be provided directly for each level (e.g.\ measured or taken from a
+data-sheet) or estimated by an external tool.
+\textbf{Accelergy}~\cite{wu2019accelergy} is a widely used energy-estimation
+framework that queries technology-specific plug-ins—such as CACTI for
+SRAMs~\cite{muralimanohar2009cacti} and NeuroSim for emerging
+NVMs~\cite{chen2018neurosim}—to estimate the per-access energy and area of
+each component given its configuration (depth, width, technology node, number
+of ports).
+Because the per-access energies are constants of the architecture and do
+\emph{not} change across mappings, they can be queried once during
+architecture setup and then reused throughout exploration.
+
+An important observation is that Equation~\eqref{eq:energy} makes the
+data-movement energy \emph{mapping-dependent} solely through the MOP counts,
+while compute energy is fixed once the workload is determined: the
+total number of MACs is a property of the computation, not of how it is
+mapped.
+Since DRAM accesses are orders of magnitude more energy-expensive than
+register-file accesses or MACs (${\sim}200\,\text{pJ}$ vs.\
+${\sim}1\,\text{pJ}$ vs.\ ${\sim}0.2\,\text{pJ}$ at $45\,$nm%
+~\cite{horowitz20141}), data movement dominates the energy budget, and
+minimizing the number of MOPs at the costliest levels is the primary
+objective of any mapping optimization.
+
+% ------------------------------------------------------------------
+\subsection{Latency Model}
+\label{sec:latency-model}
+
+The latency of a mapping is the total number of clock cycles from the first
+input read to the last output drain.
+In an analytical model, latency is driven by two bottlenecks at every memory
+level: the \emph{compute bound} and the \emph{bandwidth bound}.
+
+\paragraph{Compute bound.}
+If the available bandwidth is sufficient to keep the compute units fed, the
+latency at level~$\ell$ equals the number of tiles processed times the
+latency of one tile:
+\begin{equation}
+\label{eq:lat-compute}
+L_\ell^{\text{compute}} \;=\; c_{\text{tile}} \;\cdot\;
+  \prod_{k \in \mathcal{L}_\ell} f_k,
+\end{equation}
+where $c_{\text{tile}}$ is the clock cycles required to process one tile
+(propagated upward from the compute level).
+
+\paragraph{Bandwidth bound.}
+If the aggregate data rate demanded by a level exceeds its read or write
+bandwidth~$B_\ell$, the level becomes a bottleneck and latency increases:
+\begin{equation}
+\label{eq:lat-bw}
+L_\ell^{\text{BW,rd}}
+  \;=\; \frac{\text{reads}_\ell + \text{drains}_\ell}{B_\ell^{\text{rd}}},
+\qquad
+L_\ell^{\text{BW,wr}}
+  \;=\; \frac{\text{fills}_\ell + \text{updates}_\ell}{B_\ell^{\text{wr}}}.
+\end{equation}
+The effective latency contributed by each level is then
+\begin{equation}
+\label{eq:lat-level}
+L_\ell \;=\; \max\!\bigl(L_\ell^{\text{compute}},\;
+  L_\ell^{\text{BW,rd}},\; L_\ell^{\text{BW,wr}}\bigr),
+\end{equation}
+and the overall execution latency is the maximum across all levels:
+\begin{equation}
+\label{eq:latency}
+L \;=\; \max_\ell\; L_\ell.
+\end{equation}
+
+When a level's bandwidth is saturated, the excess demand translates into
+\emph{stall cycles} that idle the compute units:
+$\Delta_\ell = L_\ell - L_\ell^{\text{compute}}$.
+A mapping with zero stall cycles at every level achieves full
+\emph{compute utilization}; in practice, the slowest memory level dictates
+the overall throughput, an observation closely related to the \emph{roofline
+model}~\cite{williams2009roofline}.
+
+% ------------------------------------------------------------------
+\subsection{Compound Metrics}
+\label{sec:compound-metrics}
+
+Energy and latency capture complementary aspects of a mapping's quality:
+a mapping may reduce energy by reusing data more but increase latency due
+to bandwidth stalls, or vice versa.
+To compare mappings along both axes simultaneously, compound metrics are
+commonly used.
+
+\paragraph{Energy-Delay Product (EDP).}
+The most widely adopted metric is the \emph{energy-delay product}:
+\begin{equation}
+\label{eq:edp}
+\text{EDP} \;=\; E \times L \qquad [\text{pJ}\cdot\text{cc}].
+\end{equation}
+Minimizing the~EDP balances energy against latency: improving either
+dimension while not degrading the other yields a better mapping.
+EDP is used as the default optimization target by several frameworks,
+including Timeloop~\cite{parashar2019timeloop}, and is adopted as the
+primary objective in this thesis.
+
+\paragraph{Weighted Arithmetic Intensity (WART).}
+An alternative metric employed in FactorFlow is the \emph{Weighted
+Arithmetic Intensity}:
+\begin{equation}
+\label{eq:wart}
+\text{WART} \;=\; \frac{\text{FLOPs}}{E \times L}\;\cdot\; U,
+\end{equation}
+where $U$ denotes the spatial utilization of the array (the fraction of PEs
+that are active).
+maximizing~WART is equivalent to minimizing EDP per useful operation, while
+additionally penalizing low utilization of the spatial fabric.
+
+% ------------------------------------------------------------------
+\subsection{Existing Frameworks}
+\label{sec:existing-frameworks}
+
+Several frameworks integrate an analytical cost model with a mapper to
+automatically find efficient mappings for spatial architectures.
+
+\textbf{Timeloop}~\cite{parashar2019timeloop} is a widely used framework
+that couples an analytical cost model with a random and pruned search over
+the map space; its companion tool Accelergy~\cite{wu2019accelergy} supplies
+per-access energy numbers.
+
+\textbf{MAESTRO}~\cite{kwon2020maestro} introduces a \emph{data-centric}
+notation for dataflows and provides rapid analytical cost estimation
+with a focus on NoC modeling.
+
+\textbf{ZigZag}~\cite{mei2021zigzag} models uneven mappings (where tile
+sizes need not divide the problem dimensions evenly) and performs an
+exhaustive or heuristic search with memory-capacity pruning.
+
+\textbf{CoSA}~\cite{huang2021cosa} formulates the mapping problem as a
+constrained optimization and applies mathematical programming solvers rather
+than explicit enumeration.
+
+\textbf{Gamma}~\cite{kao2020gamma} uses a genetic algorithm to navigate
+the map space efficiently for very large accelerators.
+
+These frameworks share the same core abstraction—tiling factors, loop
+orderings, and spatial unrolling over a parameterized memory hierarchy—but
+differ in search strategy, cost-model fidelity, and supported architecture
+features.
+The analytical model used in this thesis builds upon the same principles,
+extending them to support multi-layer (fused) computations as discussed in
+Section~\ref{sec:bg-layer-fusion}.

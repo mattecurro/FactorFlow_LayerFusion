@@ -1,0 +1,310 @@
+% ============================================================
+%  2.2  DNN Workloads and Notation
+% ============================================================
+\section{DNN Workloads and Notation}
+\label{sec:bg-workloads}
+
+Having established what a DNN is in Section~\ref{sec:bg-ai}, we now turn to
+formalizing the \emph{computational workload} that each layer imposes on
+hardware.
+This formalization is essential because the mapping problem---how to schedule
+and tile a workload onto a spatial architecture---is defined entirely in
+terms of the loop-nest structure derived from it.
+
+
+% ------------------------------------------------------------
+\subsection{A Layer as a Loop Nest}
+\label{sec:loop-nest}
+% ------------------------------------------------------------
+
+Every DNN layer can be decomposed into one or more
+\emph{multiply-accumulate} (MAC) operations applied to three tensors:
+an \emph{input activation} tensor, a \emph{weight} (or filter) tensor,
+and an \emph{output activation} tensor.
+A bias term, when present, is absorbed into the output initialization and
+does not affect the loop-nest structure.
+
+Because the MAC is associative and commutative, the order in which the
+individual multiplications and accumulations are carried out is
+irrelevant to the final numerical result.
+This observation is crucial: it means the computation can be expressed as
+a set of perfectly nested loops iterating over the various tensor
+dimensions, and one is free to tile, reorder, and parallelize these loops
+without altering correctness.
+
+\paragraph{Example: one-dimensional convolution.}
+To make the discussion concrete, consider a 1D convolution that maps an
+input with $C$ channels and spatial extent $H$ to an output with $M$
+channels and spatial extent $P$, using filters of size $R$:
+\begin{equation}
+\label{eq:1dconv}
+\texttt{Output}[m,\, p] \;=\; \sum_{c=0}^{C-1}\;\sum_{r=0}^{R-1}
+  \texttt{Input}[c,\, p{+}r]\;\times\;\texttt{Filter}[m,\, c,\, r],
+\end{equation}
+where $m \in [0,\,M)$ and $p \in [0,\,P)$.
+Each output element requires $C \times R$ MAC operations, and the total
+work is $M \times P \times C \times R$ MACs.
+
+This expression can be read directly as a four-deep loop nest:
+
+\begin{center}
+\begin{minipage}{0.55\textwidth}
+\begin{verbatim}
+  for m in [0, M):
+    for p in [0, P):
+      for c in [0, C):
+        for r in [0, R):
+          Out[m][p] += W[m][c][r] * In[c][p+r]
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\noindent
+The four loop dimensions---$M$, $P$, $C$, $R$---constitute the
+\emph{iteration space} of the computation.
+The key property is that these loops can be freely reordered (all $4!$
+permutations produce the same output) and each loop can be tiled
+(split into an outer and an inner sub-loop) to create smaller sub-problems
+that fit in limited on-chip memories.
+This flexibility is the foundation of all mapping strategies discussed in
+Section~\ref{sec:bg-mapping}.
+
+\paragraph{Extension to 2D convolutions.}
+The standard 2D convolution, as used in CNNs, adds a second spatial
+dimension and a batch dimension, leading to a seven-deep loop nest:
+\begin{equation}
+\label{eq:2dconv}
+\texttt{O}[n,\,m,\,p,\,q]
+  = \sum_{c}\;\sum_{r}\;\sum_{s}
+    \texttt{I}[n,\,c,\,p{+}r,\,q{+}s] \;\times\;
+    \texttt{W}[m,\,c,\,r,\,s],
+\end{equation}
+with dimensions $N$ (batch), $M$ (output channels), $P$ and $Q$ (output
+spatial), $C$ (input channels), and $R$, $S$ (filter spatial).
+This is the most common single-layer workload targeted by DNN accelerators
+and the one used in the experimental evaluation of this thesis.
+
+
+% ------------------------------------------------------------
+\subsection{Coupling: the Relationship Between Dimensions and Tensors}
+\label{sec:coupling}
+% ------------------------------------------------------------
+
+Each loop dimension in the nest participates in the indexing of one or
+more of the three operand tensors.
+The precise binding between dimensions and tensors---which we call the
+\emph{coupling}---fully determines what data each iteration reads and
+writes, and therefore what reuse opportunities exist.
+
+\begin{definition}[Coupled and orthogonal dimensions]
+\label{def:coupled-orthogonal}
+A dimension $d$ is said to be \textbf{coupled} to an operand if $d$
+appears in that operand's index expression (i.e., changing $d$ changes
+the element accessed).
+Conversely, $d$ is \textbf{orthogonal} to an operand if $d$ does not
+appear in any of its index expressions; the operand's tile remains
+constant as $d$ iterates, enabling complete \emph{stationarity} of that
+operand.
+\end{definition}
+
+Consider the 2D convolution of Eq.~\eqref{eq:2dconv}.
+Table~\ref{tab:coupling-conv} shows the coupling for each operand.
+Every dimension is coupled to exactly two of the three operands and
+orthogonal to one, creating a clean three-way partition that directly
+maps onto the classical stationary dataflows (weight-stationary,
+input-stationary, output-stationary), as discussed in
+Section~\ref{sec:bg-mapping}.
+
+\begin{table}[htbp]
+\centering
+\caption{Coupling of the standard 2D convolution.
+A \checkmark\ indicates the dimension is coupled to (indexes) the operand;
+a -- indicates orthogonality.}
+\label{tab:coupling-conv}
+\smallskip
+\begin{tabular}{lccc}
+\toprule
+\textbf{Dimension} & \textbf{Input} & \textbf{Weight} & \textbf{Output} \\
+\midrule
+$M$ (out channels)   & --             & \checkmark      & \checkmark \\
+$C$ (in channels)    & \checkmark     & \checkmark      & -- \\
+$R$ (filter height)  & \checkmark     & \checkmark      & -- \\
+$S$ (filter width)   & \checkmark     & \checkmark      & -- \\
+$P$ (out height)     & \checkmark     & --              & \checkmark \\
+$Q$ (out width)      & \checkmark     & --              & \checkmark \\
+$N$ (batch)          & \checkmark     & --              & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+% ------------------------------------------------------------
+\subsection{Normal and Affine Dimensions}
+\label{sec:normal-affine}
+% ------------------------------------------------------------
+
+Not all loop dimensions interact with tensor indices in the same way.
+We distinguish two fundamental categories:
+
+\begin{definition}[Normal dimension]
+\label{def:normal-dim}
+A dimension $d$ is \textbf{normal} if it appears alone as a tensor index
+for every operand it is coupled to.
+A normal dimension indexes each coupled operand independently: changing
+$d$ selects a completely \emph{different} element along that operand's
+corresponding axis.
+\end{definition}
+
+\begin{definition}[Affine dimension]
+\label{def:affine-dim}
+A dimension $d$ is \textbf{affine} if, for at least one operand, it
+participates in a \emph{sum of indices} used to access a tensor
+dimension.
+That is, the operand is indexed by an expression of the form
+$\alpha\, d + \beta \,d'$ (more generally, an affine combination of
+two or more loop variables), rather than by $d$ alone.
+\end{definition}
+
+\paragraph{Illustration.}
+In the 2D convolution of Eq.~\eqref{eq:2dconv}, the input
+is indexed along its height by $p + r$.
+Therefore:
+\begin{itemize}
+  \item $M$ and $C$ are \textbf{normal} dimensions: $M$ alone
+    indexes the weight and output channel axes, $C$ alone indexes the
+    input and weight channel axes.
+  \item $R$ is \textbf{affine}: it appears in the sum $p + r$ that
+    indexes the input's height.
+    Likewise $S$ is affine via $q + s$.
+  \item $P$ is also \textbf{affine}: it appears in the same sum $p + r$.
+    $Q$ is affine via $q + s$.
+\end{itemize}
+
+The normal/affine distinction has deep consequences for mapping:
+\begin{enumerate}
+  \item \textbf{Tile-size computation.}
+    When a normal dimension $d$ is tiled to size $t_d$ at some level, the
+    operand tile along that axis is exactly $t_d$ elements.
+    For an affine pair such as $(P,\,R)$, the input tile along the
+    corresponding spatial axis is $t_P + t_R - 1$ (assuming unit stride),
+    because consecutive output tiles \emph{overlap} in their input
+    requirements.
+  \item \textbf{Halo reuse.}
+    When the innermost iterated dimension at a memory level is affine for
+    an operand, consecutive iterations produce overlapping input tiles.
+    Only the non-overlapping slice---the \emph{halo}---needs to be
+    refetched, while the remaining data is reused from the previous
+    iteration.
+    This \emph{halo reuse} is unique to affine dimensions and does not
+    arise with normal ones.
+  \item \textbf{Map-space counting.}
+    Only normal dimensions contribute independent tiling factors to the
+    map-space cardinality (see Section~\ref{sec:bg-mapspace}).
+    Affine dimensions affect tile sizes but are not independently looped;
+    their tile sizes are derived from those of the normal dimensions
+    they are summed with.
+\end{enumerate}
+
+
+% ------------------------------------------------------------
+\subsection{Extended Einsum Notation}
+\label{sec:een}
+% ------------------------------------------------------------
+
+To express the structure of tensor computations more concisely,
+this thesis adopts the \textbf{extended Einsum notation}
+(EEN)~\cite{abdelfattah2016EEN}, which augments the standard Einstein
+summation convention with three features particularly suited to DNN
+workloads:
+\begin{enumerate}
+  \item \textbf{Named ranks.}
+    Each tensor dimension is given an explicit name (uppercase letter),
+    and the variable iterating over it is denoted by the corresponding
+    lowercase letter.
+  \item \textbf{Shape tags.}
+    Superscripts on each tensor specify the size of every rank, making
+    the shapes explicit in the notation.
+  \item \textbf{Affine subscripts.}
+    Index expressions may contain sums of variables (e.g., $p + r$),
+    directly encoding sliding-window and strided access patterns.
+\end{enumerate}
+
+Using the extended Einsum notation, the 1D convolution from
+Eq.~\eqref{eq:1dconv} can be rewritten as:
+\begin{equation}
+\label{eq:een-1dconv}
+\mathrm{Output}^{M,\,P}_{m,\,p}
+  \;=\; \sum_{c,\,r}\;
+  \mathrm{Input}^{C,\,H}_{c,\,p+r} \;\times\;
+  \mathrm{Filter}^{M,\,C,\,R}_{m,\,c,\,r}\,.
+\end{equation}
+
+\noindent
+The superscripts define the shapes of the tensors (e.g., the input has
+$C$ channels and spatial extent $H = P + R - 1$).
+The subscript $p + r$ makes the sliding-window access pattern
+immediately visible: as $p$ advances, the accessed region in the input
+shifts by one, overlapping with the previous region in $R - 1$ elements.
+Padding is handled implicitly: any access with indices outside the
+valid bounds of a rank is treated as zero.
+
+The 2D convolution of Eq.~\eqref{eq:2dconv} becomes:
+\begin{equation}
+\label{eq:een-2dconv}
+\mathrm{O}^{N,M,P,Q}_{n,m,p,q}
+  \;=\; \sum_{c,r,s}\;
+  \mathrm{I}^{N,C,H,W}_{n,\,c,\,p+r,\,q+s} \;\times\;
+  \mathrm{W}^{M,C,R,S}_{m,c,r,s}\,.
+\end{equation}
+
+\noindent
+The extended Einsum notation is a compact specification that maps
+directly to the loop-nest representation of
+Section~\ref{sec:loop-nest}.
+Every rank in the notation corresponds to a loop dimension, every affine
+subscript encodes a coupled (non-orthogonal) relationship between two
+dimensions, and the implicit summation convention ($\sum_{c,r,s}$)
+identifies the contraction (reduction) dimensions.
+This one-to-one correspondence between the algebraic notation and the
+loop-nest representation makes EEN a natural interface for specifying
+workloads to mapping frameworks.
+
+
+% ------------------------------------------------------------
+\subsection{Activation-Dominant and Weight-Dominant Workloads}
+\label{sec:act-weight-dominant}
+% ------------------------------------------------------------
+
+The coupling structure and dimension sizes of a layer determine which
+operand generates the most data traffic.
+This distinction is important for selecting mapping strategies and
+for understanding when layer fusion is most beneficial.
+
+\begin{definition}[Activation-dominant layer]
+A layer is \textbf{activation-dominant} when the total size of its
+activation tensors (input and output feature maps) exceeds the total
+size of its weight tensor.
+This is typical of the early layers of a CNN, where spatial dimensions
+($P$, $Q$) are large and the number of channels ($M$, $C$) is small.
+\end{definition}
+
+\begin{definition}[Weight-dominant layer]
+A layer is \textbf{weight-dominant} when its weight tensor is
+larger than its activation tensors.
+This occurs in later layers of deep networks, where spatial dimensions
+have been reduced (through pooling or strided convolution) and the
+channel count has grown substantially.
+\end{definition}
+
+\paragraph{Implications for layer fusion.}
+Layer fusion primarily targets the elimination of intermediate
+activation traffic between consecutive layers
+(see Section~\ref{sec:bg-layer-fusion}).
+Its benefit is therefore most pronounced in activation-dominant layers,
+where the suppressed DRAM transfers of feature maps constitute a large
+fraction of total data movement.
+In weight-dominant layers, the potential savings from fusion are smaller
+in relative terms, since the dominant traffic component---the
+weights---is not reduced by fusion.
+This trade-off is examined quantitatively in the experimental
+evaluation (Chapter~\ref{ch:experimental-results}).

@@ -1,0 +1,192 @@
+% ============================================================
+%  2.5  Why the Map-Space Explodes
+% ============================================================
+\section{Why the Map-Space Explodes}
+\label{sec:bg-mapspace}
+
+Section~\ref{sec:bg-mapping} introduced the mapping problem and its
+three degrees of freedom.
+This section demonstrates that even modest workloads on relatively
+simple architectures produce map-spaces of astronomical size, motivating
+the need for analytical cost models and structural pruning strategies.
+
+Two observations underpin the explosion:
+
+\begin{itemize}
+  \item \textbf{Permutations per memory level.}
+    Loop \emph{ordering} at memory levels matters because it determines
+    which operand is stationary, whether halo reuse is available, and in
+    what sequence transfers occur.
+    In contrast, on spatial levels loop order does not change behavior:
+    only the chosen \emph{parallelized dimensions} matter
+    (Section~\ref{sec:loop-ordering}).
+
+  \item \textbf{Independent tiling choices.}
+    For each \emph{normal} dimension~$d \in D$
+    (cf.\ Definition~\ref{def:normal-dim}), we decompose its extent
+    into prime factors and distribute the resulting copies across the
+    $L$ levels of the architecture.
+    These choices are independent across distinct primes and across
+    dimensions.
+\end{itemize}
+
+
+% ------------------------------------------------------------
+\subsection{Formal Setup and Notation}
+\label{sec:mapspace-notation}
+% ------------------------------------------------------------
+
+Let $L$ denote the total number of levels in the spatial architecture
+and $L_m \le L$ the number of \emph{memory} levels.
+Let $D$ be the set of normal kernel dimensions (affine dimensions
+affect tile \emph{sizes} but are not independently looped; see
+Section~\ref{sec:normal-affine}).
+For each dimension $d \in D$, write the prime factorization of its
+extent as
+\[
+  |d| \;=\; \prod_{p}\, p^{\,v_p(d)},
+\]
+where $v_p(d)$ is the $p$-adic valuation of~$|d|$ (i.e., the
+exponent of prime~$p$ in the factorization).
+
+\paragraph{Counting objective.}
+We aim to count the total number of mappings \emph{ignoring validity
+constraints}---that is, including configurations whose tiles may
+exceed memory capacities.
+This upper bound is useful to understand scale and to motivate
+pruning.
+
+
+% ------------------------------------------------------------
+\subsection{Counting Loop Permutations}
+\label{sec:count-permutations}
+% ------------------------------------------------------------
+
+On each memory level, we may arbitrarily permute the $|D|$ loops.
+This yields $|D|!$ choices per memory level and
+\[
+  (|D|!)^{L_m}
+\]
+in total.
+Spatial levels do not contribute because, as established in
+Section~\ref{sec:loop-ordering}, loop order on them is irrelevant.
+
+
+% ------------------------------------------------------------
+\subsection{Counting Factor Allocations}
+\label{sec:count-factors}
+% ------------------------------------------------------------
+
+For a fixed dimension~$d$ and a fixed prime~$p$, we must distribute
+$v_p(d)$ indistinguishable copies of~$p$ across $L$ \emph{labeled}
+levels; levels may receive zero copies, and the assignment to
+different levels produces different tile sizes, so order matters.
+The number of such allocations is the number of weak compositions
+of~$v_p(d)$ into~$L$ parts:
+\[
+  \binom{v_p(d) + L - 1}{L - 1}.
+\]
+
+Because allocations are independent across distinct primes $p \mid d$
+and across dimensions $d \in D$, the \emph{total} number of factor
+allocations is
+\[
+  \prod_{d \in D}\;\prod_{p \mid d}
+    \binom{v_p(d) + L - 1}{L - 1}.
+\]
+
+
+% ------------------------------------------------------------
+\subsection{Map-Space Cardinality}
+\label{sec:mapspace-card}
+% ------------------------------------------------------------
+
+Combining permutations and factor allocations yields the following
+expression for the (valid + invalid) map-space
+size~\cite{ronzani2025quickflow}:
+
+\begin{equation}
+\label{eq:ms-cardinality}
+\boxed{%
+  |\mathcal{MS}|
+  \;=\;
+  \underbrace{(|D|!)^{L_m}}_{\text{loop permutations}}
+  \;\cdot\;
+  \underbrace{
+    \prod_{d \in D}\;\prod_{p \mid d}
+      \binom{v_p(d) + L - 1}{L - 1}
+  }_{\text{factor allocations}}.
+}
+\end{equation}
+
+\paragraph{Growth with architecture complexity.}
+The permutation term scales \emph{exponentially} in~$L_m$ (with
+base~$|D|!$), while the factor-allocation term grows
+\emph{polynomially} in~$L$, with the exponent equal to the total
+number of prime copies
+$\sum_{d \in D}\sum_{p \mid d} v_p(d)$,
+which itself increases with~$|D|$ and the loop extents.
+
+
+% ------------------------------------------------------------
+\subsection{Worked Example}
+\label{sec:mapspace-example}
+% ------------------------------------------------------------
+
+Consider a standard 2D convolution with $|D| = 6$ normal loops
+(e.g., $M, C, P, Q, R, S$) mapped onto an architecture with $L = 5$
+levels, of which $L_m = 4$ are memory levels.
+
+\paragraph{Permutations.}
+\[
+  \text{Permutations}
+  \;=\; (6!)^{4}
+  \;=\; 720^{4}
+  \;\approx\; 2.68 \times 10^{11}.
+\]
+
+\paragraph{Factor allocations.}
+Suppose each dimension has, in total, five prime-factor copies to
+distribute across the five levels.
+Two boundary cases illustrate the range:
+
+\begin{enumerate}
+  \item \textbf{All five copies on the same prime}
+    (e.g., $v_p(d) = 5$ for one~$p$):
+    per dimension
+    $\binom{5 + 5 - 1}{5 - 1} = \binom{9}{4} = 126$,
+    so across six dimensions $126^{6} \approx 1.07 \times 10^{13}$.
+
+  \item \textbf{Five distinct primes, one copy each}
+    ($v_{p}(d) = 1$ for five primes):
+    per dimension
+    $\bigl(\binom{1 + 5 - 1}{5 - 1}\bigr)^{5} = 5^{5} = 3125$,
+    so across six dimensions $3125^{6} \approx 3.05 \times 10^{20}$.
+\end{enumerate}
+
+\paragraph{Total.}
+Multiplying by permutations, the map-space size ranges between
+\[
+  \underbrace{720^{4} \cdot 126^{6}}_{\approx\;1.1 \times 10^{24}}
+  \quad\text{and}\quad
+  \underbrace{720^{4} \cdot 3125^{6}}_{\approx\;2.5 \times 10^{32}}.
+\]
+
+Even the conservative end of this range \emph{far} exceeds
+$10^{24}$.
+These numbers represent \emph{all} mappings, including invalid ones;
+nevertheless, they demonstrate that exhaustive enumeration is
+infeasible.
+
+\paragraph{Practical implications.}
+Across realistic map-spaces, EDP can vary by up to $10^{4}\times$
+between the best and worst valid mappings, and near-optimal points are
+sparsely distributed~\cite{kao2020gamma}.
+Small random sampling budgets are therefore unlikely to discover good
+solutions without \emph{structural pruning}---heuristics that
+eliminate provably sub-optimal or redundant regions of the search
+space before evaluation.
+This motivates the use of analytical cost models that can evaluate
+candidate mappings cheaply (Section~\ref{sec:bg-cost-model}) and
+mapper algorithms that exploit the structure of the map-space to
+navigate it efficiently.
