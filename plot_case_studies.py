@@ -447,7 +447,7 @@ FUSION_AUTO = {
     },
     "Eyeriss": {
         "FSRCNN": {
-            "pe": "128x16", "gb": "128KB", "wreg": 384,
+            "pe": "128x16", "gb": "128KB", "wreg": 384, "intreg": 36,
             "full":    {"energy": 7.150e4, "latency": 1.918e7, "edp": 1.37e6,
                         "dram_rd": 1_573_992, "dram_wr": 8_294_400},
             "single":  {"energy": 1.117e4, "latency": 3.525e7, "edp": 3.94e5,
@@ -456,7 +456,7 @@ FUSION_AUTO = {
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
         },
         "MC-CNN": {
-            "pe": "256x8", "gb": "128KB", "wreg": 384,
+            "pe": "256x8", "gb": "128KB", "wreg": 384, "intreg": 65,
             "full":    {"energy": 9.217e4, "latency": 1.261e7, "edp": 1.16e6,
                         "dram_rd": 494_928, "dram_wr": 14_943_744},
             "single":  {"energy": 8.784e3, "latency": 1.495e7, "edp": 1.31e5,
@@ -465,7 +465,7 @@ FUSION_AUTO = {
                         "dram_rd": 15_438_672, "dram_wr": 29_887_488},
         },
         "VGG16": {
-            "pe": "512x32", "gb": "128KB", "wreg": 1200,
+            "pe": "512x32", "gb": "128KB", "wreg": 1200, "intreg": 350,
             "full":    {"energy": 3.478e5, "latency": 5.455e6, "edp": 1.90e6,
                         "dram_rd": 14_860_992, "dram_wr": 100_352},
             "single":  {"energy": 9.425e3, "latency": 6.922e6, "edp": 6.52e4,
@@ -474,7 +474,7 @@ FUSION_AUTO = {
                         "dram_rd": 17_670_848, "dram_wr": 7_426_048},
         },
         "ResNet18": {
-            "pe": "512x32", "gb": "128KB", "wreg": 902,
+            "pe": "512x32", "gb": "128KB", "wreg": 902, "intreg": 300,
             "full":    {"energy": 4.729e4, "latency": 3.042e6, "edp": 1.44e5,
                         "dram_rd": 11_032_512, "dram_wr": 25_088},
             "single":  {"energy": 1.872e3, "latency": 3.301e6, "edp": 6.18e3,
@@ -493,7 +493,7 @@ FUSION_AUTO = {
 # ====================================================================
 
 FUSION_AUTO_DRAM_200 = {
-    # ── Source: run_dram200_test.py  (Scenario A, DRAM = 200 pJ/byte) ────
+    # ── Source: experiment_runner.py --compare-fusion --dram-energy 200 ───
     "DepFiN": {
         "FSRCNN": {
             "pe": "16x128", "fmem": "576KB", "wmem": "19KB", "tile": 120,
@@ -503,6 +503,33 @@ FUSION_AUTO_DRAM_200 = {
                         "dram_rd": 90_738_792, "dram_wr": 97_459_200},
             "partial": {"energy": 1.452e4, "latency": 6.351e6, "edp": 9.22e4,
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+        },
+        "MC-CNN": {
+            "pe": "8x256", "fmem": "522KB", "wmem": "32KB", "tile": 207,
+            "full":    {"energy": 1.426e4, "latency": 7.975e6, "edp": 1.31e5,
+                        "dram_rd": 494_928, "dram_wr": 14_943_744},
+            "single":  {"energy": 2.188e4, "latency": 1.381e7, "edp": 3.02e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+            "partial": {"energy": 2.002e4, "latency": 7.975e6, "edp": 1.60e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+        },
+        "VGG16": {
+            "pe": "16x128", "fmem": "568KB", "wmem": "14366KB", "tile": 14,
+            "full":    {"energy": 7.861e4, "latency": 2.728e7, "edp": 3.89e6,
+                        "dram_rd": 14_860_992, "dram_wr": 100_352},
+            "single":  {"energy": 8.659e3, "latency": 2.452e7, "edp": 2.12e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+            "partial": {"energy": 4.160e4, "latency": 2.432e7, "edp": 1.01e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+        },
+        "ResNet18": {
+            "pe": "16x128", "fmem": "266KB", "wmem": "10738KB", "tile": 7,
+            "full":    {"energy": 1.269e4, "latency": 8.998e6, "edp": 1.91e5,
+                        "dram_rd": 11_032_512, "dram_wr": 25_088},
+            "single":  {"energy": 3.194e3, "latency": 6.905e6, "edp": 2.21e4,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+            "partial": {"energy": 1.013e4, "latency": 7.813e6, "edp": 7.92e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
         },
     },
     "Eyeriss": {
@@ -514,6 +541,33 @@ FUSION_AUTO_DRAM_200 = {
                         "dram_rd": 90_738_792, "dram_wr": 97_459_200},
             "partial": {"energy": 8.101e4, "latency": 1.918e7, "edp": 1.55e6,
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+        },
+        "MC-CNN": {
+            "pe": "256x8", "gb": "128KB", "wreg": 384, "intreg": 65,
+            "full":    {"energy": 9.502e4, "latency": 1.261e7, "edp": 1.22e6,
+                        "dram_rd": 494_928, "dram_wr": 14_943_744},
+            "single":  {"energy": 2.641e4, "latency": 1.495e7, "edp": 3.95e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+            "partial": {"energy": 5.524e4, "latency": 1.261e7, "edp": 6.97e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+        },
+        "VGG16": {
+            "pe": "512x32", "gb": "128KB", "wreg": 1200, "intreg": 350,
+            "full":    {"energy": 3.699e5, "latency": 5.455e6, "edp": 2.05e6,
+                        "dram_rd": 14_860_992, "dram_wr": 100_352},
+            "single":  {"energy": 1.568e4, "latency": 6.922e6, "edp": 1.09e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+            "partial": {"energy": 1.415e5, "latency": 5.852e6, "edp": 8.28e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+        },
+        "ResNet18": {
+            "pe": "512x32", "gb": "128KB", "wreg": 902, "intreg": 300,
+            "full":    {"energy": 4.915e4, "latency": 3.042e6, "edp": 1.53e5,
+                        "dram_rd": 11_032_512, "dram_wr": 25_088},
+            "single":  {"energy": 4.350e3, "latency": 3.301e6, "edp": 1.44e4,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+            "partial": {"energy": 3.344e4, "latency": 3.139e6, "edp": 1.05e5,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
         },
     },
 }
@@ -588,6 +642,158 @@ FUSION_PARTIAL_SIZED = {
         },
     },
 }
+
+
+# ====================================================================
+#  DATA  –  Fusion Comparisons (Partial-Sized Arch, DRAM Energy = 200 pJ/byte)
+#  Same architecture configs as FUSION_PARTIAL_SIZED but with DRAM access
+#  energy set to 200 pJ/byte instead of the Accelergy-derived 32 pJ/byte.
+# ====================================================================
+
+FUSION_PARTIAL_DRAM_200 = {
+    # ── Source: experiment_runner.py --compare-partial-vs-single --dram-energy 200
+    "DepFiN": {
+        "FSRCNN": {
+            "pe": "16x128", "fmem": "248KB", "wmem": "9KB", "tile": 120,
+            "partial": {"energy": 1.436e4, "latency": 6.351e6, "edp": 9.12e4,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 3.801e4, "latency": 1.175e7, "edp": 4.47e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "8x256", "fmem": "396KB", "wmem": "22KB", "tile": 207,
+            "partial": {"energy": 2.000e4, "latency": 7.975e6, "edp": 1.59e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 2.178e4, "latency": 1.381e7, "edp": 3.01e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "16x128", "fmem": "112KB", "wmem": "4610KB", "tile": 14,
+            "partial": {"energy": 4.133e4, "latency": 2.432e7, "edp": 1.01e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 8.736e3, "latency": 2.452e7, "edp": 2.14e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "16x128", "fmem": "48KB", "wmem": "4608KB", "tile": 7,
+            "partial": {"energy": 8.883e3, "latency": 7.425e6, "edp": 6.60e4,
+                        "dram_rd": 11_448_768, "dram_wr": 551_936},
+            "single":  {"energy": 3.270e3, "latency": 6.905e6, "edp": 2.26e4,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+    "Eyeriss": {
+        "FSRCNN": {
+            "pe": "128x16", "gb": "128KB", "wreg": 384, "inreg": 34,  "intreg":32,
+            "outreg": 64, "tile": 120,
+            "partial": {"energy": 7.787e4, "latency": 1.918e7, "edp": 1.49e6,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 4.279e4, "latency": 3.525e7, "edp": 1.51e6,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "256x8", "gb": "128KB", "wreg": 384,"inreg": 34,  "intreg":32,
+            "outreg": 64, "tile": 69,
+            "partial": {"energy": 1.007e5, "latency": 1.261e7, "edp": 1.27e6,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 2.644e4, "latency": 1.495e7, "edp": 3.95e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "512x32", "gb": "128KB", "wreg": 576, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "partial": {"energy": 1.650e5, "latency": 5.852e6, "edp": 9.65e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 1.569e4, "latency": 6.922e6, "edp": 1.09e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "512x32", "gb": "128KB", "wreg": 384, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "partial": {"energy": 3.535e4, "latency": 3.139e6, "edp": 1.11e5,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+            "single":  {"energy": 4.350e3, "latency": 3.301e6, "edp": 1.44e4,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+}
+
+
+# ====================================================================
+#  DATA  –  Fusion Comparisons (Partial-Sized Arch, 12nm Technology)
+#  Same architecture configs as FUSION_PARTIAL_SIZED but with
+#  technology="12nm", technology_scale=1.0 (no double-scaling).
+#  DRAM energy = 64 pJ/operand (unscaled, off-chip).
+# ====================================================================
+
+FUSION_PARTIAL_12NM = {
+    # ── Source: experiment_runner.py --compare-partial-vs-single (12nm config)
+    "DepFiN": {
+        "FSRCNN": {
+            "pe": "16x128", "fmem": "248KB", "wmem": "9KB", "tile": 120,
+            "partial": {"energy": 6.767e3, "latency": 6.351e6, "edp": 4.30e4,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 1.256e4, "latency": 1.175e7, "edp": 1.48e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "8x256", "fmem": "396KB", "wmem": "22KB", "tile": 207,
+            "partial": {"energy": 1.051e4, "latency": 7.975e6, "edp": 8.38e4,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 7.831e3, "latency": 1.381e7, "edp": 1.08e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "16x128", "fmem": "112KB", "wmem": "4610KB", "tile": 14,
+            "partial": {"energy": 4.783e4, "latency": 2.432e7, "edp": 1.16e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 4.241e3, "latency": 2.452e7, "edp": 1.04e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "16x128", "fmem": "48KB", "wmem": "4608KB", "tile": 7,
+            "partial": {"energy": 1.052e4, "latency": 7.813e6, "edp": 8.22e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+            "single":  {"energy": 1.412e3, "latency": 6.905e6, "edp": 9.75e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+    "Eyeriss": {
+        "FSRCNN": {
+            "pe": "128x16", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 120,
+            "partial": {"energy": 3.347e4, "latency": 1.918e7, "edp": 6.42e5,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 1.440e4, "latency": 3.525e7, "edp": 5.08e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "256x8", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 69,
+            "partial": {"energy": 4.324e4, "latency": 1.261e7, "edp": 5.45e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 9.171e3, "latency": 1.495e7, "edp": 1.37e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "512x32", "gb": "128KB", "wreg": 576, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "partial": {"energy": 7.177e4, "latency": 5.852e6, "edp": 4.20e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 6.012e3, "latency": 6.922e6, "edp": 4.16e4,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "512x32", "gb": "128KB", "wreg": 384, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "partial": {"energy": 1.521e4, "latency": 3.139e6, "edp": 4.77e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+            "single":  {"energy": 1.561e3, "latency": 3.301e6, "edp": 5.15e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+}
+
 
 # ====================================================================
 #  DATA  –  Fusion Comparisons (Auto-Sized, Normalized to Full=1.0)

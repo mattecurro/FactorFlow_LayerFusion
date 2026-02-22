@@ -3232,9 +3232,11 @@ try:
         create_thesis_architecture_10layers,  # Legacy, for backward compatibility
         ThesisArchConfig,
         get_baseline_config,
+        get_energy_values_from_accelergy,
         # Eyeriss architecture support
         create_eyeriss_architecture,
         EyerissArchConfig,
+        get_eyeriss_energy_values,
         # Constrained Eyeriss (fully deterministic mapping)
         create_constrained_eyeriss_architecture,
     )
@@ -3323,6 +3325,9 @@ class ExperimentConfig:
     tile_size: Optional[int] = None           # Output tile size override (None = auto GCD)
     scale_bandwidth: bool = True             # Scale FMEM bandwidth with tile size
     base_tile_size: int = 128                  # Reference tile size for scaling
+    
+    # Energy override
+    dram_energy_override: Optional[float] = None  # If set, override DRAM energy (pJ/byte)
     
     # Settings
     bias_read: bool = False
@@ -3593,6 +3598,14 @@ class ExperimentRunner:
                         base_tile_size_for_scaling=config.base_tile_size,
                     )
                     
+                    # Build custom_energy dict if DRAM override is set
+                    custom_energy = None
+                    if config.dram_energy_override is not None:
+                        # Get base energy from Accelergy, then override DRAM
+                        base_energy = get_eyeriss_energy_values(arch_config)
+                        base_energy['dram_energy'] = config.dram_energy_override
+                        custom_energy = base_energy
+                    
                     # If tile_size is specified, use constrained (deterministic) architecture
                     if config.tile_size is not None:
                         arch = create_constrained_eyeriss_architecture(
@@ -3600,14 +3613,16 @@ class ExperimentRunner:
                             coupling=coupling,
                             shape=shape,
                             output_tile_size=config.tile_size,
-                            num_layers=config.num_fused_layers
+                            num_layers=config.num_fused_layers,
+                            custom_energy=custom_energy,
                         )
                     else:
                         arch = create_eyeriss_architecture(
                             config=arch_config,
                             coupling=coupling,
                             shape=shape,
-                            num_layers=config.num_fused_layers
+                            num_layers=config.num_fused_layers,
+                            custom_energy=custom_energy,
                         )
                 else:
                     # Create DepFiN-style architecture with separate FMEM/WMEM (default)
@@ -3622,12 +3637,29 @@ class ExperimentRunner:
                         scale_bandwidth_with_tile=config.scale_bandwidth,
                         base_tile_size_for_scaling=config.base_tile_size,
                     )
+                    
+                    # Build custom_energy dict if DRAM override is set
+                    custom_energy = None
+                    use_accelergy = True
+                    if config.dram_energy_override is not None:
+                        base_energy = get_energy_values_from_accelergy(arch_config)
+                        custom_energy = {
+                            'dram': config.dram_energy_override,
+                            'fmem': base_energy['fmem_energy_per_byte'],
+                            'wmem': base_energy['wmem_energy_per_byte'],
+                            'accreg': base_energy['accreg_energy_per_byte'],
+                            'compute': base_energy['compute_energy_per_mac'],
+                        }
+                        use_accelergy = False
+                    
                     # Use generic architecture factory with proper layer count and shape
                     arch = create_thesis_architecture(
                         config=arch_config,
                         coupling=coupling,
                         shape=shape,
-                        num_layers=config.num_fused_layers
+                        num_layers=config.num_fused_layers,
+                        use_accelergy_energy=use_accelergy,
+                        custom_energy=custom_energy,
                     )
             except Exception as e:
                 print(f"Warning: Could not create thesis_arch ({e}), using eyeriss_conv")
@@ -5432,6 +5464,7 @@ class ExperimentRunner:
         tile_size: Optional[int] = None,
         scale_bandwidth: bool = False,
         base_tile_size: int = 128,
+        dram_energy_override: Optional[float] = None,
         verbose: bool = False,
     ) -> Dict[str, Any]:
         """
@@ -5525,6 +5558,8 @@ class ExperimentRunner:
             print(f"Tile size override: {tile_size}")
         else:
             print(f"Tile size: auto-detected per fusion level")
+        if dram_energy_override is not None:
+            print(f"⚡ DRAM energy override: {dram_energy_override} pJ/byte (default: 32 pJ/byte)")
         print(f"{'='*90}\n")
         
         # Helper to create config with per-variant WMEM and Eyeriss sizing
@@ -5590,6 +5625,7 @@ class ExperimentRunner:
                 tile_size=effective_tile,
                 scale_bandwidth=scale_bandwidth,
                 base_tile_size=base_tile_size,
+                dram_energy_override=dram_energy_override,
                 verbose=verbose,
             ), variant_wmem_kb
         
@@ -5931,6 +5967,7 @@ class ExperimentRunner:
         output_reg_entries: int = None,
         tile_size: Optional[int] = None,
         intermediate_level_override: Optional[str] = None,
+        dram_energy_override: Optional[float] = None,
         verbose: bool = False,
     ) -> Dict[str, Any]:
         """
@@ -6004,6 +6041,8 @@ class ExperimentRunner:
             print(f"  FMEM={fmem_size_kb}KB, WMEM={wmem_size_kb}KB")
         if tile_size is not None:
             print(f"  Tile size override: {tile_size}")
+        if dram_energy_override is not None:
+            print(f"  ⚡ DRAM energy override: {dram_energy_override} pJ/byte (default: 32 pJ/byte)")
         print(f"  ALL experiments use IDENTICAL architecture (fair comparison)")
         print(f"{'='*100}\n")
 
@@ -6026,7 +6065,9 @@ class ExperimentRunner:
                 weight_reg_entries=weight_reg_entries,
                 intermediate_reg_entries=intermediate_reg_entries,
                 output_reg_entries=output_reg_entries,
-                tile_size=effective_tile, verbose=verbose,
+                tile_size=effective_tile,
+                dram_energy_override=dram_energy_override,
+                verbose=verbose,
             )
 
         # ── Pre-compute per-block tile sizes from full fusion stride info ──
@@ -6545,6 +6586,10 @@ Examples:
     parser.add_argument("--base-tile-size", type=int, default=128,
                        help="Reference tile size for bandwidth scaling (default: 128)")
     
+    # Energy override
+    parser.add_argument("--dram-energy", type=float, default=None,
+                       help="Override DRAM access energy in pJ/byte (default: Accelergy-derived, ~32 pJ/byte)")
+    
     # Output options
     parser.add_argument("--output", "-o", type=str,
                        help="Output filename for results (CSV)")
@@ -6820,6 +6865,7 @@ def main():
             tile_size=args.tile_size,
             scale_bandwidth=not args.no_scale_bandwidth,
             base_tile_size=args.base_tile_size,
+            dram_energy_override=args.dram_energy,
             verbose=args.verbose,
             # Per-variant Eyeriss sizes for fairness
             single_gb_size_kb=args.single_gb_size,
@@ -6858,6 +6904,7 @@ def main():
             output_reg_entries=args.output_reg,
             tile_size=args.tile_size,
             intermediate_level_override=args.intermediate_level,
+            dram_energy_override=args.dram_energy,
             verbose=args.verbose,
         )
 

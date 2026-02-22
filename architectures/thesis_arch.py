@@ -62,8 +62,8 @@ class ThesisArchConfig:
     wmem_write_bandwidth: int = 16          # WMEM write bandwidth
     
     # === Technology Parameters ===
-    technology: str = "22nm"           # Technology node for Accelergy
-    technology_scale: float = 0.5      # Scale factor (e.g., 0.5 for 12nm from 22nm)
+    technology: str = "12nm"           # Technology node for Accelergy
+    technology_scale: float = 1     
     
     # === Memory Organization (for Accelergy) ===
     fmem_word_bits: int = 1056         # FMEM wordline width (132 bytes)
@@ -1207,8 +1207,8 @@ class EyerissArchConfig:
     register_bandwidth: int = 4        # Register bandwidth
     
     # === Technology Parameters ===
-    technology: str = "22nm"
-    technology_scale: float = 0.5  # Scale factor (e.g., 0.5 for 12nm from 22nm)
+    technology: str = "12nm"
+    technology_scale: float = 1.0  # Scale factor (1.0 = Accelergy handles 12nm directly)
     
     # === Workload ===
     num_fused_layers: int = 1
@@ -2681,8 +2681,8 @@ def get_baseline_config() -> ThesisArchConfig:
         weight_memory_size_B=524 * 1024,
         pe_rows=16,
         pe_cols=128,
-        technology="22nm",
-        technology_scale=0.5,  # Scale to 12nm
+        technology="12nm",
+        technology_scale=1.0,  # Accelergy handles 12nm directly
     )
 
 
