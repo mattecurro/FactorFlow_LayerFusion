@@ -1,0 +1,77 @@
+\chapter{Related Works}
+This chapter reviews the literature and technological landscape that contextualizes the proposed dataflow-level framework for scheduling multiple fused layers. 
+
+
+\section{Exploring Layer-By-Layer Dataflows}
+
+With the advent of spatial architectures (SAs), the \emph{mapping problem} became a central concern. This, in turn, created a need for general techniques applicable across diverse SAs and workloads. Research has progressed along two complementary fronts: (i) analytical modeling frameworks that capture the salient microarchitectural features of SAs to provide fast, reasonably accurate performance and energy estimates for candidate mappings, and (ii) automated mappers that use these models as feedback to explore the map-space and identify high-quality schedules and dataflows \cite{parashar2019timeloop, Factorflow}. 
+
+\subsection{Timeloop}
+
+Timeloop \cite{parashar2019timeloop} is a foundational infrastructure for evaluating and exploring the architectural design space of deep-learning accelerators based on SAs. Its objective is to place different accelerators on a level playing field with respect to mappings, thereby providing insights that can guide future SA designs. To that end, it adopts a mapper–model paradigm: the mapper searches for high-quality mappings that the model can use to fairly compare SAs, while the model supplies feedback to the mapper during the search. This innovation has made Timeloop a reference point for subsequent work in the area.
+
+At the core of its analytical model, Timeloop introduces a nested-loop representation of workloads, primarily convolutions, in which each loop-body iteration corresponds to a Multiply-and-Accumulate (MAC) operation. 
+Unfortunately, Timeloop is not efficient for simpler but very common workloads, like GEneral Matrix Multiplications (GEMMs).
+Mappings are then expressed as tilings and permutations of these loops across the SA’s memory hierarchy and PE mesh; however, spatial fanout levels are handled implicitly. From these abstractions, Timeloop constructs the map-space for any SA–convolution pair, focusing particularly on the unconstrained map-space. 
+
+Given this representation, computation and data-movement patterns in neural-network kernels can be inferred analytically, enabling Timeloop to estimate throughput and access counts. By combining these results with Accelergy \cite{wu2019accelergy}, Timeloop achieves rapid estimations, avoiding the need for slow gate-level simulations after physical layout, while maintaining 95\% accuracy against well-known SAs like Eyeriss. Because Timeloop was designed primarily as a comparative tool for SAs, its map-space exploration strategies are intentionally simple, relying on exhaustive or random search to ensure consistency within modest runtimes.
+
+
+\subsection{FactorFlow}
+
+FactorFlow \cite{Factorflow} introduces an automatic framework comprising an analytical model and a mapper specifically tailored for General Matrix Multiplications (GEMMs) \cite{1} and convolutions. 
+The architectural model is fully flexible and expressed via components reflecting the description in Section \ref{sec:bg-cost-model}. 
+
+Compared to Timeloop, FactorFlow provides explicit modeling of spatial fanout levels, including the interconnections between inner instances and the rest of the memory hierarchy. It introduces toggles for multicast and reduction capabilities and details implemented communication styles (e.g., forwarding, one-to-one, one-to-many). All levels can individually specify their supported dataflows; spatial fanouts, in particular, must specify which or how many dimensions can leverage reuse if they are spatially unrolled. 
+
+FactorFlow's model is significantly more lightweight than convolution-focused alternatives for the evaluation of GEMMs, consistently discovers near-optimal mappings, achieving 1-161$\times$ better Energy-Delay Product (EDP) with up to 205$\times$ lower execution times compared to other state-of-the-art mapping tools \cite{Factorflow}.
+
+\subsection{Motivation for a FactorFlow-based Extension}
+
+The primary motivation for selecting FactorFlow as the baseline for this framework lies in the industry-wide architectural shift driven by Transformer networks, which has positioned GEMMs as the dominant computational bottleneck \cite{1}. While existing state-of-the-art mapping tools can handle GEMMs, they fundamentally treat them as convolutions with three out of six dimensions set to one \cite{Factorflow}. This abstraction introduces severe modeling overheads and relies on mapping techniques that fail to leverage GEMM-specific characteristics, causing them to struggle when generating optimal mappings in a reasonable timeframe \cite{Factorflow}. 
+
+FactorFlow circumvents these limitations, furthermore, by integrating QuickFlow  \cite{Quickflow} as a mapper, which flips the traditional mapping order by choosing factors first (tiling and parallelism) and subsequently picking the best permutation in one shot, FactorFlow yields 1–2.1$\times$ better EDP with up to 182$\times$ less runtime than generalized baselines also for convolutions. 
+
+For a framework aiming to explore fused-layer dataflows, where the map-space grows exponentially with each additional fused layer, starting from a baseline that can evaluate mappings efficiently is not merely an optimization; it is a strict necessity. 
+
+
+
+
+\section{Fused-Layer DF Exploration Framework}
+
+\subsection{DeFiNES}
+DeFiNES \cite{mei2023defines} introduces a comprehensive framework for exploring the depth-first (DF) \ref{sec:depth-first} scheduling space. It builds upon LOMA \cite{symons2021loma}, a analytical mapping framework designed to evaluate loop-order-based memory allocation, by extending its capabilities to cross-layer schedules.
+However, the evaluation of mappings within LOMA lacks the time efficiency demonstrated by more recent works\cite{Quickflow}, which can limit the scalability of the exploration for a mapper.
+DeFiNES formalizes the depth-first design space along three primary axes: (i) the tile size at the final layer, (ii) the overlap storing mode (i.e., caching policies \ref{sec:caching-policies}), and (iii) the fuse depth. 
+
+A key contribution of DeFiNES is its unified analytical cost model for estimating latency and energy. Unlike prior works that often limit their scope to DRAM and activation memory accesses, DeFiNES accounts for the full on-chip multi-level memory hierarchy and explicitly models weight traffic. By evaluating the system comprehensively, DeFiNES demonstrates that partial architectural models can be misleading, reporting up to a $10\times$ improvement in the quality of found solutions when both full memory hierarchy and weight costs are considered. Furthermore, DeFiNES provides extensive case studies detailing the trade-offs between different DF schedules and illustrating how workload characteristics and hardware architecture influence the optimal scheduling strategy.
+
+\subsection{LoopTree}
+LoopTree \cite{gilbert2024looptree} proposes an extensive design space and a corresponding analytical model to evaluate latency, energy, buffer capacity, and off-chip transfers for fused-layer dataflows. It models complex trade-offs involving inter-layer tiling, data retention, and recomputation. 
+
+While LoopTree excels as a highly accurate analytical model and baseline comparator, its primary weakness lies in its map-space exploration mechanism. Because LoopTree is built as an extension of Timeloop, it inherits Timeloop's generalized, exhaustive mapping strategies. Within the context of layer-by-layer optimization, exhaustive search is merely slow; however, in a fused-layer paradigm—where the map-space grows exponentially with each additional fused layer and tile size variation—this approach struggles to scale. Consequently, while LoopTree serves as a robust analytical comparator, it is severely bottlenecked during the search process, making it difficult to rely on for finding optimal solutions within a competitive runtime.
+
+A further distinction between LoopTree and the framework proposed in this thesis lies in the representational approach. LoopTree introduces a tree-based taxonomy to specify inter-layer dependencies and dataflows, which represents a structural departure from traditional nested-loop abstractions. In contrast, our approach proposes a cohesive and organic extension to the existing FactorFlow syntax, maintaining structural consistency while seamlessly introducing fused-layer capabilities.
+
+\section{Hardware Implementations of Layer Fusion}
+
+The theoretical benefits of layer fusion have been heavily substantiated by dedicated silicon and FPGA implementations, which demonstrate the empirical value of avoiding intermediate memory round-trips. For instance, classic fused-layer CNN accelerators have shown that layer fusion of initial five convolutional layers of the VGG-E (a weight dominant workload) layer fusion reduces off-chip data transfers by approximately 95\% (from 77\,MB down to 3.6\,MB) while requiring only a modest increase in on-chip storage \cite{alwani2016fusedlayer}.
+
+\subsection{ISAAC and DepFiN}
+
+Building upon these principles, the ISAAC \cite{shafiee2016isaac} architecture exemplifies a pipelined, fused organization tailored for in-situ analog processing. Central to ISAAC's design is the memristor crossbar array, a dense hardware matrix where computational weights are stored as programmable resistances at the cross-points of conductive wires. This structure allows MAC operations to be performed directly in the analog domain as voltages pass through the grid, meaning the weights remain completely stationary. To enable fusion, eDRAM buffers stage inter-layer data, allowing subsequent layers to commence computation as soon as a minimal activation window is generated.
+
+More recently, depth-first silicon implementations such as \emph{DepFiN} \cite{goetschalckx2023depfin} have pushed the boundaries of fusion for high-resolution pixel processing workloads. DepFiN relies on a control flow that supports frequent inter-layer switching to keep intermediate feature maps on-chip. This architecture achieves a reported on the MC-CNN-fast workload up to $18\times$ system-level efficiency gains when compared to a conventional layer-by-layer processor with equivalent core-level efficiency. 
+
+The tremendous physical performance gains demonstrated by hardware like ISAAC and DepFiN strongly motivate the need for generalized exploration frameworks—such as the one proposed in this thesis—capable of automatically navigating the complex scheduling and mapping spaces these accelerators introduce.
+
+\section{Broader Landscape of Layer Fusion}
+
+Beyond the foundational frameworks and hardware implementations discussed above, the state of art literature explores specific facets of the layer fusion paradigm. Works such as \emph{ConvFusion} \cite{convfusion}, various Fused-layer CNN architectures \cite{fusedlayercnn}, and hardware-software co-design strategies like HW Flow Fusion \cite{hwflowfusion} have proposed targeted techniques to minimize intermediate data transfers. Similarly, structural methodologies like \emph{Fusion Frame} \cite{fusionframe} offer standardized approaches to identifying fusion opportunities. While these contributions provide valuable optimizations for specific network topologies or fixed hardware dataflows, they generally lack the generalized, search-based mapping capabilities necessary to automatically optimize schedules across diverse spatial architectures. 
+
+\subsection{Graph-Level vs. Dataflow-Level Fusion: Optimus}
+
+When discussing automated fusion exploration, it is critical to distinguish between graph-level decisions and dataflow-level mapping. \emph{Optimus} \cite{optimus} exemplifies a state-of-the-art approach to the former. It operates as a graph-level compiler, employing memory-aware heuristics to determine exactly \emph{which} layers within a neural network should be fused to avoid memory bottlenecks. 
+
+
+

@@ -5,7 +5,7 @@ from copy import deepcopy
 from settings import *
 from factors import *
 from utils import *
-from heuristic_check import ConvolutionScheduleValidator
+from pruning_check import ConvolutionScheduleValidator
 import re
 
 if TYPE_CHECKING:

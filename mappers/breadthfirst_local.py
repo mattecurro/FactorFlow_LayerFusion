@@ -14,7 +14,7 @@ from prints import *
 from cost_model import *
 from utils import *
 from arch import *
-from heuristic_check import ConvolutionScheduleValidator
+from pruning_check import ConvolutionScheduleValidator
 
 # TODO: put me in an inner scope!!!
 candidate_perms_per_mem_level : list[list[str]] = []

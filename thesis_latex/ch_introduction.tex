@@ -1,0 +1,238 @@
+% ====================================================================
+%  CHAPTER: INTRODUCTION
+% ====================================================================
+\chapter{Introduction}
+\label{ch:introduction}
+
+% ====================================================================
+%  §1  CONTEXT
+% ====================================================================
+\section{Context}
+\label{sec:intro-context}
+
+Deep neural networks (DNNs) have become the dominant computational
+paradigm across a wide range of applications, from image classification
+and object detection to natural language processing and autonomous
+driving~\cite{lecun2015deep}.
+The computational cost of modern DNNs, however, is immense: a single
+inference pass of a large convolutional network such as VGG16 requires
+billions of multiply-and-accumulate (MAC) operations, while training
+demands orders of magnitude more~\cite{vgg_paper}.
+General-purpose processors---CPUs and GPUs---struggle to deliver the
+energy efficiency and throughput required by edge and data-centre
+deployments, motivating the development of dedicated \emph{spatial
+architectures} (SAs): custom accelerators that exploit massive
+data-level parallelism through arrays of processing elements (PEs)
+interconnected by an on-chip network~\cite{sze2017efficient}.
+
+The performance and energy efficiency of a spatial architecture depend
+not only on its hardware design but, critically, on the \emph{mapping}:
+a schedule that determines the order in which loop iterations are
+executed, how data are tiled and distributed across PEs, and which
+operands are retained in each level of the memory hierarchy.
+For a single convolutional layer on a moderately complex SA, the
+resulting \emph{map space}---the set of all valid mappings---already
+exceeds $10^{19}$ candidates~\cite{Factorflow}, making exhaustive
+search intractable and motivating the development of analytical cost
+models and automated mappers.
+
+Several frameworks have been proposed to address this challenge.
+\textbf{Timeloop}~\cite{parashar2019timeloop} introduced the
+mapper--model paradigm, pairing a search engine with an analytical
+cost model that estimates energy, latency, and data movement for
+each candidate mapping.
+\textbf{FactorFlow}~\cite{Factorflow} reformulated the problem
+by adopting the extended Einsum notation~\cite{een} and treating
+the map space as a factor-manipulation problem, enabling a broader
+class of mappers---linear, quadratic, and hybrid---to navigate the
+space more efficiently.
+
+% ====================================================================
+%  §2  MOTIVATION
+% ====================================================================
+\section{Motivation}
+\label{sec:intro-motivation}
+
+Despite their effectiveness, both Timeloop and FactorFlow operate
+on a \emph{single layer at a time}.
+In a layer-by-layer execution model, every intermediate activation
+tensor is written to off-chip DRAM after one layer completes and
+read back when the next layer begins.
+Because DRAM accesses are roughly two orders of magnitude more
+expensive than on-chip SRAM accesses in terms of energy, this
+ping-pong pattern dominates the total energy budget for many
+workloads~\cite{sze2017efficient}.
+
+\emph{Layer fusion} addresses this bottleneck by computing
+multiple consecutive layers in a single, interleaved schedule.
+Intermediate activations are produced and consumed entirely
+within on-chip buffers, eliminating the round trip through DRAM.
+Hardware implementations such as DepFiN~\cite{goetschalckx2023depfin}
+have demonstrated that depth-first, fused execution can achieve
+significant energy savings for activation-dominant workloads.
+
+However, reasoning about fused-layer mappings is far more complex
+than the single-layer case.
+Fusing $L$~layers multiplies the number of loop dimensions,
+introduces cascading tile-size dependencies between producers
+and consumers, creates five distinct operand categories
+(input activations, output activations, weights,
+intermediate-input, and intermediate-output), and
+causes the map space to grow to astronomical proportions.
+For an 8-layer fusion of FSRCNN on DepFiN, the map space
+exceeds $10^{463}$~candidates---over 400~orders of magnitude
+larger than the single-layer space~\cite{Factorflow}.
+Existing fused-layer exploration frameworks, such as
+DeFiNES~\cite{DeFiNES} and LoopTree~\cite{LoopTree}, make
+progress on this front but typically impose constraints on the
+schedule structure or the set of admissible dataflows.
+No prior tool extends the full generality of the FactorFlow
+factor-manipulation paradigm to multi-layer fusion.
+
+% ====================================================================
+%  §3  OBJECTIVES
+% ====================================================================
+\section{Objectives}
+\label{sec:intro-objectives}
+
+The primary objective of this thesis is to extend FactorFlow with
+support for fused-layer mappings, producing a tool that can:
+%
+\begin{enumerate}
+  \item \textbf{Represent} fused-layer computations within the
+        existing extended Einsum and factor-based framework, using
+        aliasing and decoupling to unify multi-layer loop nests
+        without sacrificing per-layer independence.
+
+  \item \textbf{Navigate} the combinatorial fused-layer map space
+        through a depth-first scheduling heuristic that prunes
+        infeasible mappings by enforcing the producer--consumer
+        tile-size inequality at every hierarchy level.
+
+  \item \textbf{Evaluate} candidate fused-layer mappings with an
+        analytical cost model that accounts for per-layer memory
+        operations, energy (via Accelergy~\cite{accelergy}), and
+        latency---including bandwidth-limited stall cycles.
+
+  \item \textbf{Validate} the extended model against a published
+        hardware baseline (DepFiN), demonstrating that the
+        analytical predictions match the reference design within
+        an acceptable error margin.
+
+  \item \textbf{Explore} the design space by conducting sensitivity
+        analyses on two spatial architectures (DepFiN and Eyeriss~v1)
+        and four CNN workloads, comparing full fusion, partial fusion,
+        and single-layer execution modes.
+\end{enumerate}
+
+% ====================================================================
+%  §4  CONTRIBUTIONS
+% ====================================================================
+\section{Contributions}
+\label{sec:intro-contributions}
+
+The main contributions of this work are:
+%
+\begin{enumerate}
+  \item \textbf{Formal representation of fused-layer mappings.}
+        A representation scheme based on \emph{aliasing} of
+        shared activation dimensions and \emph{decoupling} of
+        per-layer weight dimensions, which integrates multi-layer
+        fusion into the FactorFlow factor-based abstraction without
+        altering its single-layer semantics
+        (Chapter~\ref{ch:proposed-solution},
+         Section~\ref{sec:ps-modeling}).
+
+  \item \textbf{Depth-first scheduling heuristic.}
+        A validity heuristic that enforces the cascading
+        tile-size inequality at every hierarchy level,
+        enabling the mapper to prune infeasible regions
+        of the map space before cost evaluation
+        (Chapter~\ref{ch:proposed-solution},
+         Section~\ref{sec:ps-heuristic}).
+
+  \item \textbf{Per-layer cost-model extensions.}
+        Generalisation of the single-layer cost model to
+        compute memory operations, energy, and latency
+        on a per-layer basis, including a stall-cycle model
+        that detects bandwidth-limited memory levels
+        (Chapter~\ref{ch:proposed-solution},
+         Section~\ref{sec:ps-cost-model}).
+
+  \item \textbf{Tool implementation.}
+        A complete Python implementation extending the FactorFlow
+        codebase, comprising workload, architecture, and mapping
+        specification modules, a cost-model engine, and a set
+        of mappers (linear, quadratic, hybrid)
+        (Chapter~\ref{ch:proposed-solution},
+         Section~\ref{sec:ps-implementation}).
+
+  \item \textbf{Validation against DepFiN.}
+        A validation study reproducing the depth-first execution
+        of an 11-layer FSRCNN workload on the DepFiN accelerator,
+        comparing model predictions against published silicon data
+        (Chapter~\ref{ch:validation}).
+
+  \item \textbf{Experimental design-space exploration.}
+        A comprehensive set of experiments covering two
+        architectures (DepFiN-like and Eyeriss-v1-like),
+        four CNN workloads (FSRCNN, MC-CNN, VGG16, ResNet18),
+        and three fusion modes (full, partial, single-layer),
+        quantifying the energy, latency, and
+        energy-delay product trade-offs of layer fusion.
+\end{enumerate}
+
+% ====================================================================
+%  §5  THESIS ORGANISATION
+% ====================================================================
+\section{Thesis Organisation}
+\label{sec:intro-organisation}
+
+The remainder of this thesis is organised as follows.
+
+\begin{description}
+  \item[Chapter~\ref{ch:background} --- Background.]
+    Introduces the foundational concepts: artificial intelligence
+    and deep learning, DNN workloads and the extended Einsum notation,
+    hardware acceleration with spatial architectures, the mapping
+    problem and map-space explosion, analytical cost modelling,
+    and layer fusion.
+
+  \item[Chapter~3 --- Related Works.]
+    Reviews the state of the art in layer-by-layer dataflow
+    exploration (Timeloop, FactorFlow), fused-layer frameworks
+    (DeFiNES, LoopTree), hardware implementations (ISAAC, DepFiN),
+    and graph-level optimisation tools (Optimus).
+
+  \item[Chapter~\ref{ch:fused-design-space} --- Fused-Layer
+    Mapping Design Space.]
+    Characterises the fused-layer mapping problem: the
+    proliferation of dimensions, cascading tile dependencies,
+    the five operand categories, data-reuse strategies
+    (immediate, buffered, fully cached), and the combinatorial
+    growth of the map space.
+
+  \item[Chapter~\ref{ch:proposed-solution} --- Proposed Solution.]
+    Presents the FactorFlow extension: the aliasing and decoupling
+    model, the depth-first scheduling heuristic, cost-model
+    generalisations, and implementation details.
+
+  \item[Chapter~\ref{ch:validation} --- Validation.]
+    Validates the extended model against the DepFiN accelerator
+    executing an 11-layer FSRCNN workload, analysing the
+    agreement between predicted and published data-movement
+    and energy figures.
+
+  \item[Chapter~7 --- Experimental Results.]
+    Reports the design-space exploration: experimental setup
+    (architectures, workloads, metrics), single-architecture
+    sensitivity analyses (tile size, PE count, register sizing),
+    and the layer-fusion comparison across full, partial, and
+    single-layer execution modes.
+
+  \item[Chapter~8 --- Conclusions and Future Work.]
+    Summarises the findings and outlines directions for
+    future research, including support for residual connections,
+    automated architecture sizing, and integration with
+    graph-level scheduling.
+\end{description}
