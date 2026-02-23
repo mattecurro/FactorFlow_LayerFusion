@@ -1,0 +1,1066 @@
+% ====================================================================
+%  CHAPTER: PROPOSED SOLUTION
+% ====================================================================
+\chapter{Proposed Solution}
+\label{ch:proposed-solution}
+
+% ====================================================================
+%  §1  INTRODUCTION
+% ====================================================================
+\section{Introduction}
+\label{sec:ps-intro}
+
+Chapter~\ref{ch:fused-design-space} characterised the fused-layer
+mapping design space: the proliferation of dimensions
+(Section~\ref{sec:fds-dim-proliferation}), the five operand categories
+(Section~\ref{sec:fds-five-operands}), the cascading tile dependencies
+(Section~\ref{sec:fds-tile-deps}), and the combinatorial growth of the
+map space to magnitudes exceeding $10^{463}$
+(Section~\ref{sec:fds-cardinality}).
+This chapter presents how \textbf{FactorFlow} is extended to model,
+evaluate, and navigate that space.
+
+The extension rests on three conceptual pillars, presented in
+Section~\ref{sec:ps-modeling}:
+\emph{aliasing}, which captures the two-sided view of every
+intermediate activation — produced by one layer, consumed by the next;
+\emph{decoupling}, which isolates per-layer weight dimensions so that
+each layer's tiling remains locally independent; and a
+\emph{depth-first scheduling heuristic}, which prunes infeasible
+mappings at every hierarchy level by enforcing the producer--consumer
+tile-size inequality.
+
+Section~\ref{sec:ps-abstraction} describes the concrete data structures
+that extend FactorFlow's workload, architecture, and mapping
+specifications to multi-layer fusion.
+Section~\ref{sec:ps-cost-model} develops the per-layer cost-model
+extensions — memory operations, energy, and latency with
+bandwidth-limited stall detection — that generalise the single-layer
+model of Section~\ref{sec:bg-cost-model}.
+Section~\ref{sec:ps-implementation} discusses the implementation: the
+overall code structure, the \texttt{moveFactor} mapper primitive, and
+the current limitations.
+Section~\ref{sec:ps-summary} summarises the contributions.
+
+
+% ====================================================================
+%  §2  MODELING FUSED COMPUTATION
+% ====================================================================
+\section{Modeling Fused Computation}
+\label{sec:ps-modeling}
+
+A fused group of $F$ consecutive convolution layers executes as a
+single, unified loop nest over a combined set of dimensions
+$\mathcal{D}$ (cf.\ Equation~\ref{eq:fused-dims}).
+Three modelling concepts govern how FactorFlow represents the
+inter-layer relationships within this unified nest.
+
+% --------------------------------------------------------------------
+\subsection{Dimension Aliasing}
+\label{sec:ps-aliasing}
+
+When layers are fused, each intermediate activation $A_i$
+($0 \le i \le F\!-\!2$) serves a dual role: it is the \emph{output} of
+layer~$i$ and the \emph{input} of layer~$i\!+\!1$.
+In the unified loop nest this duality manifests as two separate
+coupling entries — one for the \texttt{int\_out} operand and one for
+the \texttt{int\_in} operand — that index the \emph{same} physical
+tensor.
+
+Consider the 11-layer ($F\!=\!11$) fusion used in the validation
+workload (Chapter~\ref{ch:validation}).
+For the connection between layer~$i$ and layer~$i\!+\!1$
+($i = 0, \dots, 8$), the two coupling entries are:
+
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Operand}  & \textbf{Coupling entry} & \textbf{Indexing of~$A_i$} \\
+  \midrule
+  \texttt{int\_out}$[i]$
+      & $[\,Z_i,\; Y_i,\; X_i\,]$
+      & $A_i[\,z_i,\; y_i,\; x_i\,]$ \\[4pt]
+  \texttt{int\_in}$[i]$
+      & $[\,C_{i+1},\; [Y_{i+1},R_{i+1}],\; [X_{i+1},S_{i+1}]\,]$
+      & $A_i[\,c_{i+1},\; y_{i+1}\!+\!r_{i+1},\; x_{i+1}\!+\!s_{i+1}\,]$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Both entries address the same tensor~$A_i$, yet they use
+\emph{different loop variables}.
+The dimensions that appear in both coupling entries — albeit under
+different names — are said to be \emph{aliased}:
+
+\begin{itemize}
+  \item \textbf{Channel aliasing.}
+        $Z_i$ (the number of output filters of layer~$i$) and
+        $C_{i+1}$ (the number of input channels of layer~$i\!+\!1$)
+        index the same physical channel axis of~$A_i$.
+        Within the unified loop nest they are distinct dimensions, but
+        their tiles must satisfy
+        $C_{i+1}^{(l)} \le Z_i^{(l)}$ at every hierarchy level~$l$:
+        one cannot read more channels than have been produced.
+
+  \item \textbf{Spatial aliasing.}
+        The producer writes $A_i$ at position $(y_i,\, x_i)$ using
+        \emph{normal} indexing (Section~\ref{sec:normal-affine});
+        the consumer reads it at
+        $(y_{i+1}\!+\!r_{i+1},\; x_{i+1}\!+\!s_{i+1})$ using
+        \emph{affine} indexing.
+        The maximum row accessed by the consumer is
+        $Y_{i+1} + R_{i+1} - 1$; the maximum column is
+        $X_{i+1} + S_{i+1} - 1$.
+        For the producer's tile to contain every element that the
+        consumer will read, the following must hold at every hierarchy
+        level:
+\end{itemize}
+
+\begin{equation}
+\label{eq:ps-alias-height}
+  Y_{i+1}^{(l)} + R_{i+1}^{(l)} - 1
+  \;\le\;
+  Y_i^{(l)},
+\end{equation}
+\begin{equation}
+\label{eq:ps-alias-width}
+  X_{i+1}^{(l)} + S_{i+1}^{(l)} - 1
+  \;\le\;
+  X_i^{(l)},
+\end{equation}
+
+\noindent
+where the superscript $(l)$ denotes the tile size (number of
+iterations) at hierarchy level~$l$.
+These are the same cascading constraints introduced qualitatively in
+Section~\ref{sec:fds-tile-deps}; here they are formalised as
+consequences of the aliasing between \texttt{int\_out} and
+\texttt{int\_in}.
+
+For the two boundary connections the indexing adjusts.
+The final layer ($i = F\!-\!1$) uses the global output dimensions
+$P$ and $Q$ instead of intermediate spatial variables:
+$\texttt{int\_in}[F\!-\!2] = [\,C_{F-1},\;[P,\,R_{F-1}],\;
+[Q,\,S_{F-1}]\,]$.
+Similarly, the first layer's input uses the global input coupling:
+$\texttt{in} = [\,C_0,\;[Y_0,\,R_0],\;[X_0,\,S_0]\,]$.
+
+Aliasing is \emph{implicit} in FactorFlow's data structures: no
+explicit pointer links $Z_i$ to $C_{i+1}$.
+Instead, the constraint is enforced by the depth-first scheduling
+heuristic (Section~\ref{sec:ps-heuristic}), which is evaluated after
+every candidate mapping modification.
+
+
+% --------------------------------------------------------------------
+\subsection{Dimension Decoupling}
+\label{sec:ps-decoupling}
+
+Not all inter-layer relationships are aliased.
+Each layer~$i$ possesses its own set of \emph{weight dimensions} —
+$Z_i$, $C_i$, $R_i$, $S_i$ — that appear exclusively in the
+\texttt{w\_coupling} entry for that layer.
+These dimensions are \textbf{orthogonal across layers}: the weight
+dimensions of layer $j \neq i$ never appear in $W_i$'s coupling, and
+their tiling factors can vary independently.
+
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Layer} & \textbf{Weight coupling} & \textbf{Independent dims} \\
+  \midrule
+  $L_0$       & $[\,Z_0,\; C_0,\; R_0,\; S_0\,]$
+              & $\{Z_0,\, C_0,\, R_0,\, S_0\}$ \\
+  $L_1$       & $[\,Z_1,\; C_1,\; R_1,\; S_1\,]$
+              & $\{Z_1,\, C_1,\, R_1,\, S_1\}$ \\
+  $\vdots$    & $\vdots$ & $\vdots$ \\
+  $L_{F-1}$   & $[\,Z_{F-1},\; C_{F-1},\; R_{F-1},\; S_{F-1}\,]$
+              & $\{Z_{F-1},\, C_{F-1},\, R_{F-1},\, S_{F-1}\}$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Decoupling has two important consequences.
+First, the tiling of $R_3$ or $S_5$ does not affect any other layer's
+data reuse — each weight tensor can be tiled optimally for its own
+layer subject only to memory capacity.
+Second, decoupled dimensions do not participate in the aliasing
+constraints of
+Equations~\ref{eq:ps-alias-height}--\ref{eq:ps-alias-width}; they are
+free to iterate at whatever granularity best suits the mapping.
+
+Together, aliasing and decoupling partition the unified dimension set
+$\mathcal{D}$ into two classes:
+\begin{enumerate}
+  \item \textbf{Aliased dimensions} — the spatial and channel
+        dimensions that are shared (albeit under different names)
+        between producer and consumer through the intermediate
+        activation.  Their tiling is \emph{coupled across layers}.
+  \item \textbf{Decoupled dimensions} — the per-layer weight
+        dimensions that affect only their own layer.  Their tiling is
+        \emph{locally independent}.
+\end{enumerate}
+
+\noindent
+For an $F$-layer 2-D convolution fusion, the aliased set contains
+the $3(F\!-\!1)$ intermediate spatial and channel dimensions
+($Y_i, X_i, Z_i$ for $i = 0, \dots, F\!-\!2$) plus $P$, $Q$, and
+the global input dimensions $C_0, Y_0, X_0$; the decoupled set
+contains $4F$ weight dimensions ($Z_i, C_i, R_i, S_i$ for each
+layer~$i$).
+Note that some dimensions, such as $Z_i$, appear in \emph{both} the
+aliased set (through channel aliasing with $C_{i+1}$) and the weight
+coupling of layer~$i$ — they are aliased with respect to the
+inter-layer link but decoupled with respect to other layers' weights.
+
+
+% --------------------------------------------------------------------
+\subsection{Depth-First Scheduling Heuristic}
+\label{sec:ps-heuristic}
+
+Aliasing introduces constraints; the depth-first scheduling heuristic
+enforces them.
+At every level~$l$ of the memory hierarchy, for every inter-layer
+connection $i \to i\!+\!1$, the following must hold:
+
+\begin{align}
+  \label{eq:ps-heuristic-width}
+  Q_i^{(l)} + S_i^{(l)} - 1 &\;\le\; X_i^{(l)}, \\[4pt]
+  \label{eq:ps-heuristic-height}
+  P_i^{(l)} + R_i^{(l)} - 1 &\;\le\; Y_i^{(l)}, \\[4pt]
+  \label{eq:ps-heuristic-channel}
+  C_{i+1}^{(l)} &\;\le\; Z_i^{(l)},
+\end{align}
+
+\noindent
+where $Q_i$ ($P_i$) denotes the output spatial dimension of the
+\emph{consumer} — that is, $X_{i+1}$ for intermediate layers, or $Q$
+($P$) for the last layer — and $S_i$ ($R_i$) is the corresponding
+weight spatial dimension of layer~$i$.
+$X_i$ ($Y_i$) is the spatial extent of the intermediate activation as
+seen by the \emph{producer}.
+
+\paragraph{Per-level enforcement.}
+Equations~\ref{eq:ps-heuristic-width}--\ref{eq:ps-heuristic-channel}
+are checked for \emph{each hierarchy level independently}.
+Consider a four-level hierarchy (DRAM, FMEM, WMEM, Compute): the
+heuristic must hold at the DRAM level, at the FMEM level, and so on.
+At each level, the "tile size" refers to the product of all iterations
+of that dimension at and below that level in the loop nest — that is,
+the total number of distinct values visited before the dimension's loop
+at that level completes one full pass.
+
+\paragraph{Multi-layer validation.}
+The implementation (\texttt{validate\_mapping\_heuristic} in
+\texttt{arch.py}) iterates from the top layer ($i = F\!-\!1$)
+downward to layer~1.
+For each layer, it constructs the appropriate dimension triplets — for
+width ($Q_i$, $S_i$, $X_i$), for height ($P_i$, $R_i$, $Y_i$), and
+for channel depth ($C_{i+1}$, $Z_i$) — and invokes the per-triplet
+validator.
+The height and channel checks are only performed if the corresponding
+dimensions exist in the loop order, ensuring graceful handling of 1-D
+convolutions or other reduced-dimensionality workloads.
+
+\paragraph{Initial condition.}
+An additional constraint requires that the innermost loop with more
+than one iteration (i.e., the first non-trivial loop from the bottom
+of the nest) must be an \emph{input spatial dimension} of some layer,
+not an output or weight spatial dimension.
+This ensures that the very first iterations produce data that
+subsequent iterations can consume, rather than attempting to consume
+before anything has been produced.
+
+\paragraph{Necessary but not sufficient.}
+The heuristic is a \emph{necessary} condition for a valid depth-first
+schedule: any mapping that violates it will certainly attempt to read
+intermediate data that has not yet been produced.
+However, it is not by itself sufficient to guarantee correctness in all
+corner cases — for instance, it does not verify that the exact
+iteration order within a level respects the sequential write-then-read
+discipline.
+In practice, combining the heuristic with the constrained loop
+orderings enforced by the architecture specification
+(Section~\ref{sec:ps-arch-spec}) eliminates all observed false
+positives in the configurations tested.
+
+\paragraph{Integration with the mapper.}
+Every candidate mapping move (Section~\ref{sec:ps-movefactor}) can
+optionally trigger a call to the heuristic validator.
+If the move results in a mapping that violates any of
+Equations~\ref{eq:ps-heuristic-width}--\ref{eq:ps-heuristic-channel},
+the move is rolled back and marked as infeasible.
+This pruning dramatically reduces the effective search space: the
+constraint-based pruning analysis of Section~\ref{sec:fds-pruning}
+showed that the heuristic, together with architectural constraints,
+reduces the $10^{463}$-point map space of the 11-layer workload to a
+tractable subset.
+
+
+% ====================================================================
+%  §3  EXTENDING THE FACTORFLOW ABSTRACTION
+% ====================================================================
+\section{Extending the FactorFlow Abstraction}
+\label{sec:ps-abstraction}
+
+FactorFlow describes a mapping problem through three inputs: a
+\emph{workload}, an \emph{architecture}, and a \emph{mapping}.
+Each must be extended to support multi-layer fusion.
+The extensions are designed to be \emph{backward-compatible}: a
+single-layer problem is a special case with $F = 1$ and no
+intermediate operands.
+
+% --------------------------------------------------------------------
+\subsection{Workload Specification}
+\label{sec:ps-workload-spec}
+
+A workload is defined by two objects: a \textbf{Shape} and a
+\textbf{Coupling}.
+
+The \texttt{Shape} is a dictionary mapping every dimension name to its
+size.
+For a fused group of $F$ convolution layers operating on 2-D feature
+maps, the shape contains entries for:
+\begin{itemize}
+  \item $C_0$: input channels; and, for the first layer, $Y_0$ and $X_0$
+        (the intermediate spatial extent produced by layer~0).
+  \item For each layer $i = 0, \dots, F\!-\!1$: $Z_i$, $C_i$, $R_i$, $S_i$
+        (output channels, input channels, filter height, filter width).
+  \item For each intermediate $i = 1, \dots, F\!-\!2$: $Y_i$ and $X_i$
+        (spatial height and width of the intermediate activation produced
+        by layer~$i$).
+  \item $P$, $Q$: final output height and width; $Z_{F-1}$: final output
+        channels.
+\end{itemize}
+
+\noindent
+The \texttt{Coupling} encodes which dimensions index which operand.
+Its constructor accepts \emph{five} coupling lists — one for each
+operand category introduced in Section~\ref{sec:fds-five-operands}:
+
+\begin{center}
+\small
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Argument} & \textbf{Type} & \textbf{Semantics} \\
+  \midrule
+  \texttt{in\_coupling}
+      & \texttt{list}
+      & Dims indexing the global input \\
+  \texttt{w\_coupling}
+      & \texttt{dict[\,int $\to$ list\,]}
+      & Per-layer weight dims \\
+  \texttt{out\_coupling}
+      & \texttt{list}
+      & Dims indexing the global output \\
+  \texttt{int\_out\_coupling}
+      & \texttt{dict[\,int $\to$ list\,]}
+      & Per-connection producer dims \\
+  \texttt{int\_in\_coupling}
+      & \texttt{dict[\,int $\to$ list\,]}
+      & Per-connection consumer dims \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The dictionary key for \texttt{w\_coupling} is the layer index
+$i \in \{0, \dots, F\!-\!1\}$; for the intermediate couplings it is
+the connection index $i \in \{0, \dots, F\!-\!2\}$.
+Internally, the \texttt{Coupling} class stores both the raw (nested)
+and a flattened version of each coupling list.
+The flattened form is used for efficient look-ups during MOPs
+computation and constraint checking; the nested form preserves the
+affine structure for tile-size calculations.
+
+\paragraph{Affine indexing in couplings.}
+A nested list inside a coupling entry denotes affine (summed) indexing.
+For example, $[\texttt{Y1},\; \texttt{R1}]$ in
+$\texttt{int\_in\_coupling[0]}$ indicates activation indexing of the
+form $y_1 + r_1$, matching the sliding-window access pattern of a
+convolution.
+Optional stride dictionaries (\texttt{in\_strides},
+\texttt{w\_strides}, etc.) allow each contributing dimension to carry a
+multiplicative coefficient, generalising the model to strided
+convolutions (cf.\ Section~\ref{sec:normal-affine}).
+
+\paragraph{Example: two-layer convolution.}
+The coupling for a two-layer fusion ($F = 2$) provides a concrete
+illustration (cf.\ Section~\ref{sec:multi-layer-workload}):
+
+\begin{center}
+\small
+\begin{tabular}{@{}l@{\;:\;\;}l@{}}
+  \texttt{dims}
+    & $[\,C_0,\, Y_0,\, X_0,\, R_0,\, S_0,\, Z_0,\,
+       C_1,\, R_1,\, S_1,\, Z_1,\, P,\, Q\,]$ \\[3pt]
+  \texttt{in\_coupling}
+    & $[\,C_0,\; [Y_0, R_0],\; [X_0, S_0]\,]$ \\
+  \texttt{w\_coupling}
+    & $\{0\!: [\,Z_0, C_0, R_0, S_0\,],
+       \;\; 1\!: [\,Z_1, C_1, R_1, S_1\,]\}$ \\
+  \texttt{int\_out\_coupling}
+    & $\{0\!: [\,Z_0,\, Y_0,\, X_0\,]\}$ \\
+  \texttt{int\_in\_coupling}
+    & $\{0\!: [\,C_1,\; [P, R_1],\; [Q, S_1]\,]\}$ \\
+  \texttt{out\_coupling}
+    & $[\,Z_1,\, P,\, Q\,]$ \\
+\end{tabular}
+\end{center}
+
+\noindent
+Twelve dimensions, five operand categories, and the aliasing between
+$\texttt{int\_out}[0]$ and $\texttt{int\_in}[0]$ is immediately
+visible: $Z_0 \leftrightarrow C_1$ (channel aliasing),
+$(Y_0, X_0) \leftrightarrow ([P, R_1],\, [Q, S_1])$ (spatial aliasing).
+
+The pattern generalises mechanically: adding a layer appends six new
+dimensions ($Z_i, C_i, R_i, S_i, Y_i, X_i$ for intermediate layers,
+or $P, Q$ for the last), one new \texttt{w\_coupling} entry, and one
+new pair of intermediate coupling entries.
+Pre-defined coupling instances for 2, 3, 4, 5, 8, and 10-layer
+convolutions are provided in \texttt{computations.py}; larger fusions
+can be created programmatically by extending the same pattern.
+
+
+% --------------------------------------------------------------------
+\subsection{Architecture Specification}
+\label{sec:ps-arch-spec}
+
+An architecture in FactorFlow is an ordered list of \emph{levels},
+from outermost (e.g.\ DRAM) to innermost (Compute).
+Three level types are supported:
+\begin{itemize}
+  \item \textbf{MemLevel} — a storage level characterised by capacity
+        (bytes), per-access energy (picojoules per byte), separate read
+        and write bandwidths (bytes per cycle), a bypass list, and
+        optional factors and dataflow constraints.
+  \item \textbf{FanoutLevel} — a spatial unrolling level with a fixed
+        mesh size and the dimensions across which data is distributed.
+  \item \textbf{ComputeLevel} — the innermost functional unit
+        performing the MAC operation, with a fixed compute energy and
+        latency (cycles per operation).
+\end{itemize}
+
+\paragraph{Five-category bypasses.}
+The single-layer FactorFlow uses three bypass tags
+(\texttt{in}, \texttt{w}, \texttt{out}).
+The multi-layer extension adds \texttt{int\_in} and \texttt{int\_out},
+enabling per-level control over which intermediate operands are stored.
+A level's bypass list specifies which operand categories are
+\emph{not} stored at that level — equivalently, which operands "pass
+through" without incurring local access energy.
+
+As an example, the DepFiN architecture
+(cf.\ Table~\ref{tab:bypass-depfin}) specifies:
+\begin{center}
+\small
+\begin{tabular}{ll}
+  \toprule
+  \textbf{Level} & \textbf{Bypassed operands} \\
+  \midrule
+  DRAM           & \texttt{int\_in}, \texttt{int\_out} \\
+  FeatureMemory  & \texttt{w} \\
+  WeightMemory   & \texttt{in}, \texttt{int\_in},
+                   \texttt{int\_out}, \texttt{out} \\
+  AccReg         & \texttt{in}, \texttt{w}, \texttt{int\_in} \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Critically, both \texttt{int\_in} and \texttt{int\_out} bypass DRAM:
+intermediate activations never leave the chip.
+They are stored exclusively in the FeatureMemory (FMEM), achieving the
+inter-layer data reuse that motivates fusion
+(Section~\ref{sec:fds-immediate-reuse}).
+
+\paragraph{Per-layer fanout levels.}
+In a fused architecture, the systolic array is time-shared among layers
+(Section~\ref{sec:fds-sequential}).
+Each layer~$i$ distributes its computation across a dedicated pair of
+fanout levels — $\texttt{SACols\_}i$ along the spatial width dimension
+$X_i$ (or $Q$ for the last layer) and $\texttt{SARows\_}i$ along the
+output-channel dimension $Z_i$.
+The mesh sizes are fixed by the hardware ($128$~columns $\times$
+$16$~rows for DepFiN), and the corresponding factors are set as
+equality constraints, e.g.\ $X_i = 128$, $Z_i = 16$.
+
+Since only one layer executes on the PE array at a time, the per-layer
+fanout levels model the same physical hardware; the cost model
+accumulates their contributions sequentially
+(Section~\ref{sec:ps-latency}).
+
+\paragraph{Dataflow and factors constraints.}
+Each \texttt{MemLevel} can specify:
+\begin{itemize}
+  \item A \texttt{dataflow\_constraints} list, fixing the loop
+        ordering at that level.  For instance, the WeightMemory in
+        DepFiN constrains all weight dimensions
+        ($Z_i, C_i, R_i, S_i$ for every~$i$) to be the innermost
+        loops, ensuring maximal weight reuse.
+  \item A \texttt{factors\_constraints} dictionary, fixing the number
+        of iterations of specified dimensions.  For example,
+        $\{C_i\!: 32\}$ forces the innermost weight loop on the
+        channel dimension to tile by~32, while $\{R_i\!: 3,\; S_i\!: 3\}$
+        places the full $3 \times 3$ filter at that level.
+\end{itemize}
+
+\noindent
+The method \texttt{enforceFactorsConstraints} distributes the
+constraint factors automatically upon initialisation, moving the
+required prime factors from the innermost level (where all factors
+start) to the constrained level.
+
+
+% --------------------------------------------------------------------
+\subsection{Mapping Specification}
+\label{sec:ps-mapping-spec}
+
+A mapping in FactorFlow is defined by two pieces of information at
+every level of the architecture:
+\begin{enumerate}
+  \item The \textbf{factors allocation}: the prime-factorised tiling
+        factors assigned to each dimension at that level, determining
+        how many iterations of each dimension execute there
+        (cf.\ Section~\ref{sec:tiling}).
+  \item The \textbf{dataflow}: the ordering of dimensions at that
+        level, determining the loop nesting and hence which operand
+        enjoys innermost reuse
+        (cf.\ Section~\ref{sec:loop-ordering}).
+\end{enumerate}
+
+\noindent
+The product of a dimension's factors across all levels must equal the
+dimension's full size (completeness), and the tile sizes at each level
+must respect the capacity and equality constraints attached to that
+level (feasibility).
+
+For fused mappings, the factors allocation spans all $|\mathcal{D}|$
+dimensions — both aliased and decoupled — and the heuristic of
+Section~\ref{sec:ps-heuristic} adds an additional feasibility filter
+on top of the standard capacity constraints.
+
+\paragraph{Initialisation sequence.}
+Mapping construction follows a deterministic five-step sequence:
+\begin{enumerate}
+  \item \texttt{initFactors}: all prime factors of every dimension
+        are placed on the innermost level.
+  \item \texttt{enforceFactorsConstraints}: factors are moved outward
+        to satisfy each level's equality ($=$) and lower-bound
+        ($\ge$) constraints, using \texttt{moveFactor}
+        (Section~\ref{sec:ps-movefactor}) with constraint checking
+        temporarily disabled.
+  \item \texttt{setupBypasses}: for each bypassed operand, the last
+        non-bypassing \texttt{MemLevel} receives a pointer to the
+        chain of bypassed levels it must serve, enabling its
+        \texttt{MOPs()} method to account for the extra traffic.
+  \item \texttt{setupSpatialLevelPointers}: each \texttt{MemLevel}
+        is linked to the spatial levels (fanouts and compute) that
+        follow it.
+  \item \texttt{checkFactorsConstraints}: a final global validation
+        ensures the entire architecture satisfies all constraints.
+\end{enumerate}
+
+\noindent
+After initialisation, the resulting mapping serves as the starting
+point for the map-space exploration engine, which navigates the factor
+space using \texttt{moveFactor} (Section~\ref{sec:ps-movefactor}).
+
+
+% ====================================================================
+%  §4  COST-MODEL EXTENSIONS
+% ====================================================================
+\section{Cost-Model Extensions}
+\label{sec:ps-cost-model}
+
+The single-layer cost model (Section~\ref{sec:bg-cost-model}) computes
+three quantities: memory operations (MOPs), energy, and latency.
+Each must be generalised to handle $F > 1$ layers with five operand
+categories.
+
+% --------------------------------------------------------------------
+\subsection{Per-Layer Memory Operations}
+\label{sec:ps-mops}
+
+The entry point \texttt{updateStats} traverses the architecture
+\emph{top-to-bottom} (from DRAM toward Compute).
+At each \texttt{MemLevel}, the method \texttt{MOPs()} returns the
+\emph{per-instance} read and write counts for every operand category:
+
+\begin{center}
+\small
+\begin{tabular}{ll}
+  \toprule
+  \textbf{Return value} & \textbf{Description} \\
+  \midrule
+  \texttt{in\_reads}
+      & Reads of the global input \\
+  \texttt{per\_layer\_w\_reads}$[i]$
+      & Reads of weight tensor $W_i$ \\
+  \texttt{per\_layer\_int\_in\_reads}$[i]$
+      & Reads of $A_i$ as consumer input \\
+  \texttt{per\_layer\_int\_out\_reads}$[i]$
+      & Partial-sum reads of $A_i$ (accumulation) \\
+  \texttt{per\_layer\_int\_out\_writes}$[i]$
+      & Partial-sum writes of $A_i$ \\
+  \texttt{out\_reads}
+      & Partial-sum reads of the global output \\
+  \texttt{out\_writes}
+      & Writes of the global output \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+These per-instance counts are then \textbf{scaled} to total counts by
+multiplying each layer's contributions by the product of temporal and
+spatial iterations relevant to that layer:
+%
+\begin{equation}
+\label{eq:ps-scaling}
+  \sigma_l^{(i)} \;=\;
+    \tau_l^{(i)} \;\cdot\; s_l^{(i)},
+\end{equation}
+%
+\noindent
+where $\tau_l^{(i)} = \prod_{k > l}\,\prod_{d \in \mathcal{D}_i}
+f_{k,d}$ is the product of temporal iterations of all dimensions
+relevant to layer~$i$ at levels above~$l$, and $s_l^{(i)}$ is the
+analogous spatial iteration count accumulated from fanout levels.
+The set $\mathcal{D}_i$ contains only the dimensions coupled to
+layer~$i$'s operands — for example, layer~0 is influenced by
+$\{C_0,\, Y_0,\, X_0,\, R_0,\, S_0,\, Z_0\}$ plus the shared
+dimensions of its intermediate output.
+
+\paragraph{Per-layer dimension filtering.}
+At each level, a \texttt{dataflow\_per\_layer} dictionary is
+constructed, filtering the level's full dataflow to retain only the
+dimensions relevant to each layer.
+This filtering ensures that a dimension belonging solely to layer~$j$
+does not inflate the iteration count attributed to layer~$i$.
+The method \texttt{fullLayerProduct} computes the product of factor
+iterations for a specific layer at a specific level using exactly this
+filtered dimension set.
+
+\paragraph{Bypass propagation.}
+When an operand bypasses a level, its reads and writes at that level
+are zero.
+The level \emph{above} the bypass chain is responsible for supplying
+data to the level \emph{below}; FactorFlow models this by carrying
+"last reads" accumulators that propagate the most recent non-bypassed
+read count downward.
+For intermediate operands, this mechanism applies per-layer: each
+$\texttt{per\_layer\_int\_out\_reads}[i]$ and
+$\texttt{per\_layer\_int\_in\_reads}[i]$ is propagated independently
+through the bypass chain.
+
+\paragraph{Drain handling.}
+Writes from a lower level to a higher level (drains) are modelled
+symmetrically: when a level is not bypassed for an operand, the reads
+from the level above become writes into this level.
+The \texttt{FREE\_DRAINS} setting controls whether drains contribute
+to energy and latency; when enabled, drain reads are assumed to be
+zero-cost, matching the convention used by Timeloop.
+
+
+% --------------------------------------------------------------------
+\subsection{Energy Model}
+\label{sec:ps-energy}
+
+The weighted MOPs (WMOPs) metric (cf.\ Equation~\ref{eq:energy}) is
+extended to a per-layer decomposition:
+%
+\begin{equation}
+\label{eq:ps-wmops-per-layer}
+  \text{WMOPs}_i \;=\;
+    \sum_{l \in \text{levels}}
+      e_l \cdot \bigl(R_l^{(i)} + W_l^{(i)}\bigr),
+\end{equation}
+%
+\noindent
+where $R_l^{(i)}$ and $W_l^{(i)}$ are the total reads and writes at
+level~$l$ attributable to layer~$i$, and $e_l$ is the per-access
+energy of level~$l$.
+For a boundary layer ($i = 0$ or $i = F\!-\!1$), $R_l^{(i)}$ includes
+the global input or output contributions; for intermediate layers, it
+includes only the corresponding intermediate and weight operands.
+
+The total energy is:
+%
+\begin{equation}
+\label{eq:ps-wmops-total}
+  \text{WMOPs} \;=\;
+    \sum_{i=0}^{F-1} \text{WMOPs}_i
+    \;+\;
+    \text{WMOPs}_{\text{compute}},
+\end{equation}
+%
+\noindent
+where $\text{WMOPs}_{\text{compute}}$ accounts for the MAC energy
+across all layers.
+The per-layer decomposition is valuable for identifying which
+layer dominates energy consumption and, in future work, for guiding
+per-layer mapping optimisation.
+
+
+% --------------------------------------------------------------------
+\subsection{Latency Model}
+\label{sec:ps-latency}
+
+Latency is computed \emph{bottom-to-top}, starting from the Compute
+level and propagating upward through the memory hierarchy.
+At the Compute level, each tile executes in a fixed number of cycles
+(typically~1 for a single MAC).
+At each \texttt{MemLevel} above, the model determines whether the
+level is \textbf{compute-bound} or \textbf{memory-bound} on a
+per-layer basis.
+
+\paragraph{Per-layer ideal bandwidth.}
+For each layer~$i$ at level~$l$, the ideal read bandwidth is:
+%
+\begin{equation}
+\label{eq:ps-ideal-bw}
+  b_{l,\text{rd}}^{(i)} \;=\;
+    \frac{R_l^{(i)} + D_l^{(i)}}
+         {\sigma_l^{(i)} \cdot T_l^{(i)}},
+\end{equation}
+%
+\noindent
+where $D_l^{(i)}$ is the drain traffic, $\sigma_l^{(i)}$ is the
+scaling factor from Equation~\ref{eq:ps-scaling}, and $T_l^{(i)}$ is
+the number of compute cycles per tile for layer~$i$ at level~$l$
+(accounting for any stalls introduced by lower levels).
+The write bandwidth $b_{l,\text{wr}}^{(i)}$ is defined analogously
+using fills and updates.
+
+\paragraph{Stall detection.}
+If $b_{l,\text{rd}}^{(i)} > B_{l,\text{rd}}$ (the level's physical
+read bandwidth in bytes per cycle), the level is memory-bound for
+layer~$i$'s reads: the actual read-plus-drain latency becomes
+%
+\begin{equation}
+\label{eq:ps-stall-lat}
+  \Lambda_{l,\text{rd}}^{(i)} \;=\;
+    \frac{R_l^{(i)} + D_l^{(i)}}
+         {\sigma_l^{(i)} \cdot B_{l,\text{rd}}}.
+\end{equation}
+%
+\noindent
+Otherwise the level is compute-bound and
+$\Lambda_{l,\text{rd}}^{(i)} = T_l^{(i)}$.
+The same logic applies to the write side using fills and updates.
+The per-layer per-level latency is:
+%
+\begin{equation}
+\label{eq:ps-lat-per-layer}
+  \Lambda_l^{(i)} \;=\;
+    \max\!\bigl(
+      \Lambda_{l,\text{rd}}^{(i)},\;
+      \Lambda_{l,\text{wr}}^{(i)}
+    \bigr),
+\end{equation}
+%
+\noindent
+and the stall cycles contributed by level~$l$ for layer~$i$ are
+$\Lambda_l^{(i)} - T_l^{(i)}$.
+
+\paragraph{Sequential layer execution.}
+Under the \texttt{SEQUENTIAL\_LAYER\_EXECUTION} model — which is
+always active for $F > 1$ in the current implementation — the
+per-level latency is the \emph{sum} of per-layer latencies:
+%
+\begin{equation}
+\label{eq:ps-sequential-lat}
+  \Lambda_l \;=\;
+    \sum_{i=0}^{F-1} \Lambda_l^{(i)}.
+\end{equation}
+%
+\noindent
+This models the fact that the PE array processes one layer at a time
+in a time-multiplexed fashion.
+The total latency is then the maximum across all levels:
+%
+\begin{equation}
+\label{eq:ps-total-lat}
+  \Lambda \;=\;
+    \max_{l \in \text{levels}} \;\Lambda_l.
+\end{equation}
+
+\paragraph{FeatureMemory special case.}
+The FeatureMemory (FMEM) level in the DepFiN architecture uses a
+different latency formula: because it is the on-chip buffer that stores
+all activations (input, intermediates, output), its read and write
+latencies are \emph{summed} rather than taking the maximum:
+%
+\begin{equation}
+\label{eq:ps-fmem-lat}
+  \Lambda_{\text{FMEM}}^{(i)} \;=\;
+    \Lambda_{\text{FMEM},\text{rd}}^{(i)}
+    + \Lambda_{\text{FMEM},\text{wr}}^{(i)}.
+\end{equation}
+%
+\noindent
+This reflects the observation that, for the access patterns of fused
+execution on DepFiN, the read and write traffic to FMEM cannot overlap
+fully.
+The resulting per-layer latency is then
+$\max(\Lambda_{\text{FMEM}}^{(i)},\; T_l^{(i)})$, preserving the
+guarantee that latency is never below the ideal compute time.
+
+\paragraph{Compound metrics.}
+The EDP (Energy-Delay Product) and Wart (weighted area-time) metrics
+defined in Section~\ref{sec:compound-metrics} apply unchanged; they
+simply use the extended WMOPs and latency values computed above.
+
+
+% ====================================================================
+%  §5  IMPLEMENTATION
+% ====================================================================
+\section{Implementation}
+\label{sec:ps-implementation}
+
+This section provides an overview of the FactorFlow codebase, focusing
+on the modules most affected by the multi-layer extension.
+
+% --------------------------------------------------------------------
+\subsection{Code Structure}
+\label{sec:ps-code-structure}
+
+The implementation consists of approximately 5\,500~lines of Python
+spread across ten principal modules:
+
+\begin{center}
+\small
+\begin{tabular}{llp{7.2cm}}
+  \toprule
+  \textbf{Module} & \textbf{Lines} & \textbf{Responsibility} \\
+  \midrule
+  \texttt{factors.py}
+      & 742
+      & \texttt{Coupling}, \texttt{Factors} (prime-factor
+        dictionaries), \texttt{Shape} classes \\
+  \texttt{computations.py}
+      & 713
+      & Pre-defined coupling instances for 2, 3, 4, 5, 8, and
+        10-layer convolutions \\
+  \texttt{levels.py}
+      & 2192
+      & \texttt{MemLevel} (incl.\ $\sim$700-line
+        \texttt{MOPs()} method), \texttt{FanoutLevel},
+        \texttt{ComputeLevel} \\
+  \texttt{arch.py}
+      & 857
+      & \texttt{Arch}: \texttt{moveFactor},
+        \texttt{validate\_mapping\_heuristic},
+        \texttt{enforceFactorsConstraints} \\
+  \texttt{cost\_model.py}
+      & 707
+      & \texttt{updateStats}, \texttt{Wart}, \texttt{EDP},
+        \texttt{Energy}, \texttt{Latency} \\
+  \texttt{engine.py}
+      & 115
+      & Mapper entry point, multithreading orchestration \\
+  \texttt{settings.py}
+      & 187
+      & Global configuration flags
+        (\texttt{SEQUENTIAL\_LAYER\_EXECUTION},
+        \texttt{FULLY\_CACHED}, etc.) \\
+  \texttt{heuristic\_check.py}
+      & 289
+      & Standalone heuristic validator for unit testing \\
+  \texttt{main\_cli.py}
+      & 289
+      & Command-line interface for specifying architecture
+        and workload files \\
+  \texttt{prints.py}, \texttt{utils.py}
+      & ---
+      & Output formatting and utility functions \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+The most substantial changes for multi-layer support are concentrated
+in \texttt{factors.py} (five-category \texttt{Coupling}),
+\texttt{levels.py} (per-layer MOPs decomposition),
+\texttt{arch.py} (heuristic validation, per-layer constraint
+management), and \texttt{cost\_model.py} (per-layer energy and
+latency).
+
+Pre-defined coupling instances in \texttt{computations.py} allow
+workloads up to 10-layer fusions to be constructed by importing the
+corresponding coupling object and pairing it with a \texttt{Shape}
+specifying the dimension sizes.
+Larger fusions can be created programmatically by extending the same
+pattern.
+
+
+% --------------------------------------------------------------------
+\subsection{The \texttt{moveFactor} Primitive}
+\label{sec:ps-movefactor}
+
+The map-space exploration in FactorFlow is built on a single
+primitive:
+
+\begin{quote}
+\texttt{moveFactor(src, dst, dim, factor, amount)}
+\end{quote}
+
+\noindent
+This method transfers $\texttt{factor}^{\texttt{amount}}$ iterations
+of dimension \texttt{dim} from level \texttt{src} to level
+\texttt{dst}.
+The operation proceeds in six steps:
+
+\begin{enumerate}
+  \item \textbf{Remove} the factor from the source level's
+        prime-factor dictionary.
+        If the source does not hold enough factors, the move fails
+        immediately (returns \texttt{False}).
+  \item \textbf{Check source constraints.}
+        If the removal leaves the source level in violation of a
+        capacity or equality constraint, the factor is restored and
+        the move fails.
+  \item \textbf{Add} the factor to the destination level.
+  \item \textbf{Update tile sizes.}
+        For every level between source and destination, the tile size
+        for \texttt{dim} is multiplied (or divided) by
+        $\texttt{factor}^{\texttt{amount}}$, reflecting the changed
+        iteration count.
+  \item \textbf{Check constraints on all affected levels.}
+        If any level between source and destination (inclusive)
+        violates its constraints after the tile-size update, the
+        entire operation is rolled back: factor restored to source,
+        removed from destination, tile sizes reverted.
+  \item \textbf{Heuristic validation} (optional).
+        If \texttt{skip\_heuristic\_check} is \texttt{False}, the
+        full multi-layer heuristic
+        (Section~\ref{sec:ps-heuristic}) is evaluated on the
+        resulting mapping.
+        If any constraint is violated, the move is fully rolled back.
+\end{enumerate}
+
+\noindent
+The rollback guarantee ensures that every call to \texttt{moveFactor}
+is \emph{atomic}: the architecture is either updated to a new valid
+state or left entirely unchanged.
+This property makes it safe to use \texttt{moveFactor} as the
+exploration step in hill-climbing, breadth-first, or any other
+local-search mapper without fear of accumulating partial state.
+
+The mapper iterates through dimensions and levels, attempting
+\texttt{moveFactor} calls and evaluating the cost model after each
+successful move.
+Different mapper variants
+(\texttt{breadthfirst\_local}, \texttt{linear}, \texttt{quadratic},
+\texttt{exponential}, \texttt{hybrid}) differ in how they select
+which moves to try and how deeply they explore, but all rely on
+\texttt{moveFactor} as their sole mutation operator.
+
+
+% --------------------------------------------------------------------
+\subsection{Limitations}
+\label{sec:ps-limitations}
+
+The current implementation has several limitations that constrain its
+applicability:
+
+\begin{enumerate}
+  \item \textbf{No automated mapper for fused workloads.}
+        The map-space exploration engine (\texttt{engine.py})
+        currently supports automated search only for single-layer
+        mappings.
+        For multi-layer fused workloads, the mapping must be
+        specified manually through the architecture definition file
+        (e.g.\ \texttt{multi\_layer\_arch.py}).
+        Extending the mapper to automatically explore fused mappings
+        — while respecting the heuristic constraints — is the
+        primary direction for future work.
+
+  \item \textbf{No inter-layer parallelism.}
+        The \texttt{SEQUENTIAL\_LAYER\_EXECUTION} flag is always
+        active: all layers share the same PE array and execute one at
+        a time.
+        Architectures that overlap computation of different layers
+        (e.g.\ pipeline parallelism) are not modelled.
+
+  \item \textbf{Heuristic is necessary but not sufficient.}
+        As noted in Section~\ref{sec:ps-heuristic}, the heuristic
+        (Equations~\ref{eq:ps-heuristic-width}--\ref{eq:ps-heuristic-channel})
+        rules out many infeasible mappings but does not prove that
+        every accepted mapping is fully correct.
+        Formal verification of the depth-first schedule's correctness
+        for all accepted mappings is left to future work.
+
+  \item \textbf{No innermost dimension-sum reuse.}
+        When two dimensions contribute to the same operand index
+        through an affine sum (e.g.\ $y + r$), the current model
+        does not exploit the overlap between consecutive iterations
+        of the sliding window within a single tile.
+        This leads to conservative (over-estimated) MOPs counts for
+        the innermost level in some configurations.
+
+  \item \textbf{FeatureMemory latency model.}
+        The special-case treatment of the FMEM's latency (summing
+        read and write latencies instead of taking the maximum) is
+        specific to the DepFiN architecture and is currently
+        hardcoded in the cost model.
+        A more general parameterisation of port behaviour would
+        improve portability to other architectures.
+
+  \item \textbf{Fully-cached assumption for intermediate sizing.}
+        When the \texttt{FULLY\_CACHED} setting is enabled, the
+        memory footprint computation for intermediate activations
+        assumes that the entire tile fits within the buffer, bypassing
+        the fine-grained footprint analysis.
+        This simplification holds for the depth-first mappings
+        examined in this work but may overestimate buffer requirements
+        for other scheduling strategies.
+\end{enumerate}
+
+
+% ====================================================================
+%  §6  SUMMARY
+% ====================================================================
+\section{Summary}
+\label{sec:ps-summary}
+
+This chapter presented the extensions to FactorFlow that enable
+analytical cost modelling of fused multi-layer DNN mappings.
+
+Three modelling concepts —
+\emph{aliasing} (Section~\ref{sec:ps-aliasing}),
+\emph{decoupling} (Section~\ref{sec:ps-decoupling}), and the
+\emph{depth-first scheduling heuristic}
+(Section~\ref{sec:ps-heuristic}) — formalise how intermediate
+activations link consecutive layers and how the resulting tile-size
+constraints are enforced across every level of the memory hierarchy.
+
+The FactorFlow abstraction was extended across all three specification
+axes: the \texttt{Coupling} class now supports five operand categories
+with per-layer weight and per-connection intermediate entries
+(Section~\ref{sec:ps-workload-spec}); the architecture can specify
+per-operand bypass rules and per-layer fanout levels
+(Section~\ref{sec:ps-arch-spec}); and the mapping representation
+naturally accommodates the enlarged dimension set
+(Section~\ref{sec:ps-mapping-spec}).
+
+The cost model was generalised to a per-layer decomposition of MOPs,
+energy (WMOPs), and latency, including bandwidth-limited stall
+detection evaluated independently for each layer at each hierarchy
+level (Section~\ref{sec:ps-cost-model}).
+
+Finally, the implementation was presented, centred on the atomic
+\texttt{moveFactor} primitive that ensures safe, rollback-protected
+navigation of the factor space, and the current limitations — most
+notably the absence of an automated mapper for fused workloads — were
+discussed as directions for future work
+(Section~\ref{sec:ps-implementation}).
+
+The next chapter (Chapter~\ref{ch:validation}) validates these
+extensions by comparing FactorFlow's predictions against a reference
+implementation of the DepFiN accelerator processing an 11-layer fused
+convolution pipeline.
