@@ -913,6 +913,57 @@ producer--consumer pruning of Section~\ref{sec:ps-heuristic} adds an
 additional feasibility filter on top of the standard capacity
 constraints.
 
+\paragraph{Per-layer stationarity within a single loop nest.}
+A key consequence of aliasing and decoupling
+(Sections~\ref{sec:ps-aliasing}--\ref{sec:ps-decoupling}) is that the
+unified dataflow implicitly encodes a \emph{different mapping} --- and
+hence a different \emph{stationarity} --- for each layer, all within a
+single loop nest.
+
+Recall that stationarity is determined by which dimensions iterate at
+a given level: an operand is stationary when the innermost loops at
+that level are orthogonal to it
+(Section~\ref{sec:data-reuse}).
+Because decoupling makes the per-layer dimension sets disjoint
+($\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$,
+Section~\ref{sec:ps-decouple-sets}), the dataflow ordering at any
+level is \emph{filtered per layer}: at each level only the dimensions
+in~$\mathcal{D}_i$ are visible to layer~$i$.
+Within the unified ordering, each layer therefore ``sees'' its own
+sub-sequence of loops, and the innermost element of that sub-sequence
+determines that layer's stationarity at that level.
+
+Consider, for instance, a two-layer fusion where the dataflow at a
+memory level orders the dimensions as
+$[\ldots,\, C_1,\, X_0,\, \ldots]$ (from outermost to innermost).
+Layer~$0$ sees $X_0$ as the innermost relevant loop: the weights
+$W_0[\,z_0, c_0, r_0, s_0\,]$ do not depend on $X_0$, so $W_0$ is
+stationary --- this is an \emph{output-stationary} dataflow for
+layer~$0$.
+Layer~$1$ sees $C_1$ as its innermost relevant loop: the output
+$\text{Out}[\,z_1, p, q\,]$ does not depend on $C_1$, so the output
+is stationary --- this is an \emph{output-stationary} dataflow for
+layer~$1$ as well.
+A different ordering, e.g.\
+$[\ldots,\, Z_1,\, X_0,\, \ldots]$, would make
+$W_1$ vary on the innermost layer-$1$ loop ($Z_1$ indexes $W_1$),
+yielding an \emph{input-stationary} dataflow for layer~$1$ while
+layer~$0$ remains output-stationary.
+The same unified nest thus accommodates layer~$0$ in output-stationary
+mode and layer~$1$ in input-stationary mode --- no separate per-layer
+scheduling is needed.
+
+This property follows directly from the modelling choices described
+earlier: aliasing gives each intermediate tensor its own set of
+concrete loop variables (Section~\ref{sec:ps-alias-concrete}), and
+decoupling guarantees that these per-layer variables are disjoint
+(Section~\ref{sec:ps-decouple-sets}).
+The unified dataflow is therefore strictly more expressive than $F$
+independent single-layer mappings laid out in sequence: it can
+reproduce any combination of per-layer stationarities while also
+capturing the inter-layer data dependencies through the
+producer--consumer pruning constraint.
+
 \paragraph{Initialisation sequence.}
 Mapping construction follows a deterministic five-step sequence:
 \begin{enumerate}
