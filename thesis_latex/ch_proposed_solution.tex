@@ -543,6 +543,26 @@ The pruning is therefore \emph{exact}: it removes only infeasible
 points from the map space, preserving every feasible — and potentially
 optimal — mapping.
 
+\paragraph{Per-axis decomposition.}
+Each intermediate connection~$i$ introduces three alias pairs
+(Section~\ref{sec:ps-aliasing}), one for each physical axis of the
+tensor~$A_i$: width $(Q_i, S_i, X_i)$, height $(P_i, R_i, Y_i)$,
+and channels $(C_{i+1}, Z_i)$.
+Because the three axes index orthogonal dimensions of the same tensor,
+the pruning constraint can be evaluated \emph{independently} for each
+triplet: satisfying the width constraint
+(Equation~\ref{eq:ps-heuristic-width}) neither implies nor precludes
+satisfaction of the height constraint
+(Equation~\ref{eq:ps-heuristic-height}), and likewise for the channel
+constraint (Equation~\ref{eq:ps-heuristic-channel}).
+The implementation exploits this decomposition by calling the same
+single-triplet validator three times per layer connection --- once per
+axis --- and short-circuiting to \emph{infeasible} as soon as any
+axis fails.
+For an $F$-layer fusion this yields $3(F\!-\!1)$ independent checks
+rather than a single monolithic constraint over the entire
+intermediate tensor.
+
 \paragraph{Generality beyond depth-first.}
 Although the fused mappings explored in this thesis follow a
 depth-first schedule, the constraint itself is not specific to any
