@@ -228,6 +228,59 @@ the last connection using the global output variables $P, Q$ and the
 first connection using the global input coupling.
 
 
+\subsubsection{Dimension Proliferation with Aliasing and Decoupling}
+\label{sec:ps-dim-proliferation}
+
+Aliasing does not merely rename existing axes: it \emph{creates new
+loop variables} that the mapper must tile and order.
+For each layer added to the fusion, the coupling introduces six
+fresh dimensions:
+%
+\begin{itemize}
+  \item Three \textbf{aliased dimensions} ($Y_i$, $X_i$, $Z_i$) that
+        name the intermediate activation's height, width, and channel
+        axes.
+        Physically, these axes already exist --- the intermediate tensor
+        has a height, a width, and a depth regardless of how it is
+        indexed.
+        However, without aliasing these axes have no independent names
+        and cannot appear as standalone loops (recall the nested
+        dim-sums of Section~\ref{sec:ps-alias-concrete}).
+        Once aliased, they become concrete dimensions visible to the
+        mapper, each admitting its own tiling factors and its own
+        position in the dataflow ordering at every level.
+  \item Three \textbf{decoupled dimensions} ($C_i$, $R_i$, $S_i$) that
+        belong exclusively to the new layer's weight coupling.
+        These dimensions are genuinely new: they did not exist in the
+        single-layer formulation and they introduce additional degrees
+        of freedom for weight tiling.
+\end{itemize}
+%
+The total dimension count therefore grows by six for every fused
+layer, yielding the $|\mathcal{D}| = 6F$ formula of
+Equation~\ref{eq:fused-dims}.
+
+The map-space impact is substantial.
+Each new dimension contributes additional permutations at every memory
+level (widening the dataflow search) and additional factor-allocation
+choices across levels (deepening the tiling search).
+Because the map-space cardinality
+(Equation~\ref{eq:ms-cardinality}) depends \emph{multiplicatively}
+on both the number of permutations and the number of factor
+allocations, even the three aliased dimensions --- which add no new
+physical data --- have a compounding effect on the search space.
+For the 11-layer validation workload this proliferation inflates the
+map space from roughly $10^{24}$ (single layer) to $10^{463}$ (fused),
+as quantified in Section~\ref{sec:fds-mapspace}.
+
+In summary, aliasing and decoupling together ensure that every
+intermediate axis is an \emph{explicit} degree of freedom for the
+mapper: it can be tiled independently, placed at any position in the
+dataflow, and thereby influence stationarity and data reuse for its
+layer --- at the cost of a linearly growing dimension set that must
+be explored.
+
+
 \subsubsection{Aliasing Constraints}
 
 Because an alias pair indexes the same tensor axis, the producer's tile
