@@ -78,27 +78,42 @@ Figure~\ref{fig:partial-sized-norm} presents the normalised
 comparison (partial fusion\,=\,1.0) for energy, latency, and EDP.
 
 \paragraph{Energy.}
-As in Scenario~A, partial fusion is always the more
-energy-expensive mode.
-On DepFiN, the partial-to-single energy ratio ranges from
-$1.33\times$ (FSRCNN) to $15.1\times$ (VGG16).
-On Eyeriss the ratios are larger, from $6.5\times$ (FSRCNN) to
-$16.8\times$ (ResNet18), reflecting the per-PE register
-replication cost discussed in Section~\ref{sec:fusion-full-sized}.
+On \textbf{DepFiN}, the energy outcome mirrors the
+workload-type split observed in Scenario~A.
+For the activation-dominant workloads, partial fusion is
+\emph{cheaper} than single-layer execution: FSRCNN single-layer
+energy is $3.03\times$ the partial-fusion value, and MC-CNN is
+$1.21\times$.
+At 160\,pJ\,/\,byte, the DRAM traffic eliminated by fusing even
+two consecutive layers outweighs the per-access cost increase from
+the modestly sized feature memories (248\,KB for FSRCNN, 396\,KB
+for MC-CNN).
+Notably, the Scenario~B partial-fusion energy is also lower than
+the Scenario~A full-fusion energy in absolute terms: for FSRCNN
+the partial-sized architecture consumes $1.01 \times 10^{4}$
+versus $1.30 \times 10^{4}$ for full fusion, because the smaller
+memories reduce the per-access overhead.
 
-Compared with Scenario~A, the energy penalty of fusion is
-\emph{reduced} because the smaller memories lower the per-access
-cost.
-For instance, DepFiN VGG16's fusion-to-single energy ratio drops
-from $22.3\times$ (full fusion, Scenario~A) to $15.1\times$
-(partial fusion, Scenario~B), and ResNet18 drops from
-$11.4\times$ to $10.1\times$.
-The improvement is less dramatic on Eyeriss because the
-GlobalBuffer size is unchanged and the WReg reduction is moderate.
+For the weight-dominant workloads on DepFiN, single-layer
+execution remains substantially cheaper: VGG16 single costs only
+$15.6\%$ of the partial-fusion energy, and ResNet18 costs
+$27.7\%$.
+Even though the weight memory has been reduced by $2$--$3\times$
+relative to Scenario~A, 4.6\,MB is still large enough to
+inflate per-access energy well above the DRAM savings.
+
+On \textbf{Eyeriss}, partial fusion is more expensive than
+single-layer execution for every workload.
+FSRCNN is closest to break-even (single\,$= 0.88\times$\,partial),
+while the weight-dominant workloads show larger penalties:
+MC-CNN single costs $40.5\%$ of partial, VGG16 costs $12.9\%$,
+and ResNet18 costs $18.1\%$.
+The replicated register architecture amplifies the on-chip
+overhead, as discussed in Section~\ref{sec:fusion-full-sized}.
 
 \paragraph{Latency.}
 The latency pattern mirrors Scenario~A closely.
-Partial fusion saves $45.9\%$ on FSRCNN and $41.5\%$ on MC-CNN
+Partial fusion saves $45.9\%$ on FSRCNN and $42.3\%$ on MC-CNN
 for DepFiN, comparable to the $47.6\%$ and $42.3\%$ savings of
 full fusion in Scenario~A.
 On Eyeriss the activation-dominant savings are identical to
@@ -106,32 +121,38 @@ Scenario~A ($45.6\%$ for FSRCNN, $15.7\%$ for MC-CNN), because
 the architecture configuration has not changed for these
 workloads.
 
-For the weight-dominant workloads the latency picture changes
-only at the margins.
-On DepFiN, VGG16 is now essentially latency-neutral ($0.8\%$
-saving), a marked improvement over the $-21.1\%$ penalty of
+For the weight-dominant workloads the latency picture improves
+relative to Scenario~A.
+On DepFiN, VGG16 is now essentially latency-neutral ($+0.8\%$
+saving), a marked improvement over the $-11.3\%$ penalty of
 full fusion in Scenario~A, because the smaller weight memory
 reduces the scheduling overhead.
-ResNet18 remains slower under fusion ($-13.1\%$), though the
+ResNet18 is still slower under fusion ($-7.5\%$), but the
 penalty is less severe than the $-30.3\%$ in Scenario~A.
 On Eyeriss, VGG16 and ResNet18 retain the same modest savings
 ($15.5\%$ and $4.9\%$) observed in Scenario~A.
 
 \paragraph{EDP.}
-The EDP verdict is unambiguous.
-On DepFiN, partial fusion wins for FSRCNN only: its EDP
-($5.41 \times 10^{4}$) is $28\%$ lower than the single-layer sum
-($7.51 \times 10^{4}$).
-For all other DepFiN workloads, single-layer execution dominates,
-with MC-CNN single at $0.569\times$ partial, VGG16 at
-$0.067\times$, and ResNet18 at $0.088\times$.
+On \textbf{DepFiN}, partial fusion wins on EDP for both
+activation-dominant workloads.
+FSRCNN's single-layer EDP is $5.61\times$ the partial-fusion
+value, and MC-CNN is $2.08\times$: both energy and latency
+favour fusion, and EDP amplifies the advantage.
+For the weight-dominant workloads, single-layer execution
+dominates: VGG16 single-layer EDP is $0.157\times$ partial, and
+ResNet18 is $0.257\times$ partial.
 
-On Eyeriss, single-layer execution wins for every workload
-without exception.
-The normalised single-layer EDP is $0.286$ for FSRCNN, $0.112$
-for MC-CNN, $0.071$ for VGG16, and $0.063$ for ResNet18.
-Even the FSRCNN case, which benefits from a large latency saving,
-cannot overcome the $6.5\times$ energy penalty.
+On \textbf{Eyeriss}, partial fusion wins on EDP for FSRCNN
+(single\,$= 1.62\times$\,partial), where the $45.6\%$ latency
+saving outweighs the modest $1.13\times$ energy penalty.
+For all other Eyeriss workloads, single-layer execution wins:
+MC-CNN single EDP is $0.48\times$ partial, VGG16 is
+$0.15\times$, and ResNet18 is $0.19\times$.
+
+In total, partial fusion wins on EDP in three of the eight
+architecture--workload combinations (FSRCNN and MC-CNN on DepFiN,
+FSRCNN on Eyeriss), compared with the equivalent three of eight
+in Scenario~A.
 
 \begin{figure}[htbp]
   \centering
@@ -144,30 +165,44 @@ cannot overcome the $6.5\times$ energy penalty.
 
 \paragraph{Comparison with Scenario~A.}
 Scenario~B demonstrates that sizing the architecture for pairwise
-fusion rather than full fusion brings two advantages and one
-unchanged limitation.
+fusion rather than full fusion brings two clear advantages.
 
-The first advantage is the substantial memory reduction
+The first is the substantial memory reduction
 (Table~\ref{tab:partial-sized-configs}), which lowers chip area
 and fabrication cost.
 The second is that the latency benefit of fusion is almost fully
-preserved: partial fusion captures $92$--$98\%$ of the
+preserved: partial fusion captures $96$--$100\%$ of the
 full-fusion latency saving for the activation-dominant workloads,
-and it eliminates the worst-case latency \emph{penalty} that full
-fusion imposed on DepFiN VGG16 ($-21\%{\to}+0.8\%$).
+and it eliminates or greatly reduces the worst-case latency
+penalty that full fusion imposed on DepFiN
+($-11.3\%{\to}+0.8\%$ for VGG16; $-30.3\%{\to}-7.5\%$ for
+ResNet18).
 
-The unchanged limitation is the energy overhead.
-Although the smaller memories reduce the absolute energy, partial
-fusion in Scenario~B is still $1.3$--$16.8\times$ more expensive
-than single-layer execution, so the EDP winner remains
-single-layer in seven of the eight architecture--workload
-combinations (the exception is FSRCNN on DepFiN).
+For the activation-dominant workloads on DepFiN, Scenario~B
+even improves on the absolute energy of Scenario~A: the
+partial-fusion cost on the smaller architecture is lower than the
+full-fusion cost on the larger architecture, because the reduced
+memories yield a lower per-access energy overhead without
+sacrificing much of the DRAM elimination benefit.
+
+The EDP verdict is identical in scope: three of eight
+architecture--workload combinations favour fusion in both
+scenarios (FSRCNN and MC-CNN on DepFiN, FSRCNN on Eyeriss).
+The weight-dominant workloads continue to favour single-layer
+execution on both architectures, regardless of whether the
+design targets full or partial fusion.
 
 \paragraph{Key takeaway.}
 A partial-fusion-sized architecture delivers nearly the same
-latency benefit as a full-fusion architecture, at a fraction of
-the memory cost.
-The energy--EDP trade-off, however, is unchanged: the on-chip
-memory overhead of fusing even two layers still dominates the EDP
-comparison, making single-layer execution the more efficient
-choice in all but the most activation-heavy workload on DepFiN.
+latency and EDP benefit as a full-fusion architecture, at a
+fraction of the memory cost.
+For activation-dominant workloads on DepFiN, partial fusion
+wins on energy, latency, and EDP simultaneously, making it
+the strictly dominant strategy.
+On Eyeriss, partial fusion wins on EDP only for the most
+activation-heavy workload (FSRCNN), because the replicated
+register overhead partially offsets the DRAM savings.
+For weight-dominant workloads, the on-chip memory overhead of
+fusion still outweighs the DRAM savings at 160\,pJ\,/\,byte,
+and single-layer execution remains the more efficient choice
+on both architectures.

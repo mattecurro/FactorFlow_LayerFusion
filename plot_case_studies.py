@@ -907,7 +907,7 @@ for _arch, _wls in FUSION_AUTO_DRAM_160.items():
 
 # Normalized partial-sized data (Partial = 1.0)
 FUSION_PARTIAL_SIZED_DRAM_160_NORM = {}
-for _arch, _wls in FUSION_PARTIAL_SIZED.items():
+for _arch, _wls in FUSION_PARTIAL_DRAM_160.items():
     FUSION_PARTIAL_SIZED_DRAM_160_NORM[_arch] = {}
     for _wl, _modes in _wls.items():
         FUSION_PARTIAL_SIZED_DRAM_160_NORM[_arch][_wl] = {}
@@ -2213,11 +2213,11 @@ def plot_fusion_cross_arch():
     x = np.arange(len(WORKLOADS))
     w = 0.35
 
-    depfin_ratios = [FUSION_AUTO["DepFiN"][wl]["full"]["energy"] /
-                     FUSION_AUTO["DepFiN"][wl]["single"]["energy"]
+    depfin_ratios = [FUSION_AUTO_DRAM_160["DepFiN"][wl]["full"]["energy"] /
+                     FUSION_AUTO_DRAM_160["DepFiN"][wl]["single"]["energy"]
                      for wl in WORKLOADS]
-    eyeriss_ratios = [FUSION_AUTO["Eyeriss"][wl]["full"]["energy"] /
-                      FUSION_AUTO["Eyeriss"][wl]["single"]["energy"]
+    eyeriss_ratios = [FUSION_AUTO_DRAM_160["Eyeriss"][wl]["full"]["energy"] /
+                      FUSION_AUTO_DRAM_160["Eyeriss"][wl]["single"]["energy"]
                       for wl in WORKLOADS]
 
     ax.bar(x - w/2, depfin_ratios, w, label="DepFiN", color="#1f77b4",
@@ -2299,8 +2299,8 @@ def plot_fusion_latency_savings():
     depfin_savings = []
     eyeriss_savings = []
     for wl in WORKLOADS:
-        d_dep = FUSION_AUTO["DepFiN"][wl]
-        d_eye = FUSION_AUTO["Eyeriss"][wl]
+        d_dep = FUSION_AUTO_DRAM_160["DepFiN"][wl]
+        d_eye = FUSION_AUTO_DRAM_160["Eyeriss"][wl]
         depfin_savings.append(
             (1.0 - d_dep["full"]["latency"] / d_dep["single"]["latency"]) * 100)
         eyeriss_savings.append(
