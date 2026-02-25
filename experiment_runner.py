@@ -1665,7 +1665,7 @@ Eyeriss Case Study 3: OutRegister Size Sweep (8–64 entries)
 
 Eyeriss Case Study 5: PE Aspect Ratio Sweep (fixed total PEs=16384)
   ResNet18 17-layer full fusion, Eyeriss, GB=128KB, tile_size=1
-  Registers: InReg=400, WReg=902, IntReg=300, OutReg=64
+  Registers: InReg=400, WReg=902, IntReg=350, OutReg=64
 
     python3 experiment_runner.py --sweep-pe-aspect \
     --workload resnet18 --fusion full --variant 17layer \
@@ -3833,6 +3833,7 @@ class ExperimentRunner:
         intermediate_reg: Optional[int] = None,
         output_reg: Optional[int] = None,
         progress_callback=None,
+        dram_energy_override: Optional[float] = None,
         verbose: bool = False
     ) -> List[ExperimentResult]:
         network, fusion_level, variant = workload
@@ -3867,6 +3868,7 @@ class ExperimentRunner:
                     gb_size_kB=gb,
                     pe_rows=pe_r,
                     pe_cols=pe_c,
+                    dram_energy_override=dram_energy_override,
                     verbose=verbose,
                 )
                 # Apply register size overrides if provided
@@ -3923,6 +3925,7 @@ class ExperimentRunner:
                     pe_rows=pe_r,
                     pe_cols=pe_c,
                     tile_size=tile_size,
+                    dram_energy_override=dram_energy_override,
                     verbose=verbose,
                 )
                 
@@ -3990,6 +3993,7 @@ class ExperimentRunner:
         scale_bandwidth: bool = True,  # Scale FMEM bandwidth with tile size
         base_tile_size: int = 128,     # Reference tile size for scaling
         progress_callback=None,
+        dram_energy_override: Optional[float] = None,
         verbose: bool = False
     ) -> List[ExperimentResult]:
         from architectures.thesis_arch import (
@@ -4068,6 +4072,7 @@ class ExperimentRunner:
                 tile_size=tile_size,
                 scale_bandwidth=scale_bandwidth,
                 base_tile_size=base_tile_size,
+                dram_energy_override=dram_energy_override,
                 verbose=verbose,
             )
             
@@ -4513,6 +4518,7 @@ class ExperimentRunner:
         verbose: bool = False,
         pe_rows_candidates: List[int] = None,
         pe_cols_candidates: List[int] = None,
+        dram_energy_override: Optional[float] = None,
     ) -> Tuple[dict, dict]:
         """
         Comprehensive grid search to find:
@@ -4561,6 +4567,7 @@ class ExperimentRunner:
                     output_reg_entries=config_template.output_reg_entries,
                     tile_size=tile_size,
                     verbose=verbose,
+                    dram_energy_override=dram_energy_override,
                 )
                 
                 result = self.run_single_experiment(config)
@@ -4613,7 +4620,8 @@ class ExperimentRunner:
         output_reg_entries: int = None,
         pe_rows_grid: List[int] = None,
         pe_cols_grid: List[int] = None,
-        verbose: bool = False
+        verbose: bool = False,
+        dram_energy_override: Optional[float] = None,
     ) -> List['ExperimentResult']:
         # Use thesis_arch defaults if not specified
         if input_reg_entries is None:
@@ -4664,6 +4672,7 @@ class ExperimentRunner:
             min_pes_config, min_latency_config, all_configs = self._find_min_pe_grid_search(
                 workload, config_template, tile_size=tile_size, verbose=verbose,
                 pe_rows_candidates=pe_rows_list, pe_cols_candidates=pe_cols_list,
+                dram_energy_override=dram_energy_override,
             )
             
             # Collect all feasible configs for Summary (C)
@@ -4766,7 +4775,8 @@ class ExperimentRunner:
         output_reg_entries: int = None,
         pe_rows_grid: List[int] = None,
         pe_cols_grid: List[int] = None,
-        verbose: bool = False
+        verbose: bool = False,
+        dram_energy_override: Optional[float] = None,
     ) -> List['ExperimentResult']:
         # Use thesis_arch defaults if not specified
         if input_reg_entries is None:
@@ -4823,6 +4833,7 @@ class ExperimentRunner:
             min_pes_config, min_latency_config, all_configs = self._find_min_pe_grid_search(
                 workload, config_template, tile_size=tile_size, verbose=verbose,
                 pe_rows_candidates=pe_rows_list, pe_cols_candidates=pe_cols_list,
+                dram_energy_override=dram_energy_override,
             )
             
             # Collect all feasible configs for Summary (C)
@@ -4925,7 +4936,8 @@ class ExperimentRunner:
         intermediate_reg_entries: int = None,
         pe_rows_grid: List[int] = None,
         pe_cols_grid: List[int] = None,
-        verbose: bool = False
+        verbose: bool = False,
+        dram_energy_override: Optional[float] = None,
     ) -> List['ExperimentResult']:
         # Use thesis_arch defaults if not specified
         if input_reg_entries is None:
@@ -4983,6 +4995,7 @@ class ExperimentRunner:
             min_pes_config, min_latency_config, all_configs = self._find_min_pe_grid_search(
                 workload, config_template, tile_size=tile_size, verbose=verbose,
                 pe_rows_candidates=pe_rows_list, pe_cols_candidates=pe_cols_list,
+                dram_energy_override=dram_energy_override,
             )
             
             # Collect all feasible configs for Summary (C)
@@ -5084,7 +5097,8 @@ class ExperimentRunner:
         weight_reg_entries: int = 4000,
         intermediate_reg_entries: int = 1000,
         output_reg_entries: int = 64,
-        verbose: bool = False
+        verbose: bool = False,
+        dram_energy_override: Optional[float] = None,
     ) -> List['ExperimentResult']:
         """
         Case Study 4: GlobalBuffer size vs max feasible tile size.
@@ -5138,6 +5152,7 @@ class ExperimentRunner:
                     output_reg_entries=output_reg_entries,
                     tile_size=tile_size,
                     verbose=verbose,
+                    dram_energy_override=dram_energy_override,
                 )
                 
                 result = self.run_single_experiment(config)
@@ -5185,7 +5200,8 @@ class ExperimentRunner:
         weight_reg_entries: int = 4000,
         intermediate_reg_entries: int = 1000,
         output_reg_entries: int = 64,
-        verbose: bool = False
+        verbose: bool = False,
+        dram_energy_override: Optional[float] = None,
     ) -> List['ExperimentResult']:
         """
         Case Study 5: PE array aspect ratio with fixed total PEs.
@@ -5242,6 +5258,7 @@ class ExperimentRunner:
                 output_reg_entries=output_reg_entries,
                 tile_size=tile_size,
                 verbose=verbose,
+                dram_energy_override=dram_energy_override,
             )
             
             result = self.run_single_experiment(config)
@@ -6680,6 +6697,7 @@ def main():
             weight_reg=args.weight_reg,
             intermediate_reg=args.intermediate_reg,
             output_reg=args.output_reg,
+            dram_energy_override=args.dram_energy,
             verbose=args.verbose,
         )
     
@@ -6699,6 +6717,7 @@ def main():
             pe_cols=args.pe_cols,
             scale_bandwidth=not args.no_scale_bandwidth,
             base_tile_size=args.base_tile_size,
+            dram_energy_override=args.dram_energy,
             verbose=args.verbose,
         )
     
@@ -6751,6 +6770,7 @@ def main():
             pe_rows_grid=args.pe_rows_grid,
             pe_cols_grid=args.pe_cols_grid,
             verbose=args.verbose,
+            dram_energy_override=args.dram_energy,
         )
     
     elif args.sweep_intreg_pe:
@@ -6772,6 +6792,7 @@ def main():
             pe_rows_grid=args.pe_rows_grid,
             pe_cols_grid=args.pe_cols_grid,
             verbose=args.verbose,
+            dram_energy_override=args.dram_energy,
         )
     
     elif args.sweep_outreg_pe:
@@ -6793,6 +6814,7 @@ def main():
             pe_rows_grid=args.pe_rows_grid,
             pe_cols_grid=args.pe_cols_grid,
             verbose=args.verbose,
+            dram_energy_override=args.dram_energy,
         )
     
     elif args.sweep_gb_tile:
@@ -6813,6 +6835,7 @@ def main():
             intermediate_reg_entries=args.intermediate_reg,
             output_reg_entries=args.output_reg,
             verbose=args.verbose,
+            dram_energy_override=args.dram_energy,
         )
     
     elif args.sweep_pe_aspect:
@@ -6842,6 +6865,7 @@ def main():
             intermediate_reg_entries=args.intermediate_reg,
             output_reg_entries=args.output_reg,
             verbose=args.verbose,
+            dram_energy_override=args.dram_energy,
         )
     
     elif args.compare_fusion:

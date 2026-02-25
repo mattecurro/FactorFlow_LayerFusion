@@ -1,22 +1,20 @@
 % ============================================================
-%  N.2.6  Eyeriss CS5 — PE Array Aspect Ratio
+%  N.2.6  Eyeriss CS5: PE Array Aspect Ratio
 % ============================================================
 \subsection{Eyeriss: PE Array Aspect Ratio (CS5)}
 \label{sec:eyeriss-cs5}
 
 \subsubsection{Motivation}
 
-The previous case studies (CS1--CS3) varied the register sizes while
-allowing the PE array dimensions to change freely.
-CS5 asks a complementary question:
+CS5 address a complementary question with respect to the precedent case studies:
 \emph{given a fixed total PE budget, how should the array be shaped,
 i.e.\ how many rows versus columns, to minimise EDP?}
 
 The aspect ratio matters because the Eyeriss spatial array maps
 different loop dimensions to each axis.
 Rows absorb the weight-related factors ($C$, $S$, $Z$), while columns
-absorb the output-channel factor ($M$ in single-layer mode, $Z$ in
-multi-layer fusion).
+absorb the output-channel factor.
+
 A row-heavy array (many rows, few columns) can absorb more weight
 factors spatially but leaves larger channel residuals in the column
 direction.
@@ -24,7 +22,7 @@ A column-heavy array does the opposite.
 The optimal shape therefore depends on the relative magnitudes of the
 weight and channel dimensions of the fused workload.
 
-CS5 sweeps all power-of-two factorisations of a fixed PE budget
+CS5 sweeps all power-of-two factorizations of a fixed PE budget
 (2\,048 for FSRCNN and MC-CNN, 16\,384 for VGG16 and ResNet18) and
 records energy, latency, and EDP for each feasible configuration.
 
@@ -35,19 +33,18 @@ Table~\ref{tab:eyeriss-cs5} lists the feasible configurations for
 ResNet18.
 Seven aspect ratios are feasible, from the column-heavy
 $256 \times 64$ to the extreme row-heavy $16{,}384 \times 1$.
-Latency is constant across all configurations
-($3.042 \times 10^{6}$\,cc), so the EDP ranking is determined entirely
+Latency is constant across all configurations, so the EDP ranking is determined entirely
 by energy.
 The best configuration is $256 \times 64$
-($E = 4.993 \times 10^{4}$\,$\mu$J), and energy increases gently as
-the array becomes more row-heavy, reaching
-$5.134 \times 10^{4}$\,$\mu$J at $2{,}048 \times 8$ and beyond.
-The total variation is only $2.8\%$, indicating that for ResNet18 the
+($E = 2.350 \times 10^{4}$\,$\mu$J), and energy increases gently as
+the array becomes more row-heavy.
+
+The total variation is only $2.6\%$, indicating that for ResNet18 the
 aspect ratio has a negligible impact once feasibility is achieved.
 
 \begin{table}[htbp]
   \centering
-  \caption{Eyeriss CS5 — PE aspect ratio sweep for ResNet18
+  \caption{Eyeriss CS5: PE aspect ratio sweep for ResNet18
     (16\,384 total PEs, full fusion).
     Best EDP marked with~$\star$.}
   \label{tab:eyeriss-cs5}
@@ -56,19 +53,19 @@ aspect ratio has a negligible impact once feasibility is achieved.
     Config & Rows & Cols & Energy ($\mu$J) & EDP (J$\cdot$cc) \\
     \midrule
     $256 \times 64$\,$\star$
-           & 256   & 64  & $4.99 \times 10^{4}$ & $1.57 \times 10^{5}$ \\
+           & 256   & 64  & $2.35 \times 10^{4}$ & $7.36 \times 10^{4}$ \\
     $512 \times 32$
-           & 512   & 32  & $5.03 \times 10^{4}$ & $1.57 \times 10^{5}$ \\
+           & 512   & 32  & $2.37 \times 10^{4}$ & $7.37 \times 10^{4}$ \\
     $1024 \times 16$
-           & 1024  & 16  & $5.11 \times 10^{4}$ & $1.59 \times 10^{5}$ \\
+           & 1024  & 16  & $2.40 \times 10^{4}$ & $7.46 \times 10^{4}$ \\
     $2048 \times 8$
-           & 2048  &  8  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
+           & 2048  &  8  & $2.41 \times 10^{4}$ & $7.50 \times 10^{4}$ \\
     $4096 \times 4$
-           & 4096  &  4  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
+           & 4096  &  4  & $2.41 \times 10^{4}$ & $7.50 \times 10^{4}$ \\
     $8192 \times 2$
-           & 8192  &  2  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
+           & 8192  &  2  & $2.41 \times 10^{4}$ & $7.50 \times 10^{4}$ \\
     $16384 \times 1$
-           &16384  &  1  & $5.13 \times 10^{4}$ & $1.60 \times 10^{5}$ \\
+           &16384  &  1  & $2.41 \times 10^{4}$ & $7.50 \times 10^{4}$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -81,46 +78,33 @@ Below 64~columns the mapper must fold more $Z$ residuals into the
 weight register, increasing its access cost slightly.
 
 \paragraph{VGG16 (16\,384 PEs).}
-All seven power-of-two factorisations from $256 \times 64$ to
-$16{,}384 \times 1$ are feasible, all sharing the same latency
-($5.455 \times 10^{6}$\,cc).
-The best EDP is $512 \times 32$
-($E = 3.674 \times 10^{5}$\,$\mu$J,
-EDP\,=\,$2.04 \times 10^{6}$), tied with $256 \times 64$.
-Energy rises by $4.1\%$ to $3.804 \times 10^{5}$\,$\mu$J at
+Seven power-of-two factorisations from $256 \times 64$ to
+$16{,}384 \times 1$ are feasible, all sharing the same latency.
+The best EDP is $512 \times 32$, tied with $256 \times 64$.
+Energy rises by $4.1\%$ at
 $2{,}048 \times 8$ and plateaus thereafter, mirroring the ResNet18
-behaviour.
-The full feasibility range is achieved thanks to a sufficiently large
-IntReg allocation (350~words), which prevents the
-intermediate-activation constraint from ruling out the more
-row-heavy configurations (cf.\ CS2).
+behavior.
 
 \paragraph{FSRCNN (2\,048 PEs).}
-FSRCNN exhibits a broader feasibility range, with all nine
-power-of-two factorisations from $8 \times 256$ to $2{,}048 \times 1$
+FSRCNN exhibits a broader feasibility range, with nine
+power-of-two factorizations from $8 \times 256$ to $2{,}048 \times 1$
 being feasible.
 The best EDP is the most column-heavy configuration,
-$8 \times 256$ ($E = 1.184 \times 10^{5}$\,$\mu$J,
-EDP\,=\,$2.39 \times 10^{6}$).
-Energy is $5.5\%$ lower at $8 \times 256$ than at $64 \times 32$ and
-beyond, where it plateaus at $1.253 \times 10^{5}$\,$\mu$J.
-The column-heavy preference arises because FSRCNN's tiny channel
-counts ($Z \in \{1, 12, 56\}$) benefit from wide column arrays that
-can distribute the $Z$ factors across more SACols groups, reducing
-the per-PE intermediate-activation footprint.
+$8 \times 256$.
+Energy is $5.7\%$ lower at $8 \times 256$ than at $64 \times 32$ and
+beyond, where it plateaus.
+
 
 \paragraph{MC-CNN (2\,048 PEs).}
-All nine configurations are feasible.
-The best EDP is $16 \times 128$
-($E = 1.596 \times 10^{5}$\,$\mu$J,
-EDP\,=\,$2.09 \times 10^{6}$), tying with $128 \times 16$ through
-$2{,}048 \times 1$ on EDP but offering the lowest latency
-($1.223 \times 10^{7}$\,cc).
-The most column-heavy config ($8 \times 256$) has higher latency
-($2.344 \times 10^{7}$\,cc) because only 8 rows cannot absorb enough
+Nine configurations are feasible from $8 \times 256$ to $2{,}048 \times 1$.
+The best EDP is $128 \times 16$, tying with $256 \times 8$ through
+$2{,}048 \times 1$, while $16 \times 128$ is within $0.2\%$
+and offers the lowest latency among competitive configurations.
+The most column-heavy config ($8 \times 256$) has higher latency because only 8 rows cannot absorb enough
 weight factors spatially, forcing more temporal iterations.
-MC-CNN therefore favours a moderate aspect ratio that balances row
+MC-CNN therefore favors a moderate aspect ratio that balances row
 absorption of weights with column distribution of channels.
+
 
 \paragraph{Cross-workload comparison.}
 Figure~\ref{fig:eyeriss-cs5} presents the energy (top row) and EDP
@@ -128,26 +112,24 @@ Figure~\ref{fig:eyeriss-cs5} presents the energy (top row) and EDP
 Two patterns emerge.
 First, the weight-dominant workloads (VGG16, ResNet18) show nearly
 flat energy and EDP curves across all seven feasible aspect ratios,
-with total variation below $4.1\%$ for VGG16 and $2.8\%$ for
+with total variation below $4.1\%$ for VGG16 and $2.6\%$ for
 ResNet18.
 Second, the activation-dominant workloads (FSRCNN, MC-CNN) display
 a mild preference for column-heavy configurations, where the SACols
 mechanism can distribute channel factors more effectively.
 In all cases the EDP variation across feasible aspect ratios is
-modest ($< 6\%$ for FSRCNN, $< 4.1\%$ for VGG16), suggesting
-that the aspect ratio is a secondary design knob compared to register
-sizing (CS1--CS3).
+modest ($< 6\%$ for FSRCNN, $< 4.1\%$ for VGG16).
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{plots/eyeriss_cs5_aspect_ratio.pdf}
-  \caption{Eyeriss CS5 — Energy (top) and EDP (bottom) vs.\ PE aspect
+  \caption{Eyeriss CS5: Energy (top) and EDP (bottom) vs.\ PE aspect
     ratio at fixed total PEs.
     Stars mark the best-EDP configuration for each workload.}
   \label{fig:eyeriss-cs5}
 \end{figure}
 
-\paragraph{Key takeaway.}
+\paragraph{Considerations}
 Once the register sizes are set to satisfy the fused mapping
 constraints, the PE aspect ratio has limited influence on energy and
 EDP.

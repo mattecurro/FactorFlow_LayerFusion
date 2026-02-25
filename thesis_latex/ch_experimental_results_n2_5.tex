@@ -1,5 +1,5 @@
 % ============================================================
-%  N.2.5  Eyeriss CS2 & CS3 — Activation Register Sizing
+%  N.2.5  Eyeriss CS2 & CS3: Activation Register Sizing
 % ============================================================
 \subsection{Eyeriss: Activation Register Sizing (CS2, CS3)}
 \label{sec:eyeriss-cs2-cs3}
@@ -15,16 +15,16 @@ consecutive fused layers; and an \emph{output register} (OutReg),
 which holds the final-layer output before it is written back to the
 GlobalBuffer.
 
-Of these three, only IntReg is genuinely affected by fusion.
+Of these three, only IntReg (CS2) is genuinely affected by fusion.
 The InReg sees exclusively the network's input, regardless of how
 many layers are fused: intermediate activations produced inside the
 fusion chain never pass through InReg, they are routed to IntReg
 instead.
-The InReg footprint is therefore identical to the single-layer case
-and does not require a dedicated sweep.
 Similarly, the OutReg stores only the last fused layer's output
 channel residual, so its footprint does not grow with the number of
 fused layers.
+
+We will analyze InReg and OutReg in a unique case study CS3.
 
 Under full fusion the IntReg must accommodate the residual channel
 factors of \emph{all} intermediate activations, i.e.\ the $Z_i$
@@ -32,76 +32,18 @@ values that the spatial-array columns (SACols) cannot absorb.
 The footprint therefore scales with the number of fused layers and
 with the width of their channel dimensions.
 
-The designer's question mirrors CS1:
-\emph{given a PE budget, what is the minimum IntReg (or OutReg) that
-admits a feasible fused mapping?}
-CS2 answers this for the intermediate register and CS3 for the output
-register.
-In both sweeps all other registers (WReg, InReg, and OutReg or IntReg,
-respectively) are held at generous values so that only the register
-under test is the binding constraint.
 
 % ────────────────────────────────────────────────────────────────────
-\subsubsection{CS2 — Intermediate Register}
 \label{sec:eyeriss-cs2}
 
-\paragraph{Weight-dominant workloads (VGG16, ResNet18).}
-Table~\ref{tab:eyeriss-cs2-intreg} reports, for each tested IntReg
-size, the minimum-PE configuration that yields a feasible mapping.
+\paragraph{CS2 per Weight-dominant workloads (ResNet18, VGG16)}: \\
 
-\begin{table}[htbp]
-  \centering
-  \caption{Eyeriss CS2 — Minimum PE count as a function of IntReg
-    size (VGG16 and ResNet18, full fusion).
-    WReg and other registers are set large enough to be non-binding.}
-  \label{tab:eyeriss-cs2-intreg}
-  \begin{tabular}{llrrr}
-    \toprule
-    Workload & IntReg & Config & Total PEs & Saturation \\
-    \midrule
-    VGG16    &   50 & $512 \times 32$  & 16\,384 & \\
-    VGG16    &  100 & $256 \times 32$  &  8\,192 & \\
-    VGG16    &  230 & $256 \times 16$  &  4\,096 & $\checkmark$ \\
-    \midrule
-    ResNet18 &   50 & $128 \times 128$ & 16\,384 & \\
-    ResNet18 &  200 & $256 \times  32$ &  8\,192 & \\
-    ResNet18 &  400 & $256 \times  16$ &  4\,096 & $\checkmark$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+
 
 The table reveals the same doubling rule observed for WReg in CS1.
-The mechanism is as follows: the per-PE intermediate footprint equals
-the total residual channel sum across all fused layer boundaries,
-divided by the number of PE columns.
-A smaller IntReg budget therefore forces the mapper to increase the
-column count so that each PE's share of the footprint stays within
-the register capacity.
 
-Taking ResNet18 as an example, the total intermediate footprint
-across 16~layer boundaries is approximately 209~entries when mapped
-onto 16~columns.
-At IntReg\,=\,400 this footprint fits comfortably, so the mapper
-saturates at $256 \times 16 = 4{,}096$~PEs: enlarging IntReg beyond
-400 no longer reduces the PE count.
-Halving the register to IntReg\,=\,200 forces the mapper to double
-the column count to 32, yielding $256 \times 32 = 8{,}192$~PEs,
-because each PE must now hold its share within a tighter budget.
-At IntReg\,=\,50 the array widens further to
-$128 \times 128 = 16{,}384$~PEs.
-Each halving of IntReg therefore roughly doubles the required column
-count, driving a proportional increase in total PEs.
 
-VGG16 follows the same pattern.
-At IntReg\,=\,230 the mapper saturates at
-$256 \times 16 = 4{,}096$~PEs, corresponding to a per-PE footprint
-of $\sim$229~entries on 16~columns.
-Reducing IntReg to 100 doubles the array to
-$256 \times 32 = 8{,}192$~PEs, and at IntReg\,=\,50 it reaches
-$512 \times 32 = 16{,}384$~PEs.
-
-Figure~\ref{fig:eyeriss-cs2-inv} presents the designer-oriented
-view: the horizontal axis is the PE budget and the vertical axis is
+Figure~\ref{fig:eyeriss-cs2-inv} the horizontal axis is the PE budget and the vertical axis is
 the minimum IntReg that makes the fused mapping feasible.
 Reading the curve from left to right, one can directly read off the
 register size that a given area constraint demands.
@@ -111,7 +53,7 @@ reduction in PE budget roughly doubles the minimum IntReg.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.85\textwidth]{plots/eyeriss_cs2_intreg_inverted.pdf}
-  \caption{Eyeriss CS2 — Minimum IntReg required as a function of PE
+  \caption{Eyeriss CS2: Minimum IntReg required as a function of PE
     budget (VGG16 and ResNet18, full fusion).}
   \label{fig:eyeriss-cs2-inv}
 \end{figure}
@@ -121,26 +63,20 @@ at the minimum-PE configuration for each IntReg size.
 Energy increases monotonically with IntReg, because a larger register
 incurs a higher access cost on every read.
 For ResNet18 the increase is $1.4\times$ from IntReg\,=\,50 to
-IntReg\,=\,1\,000 ($1.14 \times 10^{5} \to 1.59 \times 10^{5}$\,
-$\mu$J), a modest penalty compared to the $2.4\times$ energy span
+IntReg\,=\,1\,000 ($5.15 \times 10^{4} \to 7.12 \times 10^{4}$\,
+$\mu$J), a modest penalty compared to the $2.2\times$ energy span
 caused by WReg in CS1.
 
-\paragraph{Activation-dominant workloads (FSRCNN, MC-CNN).}
+\paragraph{CS2 per Activation-dominant workloads (FSRCNN, MC-CNN).}
 For these workloads the intermediate register is not the binding
 constraint.
-FSRCNN achieves the same minimum PE configuration
-($128 \times 4 = 512$~PEs) at every tested IntReg from 200 to 400;
-energy scales linearly with register size but the PE count is
-unaffected.
-MC-CNN shows a marginal effect: at IntReg\,=\,15 the mapper requires
-more PEs than at IntReg\,$\ge$\,30, where the PE count saturates.
-In both cases the intermediate footprint is small because these
+In both cases the intermediate footprint is small (16) because these
 networks have few fused layers and narrow channels.
 
 % ────────────────────────────────────────────────────────────────────
-\subsubsection{CS3 — Output Register}
 \label{sec:eyeriss-cs3}
 
+\paragraph{CS3}
 The output register stores only the last fused layer's channel
 residual, so its footprint is inherently smaller than that of IntReg
 or WReg.
@@ -149,17 +85,17 @@ and this value turns out to be sufficient for full fusion as well at
 the PE budgets that WReg and IntReg already demand.
 
 Table~\ref{tab:eyeriss-cs3-outreg} confirms this.
-For ResNet18, OutReg\,=\,16 requires $256 \times 32 = 8{,}192$~PEs,
-while the WReg constraint (CS1) already forces 16\,384~PEs at the
-tightest feasible point.
+For ResNet18, OutReg\,=\,16 requires $128 \times 32 = 4{,}096$~PEs,
+which is the saturation point.
+The WReg constraint (CS1) already forces 16\,384~PEs at the
+tightest feasible point, so
 OutReg is therefore automatically satisfied whenever WReg is.
-Saturation occurs at OutReg\,=\,32 ($256 \times 16 = 4{,}096$~PEs).
 VGG16 tells the same story: OutReg\,=\,16 fits at
 $128 \times 32 = 4{,}096$~PEs, which is also the saturation point.
 
 \begin{table}[htbp]
   \centering
-  \caption{Eyeriss CS3 — Minimum PE count as a function of OutReg
+  \caption{Eyeriss CS3: Minimum PE count as a function of OutReg
     size (VGG16 and ResNet18, full fusion).
     All other registers are non-binding.}
   \label{tab:eyeriss-cs3-outreg}
@@ -168,12 +104,11 @@ $128 \times 32 = 4{,}096$~PEs, which is also the saturation point.
     Workload & OutReg & Config & Total PEs & Saturation \\
     \midrule
     VGG16    &   4 & $128 \times 128$ & 16\,384 & \\
-    VGG16    &   8 & $256 \times  32$ &  8\,192 & \\
+    VGG16    &   8 & $128 \times  64$ &  8\,192 & \\
     VGG16    &  16 & $128 \times  32$ &  4\,096 & $\checkmark$ \\
     \midrule
-    ResNet18 &   8 & $256 \times  64$ & 16\,384 & \\
-    ResNet18 &  16 & $256 \times  32$ &  8\,192 & \\
-    ResNet18 &  32 & $256 \times  16$ &  4\,096 & $\checkmark$ \\
+    ResNet18 &   8 & $128 \times  64$ &  8\,192 & \\
+    ResNet18 &  16 & $128 \times  32$ &  4\,096 & $\checkmark$ \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -189,36 +124,15 @@ the same minimum configuration.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.85\textwidth]{plots/eyeriss_cs3_outreg_inverted.pdf}
-  \caption{Eyeriss CS3 — Minimum OutReg required as a function of PE
+  \caption{Eyeriss CS3: Minimum OutReg required as a function of PE
     budget (VGG16 and ResNet18, full fusion).}
   \label{fig:eyeriss-cs3-inv}
 \end{figure}
 
-% ────────────────────────────────────────────────────────────────────
-\subsubsection{Combined Energy View}
+Analogous reasoning can be applied for Input register sizing.
 
-Figure~\ref{fig:eyeriss-cs2cs3} collects the energy behaviour of all
-four workloads for both register sweeps.
-The top row (CS2, IntReg) and the bottom row (CS3, OutReg) share a
-common pattern: energy rises with register size because larger SRAM
-structures cost more per access.
-For weight-dominant workloads the effect is modest ($< 1.4\times$
-over the tested range), while for FSRCNN the linear energy growth
-is steeper in relative terms because FSRCNN's small absolute energy
-makes each additional register entry more visible.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.95\textwidth]{plots/eyeriss_cs2cs3_intreg_outreg.pdf}
-  \caption{Eyeriss CS2\,/\,CS3 — Energy vs.\ register size for all
-    workloads.
-    Top row: IntReg sweep.
-    Bottom row: OutReg sweep.
-    Each point uses the minimum-PE feasible configuration.}
-  \label{fig:eyeriss-cs2cs3}
-\end{figure}
-
-\paragraph{Key takeaway.}
+\paragraph{Considerations}
 The intermediate register follows the same PE-doubling-per-halving
 rule as the weight register, but its absolute footprint is roughly
 one order of magnitude smaller, so it becomes binding only at PE
@@ -226,9 +140,6 @@ counts well below the WReg minimum.
 The output register is even less constraining: with OutReg\,=\,16
 (the value used in the original single-layer Eyeriss), the fused
 mapping is already feasible at the PE budgets imposed by WReg.
-The input register is unaffected by fusion altogether, because it
+The input register is unaffected by fusion too, because it
 handles only the first layer's input and its footprint remains the
 same as in single-layer execution.
-In practice, the binding hierarchy for the Eyeriss-Like architecture
-under full fusion is
-$\text{WReg} \gg \text{IntReg} > \text{OutReg} \ge \text{InReg}$.
