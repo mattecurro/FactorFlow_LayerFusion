@@ -200,8 +200,8 @@ between the original and modified versions of both architectures.
         WReg/InReg/OutReg sizes swept as variables \\
     \addlinespace
     Technology
-      & 22\,nm, $0.5\times$ scale
-      & 22\,nm, $0.5\times$ scale \\
+      & 12\,nm
+      & 12\,nm \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -214,9 +214,14 @@ All per-access energy values are derived from
 Accelergy~\cite{accelergy} using the CACTI plug-in for SRAMs and DRAM,
 and the Neurosim plug-in for register files.
 Both architectures target the same LPDDR4 DRAM interface (64-bit bus,
-22\,nm technology node with a $0.5\times$ scaling factor to approximate
-a 12\,nm process), yielding an identical DRAM cost of
-32\,pJ\,/\,byte.
+12\,nm technology node).
+For the off-chip DRAM energy we adopt the value of
+160\,pJ\,/\,byte used by DepFiN~\cite{depfin}, which is itself
+derived from JEDEC LPDDR4 specifications.
+This value accounts for the full read/write access cost including I/O
+and is considerably higher than the CACTI model estimate; it is also
+consistent with the widely cited range of 100--200\,pJ\,/\,byte in
+recent DNN accelerator literature~\cite{eyeriss_jssc}.
 Table~\ref{tab:energy-per-byte} reports the energy per byte at each
 level of the memory hierarchy for a representative configuration of
 each architecture.
@@ -227,8 +232,7 @@ each architecture.
 \begin{table}[htbp]
   \centering
   \caption{Energy per byte of access at each memory-hierarchy level
-           (pJ\,/\,byte), estimated by Accelergy at 22\,nm with
-           $0.5\times$ technology scaling.
+           (pJ\,/\,byte), estimated by Accelergy at 12\,nm.
            DepFiN config: FMEM\,=\,568\,KB, PE\,$16{\times}128$.
            Eyeriss config: GB\,=\,128\,KB, PE\,$512{\times}32$,
            WReg\,=\,1200, InReg\,=\,400, IntReg\,=\,350,
@@ -242,37 +246,36 @@ each architecture.
     \cmidrule(lr){1-2} \cmidrule(lr){3-4}
     Level & pJ\,/\,byte & Level & pJ\,/\,byte \\
     \midrule
-    DRAM           & 32.00  & DRAM              & 32.00  \\
-    FMEM           &  0.48  & GlobalBuffer      &  0.17  \\
-    AccReg         &  0.20  & WeightReg         & 13.23  \\
-    Compute (MAC)  &  0.22  & InputReg          &  4.48  \\
-                   &        & IntermediateReg   &  3.94  \\
-                   &        & OutputReg         &  0.81  \\
-                   &        & Compute (MAC)     &  0.19  \\
+    DRAM           & 160.00 & DRAM              & 160.00 \\
+    FMEM           &  0.71  & GlobalBuffer      &  0.24  \\
+    AccReg         &  0.09  & WeightReg         &  5.79  \\
+    Compute (MAC)  &  0.10  & InputReg          &  1.97  \\
+                   &        & IntermediateReg   &  1.73  \\
+                   &        & OutputReg         &  0.36  \\
+                   &        & Compute (MAC)     &  0.08  \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 Two observations follow from the table.
 First, DRAM access energy dominates the on-chip hierarchy by a factor
-of $\sim\!66\times$ over FMEM in DepFiN and $\sim\!194\times$ over
+of $\sim\!225\times$ over FMEM in DepFiN and $\sim\!655\times$ over
 the GlobalBuffer in Eyeriss.
 Because layer fusion eliminates DRAM traffic for all intermediate
 activations (Section~\ref{sec:partial-full-fusion}), the energy
 saving from fusion scales directly with this DRAM-to-on-chip ratio:
 the higher the assumed DRAM cost, the more fusion wins.
 A sensitivity test with DRAM energy set to 200\,pJ\,/\,byte
-($6.25\times$ the Accelergy estimate) confirms this effect:
-on FSRCNN, DepFiN full fusion saves 73.8\,\% of energy versus
-the unfused baseline, compared with a more modest saving at
-32\,pJ\,/\,byte, because the unfused configuration must pay the
-higher DRAM cost on $\sim$90\,M bytes of intermediate traffic that
-fusion eliminates entirely.
+($1.25\times$ the baseline) confirms this scaling:
+on FSRCNN, DepFiN full fusion saves an even larger fraction of energy
+versus the unfused baseline, because the unfused configuration must
+pay the higher DRAM cost on $\sim$90\,M bytes of intermediate
+traffic that fusion eliminates entirely.
 
 Second, the Eyeriss register hierarchy is notably more expensive than
 DRAM-relative to the DepFiN case.
 In particular, the WeightRegister at 1\,200~entries costs
-13.23\,pJ\,/\,byte, which is already $0.41\times$ the DRAM cost.
+5.79\,pJ\,/\,byte, which is already $0.036\times$ the DRAM cost.
 Full fusion on Eyeriss requires very large per-PE registers to hold
 the state of all fused layers simultaneously, so each MAC operation
 incurs a substantial register-energy overhead.

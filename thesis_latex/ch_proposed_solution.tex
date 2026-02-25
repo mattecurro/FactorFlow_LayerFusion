@@ -103,11 +103,7 @@ This has two severe consequences:
         Every loop that moves the first convolution simultaneously
         moves the second, because the only available variables ($P$,
         $Q$, $R_1$, $S_1$, $R_0$, $S_0$) are shared across the
-        nested dim-sum.
-        There is no way to place, say, a weight dimension of the first
-        layer at one position in the dataflow while placing a weight
-        dimension of the second layer at a different position ---
-        the two layers cannot have independent stationarities
+        nested dim-sum, the fused layers cannot have independent stationarities
         (Section~\ref{sec:data-reuse}).
 
   \item \textbf{Forced back-to-back MAC execution.}
@@ -120,7 +116,7 @@ This has two severe consequences:
         The mapping has no mechanism to express, for instance,
         performing several iterations of $\text{MAC}_0$ (accumulating
         a partial tile of the intermediate) before switching to
-        $\text{MAC}_1$ to consume that tile --- even though such a
+        $\text{MAC}_1$ to consume that tile, even though such a
         schedule could improve weight reuse or reduce partial-sum
         traffic.
         More broadly, neither a layer-by-layer schedule (complete all
@@ -137,7 +133,7 @@ Aliasing resolves this by introducing a \emph{new set of loop
 variables} for each intermediate tensor.
 The idea is to give the intermediate its own concrete dimension names,
 for instance $Y_0$ and $X_0$ for the height and width of the first
-intermediate activation, and to register them in the coupling \ref{sec:bg-coupling} so
+intermediate activation, and to register them in the coupling  (Section \ref{sec:bg-coupling}) so
 that:
 %
 \begin{itemize}
@@ -266,7 +262,7 @@ evaluated after every candidate mapping modification.
 Aliasing gives each intermediate tensor concrete dimension names that
 appear in the unified loop nest.
 A fundamental consequence of this naming is that the dimensions of
-different layers become \textbf{disjoint}, leading to a property we
+different layers become disjoint, leading to a property we
 call \emph{decoupling}: iterating over any dimension of one layer
 leaves all other layers \emph{stationary}.
 
@@ -275,7 +271,7 @@ leaves all other layers \emph{stationary}.
 \label{sec:ps-decouple-sets}
 
 The unified dimension set
-$\mathcal{D}$ (Equation~\ref{eq:fused-dims}) can be partitioned into
+$\mathcal{D}$ can be partitioned into
 per-layer subsets by collecting, for each layer, every dimension that
 appears in any operand coupling involving that layer.
 For the two-layer example of
@@ -296,7 +292,7 @@ Equations~\ref{eq:mac0-alias}--\ref{eq:mac1-alias}:
                  \;\cup\;
                  \underbrace{\{Z_1, P, Q\}}_{\texttt{out}}
                  \;=\;
-                 \{Z_1, P, Q, R_1, S_1, C_1\}.
+                 \{C_1, P, Q, R_1, S_1, Z_1\}.
   \label{eq:D1-dims}
 \end{align}
 %
@@ -463,8 +459,7 @@ fresh dimensions:
 \end{itemize}
 %
 The total dimension count therefore grows by six for every fused
-layer, yielding the $|\mathcal{D}| = 6F$ formula of
-Equation~\ref{eq:fused-dims}.
+layer.
 
 The map-space impact is substantial.
 Each new dimension contributes additional permutations at every memory
@@ -555,30 +550,6 @@ eliminate infeasible mappings from the search space \emph{before} cost
 evaluation.
 
 
-\paragraph{Exactness.}
-This rule is not an approximation: it encodes a necessary physical
-property of any valid fused-layer schedule.
-No mapping that satisfies the constraints is discarded.
-The pruning is therefore \emph{exact}: it removes only infeasible
-points from the map space, preserving every feasible, and potentially
-optimal, mapping.
-
-
-\paragraph{Per-axis decomposition.}
-Each intermediate layer ~$i$ introduces three alias pairs
-(Section~\ref{sec:ps-aliasing}), one for each physical axis of the
-tensor~$A_i$: width $(Q_i, S_i, X_i)$, height $(P_i, R_i, Y_i)$,
-and channels $(C_{i+1}, Z_i)$.
-Because the three axes index orthogonal dimensions of the same tensor,
-the pruning constraint can be evaluated \emph{independently} for each
-triplet: satisfying the width constraint
-(Equation~\ref{eq:ps-heuristic-width}) neither implies nor precludes
-satisfaction of the height constraint
-(Equation~\ref{eq:ps-heuristic-height}), and likewise for the channel
-constraint (Equation~\ref{eq:ps-heuristic-channel}).
-The implementation exploits this decomposition by calling the same
-single-triplet validator specifically for the axis that was moved by move-factor with respect to the starting valid configuration.
-
 \subsubsection{Cross-Level Validation}
 \label{sec:ps-cross-level}
 
@@ -594,7 +565,7 @@ nest, a boundary that can span multiple memory levels.
 \paragraph{Zone definition.}
 Consider a loop order that contains $K$ instances of the producer
 dimension $X$: $x_1, x_2, \dots, x_K$ (from outermost to innermost).
-Each consecutive pair $(x_k, x_{k+1})$ defines a \emph{zone} — the
+Each consecutive pair $(x_k, x_{k+1})$ defines a \emph{zone}, the
 set of all loops strictly between $x_k$ and $x_{k+1}$ in the nest.
 Within a zone, the consumer loops $Q$ and $S$ may appear at any
 memory level; the zone itself typically spans the boundary between
@@ -639,6 +610,30 @@ If a consumer dimension $Q$ or $S$ has non-trivial iterations below
 the innermost $X$, the mapping is rejected immediately.
 
 
+\paragraph{Exactness.}
+This rule is not an approximation: it encodes a necessary physical
+property of any valid fused-layer schedule.
+No mapping that satisfies the constraints is discarded.
+The pruning is therefore \emph{exact}: it removes only infeasible
+points from the map space, preserving every feasible, and potentially
+optimal, mapping.
+
+
+\paragraph{Per-axis decomposition.}
+Each intermediate layer ~$i$ introduces three alias pairs
+(Section~\ref{sec:ps-aliasing}), one for each physical axis of the
+tensor~$A_i$: width $(Q_i, S_i, X_i)$, height $(P_i, R_i, Y_i)$,
+and channels $(C_{i+1}, Z_i)$.
+Because the three axes index orthogonal dimensions of the same tensor,
+the pruning constraint can be evaluated \emph{independently} for each
+triplet: satisfying the width constraint
+(Equation~\ref{eq:ps-heuristic-width}) neither implies nor precludes
+satisfaction of the height constraint
+(Equation~\ref{eq:ps-heuristic-height}), and likewise for the channel
+constraint (Equation~\ref{eq:ps-heuristic-channel}).
+The implementation exploits this decomposition by calling the same
+single-triplet validator specifically for the axis that was moved by move-factor with respect to the starting valid configuration.
+
 
 \subsubsection{Integration with the Mapper}
 
@@ -649,6 +644,8 @@ Equations~\ref{eq:ps-heuristic-width}--\ref{eq:ps-heuristic-channel},
 the move is rolled back and marked as infeasible.
 Because the pruning eliminates only infeasible mappings, the mapper
 is guaranteed to retain every valid candidate.
+
+
 
 
 % ====================================================================
@@ -740,7 +737,7 @@ convolutions (cf.\ Section~\ref{sec:normal-affine}).
 
 \paragraph{Example: two-layer convolution.}
 The coupling for a two-layer fusion ($F = 2$) provides a concrete
-illustration (cf.\ Section~\ref{sec:multi-layer-workload}):
+illustration:
 
 \begin{center}
 \small
@@ -782,13 +779,13 @@ An architecture in FactorFlow is an ordered list of \emph{levels},
 from outermost (e.g.\ DRAM) to innermost (Compute).
 Three level types are supported:
 \begin{itemize}
-  \item \textbf{MemLevel} — a storage level characterized by capacity
+  \item \textbf{MemLevel}: a storage level characterized by capacity
         (bytes), per-access energy (picojoules per byte), separate read
         and write bandwidths (bytes per cycle), a bypass list, and
         optional factors and dataflow constraints.
-  \item \textbf{FanoutLevel} — a spatial unrolling level with a fixed
+  \item \textbf{FanoutLevel}: a spatial unrolling level with a fixed
         mesh size and the dimensions across which data is distributed.
-  \item \textbf{ComputeLevel} — the innermost functional unit
+  \item \textbf{ComputeLevel}: the innermost functional unit
         performing the MAC operation, with a fixed compute energy and
         latency (cycles per operation).
 \end{itemize}
@@ -799,12 +796,12 @@ The single-layer FactorFlow uses three bypass tags
 The multi-layer extension adds \texttt{int\_in} and \texttt{int\_out},
 enabling per-level control over which intermediate operands are stored.
 A level's bypass list specifies which operand categories are
-\emph{not} stored at that level — equivalently, which operands "pass
+\emph{not} stored at that level, equivalently, which operands "pass
 through" without incurring local access energy.
 
-As an example, the DepFiN architecture
-(cf.\ Table~\ref{tab:bypass-depfin}) specifies:
+As an example, the DepFiN architecture specifies:
 \begin{center}
+\label{tab: fused-bypasses}
 \small
 \begin{tabular}{ll}
   \toprule
@@ -817,6 +814,7 @@ As an example, the DepFiN architecture
   AccReg         & \texttt{in}, \texttt{w}, \texttt{int\_in} \\
   \bottomrule
 \end{tabular}
+
 \end{center}
 
 \noindent
@@ -830,15 +828,9 @@ inter-layer data reuse that motivates fusion
 Each \texttt{MemLevel} can specify:
 \begin{itemize}
   \item A \texttt{dataflow\_constraints} list, fixing the loop
-        ordering at that level.  For instance, the WeightMemory in
-        DepFiN constrains all weight dimensions
-        ($Z_i, C_i, R_i, S_i$ for every~$i$) to be the innermost
-        loops, ensuring maximal weight reuse.
+        ordering at that level.  
   \item A \texttt{factors\_constraints} dictionary, fixing the number
-        of iterations of specified dimensions.  For example,
-        $\{C_i\!: 32\}$ forces the innermost weight loop on the
-        channel dimension to tile by~32, while $\{R_i\!: 3,\; S_i\!: 3\}$
-        places the full $3 \times 3$ filter at that level.
+        of iterations of specified dimensions at that level.
 \end{itemize}
 
 \noindent
@@ -872,7 +864,7 @@ must respect the capacity and equality constraints attached to that
 level (feasibility).
 
 For fused mappings, the factors allocation spans all $|\mathcal{D}|$
-dimensions — both aliased and decoupled — and the
+dimensions, both aliased and decoupled, and the
 producer--consumer pruning of Section~\ref{sec:ps-pruning} adds an
 additional feasibility filter on top of the standard capacity
 constraints.
@@ -884,10 +876,9 @@ unified dataflow implicitly encodes a \emph{different mapping}, and
 hence a different \emph{stationarity}, for each layer, all within a
 single loop nest.
 
-Recall that stationarity is determined by which dimensions iterate at
+Stationarity (Section \ref{sec:data-reuse} is determined by which dimensions iterate at
 a given level: an operand is stationary when the innermost loops at
-that level are orthogonal to it
-(Section~\ref{sec:data-reuse}).
+that level are orthogonal to it.
 Because decoupling makes the per-layer dimension sets disjoint
 ($\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$,
 Section~\ref{sec:ps-decouple-sets}), the dataflow ordering at any
@@ -897,7 +888,7 @@ Within the unified ordering, each layer therefore ``sees'' its own
 sub-sequence of loops, and the innermost element of that sub-sequence
 determines that layer's stationarity at that level.
 
-Consider, for instance, a two-layer fusion where the dataflow at a
+For instance, if we consider a two-layer fusion where the dataflow at a
 memory level orders the dimensions as
 $[\ldots,\, C_1,\, X_0,\, \ldots]$ (from outermost to innermost).
 Layer~$0$ sees $X_0$ as the innermost relevant loop: the weights
@@ -906,7 +897,8 @@ stationary.
 Layer~$1$ sees $C_1$ as its innermost relevant loop: the output
 $\text{Out}[\,z_1, p, q\,]$ does not depend on $C_1$, so the output
 is stationary.
-A different ordering, e.g.\
+
+If we consider a different ordering, e.g.\
 $[\ldots,\, Z_1,\, X_0,\, \ldots]$, would make
 $W_1$ vary on the innermost layer-$1$ loop ($Z_1$ indexes $W_1$),
 yielding an \emph{input-stationary} dataflow for layer~$1$ while

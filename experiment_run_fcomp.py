@@ -1592,7 +1592,7 @@ END OF EYERISS MCCNN
     ────────────────────────────────────────────────────────────────────────────
     FULL vs SINGLE — FSRCNN on Eyeriss 128×16 (2048 PEs), WReg=384
     ────────────────────────────────────────────────────────────────────────────
-    python3 experiment_runner.py --compare-full-vs-single -w fsrcnn \
+    python3 experiment_runner.py --compare-full-vs-single --dram-energy 160 -w fsrcnn \
         --arch-type eyeriss --pe-rows 256 --pe-cols 8 --weight-reg 384 \
         --gb-size 128 --tile-size 120 --input-reg 34 --intermediate-reg 32 \
         --output-reg 64 | tee EY_FSRCNN_384B_full_vs_single.log  

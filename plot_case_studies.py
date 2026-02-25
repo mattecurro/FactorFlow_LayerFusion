@@ -487,6 +487,97 @@ FUSION_AUTO = {
 
 
 # ====================================================================
+#  DATA  –  Fusion Comparisons (Auto-Sized, DRAM Energy = 160 pJ/byte)
+#  Same architecture configs as FUSION_AUTO but with DRAM access energy
+#  hardcoded to 160 pJ/byte (DepFiN/JEDEC value).
+# ====================================================================
+
+FUSION_AUTO_DRAM_160 = {
+    # ── Source: experiment_runner.py --compare-fusion --dram-energy 160 ───
+    "DepFiN": {
+        "FSRCNN": {
+            "pe": "16x128", "fmem": "576KB", "wmem": "19KB", "tile": 120,
+            "full":    {"energy": 7.046e3, "latency": 6.156e6, "edp": 5.62e4,
+                        "dram_rd": 1_573_992, "dram_wr": 8_294_400},
+            "single":  {"energy": 3.084e4, "latency": 1.175e7, "edp": 3.62e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+            "partial": {"energy": 1.034e4, "latency": 6.351e6, "edp": 6.56e4,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+        },
+        "MC-CNN": {
+            "pe": "8x256", "fmem": "522KB", "wmem": "32KB", "tile": 207,
+            "full":    {"energy": 1.043e4, "latency": 7.975e6, "edp": 1.08e5,
+                        "dram_rd": 494_928, "dram_wr": 14_943_744},
+            "single":  {"energy": 1.806e4, "latency": 1.381e7, "edp": 2.49e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+            "partial": {"energy": 1.490e4, "latency": 7.975e6, "edp": 1.19e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+        },
+        "VGG16": {
+            "pe": "16x128", "fmem": "568KB", "wmem": "14366KB", "tile": 14,
+            "full":    {"energy": 1.040e5, "latency": 2.728e7, "edp": 5.41e6,
+                        "dram_rd": 14_860_992, "dram_wr": 100_352},
+            "single":  {"energy": 7.715e3, "latency": 2.452e7, "edp": 1.89e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+            "partial": {"energy": 5.073e4, "latency": 2.432e7, "edp": 1.23e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+        },
+        "ResNet18": {
+            "pe": "16x128", "fmem": "266KB", "wmem": "10738KB", "tile": 7,
+            "full":    {"energy": 1.573e4, "latency": 8.998e6, "edp": 2.55e5,
+                        "dram_rd": 11_032_512, "dram_wr": 25_088},
+            "single":  {"energy": 2.715e3, "latency": 6.905e6, "edp": 1.87e4,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+            "partial": {"energy": 1.176e4, "latency": 7.813e6, "edp": 9.19e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+        },
+    },
+    "Eyeriss": {
+        "FSRCNN": {
+            "pe": "128x16", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 120,
+            "full":    {"energy": 3.294e4, "latency": 1.918e7, "edp": 6.52e5,
+                        "dram_rd": 1_573_992, "dram_wr": 8_294_400},
+            "single":  {"energy": 3.245e4, "latency": 3.525e7, "edp": 1.14e6,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+            "partial": {"energy": 2.189e4, "latency": 1.918e7, "edp": 4.20e5,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+        },
+        "MC-CNN": {
+            "pe": "256x8", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 69,
+            "full":    {"energy": 4.281e4, "latency": 1.261e7, "edp": 5.49e5,
+                        "dram_rd": 494_928, "dram_wr": 14_943_744},
+            "single":  {"energy": 1.925e4, "latency": 1.495e7, "edp": 2.88e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+            "partial": {"energy": 2.762e4, "latency": 1.261e7, "edp": 3.48e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+        },
+        "VGG16": {
+            "pe": "512x32", "gb": "128KB", "wreg": 1200, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "full":    {"energy": 1.632e5, "latency": 5.455e6, "edp": 9.04e5,
+                        "dram_rd": 14_860_992, "dram_wr": 100_352},
+            "single":  {"energy": 9.594e3, "latency": 6.922e6, "edp": 6.64e4,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+            "partial": {"energy": 6.391e4, "latency": 5.852e6, "edp": 3.74e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+        },
+        "ResNet18": {
+            "pe": "512x32", "gb": "128KB", "wreg": 902, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "full":    {"energy": 2.366e4, "latency": 3.042e6, "edp": 7.37e4,
+                        "dram_rd": 11_032_512, "dram_wr": 25_088},
+            "single":  {"energy": 2.977e3, "latency": 3.301e6, "edp": 9.83e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+            "partial": {"energy": 1.641e4, "latency": 3.139e6, "edp": 5.15e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+        },
+    },
+}
+
+
+# ====================================================================
 #  DATA  –  Fusion Comparisons (Auto-Sized, DRAM Energy = 200 pJ/byte)
 #  Same architecture configs as FUSION_AUTO but with DRAM access energy
 #  hardcoded to 200 pJ/byte instead of the Accelergy-derived 32 pJ/byte.
@@ -534,7 +625,8 @@ FUSION_AUTO_DRAM_200 = {
     },
     "Eyeriss": {
         "FSRCNN": {
-            "pe": "128x16", "gb": "128KB", "wreg": 384,
+            "pe": "128x16", "gb": "128KB", "wreg": 384, "inreg": 34,  "intreg":32,
+            "outreg": 64, "tile": 120,
             "full":    {"energy": 1.146e5, "latency": 1.918e7, "edp": 2.35e6,
                         "dram_rd": 1_573_992, "dram_wr": 8_294_400},
             "single":  {"energy": 4.913e4, "latency": 3.525e7, "edp": 1.73e6,
@@ -543,7 +635,8 @@ FUSION_AUTO_DRAM_200 = {
                         "dram_rd": 14_015_592, "dram_wr": 20_736_000},
         },
         "MC-CNN": {
-            "pe": "256x8", "gb": "128KB", "wreg": 384, "intreg": 65,
+            "pe": "256x8", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 69,
             "full":    {"energy": 9.502e4, "latency": 1.261e7, "edp": 1.22e6,
                         "dram_rd": 494_928, "dram_wr": 14_943_744},
             "single":  {"energy": 2.641e4, "latency": 1.495e7, "edp": 3.95e5,
@@ -552,7 +645,8 @@ FUSION_AUTO_DRAM_200 = {
                         "dram_rd": 15_438_672, "dram_wr": 29_887_488},
         },
         "VGG16": {
-            "pe": "512x32", "gb": "128KB", "wreg": 1200, "intreg": 350,
+            "pe": "512x32", "gb": "128KB", "wreg": 1200, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
             "full":    {"energy": 3.699e5, "latency": 5.455e6, "edp": 2.05e6,
                         "dram_rd": 14_860_992, "dram_wr": 100_352},
             "single":  {"energy": 1.568e4, "latency": 6.922e6, "edp": 1.09e5,
@@ -561,7 +655,9 @@ FUSION_AUTO_DRAM_200 = {
                         "dram_rd": 17_670_848, "dram_wr": 7_426_048},
         },
         "ResNet18": {
-            "pe": "512x32", "gb": "128KB", "wreg": 902, "intreg": 300,
+            "pe": "512x32", "gb": "128KB", "wreg": 902, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+
             "full":    {"energy": 4.915e4, "latency": 3.042e6, "edp": 1.53e5,
                         "dram_rd": 11_032_512, "dram_wr": 25_088},
             "single":  {"energy": 4.350e3, "latency": 3.301e6, "edp": 1.44e4,
@@ -645,6 +741,81 @@ FUSION_PARTIAL_SIZED = {
 
 
 # ====================================================================
+#  DATA  –  Fusion Comparisons (Partial-Sized Arch, DRAM Energy = 160 pJ/byte)
+#  Same architecture configs as FUSION_PARTIAL_SIZED but with DRAM access
+#  energy set to 160 pJ/byte (DepFiN/JEDEC value) instead of Accelergy's.
+# ====================================================================
+
+FUSION_PARTIAL_DRAM_160 = {
+    # ── Source: experiment_runner.py --compare-partial-vs-single --dram-energy 160
+    "DepFiN": {
+        "FSRCNN": {
+            "pe": "16x128", "fmem": "248KB", "wmem": "9KB", "tile": 120,
+            "partial": {"energy": 1.010e4, "latency": 6.351e6, "edp": 6.42e4,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 3.063e4, "latency": 1.175e7, "edp": 3.60e5,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "8x256", "fmem": "396KB", "wmem": "22KB", "tile": 207,
+            "partial": {"energy": 1.486e4, "latency": 7.975e6, "edp": 1.19e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 1.792e4, "latency": 1.381e7, "edp": 2.48e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "16x128", "fmem": "112KB", "wmem": "4610KB", "tile": 14,
+            "partial": {"energy": 5.034e4, "latency": 2.432e7, "edp": 1.22e6,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 7.829e3, "latency": 2.452e7, "edp": 1.92e5,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "16x128", "fmem": "48KB", "wmem": "4608KB", "tile": 7,
+            "partial": {"energy": 1.021e4, "latency": 7.425e6, "edp": 7.58e4,
+                        "dram_rd": 11_448_768, "dram_wr": 551_936},
+            "single":  {"energy": 2.827e3, "latency": 6.905e6, "edp": 1.95e4,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+    "Eyeriss": {
+        "FSRCNN": {
+            "pe": "128x16", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 120,
+            "partial": {"energy": 3.681e4, "latency": 1.918e7, "edp": 7.06e5,
+                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
+            "single":  {"energy": 3.247e4, "latency": 3.525e7, "edp": 1.14e6,
+                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
+        },
+        "MC-CNN": {
+            "pe": "256x8", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
+            "outreg": 64, "tile": 69,
+            "partial": {"energy": 4.759e4, "latency": 1.261e7, "edp": 6.00e5,
+                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
+            "single":  {"energy": 1.926e4, "latency": 1.495e7, "edp": 2.88e5,
+                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
+        },
+        "VGG16": {
+            "pe": "512x32", "gb": "128KB", "wreg": 576, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "partial": {"energy": 7.418e4, "latency": 5.852e6, "edp": 4.34e5,
+                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
+            "single":  {"energy": 9.597e3, "latency": 6.922e6, "edp": 6.64e4,
+                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
+        },
+        "ResNet18": {
+            "pe": "512x32", "gb": "128KB", "wreg": 384, "inreg": 400, "intreg": 350,
+            "outreg": 64, "tile": 1,
+            "partial": {"energy": 1.641e4, "latency": 3.139e6, "edp": 5.15e4,
+                        "dram_rd": 11_760_064, "dram_wr": 752_640},
+            "single":  {"energy": 2.977e3, "latency": 3.301e6, "edp": 9.83e3,
+                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
+        },
+    },
+}
+
+
+# ====================================================================
 #  DATA  –  Fusion Comparisons (Partial-Sized Arch, DRAM Energy = 200 pJ/byte)
 #  Same architecture configs as FUSION_PARTIAL_SIZED but with DRAM access
 #  energy set to 200 pJ/byte instead of the Accelergy-derived 32 pJ/byte.
@@ -720,104 +891,28 @@ FUSION_PARTIAL_DRAM_200 = {
 
 
 # ====================================================================
-#  DATA  –  Fusion Comparisons (Partial-Sized Arch, 12nm Technology)
-#  Same architecture configs as FUSION_PARTIAL_SIZED but with
-#  technology="12nm", technology_scale=1.0 (no double-scaling).
-#  DRAM energy = 64 pJ/operand (unscaled, off-chip).
-# ====================================================================
-
-FUSION_PARTIAL_12NM = {
-    # ── Source: experiment_runner.py --compare-partial-vs-single (12nm config)
-    "DepFiN": {
-        "FSRCNN": {
-            "pe": "16x128", "fmem": "248KB", "wmem": "9KB", "tile": 120,
-            "partial": {"energy": 6.767e3, "latency": 6.351e6, "edp": 4.30e4,
-                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
-            "single":  {"energy": 1.256e4, "latency": 1.175e7, "edp": 1.48e5,
-                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
-        },
-        "MC-CNN": {
-            "pe": "8x256", "fmem": "396KB", "wmem": "22KB", "tile": 207,
-            "partial": {"energy": 1.051e4, "latency": 7.975e6, "edp": 8.38e4,
-                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
-            "single":  {"energy": 7.831e3, "latency": 1.381e7, "edp": 1.08e5,
-                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
-        },
-        "VGG16": {
-            "pe": "16x128", "fmem": "112KB", "wmem": "4610KB", "tile": 14,
-            "partial": {"energy": 4.783e4, "latency": 2.432e7, "edp": 1.16e6,
-                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
-            "single":  {"energy": 4.241e3, "latency": 2.452e7, "edp": 1.04e5,
-                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
-        },
-        "ResNet18": {
-            "pe": "16x128", "fmem": "48KB", "wmem": "4608KB", "tile": 7,
-            "partial": {"energy": 1.052e4, "latency": 7.813e6, "edp": 8.22e4,
-                        "dram_rd": 11_760_064, "dram_wr": 752_640},
-            "single":  {"energy": 1.412e3, "latency": 6.905e6, "edp": 9.75e3,
-                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
-        },
-    },
-    "Eyeriss": {
-        "FSRCNN": {
-            "pe": "128x16", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
-            "outreg": 64, "tile": 120,
-            "partial": {"energy": 3.347e4, "latency": 1.918e7, "edp": 6.42e5,
-                        "dram_rd": 14_015_592, "dram_wr": 20_736_000},
-            "single":  {"energy": 1.440e4, "latency": 3.525e7, "edp": 5.08e5,
-                        "dram_rd": 90_738_792, "dram_wr": 97_459_200},
-        },
-        "MC-CNN": {
-            "pe": "256x8", "gb": "128KB", "wreg": 384, "inreg": 34, "intreg": 32,
-            "outreg": 64, "tile": 69,
-            "partial": {"energy": 4.324e4, "latency": 1.261e7, "edp": 5.45e5,
-                        "dram_rd": 15_438_672, "dram_wr": 29_887_488},
-            "single":  {"energy": 9.171e3, "latency": 1.495e7, "edp": 1.37e5,
-                        "dram_rd": 45_326_160, "dram_wr": 59_774_976},
-        },
-        "VGG16": {
-            "pe": "512x32", "gb": "128KB", "wreg": 576, "inreg": 400, "intreg": 350,
-            "outreg": 64, "tile": 1,
-            "partial": {"energy": 7.177e4, "latency": 5.852e6, "edp": 4.20e5,
-                        "dram_rd": 17_670_848, "dram_wr": 7_426_048},
-            "single":  {"energy": 6.012e3, "latency": 6.922e6, "edp": 4.16e4,
-                        "dram_rd": 23_792_320, "dram_wr": 13_547_520},
-        },
-        "ResNet18": {
-            "pe": "512x32", "gb": "128KB", "wreg": 384, "inreg": 400, "intreg": 350,
-            "outreg": 64, "tile": 1,
-            "partial": {"energy": 1.521e4, "latency": 3.139e6, "edp": 4.77e4,
-                        "dram_rd": 11_760_064, "dram_wr": 752_640},
-            "single":  {"energy": 1.561e3, "latency": 3.301e6, "edp": 5.15e3,
-                        "dram_rd": 12_449_984, "dram_wr": 2_308_096},
-        },
-    },
-}
-
-
-# ====================================================================
 #  DATA  –  Fusion Comparisons (Auto-Sized, Normalized to Full=1.0)
 # ====================================================================
 # For each (arch, workload), every metric is divided by the Full value.
-FUSION_AUTO_NORM = {}
-for _arch, _wls in FUSION_AUTO.items():
-    FUSION_AUTO_NORM[_arch] = {}
+FUSION_AUTO_DRAM_160_NORM = {}
+for _arch, _wls in FUSION_AUTO_DRAM_160.items():
+    FUSION_AUTO_DRAM_160_NORM[_arch] = {}
     for _wl, _modes in _wls.items():
-        FUSION_AUTO_NORM[_arch][_wl] = {}
+        FUSION_AUTO_DRAM_160_NORM[_arch][_wl] = {}
         for _mode in ("full", "partial", "single"):
-            FUSION_AUTO_NORM[_arch][_wl][_mode] = {
+            FUSION_AUTO_DRAM_160_NORM[_arch][_wl][_mode] = {
                 _metric: _modes[_mode][_metric] / _modes["full"][_metric]
                 for _metric in ("energy", "latency", "edp")
             }
 
 # Normalized partial-sized data (Partial = 1.0)
-FUSION_PARTIAL_SIZED_NORM = {}
+FUSION_PARTIAL_SIZED_DRAM_160_NORM = {}
 for _arch, _wls in FUSION_PARTIAL_SIZED.items():
-    FUSION_PARTIAL_SIZED_NORM[_arch] = {}
+    FUSION_PARTIAL_SIZED_DRAM_160_NORM[_arch] = {}
     for _wl, _modes in _wls.items():
-        FUSION_PARTIAL_SIZED_NORM[_arch][_wl] = {}
+        FUSION_PARTIAL_SIZED_DRAM_160_NORM[_arch][_wl] = {}
         for _mode in ("partial", "single"):
-            FUSION_PARTIAL_SIZED_NORM[_arch][_wl][_mode] = {
+            FUSION_PARTIAL_SIZED_DRAM_160_NORM[_arch][_wl][_mode] = {
                 _metric: _modes[_mode][_metric] / _modes["partial"][_metric]
                 for _metric in ("energy", "latency", "edp")
             }
@@ -1402,14 +1497,14 @@ def plot_eyeriss_cs5():
 
 
 # ────────────────────────────────────────────────────────────────────
-#  Figure 7: Auto-Sized Fusion — Energy Comparison (grouped bars)
+#  Figure 7: Auto 160 pj/byte-Sized Fusion — Energy Comparison (grouped bars)
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_energy():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     fig.suptitle("Full-Sized Arch — Energy  (Full vs Partial vs Single)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data = FUSION_AUTO[arch]
+        data = FUSION_AUTO_DRAM_160[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.25
 
@@ -1435,14 +1530,14 @@ def plot_fusion_auto_energy():
 
 
 # ────────────────────────────────────────────────────────────────────
-#  Figure 8: Auto-Sized Fusion — Latency Comparison
+#  Figure 8: Auto-Sized 160 pj/byte Fusion — Latency Comparison
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_latency():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     fig.suptitle("Full-Sized Arch — Latency (Full vs Partial vs Single)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data = FUSION_AUTO[arch]
+        data = FUSION_AUTO_DRAM_160[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.25
 
@@ -1475,14 +1570,14 @@ def plot_fusion_auto_latency():
 
 
 # ────────────────────────────────────────────────────────────────────
-#  Figure 9: Auto-Sized Fusion — DRAM Traffic
+#  Figure 9: Auto-Sized 160 pj/byte Fusion — DRAM Traffic
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_dram():
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle("Full-Sized Arch — DRAM Traffic Reduction", fontsize=16, y=0.98)
 
     for col_idx, arch in enumerate(["DepFiN", "Eyeriss"]):
-        data = FUSION_AUTO[arch]
+        data = FUSION_AUTO_DRAM_160[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.25
 
@@ -1526,14 +1621,14 @@ def plot_fusion_auto_dram():
 
 
 # ────────────────────────────────────────────────────────────────────
-#  Figure 9b: Normalized Energy (Full Fusion = 1.0)
+#  Figure 9b: Normalized Energy 160 pj/byte (Full Fusion = 1.0)
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_energy_norm():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     fig.suptitle("Full-Sized Arch — Normalized Energy  (Full = 1.0)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data = FUSION_AUTO_NORM[arch]
+        data = FUSION_AUTO_DRAM_160_NORM[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.25
 
@@ -1576,7 +1671,7 @@ def plot_fusion_auto_latency_norm():
     fig.suptitle("Full-Sized Arch — Normalized Latency  (Full = 1.0)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data = FUSION_AUTO_NORM[arch]
+        data = FUSION_AUTO_DRAM_160_NORM[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.25
 
@@ -1618,7 +1713,7 @@ def plot_fusion_auto_edp_norm():
     fig.suptitle("Full-Sized Arch — Normalized EDP  (Full = 1.0)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data = FUSION_AUTO_NORM[arch]
+        data = FUSION_AUTO_DRAM_160_NORM[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.25
 
@@ -1671,8 +1766,8 @@ def plot_partial_sized_energy():
                  fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data_ps = FUSION_PARTIAL_SIZED[arch]
-        data_fs = FUSION_AUTO[arch]
+        data_ps = FUSION_PARTIAL_SIZED_DRAM_160_NORM[arch]
+        data_fs = FUSION_AUTO_DRAM_160[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.3
 
@@ -1712,7 +1807,7 @@ def plot_partial_sized_latency():
                  fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data_ps = FUSION_PARTIAL_SIZED[arch]
+        data_ps = FUSION_PARTIAL_SIZED_DRAM_160_NORM[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.3
 
@@ -1751,7 +1846,7 @@ def plot_partial_sized_edp():
                  fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
-        data_ps = FUSION_PARTIAL_SIZED[arch]
+        data_ps = FUSION_PARTIAL_SIZED_DRAM_160_NORM[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.3
 
@@ -1791,7 +1886,7 @@ def plot_partial_sized_norm():
     fig.suptitle("Partial-Sized Arch — Normalised  (Partial = 1.0)", fontsize=16, y=0.98)
 
     for col, arch in enumerate(["DepFiN", "Eyeriss"]):
-        data = FUSION_PARTIAL_SIZED_NORM[arch]
+        data = FUSION_PARTIAL_SIZED_DRAM_160_NORM[arch]
         x = np.arange(len(WORKLOADS))
         w = 0.3
         for row, (metric, ylabel) in enumerate(metrics):
