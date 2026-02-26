@@ -5,12 +5,12 @@
 \label{sec:bg-layer-fusion}
 
 All preceding sections have implicitly assumed that only a
-\emph{single} convolution (or GEMM) is mapped at a time: the
+\emph{single} convolution is mapped at a time: the
 accelerator reads one layer's inputs and weights from DRAM, computes
 its outputs, writes them back to DRAM, and then moves on to the next
 layer.
 Under this \textbf{layer-by-layer} (LBL) execution model, every
-intermediate feature map must traverse the full memory hierarchy twice—once
+intermediate feature map must traverse the full memory hierarchy twice, once
 as the output of one layer and once as the input to the next.
 Since DRAM accesses dominate the energy budget
 (Section~\ref{sec:energy-model}), these redundant round-trips constitute a
@@ -18,7 +18,7 @@ major source of inefficiency in modern DNN inference.
 
 \textbf{Layer fusion} is the strategy of co-executing two or more
 consecutive layers so that intermediate feature maps are produced
-\emph{and consumed on-chip}, without ever being written to DRAM.
+\emph{and consumed on-chip}, without being written to and so read from DRAM.
 This section introduces the concept, formalizes its mechanics, and
 discusses the open problems it raises.
 
@@ -40,9 +40,9 @@ T_{\text{LBL}}^{\text{intermediate}}
 \end{equation}
 DRAM accesses (one write plus one read per element).  For deep networks with
 large spatial resolutions, this traffic can far exceed the traffic for inputs,
-outputs, and weights combined.  For instance, in the early layers of
-VGG-16~\cite{simonyan2015very}, the intermediate feature maps of a single
-$224\!\times\!224$ image occupy tens of megabytes—orders of magnitude
+outputs, and weights combined.  For instance, even for a weight dominant workload (deep layers with
+        many channels and small spatial dimensions) as VGG-16~\cite{vgg16},  in the early layers of a the intermediate feature maps of a single
+$224\!\times\!224$ image occupy tens of megabytes, orders of magnitude
 larger than the corresponding filter weights.
 
 When $F$ consecutive layers ($\mathcal{L}_0$ through
@@ -66,7 +66,7 @@ Fusion does not simply mean running all layers in sequence inside a
 single invocation.
 The key insight is that the tiling of the outer (last) layer's output
 \emph{dictates} the tiles required from every preceding layer through
-a chain of producer--consumer dependencies.
+a chain of producer--consumer dependencies
 
 \begin{figure}[t]
 \centering
@@ -102,10 +102,10 @@ a chain of producer--consumer dependencies.
 \end{figure}
 
 Consider fusing two convolutional layers with filter sizes
-$R_0\!\times\!S_0$ and $R_1\!\times\!S_1$ respectively.
+$R_0\!\times\!S_0$ and $R_1\!\times\!S_1$ respectively with strides assumed to be 1 for simplicity of the example.
 If the second layer requires an output tile of size $P\!\times\!Q$, it
 needs an intermediate tile of size
-$(P+R_1-1)\times(Q+S_1-1)$ from the first layer's output
+$(P+R_1-1)\times(Q+S_1-1)$ from the first layer's output,
 (cf.\ the halo discussion in Section~\ref{sec:loop-ordering}).
 To produce that intermediate tile, the first layer in turn needs an input
 tile of size
@@ -126,8 +126,7 @@ propagate tile-size requirements across layers.
 All intermediate tiles must fit simultaneously in an on-chip buffer,
 since they are produced and consumed between consecutive loop
 iterations without visiting DRAM.
-Let $\text{FMEM}$ denote the on-chip feature memory.  In the two-layer
-case the buffer must hold at least:
+In the two-layer case the on-chip buffer must hold at least:
 \begin{equation}
 \label{eq:fused-footprint}
 \text{footprint}
@@ -143,63 +142,6 @@ concurrently, increasing the footprint.  Correspondingly, the output
 tile size $P\!\times\!Q$ that fits within a given FMEM budget
 \emph{decreases} with the number of fused layers, which can impact
 data reuse and, in turn, energy efficiency.
-
-% ------------------------------------------------------------------
-\subsection{Multi-Layer Workload Formalization}
-\label{sec:multi-layer-workload}
-
-Section~\ref{sec:bg-workloads} formalized a single-layer computation as a
-loop nest with a coupling that maps dimensions to operands.
-Fusion extends this formalization: a fused group of $F$ layers is
-expressed as a \emph{single, unified loop nest} whose coupling now defines
-five categories of operands instead of three:
-\begin{enumerate}
-  \item \textbf{Input} (\texttt{in})—read-only tensor consumed by the
-        first layer.
-  \item \textbf{Weights} (\texttt{w})—one per layer ($W_0, \dots, W_{F-1}$),
-        each referenced only by its own layer's dimensions.
-  \item \textbf{Intermediate output} (\texttt{int\_out})—the output
-        produced by every layer except the last; for layer~$i$ this is
-        $A_i$.
-  \item \textbf{Intermediate input} (\texttt{int\_in})—the input consumed
-        by every layer except the first; layer~$i$ reads $A_{i-1}$, which
-        is the \texttt{int\_out} of the previous layer.
-  \item \textbf{Output} (\texttt{out})—write-only tensor produced by the
-        last layer.
-\end{enumerate}
-
-In the Extended Einsum Notation (Section~\ref{sec:een}), a two-layer
-fused convolution is written as:
-\begin{align}
-\label{eq:een-fused-2layer}
-A_0[z_0, y_0, x_0] &\mathrel{+}= W_0[z_0, c_0, r_0, s_0]
-  \cdot \text{In}[c_0, y_0\!+\!r_0, x_0\!+\!s_0], \notag\\[2pt]
-\text{Out}[z_1, p, q] &\mathrel{+}= W_1[z_1, c_1, r_1, s_1]
-  \cdot A_0[c_1, p\!+\!r_1, q\!+\!s_1].
-\end{align}
-All twelve dimensions ($C_0, Y_0, X_0, R_0, S_0, Z_0, C_1, R_1,
-S_1, Z_1, P, Q$) appear in a single combined loop nest.  The coupling
-tables for the five operand categories fully specify which dimensions
-index which tensors (cf.\ Table~\ref{tab:coupling-conv} extended to
-multiple layers).
-
-This unified representation has two important consequences:
-\begin{itemize}
-  \item The \textbf{map space grows combinatorially} with the number of
-        fused layers, because there are more dimensions, more factors, and
-        more permutations.  The formula developed in
-        Section~\ref{sec:bg-mapspace} applies unchanged, but
-        $|\text{dims}|$ and $|\text{levels}|$ increase substantially:
-        for an 11-layer fusion on a four-level hierarchy, the map space
-        can exceed $10^{70}$, making exhaustive search intractable.
-  \item The \textbf{cost model} must track per-layer MOPs for each
-        intermediate tensor, respecting the producer--consumer chain and
-        the cascading tile-size dependencies discussed above.
-        Section~\ref{sec:bg-cost-model} generalizes naturally: reads and
-        writes for \texttt{int\_in} and \texttt{int\_out} are computed
-        per layer and weighted by the corresponding level's access energy,
-        just as for \texttt{in}, \texttt{w}, and \texttt{out}.
-\end{itemize}
 
 % ------------------------------------------------------------------
 \subsection{Inter-Layer vs.\ Intra-Layer Reuse}
@@ -226,7 +168,7 @@ Two complementary forms of data reuse arise in fused execution:
 \end{description}
 
 The total on-chip reuse in a fused mapping is the combination of both
-forms.  A good mapper must balance them: aggressively tiling the
+forms.  Tiling the
 intermediate tensor to maximize inter-layer reuse can starve intra-layer
 reuse within each individual layer, and vice versa.
 
@@ -242,12 +184,12 @@ consecutive layers to group into a fused set depends on several factors:
         Each additional fused layer increases the memory footprint
         (Equation~\eqref{eq:fused-footprint}).  If the on-chip buffer
         cannot accommodate the combined intermediate tiles, the output
-        tile must shrink, reducing data reuse and potentially increasing
-        total energy.
+        tile must be reduced, reducing data reuse and potentially increasing
+        total energy, even with the minimum output tile can be possible to don't have enough memory footprint.
 
   \item \textbf{Intermediate activation volume.}
         Fusion is most beneficial when the intermediate tensors are
-        large—i.e.\ when the spatial resolution is high and the number
+        large, i.e.\ when the spatial resolution is high and the number
         of channels is moderate.  This corresponds to the
         \emph{activation-dominant} regime described in
         Section~\ref{sec:act-weight-dominant}.  Conversely, fusing
@@ -255,61 +197,26 @@ consecutive layers to group into a fused set depends on several factors:
         many channels and small spatial dimensions) yields diminishing
         returns because the intermediate traffic is already small.
 
-  \item \textbf{Compatibility constraints.}
-        Certain layer types (e.g.\ pooling, batch normalization, skip
-        connections, element-wise activations) interact with the
-        producer--consumer chain.
-        Element-wise operations such as ReLU are trivially fused because
-        they do not alter the tensor shape.
-        Pooling layers reduce spatial dimensions and must be accounted for
-        when propagating tile sizes backward.
-        Skip connections break the strictly sequential chain and require
-        additional buffer capacity to hold the ``shortcut'' tensor until
-        it is needed.
-
   \item \textbf{Diminishing returns.}
         Beyond a certain depth of fusion, the marginal DRAM traffic saved
         by adding one more layer decreases while the memory pressure on
         the on-chip buffer and the map-space size continue to grow.
-        Finding the optimal \emph{fusion depth}—that is, how many
-        layers to fuse together—is itself a combinatorial problem.
+        Finding the optimal \emph{fusion depth},  how many
+        layers to fuse together, is itself a combinatorial problem.
 \end{itemize}
 
 Several works have addressed the fusion-set selection problem.
-\textbf{Alwani et~al.}~\cite{alwani2016fused} first demonstrated
+\textbf{Alwani et~al.}~\cite{alwani2016fusedlayer} first demonstrated
 fused-layer CNN accelerators, proposing a greedy algorithm that fuses
 consecutive layers while the intermediate tiles fit in on-chip memory.
 \textbf{Xiao et~al.}~\cite{xiao2017exploring} extended this analysis
 by exploring the trade-off between fusion depth and output tile size.
-\textbf{Tangram}~\cite{gao2019tangram} introduced a
-\emph{set-based} partitioning of the dataflow graph, allowing non-contiguous
-and parallel fusion sets.
-\textbf{Optimus}~\cite{li2023optimus} formulates the partition into fusion
+\textbf{Optimus}~\cite{optimus} formulates the partition into fusion
 sets as an optimization problem solved by dynamic programming.
-\textbf{Herald}~\cite{kwon2023herald} proposes a heterogeneous
-dataflow that dynamically switches between layer-by-layer and fused
-execution depending on on-chip resource availability.
 
-In this thesis, the focus is on the \emph{mapping} of an already-determined
+We on the \emph{mapping} of an already-determined
 fusion set rather than on the selection of which layers to fuse.
 The analytical cost model and mapper developed in the following chapters
 accept any fusion depth and optimize the combined loop nest accordingly,
 enabling systematic evaluation of both shallow and deep fusion
 configurations.
-
-% ------------------------------------------------------------------
-\subsection{Summary}
-\label{sec:fusion-summary}
-
-Layer fusion eliminates the dominant source of DRAM traffic in DNN
-inference—intermediate activations—by keeping them on-chip across
-consecutive layers.
-Its effectiveness hinges on three aspects: (i)~the cascading tile-size
-dependencies that arise from producer--consumer relationships,
-(ii)~the interplay between inter-layer and intra-layer reuse, and
-(iii)~the memory-footprint constraints of the on-chip buffer.
-Formally, fusion extends the single-layer loop nest and coupling into a
-unified multi-layer formulation with five operand categories, enlarging
-both the cost model and the map space.
-The following chapters build on this foundation to present the
-FactorFlow framework extended with native layer-fusion support.

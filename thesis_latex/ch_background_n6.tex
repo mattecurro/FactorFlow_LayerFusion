@@ -6,12 +6,11 @@
 
 Sections~\ref{sec:bg-mapping} and~\ref{sec:bg-mapspace} established that the
 mapping problem requires choosing one mapping out of a combinatorially large
-space and that the optimal choice depends on the \emph{cost} of each mapping.
+space and that the optimal choice depends on the \emph{cost} of each mapping (in terms of Energy-Delay-Product, Energy or Latency.
 This section formalizes how that cost is estimated.
 
 A \textbf{cost model} is a function that takes an architecture description and
-a mapping and returns one or more scalar figures of merit—typically energy,
-latency, or a compound metric—without actually fabricating the chip or
+a mapping and returns the cost without actually fabricating the chip or
 running the workload on real hardware.
 Two fundamentally different strategies exist.
 
@@ -27,16 +26,15 @@ Two fundamentally different strategies exist.
         and the architecture's parameters.
         Their runtime is independent of the workload size, enabling rapid
         exploration of large map spaces.
-        The trade-off is that simplifications—such as assuming perfect
-        double-buffering or ignoring interconnect congestion—introduce
+        The trade-off is that simplifications, such as assuming perfect
+        double-buffering or ignoring interconnect congestion, introduce
         approximation error.
 \end{itemize}
 
 Because map-space exploration (Section~\ref{sec:bg-mapspace}) requires
 evaluating a cost function for a very large number of candidate mappings,
 analytical models are the predominant choice in modern DNN mapping
-frameworks~\cite{parashar2019timeloop, wu2019accelergy, kwon2020maestro,
-mei2021zigzag}.
+frameworks~\cite{parashar2019timeloop, wu2019accelergy, kwon2019MAESTRO}.
 The remainder of this section describes the three building blocks of such
 models: the \emph{memory-access count}, the \emph{energy model}, and the
 \emph{latency model}, together with the compound metrics derived from them.
@@ -48,7 +46,7 @@ models: the \emph{memory-access count}, the \emph{energy model}, and the
 The starting point of any analytical cost model is to determine how many
 \emph{memory operations} (MOPs) each level of the hierarchy performs for a
 given mapping.
-A memory operation is a single scalar read or write to a storage level;
+A memory operation is a single scalar read or write from/to a storage level;
 the total count depends on the tiling, loop ordering, and bypass
 configuration of the mapping (Sections~\ref{sec:tiling}--\ref{sec:loop-ordering}).
 
@@ -72,8 +70,8 @@ where $f_k$ are the tiling factors on level~$\ell$, the product ranges over
 the loops~$\mathcal{L}_\ell$ mapped there, and $\text{reuse}_{o,\ell}$
 captures temporal reuse from stationarity and halo overlap
 (Section~\ref{sec:loop-ordering}).
-\emph{Fills}—data moved into the level from above—and \emph{updates}—partial
-sums drained from below—are tracked separately so that read and write
+The writes are the sum of \emph{fills}., data moved into the level from above level, and \emph{updates}, partial
+sums drained from below levels, reads and writes are tracked separately so that read and write
 bandwidths can be individually bounded.
 
 Additionally, MOPs occurring at a fanout level (Section~\ref{sec:sa-abstraction})
@@ -110,26 +108,21 @@ The summation runs over all memory levels and the compute level.
 The per-access energies are technology-dependent constants that characterize
 the hardware.
 They can be provided directly for each level (e.g.\ measured or taken from a
-data-sheet) or estimated by an external tool.
-\textbf{Accelergy}~\cite{wu2019accelergy} is a widely used energy-estimation
-framework that queries technology-specific plug-ins—such as CACTI for
-SRAMs~\cite{muralimanohar2009cacti} and NeuroSim for emerging
-NVMs~\cite{chen2018neurosim}—to estimate the per-access energy and area of
+data-sheet) or estimated by an external tool like \textbf{accelergy}~\cite{wu2019accelergy} a widely used energy-estimation
+framework that queries technology-specific plug-ins, such as CACTI for
+SRAMs~\cite{cacti}, to estimate the per-access energy and area of
 each component given its configuration (depth, width, technology node, number
-of ports).
+of ports, number of banks).
 Because the per-access energies are constants of the architecture and do
 \emph{not} change across mappings, they can be queried once during
 architecture setup and then reused throughout exploration.
-
-An important observation is that Equation~\eqref{eq:energy} makes the
-data-movement energy \emph{mapping-dependent} solely through the MOP counts,
-while compute energy is fixed once the workload is determined: the
+Compute energy is fixed once the workload is determined: the
 total number of MACs is a property of the computation, not of how it is
 mapped.
 Since DRAM accesses are orders of magnitude more energy-expensive than
-register-file accesses or MACs (${\sim}200\,\text{pJ}$ vs.\
-${\sim}1\,\text{pJ}$ vs.\ ${\sim}0.2\,\text{pJ}$ at $45\,$nm%
-~\cite{horowitz20141}), data movement dominates the energy budget, and
+register-file accesses or multiply accumulations (${\sim}50/100\,\text{pJ}$ vs.\
+${\sim}1\,\text{pJ}$ vs.\ ${\sim}0.2\,\text{pJ}$ per byte accessed at $45\,$nm%
+~\cite{horowitz20141}), data movement dominates the energy budget, and so
 minimizing the number of MOPs at the costliest levels is the primary
 objective of any mapping optimization.
 
@@ -145,7 +138,7 @@ level: the \emph{compute bound} and the \emph{bandwidth bound}.
 \paragraph{Compute bound.}
 If the available bandwidth is sufficient to keep the compute units fed, the
 latency at level~$\ell$ equals the number of tiles processed times the
-latency of one tile:
+latency of one single tile:
 \begin{equation}
 \label{eq:lat-compute}
 L_\ell^{\text{compute}} \;=\; c_{\text{tile}} \;\cdot\;
@@ -182,8 +175,7 @@ When a level's bandwidth is saturated, the excess demand translates into
 $\Delta_\ell = L_\ell - L_\ell^{\text{compute}}$.
 A mapping with zero stall cycles at every level achieves full
 \emph{compute utilization}; in practice, the slowest memory level dictates
-the overall throughput, an observation closely related to the \emph{roofline
-model}~\cite{williams2009roofline}.
+the overall throughput.
 
 % ------------------------------------------------------------------
 \subsection{Compound Metrics}
@@ -204,52 +196,4 @@ The most widely adopted metric is the \emph{energy-delay product}:
 Minimizing the~EDP balances energy against latency: improving either
 dimension while not degrading the other yields a better mapping.
 EDP is used as the default optimization target by several frameworks,
-including Timeloop~\cite{parashar2019timeloop}, and is adopted as the
-primary objective in this thesis.
-
-\paragraph{Weighted Arithmetic Intensity (WART).}
-An alternative metric employed in FactorFlow is the \emph{Weighted
-Arithmetic Intensity}:
-\begin{equation}
-\label{eq:wart}
-\text{WART} \;=\; \frac{\text{FLOPs}}{E \times L}\;\cdot\; U,
-\end{equation}
-where $U$ denotes the spatial utilization of the array (the fraction of PEs
-that are active).
-maximizing~WART is equivalent to minimizing EDP per useful operation, while
-additionally penalizing low utilization of the spatial fabric.
-
-% ------------------------------------------------------------------
-\subsection{Existing Frameworks}
-\label{sec:existing-frameworks}
-
-Several frameworks integrate an analytical cost model with a mapper to
-automatically find efficient mappings for spatial architectures.
-
-\textbf{Timeloop}~\cite{parashar2019timeloop} is a widely used framework
-that couples an analytical cost model with a random and pruned search over
-the map space; its companion tool Accelergy~\cite{wu2019accelergy} supplies
-per-access energy numbers.
-
-\textbf{MAESTRO}~\cite{kwon2020maestro} introduces a \emph{data-centric}
-notation for dataflows and provides rapid analytical cost estimation
-with a focus on NoC modeling.
-
-\textbf{ZigZag}~\cite{mei2021zigzag} models uneven mappings (where tile
-sizes need not divide the problem dimensions evenly) and performs an
-exhaustive or heuristic search with memory-capacity pruning.
-
-\textbf{CoSA}~\cite{huang2021cosa} formulates the mapping problem as a
-constrained optimization and applies mathematical programming solvers rather
-than explicit enumeration.
-
-\textbf{Gamma}~\cite{kao2020gamma} uses a genetic algorithm to navigate
-the map space efficiently for very large accelerators.
-
-These frameworks share the same core abstraction—tiling factors, loop
-orderings, and spatial unrolling over a parameterized memory hierarchy—but
-differ in search strategy, cost-model fidelity, and supported architecture
-features.
-The analytical model used in this thesis builds upon the same principles,
-extending them to support multi-layer (fused) computations as discussed in
-Section~\ref{sec:bg-layer-fusion}.
+including Timeloop~\cite{parashar2019timeloop}, and Factorflow \cite{Factorflow} .
