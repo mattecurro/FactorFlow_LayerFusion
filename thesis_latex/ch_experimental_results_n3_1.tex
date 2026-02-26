@@ -179,13 +179,33 @@ $7.8\%$.
 On DepFiN, however, full fusion is \emph{slower} than the
 single-layer sum: VGG16 loses $11.3\%$ and ResNet18 loses
 $30.3\%$.
-The key difference is that DepFiN's full-fusion configuration
-must allocate a very large weight memory (10--14\,MB), and the
-mapper requires more temporal passes to fill it.
-The additional scheduling overhead exceeds the latency saved from
-reduced DRAM traffic, producing a net latency increase.
-Eyeriss avoids this penalty because its distributed register
-architecture can parallelize weight loading across PEs.
+The cause is a \emph{suboptimal joint tiling structure} at the
+DRAM level.
+In single-layer mode each layer independently optimises its
+loop tiling: the DRAM outer loop iterates only over that layer's
+own spatial dimensions, and every memory level is perfectly
+balanced (compute-bound, no stalls).
+In full fusion, all 17~layers share the DRAM level, and the
+mapper must place the spatial-height factors ($Y_i$) of
+\emph{every} layer at this outermost level because the
+on-chip memories are already saturated by the 10--14\,MB of
+weights.
+This inflates the DRAM iteration count for the early, small
+layers far beyond what they need in isolation.
+A per-layer breakdown for ResNet18 confirms the effect: the
+first five convolutional layers (L0--L4) suffer a
+$2$--$7\times$ DRAM-latency inflation, contributing $+1.6$\,M
+excess clock cycles; the three stride-2 transition layers
+(L5, L9, L13) add another $+1.2$\,M due to the doubling of
+DRAM iterations at each spatial halving.
+Meanwhile, the second layer of every residual pair (L6--L8,
+L10--L12, L14--L16) shows virtually no overhead because its
+single-layer latency is already dominated by the same DRAM
+bottleneck.
+Eyeriss avoids this penalty because its distributed per-PE
+register architecture keeps each layer's weight factors local,
+allowing the mapper to balance DRAM and compute without a
+shared memory contention point.
 
 Partial fusion tracks the full-fusion latency closely in most
 cases: the ratio ranges from $0.87\times$ (ResNet18, DepFiN) to

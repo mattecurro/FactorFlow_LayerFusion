@@ -99,8 +99,35 @@ The EDP therefore tracks energy closely, growing by $2.2\times$ over
 the same range.
 
 VGG16 shows both a steeper energy increase ($2.6\times$) and a
-moderate latency increase ($\approx23\%$), so its
+moderate latency increase ($\approx 23\,\%$), so its
 EDP rises by $3.1\times$ from the largest to the smallest PE budget.
+A per-layer breakdown reveals the origin of this latency growth.
+Each layer's DRAM-level latency equals the maximum of two terms:
+the \emph{weight-transfer time} (weight volume divided by DRAM
+bandwidth) and the \emph{inner-compute time} (temporal register
+iterations multiplied by the number of spatial positions processed
+inside each DRAM tile).
+For the late VGG16 layers (L10--L12, $512{\times}512$, $14{\times}14$),
+each layer streams $\sim\!2.36$\,M weight bytes at a bandwidth of
+4\,B/cc, requiring $\sim\!590$\,k cycles---far more than the
+inner-compute time even with only 4\,096 PEs.
+These layers are therefore \emph{DRAM-bandwidth-limited} and their
+latency does not change with the PE budget.
+Conversely, for the middle layers (L2--L6, $Z{=}128$--$256$,
+$56{\times}56$--$112{\times}112$), the weight volumes are four to
+eight times smaller, so the transfer finishes in $18$--$148$\,k cycles.
+With 16\,384 PEs the inner compute is comparable to or below this
+transfer time, but halving the array to 4\,096 PEs roughly
+quadruples the temporal iterations at the register level, pushing the
+compute well above the transfer limit.
+Layers L5 and L6 ($256{\to}256$, $56{\times}56$) show the largest
+per-layer inflation ($3.0\times$), while L4 suffers $2.4\times$ and
+L3 $1.5\times$.
+The cumulative excess across L2--L9 amounts to ${\sim}1.26$\,M cycles
+out of a 6.71\,M total, matching the observed $+23\,\%$.
+ResNet18's layers, by contrast, maintain a higher weight-to-spatial
+ratio throughout the network, so DRAM weight transfer remains the
+dominant term at every PE budget and latency stays flat.
 
 
 Figure~\ref{fig:eyeriss-cs1-inv} The horizontal axis is the PE budget and

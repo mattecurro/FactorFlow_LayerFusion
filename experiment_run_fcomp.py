@@ -1787,6 +1787,8 @@ END OF EYERISS all the workloads
     ==================================================================================
     FULL vs SINGLE — ResNet18 on DepFiN 16×128 (2048 PEs), FMEM=266KB, WMEM=10738KB
     ----------------------------------------------------------------------------------
+    "pe": "16x128", fmem: "266KB", "wmem": "10738KB"
+    
     python3 experiment_runner.py --compare-full-vs-single -w resnet18 \
         --arch-type depfin --pe-rows 16 --pe-cols 128 --fmem-size 266 \
         --wmem-size 10738 --tile-size 7 | tee DF_RESNET_266KB_10738KB_full_vs_single.log
