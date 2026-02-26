@@ -33,13 +33,13 @@ iterations, which has two consequences:
         each additional pass requires a full traversal of all
         fused layers for that tile slice.
   \item \textbf{Weight re-reads increase}: at every new tile pass the
-        entire weight set must be re-fetched from the Weight Memory
+        entire weight set must be re-fetched from the Weight Memory (WMEM)
         into the per-PE weight registers, since the weights must be available for each pass.
 \end{enumerate}
 %
-The FMEM read bandwidth is scaled proportionally to the tile size
-($\text{BW}_{\text{scaled}} = \text{BW}_{\text{base}} \times t / 128$)
-to reflect the reduced wordline utilization at smaller tiles.
+The Feature Memory (FMEM) read bandwidth is scaled proportionally to the tile size
+($\text{BW}_{\text{scaled}} = \text{BW}_{\text{base}} \times t / 128$) to reflect the reduced wordline utilization at smaller tiles,
+without this change, we would simply see an under utilization of the bandwidth.
 All other parameters are held constant: $16 \times 128$~PEs
 (2\,048 total), FMEM\,=\,1\,056\,KB, WMEM\,=\,524\,KB.
 
@@ -51,9 +51,8 @@ limitation: in both the DepFiN-Like and the Eyeriss-Like architectures the
 height dimension~$P$ is handled identically, as a purely temporal
 iteration at the DRAM level.
 A sweep over tile height, or over both dimensions jointly, would
-therefore require no modification to either architecture model, and would produce qualitatively
-analogous results through the same mechanism of additional DRAM-level
-passes.
+therefore require no modification to our model, but the results would not be efficient do to the native architecture parallelization.
+
 
 \subsubsection{Results}
 
@@ -67,14 +66,14 @@ parallelism in the column dimension is uniformly beneficial.
   \centering
   \includegraphics[width=0.85\textwidth]{plots/depfin_cs1_tile_sweep.pdf}
   \caption{DepFiN CS1: EDP vs.\ tile size for each workload
-    ($16 \times 128$~PEs, FMEM BW scaled with tile).
+    (FMEM BW scaled with tile).
     The gold star marks the best (minimum-EDP) tile.}
   \label{fig:depfin-cs1}
 \end{figure}
 
 \paragraph{FSRCNN (activation-dominant, no stride).}
 As a representative example, FSRCNN is swept from tile\,=\,120
-(93.8\,\% PE utilisation) down to tile\,=\,8 (6.2\,\%).
+(93.8\,\% PE utilization) down to tile\,=\,8 (6.2\,\%).
 The EDP degrades by $\approx 15\times$ driven
 almost entirely by latency, which increases by $15\times$.
 Energy, in contrast, rises by only $+4$\,\%.
@@ -93,8 +92,9 @@ to worst tile), due to larger weight volumes to be reloaded.
 The EDP degradation ranges from $8\times$ (ResNet18, tiles 7\,$\to$\,1)
 to $15\times$ (VGG16, tiles 14\,$\to$\,1).
 
-\paragraph{Considerations}
-For all four workloads, the largest feasible tile size minimizes EDP.
+\paragraph{Considerations.}
+
+For all four workloads, the largest feasible tile size minimizes EDP in DepFiN.
 The dominant effect is latency: smaller tiles force more temporal
 iterations at the DRAM level.
 The effect of Energy is secondary and grows mainly through increased weight re-reads in the Weight Memory, but this effect is more pronounced for

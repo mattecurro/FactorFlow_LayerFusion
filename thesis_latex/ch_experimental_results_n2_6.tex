@@ -5,46 +5,27 @@
 \label{sec:eyeriss-cs5}
 
 \subsubsection{Motivation}
+Optimizing the PE array aspect ratio for EDP  (see Section\~\ref\{sec:cs4-aspect\}) is also essential in Eyeriss, because its spatial mapping distributes different loop dimensions across the two axes. Rows absorb weight-related factors (\$C\$, \$S\$, \$Z\$), whereas columns absorb output channel factors.
 
-CS5 address a complementary question with respect to the precedent case studies:
-\emph{given a fixed total PE budget, how should the array be shaped,
-i.e.\ how many rows versus columns, to minimise EDP?}
+Therefore, a row-heavy array absorbs more weight factors spatially but forces larger channel residuals in the column direction, while a column-heavy configuration exhibits the inverse behavior. Ultimately, the optimal shape is governed by the relative size of the weight and activation dimensions in the fused workload.
 
-The aspect ratio matters because the Eyeriss spatial array maps
-different loop dimensions to each axis.
-Rows absorb the weight-related factors ($C$, $S$, $Z$), while columns
-absorb the output-channel factor.
+To evaluate this trade-off, CS5 sweeps all power-of-two factorizations of a fixed PE budget (2,048 PEs for FSRCNN and MC-CNN; 16,384 PEs for VGG16 and ResNet18), tracking the resulting energy, latency, and EDP for every feasible mapping.
 
-A row-heavy array (many rows, few columns) can absorb more weight
-factors spatially but leaves larger channel residuals in the column
-direction.
-A column-heavy array does the opposite.
-The optimal shape therefore depends on the relative magnitudes of the
-weight and channel dimensions of the fused workload.
-
-CS5 sweeps all power-of-two factorizations of a fixed PE budget
-(2\,048 for FSRCNN and MC-CNN, 16\,384 for VGG16 and ResNet18) and
-records energy, latency, and EDP for each feasible configuration.
 
 \subsubsection{Results}
 
 \paragraph{ResNet18 (16\,384 PEs).}
-Of the fifteen power-of-two aspect ratios tested, eight are
-infeasible and seven are feasible (Table~\ref{tab:eyeriss-cs5}).
+Table~\ref{tab:eyeriss-cs5} lists the feasible configurations for
+ResNet18, with a weight register size fixed.
+Seven aspect ratios are feasible, from
+$256 \times 64$ to the extreme row-heavy $16{,}384 \times 1$.
+Latency is constant across all configurations, therefore the EDP ranking is determined entirely
+by energy.
+The best configuration is $256 \times 64$, and energy increases gently as
+the array becomes more row-heavy.
 
-\textit{Infeasibility analysis.}\enspace
-The eight configurations with the most columns
-($1 \times 16{,}384$ through $128 \times 128$) are infeasible because
-too few rows prevent the SARows levels from absorbing enough weight
-and input-channel factors spatially, leaving large residuals that
-overflow the per-PE input and weight registers.
-With only 1~row, no spatial factor can be absorbed at all: the weight
-register requires a footprint of 10\,197~entries whereas only 902 are
-available, and the input register requires 10\,216 vs.\ 400.
-As the row count increases, register pressure drops progressively.
-Feasibility is first achieved at $256 \times 64$, where 256~rows
-provide enough spatial capacity to absorb the full $S$ and $C$
-factors of every layer within the register budget.
+The total variation is only $2.6\%$, indicating that for ResNet18 the
+aspect ratio has a negligible impact once feasibility is achieved.
 
 \begin{table}[htbp]
   \centering
@@ -73,39 +54,10 @@ factors of every layer within the register budget.
     \bottomrule
   \end{tabular}
 \end{table}
-
-\textit{Energy and latency analysis.}\enspace
-Latency is identical across all seven feasible configurations because the DRAM transfer volume is
-constant: 44.1\,M reads and 0.1\,M writes, regardless of array shape.
-Energy varies by only 2.6\,\%, with $256 \times 64$ achieving the
-lowest value.
-The variation arises from two register levels that shift in opposite
-directions as the row count increases:
-\begin{itemize}
-  \item \textbf{InRegister}: reads decrease by 19.2\,\%, because additional rows allow
-    the SARows levels to absorb larger $S$ and $C$ factors
-    spatially, reducing temporal iterations over input data.
-    Writes decrease by 23.6\,\% for the same reason.
-  \item \textbf{IntermediateRegister}: reads increase by 16.4\,\%
-    and writes by 11.9\,\%, because fewer columns force the
-    mapper to iterate over more $Z$ (intermediate output or output-channel) residuals
-    temporally, increasing intermediate-activation traffic.
-\end{itemize}
-Weight-register reads, Global-Buffer traffic, and DRAM
-traffic are constant across all seven configurations.
-The IntermediateRegister increase slightly outweighs the InRegister
-savings, producing the gentle 2.6\,\% upward energy trend as the
-array becomes more row-heavy.
-The best configuration, $256 \times 64$, maximizes the number of
-columns among feasible aspect ratios, allowing SACols to absorb a
-larger share of the $Z$ factors and minimise intermediate register
-pressure.
-Beyond $2{,}048 \times 8$, energy and EDP plateau because SARows
-has already absorbed all available weight factors; additional rows
-offer no further spatial benefit.
+The underlying reason is that ResNet18 features deep channel dimensions ($Z$ up to 512) that easily saturate a moderate column count. At 64~columns, the spatial mapping mechanism (\texttt{SACols}) effectively absorbs the most $Z$ factors. Conversely, if the array is constrained to fewer than 64~columns, the mapper is forced to handle the excess $Z$ dimensions temporally. This temporal folding increases the required capacity of the weight register to accommodate the larger residuals, which marginally raises the energy cost per access.
 
 \paragraph{VGG16 (16\,384 PEs).}
-Seven power-of-two factorisations from $256 \times 64$ to
+Seven power-of-two factorizations from $256 \times 64$ to
 $16{,}384 \times 1$ are feasible, all sharing the same latency.
 The best EDP is $512 \times 32$, tied with $256 \times 64$.
 Energy rises by $4.1\%$ at
@@ -127,7 +79,7 @@ Nine configurations are feasible from $8 \times 256$ to $2{,}048 \times 1$.
 The best EDP is $128 \times 16$, tying with $256 \times 8$ through
 $2{,}048 \times 1$, while $16 \times 128$ is within $0.2\%$
 and offers the lowest latency among competitive configurations.
-The most column-heavy config ($8 \times 256$) has higher latency because only 8 rows cannot absorb enough
+The most column-heavy configuration ($8 \times 256$) has higher latency because only 8 rows cannot absorb enough
 weight factors spatially, forcing more temporal iterations.
 MC-CNN therefore favors a moderate aspect ratio that balances row
 absorption of weights with column distribution of channels.
@@ -163,6 +115,3 @@ EDP.
 Column-heavy configurations offer a small advantage for workloads with
 narrow channels, while weight-dominant workloads show nearly flat
 curves regardless of aspect ratio once registers are adequately sized.
-The designer can therefore choose the aspect ratio primarily based
-on physical layout and interconnect considerations, with confidence
-that the energy impact is within a few percent of the optimum.

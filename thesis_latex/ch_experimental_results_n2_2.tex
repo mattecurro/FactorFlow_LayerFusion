@@ -7,10 +7,10 @@
 \subsubsection{Motivation}
 
 The two spatial dimensions of the DepFiN PE array serve different
-purposes: columns are mapped to the output width~$Q$ (determining the
-tile size), while rows are mapped to output channels~$Z$.
+purposes: columns are mapped to the output width~$Q$ (determining the maximum output tile size available to be chosen), while rows are mapped to output channels~$Z$.
 Adding PEs along one dimension therefore has a qualitatively different
 effect from adding them along the other.
+We select to explore three potential PEs configuration for activation dominant workloads, and four for weight dominant workloads.
 CS2 and CS3 isolate these two effects by sweeping one dimension at a
 time while keeping the other fixed.
 
@@ -95,12 +95,10 @@ sweep achieves a $3.7\times$ reduction.
 \paragraph{Weight-dominant workloads (VGG16, ResNet18).}
 The row and column sweeps affect these workloads differently.
 In the row sweep~(CS2), VGG16 EDP decreases by approximately~$9$\,\%
-from 16 to 128~rows, driven entirely by a latency reduction
-($2.73 \times 10^{7} \to 2.47 \times 10^{7}$~cc) as energy remains
+from 16 to 128~rows, driven entirely by a latency reduction as energy remains
 essentially flat ($< 1$\,\% variation).
 ResNet18 exhibits a similar pattern, with EDP decreasing by
-approximately~$11$\,\% ($2.55 \times 10^{5} \to 2.27 \times 10^{5}$),
-also latency-driven ($9.00 \times 10^{6} \to 8.03 \times 10^{6}$~cc).
+approximately~$11$\,\%
 Both workloads reach diminishing returns at 64~rows, beyond which
 additional row parallelism provides no further benefit.
 The latency improvement arises because, at fewer rows, DRAM
@@ -111,10 +109,10 @@ In the column sweep~(CS3), both VGG16 and ResNet18 show
 zero variation across all tested column configurations.
 The spatial dimensions of both workloads already fit within
 128~columns, so adding columns does not enlarge the tile or
-reduce the DRAM pass count.
+reduce the DRAM pass count, the Spatial Fanout SACols is underutilized.
 
 \paragraph{Considerations}
-For activation-dominant workloads, investing additional PEs in columns
+For activation-dominant workloads, additional PEs in columns
 is substantially more effective than investing them in rows, because
 columns enlarge the tile and reduce DRAM-level iterations, whereas
 rows only reduce output-channel iterations, which saturate quickly.

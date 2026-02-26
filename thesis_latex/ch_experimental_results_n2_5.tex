@@ -7,7 +7,7 @@
 \subsubsection{Motivation}
 
 Besides the weight register examined in CS1, every PE in the
-Eyeriss-Like architecture contains three additional local storage
+Eyeriss-Like architecture contains three local storage
 structures: an \emph{input register} (InReg), which buffers the
 first layer's input activations; an \emph{intermediate register}
 (IntReg), which buffers the activation values exchanged between
@@ -28,7 +28,7 @@ We will analyze InReg and OutReg in a unique case study CS3.
 
 Under full fusion the IntReg must accommodate the residual channel
 factors of \emph{all} intermediate activations, i.e.\ the $Z_i$
-values that the spatial-array columns (SACols) cannot absorb.
+values that the systolic array columns (SACols) cannot absorb.
 The footprint therefore scales with the number of fused layers and
 with the width of their channel dimensions.
 
@@ -57,20 +57,13 @@ reduction in PE budget roughly doubles the minimum IntReg.
     budget (VGG16 and ResNet18, full fusion).}
   \label{fig:eyeriss-cs2-inv}
 \end{figure}
+Figure~\ref{fig:eyeriss-cs2-inv} (top row) reports the energy consumption at the minimum-PE configuration for each IntReg size. Energy grows monotonically with IntReg capacity, as a larger register incurs a higher per-read access cost. For ResNet18, the energy increases by $1.4\times$ when scaling from IntReg\,=\,50 to IntReg\,=\,1\,000. This is a relatively modest penalty compared to the $2.2\times$ energy span caused by the WReg expansion in CS1, a difference that directly reflects the weight-dominant nature of the workload.
 
-Figure~\ref{fig:eyeriss-cs2cs3} (top row) shows the energy measured
-at the minimum-PE configuration for each IntReg size.
-Energy increases monotonically with IntReg, because a larger register
-incurs a higher access cost on every read.
-For ResNet18 the increase is $1.4\times$ from IntReg\,=\,50 to
-IntReg\,=\,1\,000 ($5.15 \times 10^{4} \to 7.12 \times 10^{4}$\,
-$\mu$J), a modest penalty compared to the $2.2\times$ energy span
-caused by WReg in CS1.
 
 \paragraph{CS2 per Activation-dominant workloads (FSRCNN, MC-CNN).}
-For these workloads the intermediate register is not the binding
+For these workloads the intermediate register is not a binding
 constraint.
-In both cases the intermediate footprint is small (16) because these
+In both cases, even with a budget of PEs of 1024, the intermediate footprint is small (16) because these
 networks have few fused layers and narrow channels.
 
 % ────────────────────────────────────────────────────────────────────
@@ -80,46 +73,15 @@ networks have few fused layers and narrow channels.
 The output register stores only the last fused layer's channel
 residual, so its footprint is inherently smaller than that of IntReg
 or WReg.
-The original single-layer Eyeriss design uses OutReg\,=\,16 entries,
+The original single-layer Eyeriss design uses OutReg\,=\,16 bytes,
 and this value turns out to be sufficient for full fusion as well at
 the PE budgets that WReg and IntReg already demand.
 
-Table~\ref{tab:eyeriss-cs3-outreg} confirms this.
-For ResNet18, OutReg\,=\,16 requires $128 \times 32 = 4{,}096$~PEs,
-which is the saturation point.
-The WReg constraint (CS1) already forces 16\,384~PEs at the
-tightest feasible point, so
-OutReg is therefore automatically satisfied whenever WReg is.
-VGG16 tells the same story: OutReg\,=\,16 fits at
-$128 \times 32 = 4{,}096$~PEs, which is also the saturation point.
-
-\begin{table}[htbp]
-  \centering
-  \caption{Eyeriss CS3: Minimum PE count as a function of OutReg
-    size (VGG16 and ResNet18, full fusion).
-    All other registers are non-binding.}
-  \label{tab:eyeriss-cs3-outreg}
-  \begin{tabular}{llrrr}
-    \toprule
-    Workload & OutReg & Config & Total PEs & Saturation \\
-    \midrule
-    VGG16    &   4 & $128 \times 128$ & 16\,384 & \\
-    VGG16    &   8 & $128 \times  64$ &  8\,192 & \\
-    VGG16    &  16 & $128 \times  32$ &  4\,096 & $\checkmark$ \\
-    \midrule
-    ResNet18 &   8 & $128 \times  64$ &  8\,192 & \\
-    ResNet18 &  16 & $128 \times  32$ &  4\,096 & $\checkmark$ \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-Figure~\ref{fig:eyeriss-cs3-inv} shows the inverted view.
 The curves lie well below the corresponding CS1 and CS2 curves at
 every PE budget, confirming that OutReg is the least binding of the
 three register types.
 For activation-dominant workloads (FSRCNN, MC-CNN) the output register
-has no effect on the PE count whatsoever: all tested OutReg sizes yield
-the same minimum configuration.
+has no effect on the PE count whatsoever: all tested PEs budget have could support the OutReg size of the Eyeriss single layer configuration.
 
 \begin{figure}[htbp]
   \centering

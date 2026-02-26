@@ -106,7 +106,7 @@ This has two severe consequences:
         nested dim-sum, the fused layers cannot have independent stationarities
         (Section~\ref{sec:data-reuse}).
 
-  \item \textbf{Forced back-to-back MAC execution.}
+  \item \textbf{Forced back-to-back multiply accumulation (MAC) execution.}
         Because no loop variable can advance the first convolution
         without simultaneously advancing the second, the two MAC
         operations are locked into a \emph{back-to-back} schedule:
@@ -470,7 +470,6 @@ choices across levels (deepening the tiling search).
 \paragraph{An example: Fused 11-layer configuration.}
 For the 10-layer fusion workload validated in Chapter~\ref{ch:validation},
 the unified loop nest has $|D_{\text{fused}}| = 66$ dimensions, 6 new dimensions introduced for every layer fused.
-(Equation~\ref{eq:fused-dims}).
 If, for instance, we want to execute this workload on Eyeriss-like architecture: it has $L_m = 5$ memory levels (DRAM,
 Global Buffer, InputRegister, WeightRegister, IntermediateOutputRegister) and $L = 7$ total levels (5~memory + 2~spatial
 fanout levels).
@@ -554,10 +553,10 @@ evaluation.
 \label{sec:ps-cross-level}
 
 The core of the pruning logic is the observation that, in a
-multi-memory level loop nest, the producer dimension (e.g.: $X$) may be tiled
-across several hierarchy levels, while the consumer dimensions (e.g.: $Q$
-and $S$) that fall \emph{between} two consecutive $X$ loop instances
+multi-memory level loop nest, the producer dimension (i.e.: $X$, $Y$, $Z$) may be tiled
+across several hierarchy levels, while the consumer dimensions (i.e. : $Q$ and $S$, $P$ and $R$, $C$) that fall \emph{between} two consecutive producer loop instances
 can also belong to different levels.
+For instance, considering the cross-level validation for the producer dimension width $X$.
 The constraint must therefore be checked not at each memory level in
 isolation, but at each boundary defined by the $X$ loops in the
 nest, a boundary that can span multiple memory levels.
@@ -584,7 +583,7 @@ For each zone, the validator computes:
 \end{itemize}
 The constraint then requires:
 \begin{equation}
-\label{eq:ps-zone-check}
+\label{eq:ps-pruning-check-width}
   Q_{\text{zone}} + S_{\text{zone}} - 1 \;\le\; X_{\text{cum}}.
 \end{equation}
 
@@ -624,13 +623,22 @@ Each intermediate layer ~$i$ introduces three alias pairs
 (Section~\ref{sec:ps-aliasing}), one for each physical axis of the
 tensor~$A_i$: width $(Q_i, S_i, X_i)$, height $(P_i, R_i, Y_i)$,
 and channels $(C_{i+1}, Z_i)$.
-Because the three axes index orthogonal dimensions of the same tensor,
+The constraint is analogous for each physical axis, with a simplification for the Z axis (because there is not an affine dimension in that case).
+\begin{equation}
+\label{eq:ps-pruning-check-height}
+  P_{\text{zone}} + R_{\text{zone}} - 1 \;\le\; Y_{\text{cum}}.
+\end{equation}
+\begin{equation}
+\label{eq:ps-pruning-check-channel}
+  C_{i+1, \text{zone}} \;\le\; Z_{i, \text{cum}}.
+\end{equation}
+
+Since the three axes index orthogonal dimensions of the same tensor,
 the pruning constraint can be evaluated \emph{independently} for each
 triplet: satisfying the width constraint
-(Equation~\ref{eq:ps-heuristic-width}) neither implies nor precludes
-satisfaction of the height constraint
-(Equation~\ref{eq:ps-heuristic-height}), and likewise for the channel
-constraint (Equation~\ref{eq:ps-heuristic-channel}).
+(Equation~\ref{eq:ps-pruning-check-width}) neither implies nor precludes
+satisfaction of the height constraint (Equation~\ref{eq:ps-pruning-check-height}), and likewise for the channel
+constraint (Equation~\ref{eq:ps-pruning-check-channel}).
 The implementation exploits this decomposition by calling the same
 single-triplet validator specifically for the axis that was moved by move-factor with respect to the starting valid configuration.
 

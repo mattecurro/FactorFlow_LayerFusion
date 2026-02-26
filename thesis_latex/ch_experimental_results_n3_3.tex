@@ -173,7 +173,7 @@ register-driven shrinkage is a minor effect.
 The product of these two factors yields the observed
 ${\sim}1.5$--$1.9\times$ ratio growth per step.
 
-\paragraph{Key takeaway.}
+\paragraph{Considerations}
 The energy penalty of fusion on the Eyeriss architecture is not a
 fixed constant; it \emph{scales super-linearly} with register size.
 A designer who chooses a smaller PE array to save area will face a
@@ -181,7 +181,7 @@ correspondingly larger WReg and, consequently, a worse
 fusion-to-single energy ratio.
 At the extreme tested point (VGG16, WReg\,=\,4\,800), fusion
 consumes $54\times$ the energy of single-layer execution.
-This scaling behaviour reinforces the conclusion from
+This scaling behavior reinforces the conclusion from
 Sections~\ref{sec:fusion-full-sized}
 and~\ref{sec:fusion-partial-sized}: fusion's energy cost is
 the dominant factor in the EDP trade-off, and it grows worse

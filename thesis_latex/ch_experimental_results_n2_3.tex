@@ -5,7 +5,9 @@
 \label{sec:cs4-aspect}
 
 \subsubsection{Motivation}
-
+CS4 address a complementary question with respect to the precedent case studies:
+\emph{given a fixed total PE budget, how should the array be shaped,
+i.e.\ how many rows versus columns, to minimize EDP?}
 CS4 fix the total number of PEs at
 2\,048 and varying only the aspect ratio, from the extremely
 column-heavy configuration $2 \times 1\,024$ to the extremely
@@ -15,7 +17,7 @@ per-workload values used throughout the DepFiN experiments.
 
 Because rows map to output channels~$Z$ and columns map to tile
 width~$Q$, shifting PEs from columns to rows simultaneously reduces
-the tile size and increases the $Z$-parallelism.
+the highest tile size available and increases the $Z$-parallelism.
 The tile size, in turn, is chosen for the experiment as the largest divisor
 of~$Q$ that fits within the available columns.
 A strongly column-heavy shape therefore wastes rows (few $Z$ channels
@@ -23,6 +25,7 @@ processed per pass, many re-reads of input activations from the
 Feature Memory), while a strongly row-heavy shape wastes columns (tiny
 tile, many DRAM-level passes, many weight re-reads from the Weight
 Memory).
+
 The EDP curve is thus expected to be U-shaped, with a minimum at the
 aspect ratio that best balances the two effects.
 
@@ -43,21 +46,19 @@ The gold star marks the EDP-optimal configuration.
 \end{figure}
 
 \paragraph{FSRCNN (activation-dominant).}
-The EDP curve exhibits a broad minimum centred on $16 \times 128$
-($5.59 \times 10^{4}$\,J$\cdot$cc), with the neighbouring
+The EDP curve exhibits a broad minimum centered on $16 \times 128$, with the neighboring
 configurations $4 \times 512$ and $8 \times 256$ within
 5\,\% and 3\,\% respectively.
 Moving toward the row-heavy end the EDP rises steeply: at $512 \times 4$, the increase is driven entirely by latency, which grows by $28\times$
 from $16 \times 128$ configuration to $512 \times 4$, as the tile
-shrinks from 120 (the maximum with 128 PE Columns) to 4 and each additional DRAM pass reloads the full weight set.
+shrinks and each additional DRAM pass reloads the full weight set.
 Energy, in contrast, varies by only $\pm 20$\,\% across the entire
-sweep, confirming that for activation-dominant workloads the dominant energy
-component, register-level operations, is largely insensitive to the
+sweep, confirming that for activation-dominant workloads the dominant energy component, register-level operations, is largely insensitive to the
 array shape.
 
 \paragraph{MC-CNN (activation-dominant).}
-MC-CNN is the only workload whose optimum shifts away from
-$16 \times 128$: the best configuration is $8 \times 256$.
+MC-CNN is the only workload tried whose optimum shifts away from
+$16 \times 128$ PE configuration: the best configuration is $8 \times 256$.
 The shift occurs because MC-CNN's output spatial dimension
 ($Q = 1\,242$) benefit from the wider tile that 256
 columns provide, reducing DRAM-level passes beyond what 128 columns
@@ -85,9 +86,8 @@ $13\times$ above the optimum.
 
 \paragraph{Considerations.}
 All four workloads produce a U-shaped EDP curve, confirming that both
-extremes of the aspect ratio are detrimental.
+extremes of the aspect ratio are not suitable for these workloads.
 The optimum lies near $16 \times 128$ for three of the four workloads
 and at $8 \times 256$ for MC-CNN, whose large output spatial dimension
 rewards a wider tile.
 The curve is consistently asymmetric: but the rapidity of growing of EDP is determined by the activation or weight dominance of the workload.
-

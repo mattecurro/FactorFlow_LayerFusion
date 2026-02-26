@@ -10,17 +10,16 @@ In the Eyeriss-Like architecture every PE stores its assigned weight
 filters in a local Weight Register (WReg).
 When multiple layers are fused, a single PE must hold the weight
 residuals for \emph{all} fused layers simultaneously, that is, the weight iterations
-that are not spatially absorbed by the SARows mapping.
-The WReg is therefore the largest per-PE register in case of Weight-Dominant workloads,
-and it acts as the binding constraint on feasibility: if the required
+that are not spatially absorbed by the Systolic Array Rows (SARows) mapping.
+The WReg is therefore the largest per-PE register in case of Weight-Dominant workloads, and it acts as the binding constraint on feasibility: if the required
 weight footprint exceeds the WReg capacity, no valid mapping exists
 for that PE configuration.
 
-There is a direct trade-off between WReg size and the minimum number
-of PEs:
+The trade-off between WReg size and the minimum number
+of PEs can be expressed as:
 %
 \begin{itemize}
-  \item A higher total PE count means that more weight factors are spatially absored, enabling a \emph{smaller} WReg.
+  \item A higher total PE count means that more weight factors are spatially absorbed, enabling a \emph{smaller} WReg.
   \item A smaller total PE count means that each PE must store more residual in its WReg, so it must to be \emph{larger}, at the cost of having higher energy access cost.
 \end{itemize}
 
@@ -72,7 +71,7 @@ by the mapper and the resulting energy, latency, and EDP.
 
 The table reveals a regular scaling law.
 For ResNet18 a designer with a 16\,384-PE budget needs at least
-WReg\,=\,902 entries, and only two PE configurations out of the entire
+WReg\,=\,902 bytes, and only two PE configurations out of the entire
 grid are feasible at that size.
 Halving the PE budget to 8\,192 doubles the required register to
 WReg\,=\,1\,800, and halving again to 4\,096 doubles it once more to
@@ -83,8 +82,7 @@ factors unabsorbed, and those residuals must be stored temporally in
 the register.
 
 VGG16 obeys the same doubling rule (1\,200 $\to$ 2\,400 $\to$ 4\,800)
-at proportionally larger WReg values, reflecting its deeper network
-(13 fused layers) and wider channels.
+at proportionally larger WReg values, reflecting its wider channels.
 
 The energy consequence is substantial.
 For ResNet18, moving from the 16\,384-PE point
@@ -94,40 +92,12 @@ because each weight access now touches a register that is $4\times$
 larger.
 Latency, however, stays nearly constant
 (less than 1\% of difference), which indicates that the
-computation is not memory-bound once a feasible mapping exists.
+computation is not memory-bound (\ref{sec:ps-latency}) once a feasible mapping exists.
 The EDP therefore tracks energy closely, growing by $2.2\times$ over
 the same range.
 
-VGG16 shows both a steeper energy increase ($2.6\times$) and a
-moderate latency increase ($\approx 23\,\%$), so its
-EDP rises by $3.1\times$ from the largest to the smallest PE budget.
-A per-layer breakdown reveals the origin of this latency growth.
-Each layer's DRAM-level latency equals the maximum of two terms:
-the \emph{weight-transfer time} (weight volume divided by DRAM
-bandwidth) and the \emph{inner-compute time} (temporal register
-iterations multiplied by the number of spatial positions processed
-inside each DRAM tile).
-For the late VGG16 layers (L10--L12, $512{\times}512$, $14{\times}14$),
-each layer streams $\sim\!2.36$\,M weight bytes at a bandwidth of
-4\,B/cc, requiring $\sim\!590$\,k cycles---far more than the
-inner-compute time even with only 4\,096 PEs.
-These layers are therefore \emph{DRAM-bandwidth-limited} and their
-latency does not change with the PE budget.
-Conversely, for the middle layers (L2--L6, $Z{=}128$--$256$,
-$56{\times}56$--$112{\times}112$), the weight volumes are four to
-eight times smaller, so the transfer finishes in $18$--$148$\,k cycles.
-With 16\,384 PEs the inner compute is comparable to or below this
-transfer time, but halving the array to 4\,096 PEs roughly
-quadruples the temporal iterations at the register level, pushing the
-compute well above the transfer limit.
-Layers L5 and L6 ($256{\to}256$, $56{\times}56$) show the largest
-per-layer inflation ($3.0\times$), while L4 suffers $2.4\times$ and
-L3 $1.5\times$.
-The cumulative excess across L2--L9 amounts to ${\sim}1.26$\,M cycles
-out of a 6.71\,M total, matching the observed $+23\,\%$.
-ResNet18's layers, by contrast, maintain a higher weight-to-spatial
-ratio throughout the network, so DRAM weight transfer remains the
-dominant term at every PE budget and latency stays flat.
+VGG16 shows both a steeper energy increase ($2.6\times$) and a moderate latency penalty ($\approx 23\,\%$), compounding into a $3.1\times$ EDP rise across the PE budget sweep. The latency degradation is driven by the middle layers (L2--L6, $Z{=}128$--$256$, $56{\times}56$--$112{\times}112$), where the constrained PE count increases weight traffic beyond the DRAM bandwidth capacity, causing memory stalls.
+
 
 
 Figure~\ref{fig:eyeriss-cs1-inv} The horizontal axis is the PE budget and
@@ -146,8 +116,8 @@ register size that a given area constraint demands.
 \paragraph{Activation-dominant workloads (FSRCNN, MC-CNN).}
 For these workloads the weight register is not the binding constraint.
 FSRCNN and MC-CNN reaches feasibility for 1024 PEs at values of WReg lower than the value of default single layer
-Eyeriss (384), and raising WReg does not reduce the
-required PE count.
+Eyeriss (384 bits).
+
 Energy still scales linearly with register size, but the effect is
 modest because the register is small in absolute terms.
 
@@ -157,8 +127,8 @@ The weight register is a critical sizing knob for the Eyeriss-Like
 architecture under full fusion.
 For weight-dominant workloads, halving the PE budget roughly doubles
 the required WReg, and the larger register inflates energy in
-proportion, because every weight read touches a physically larger SRAM
+proportion, because every weight read access a physically larger SRAM
 structure.
-Latency is less affected, so EDP tracks energy mainly.
+At the number of PEs tried, latency is less affected, so EDP tracks energy mainly.
 For activation-dominant workloads the register is non-binding and can
 be kept small without limiting feasibility.
