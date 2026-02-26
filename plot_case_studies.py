@@ -1167,7 +1167,7 @@ def plot_depfin_cs4():
         ax.set_ylabel("EDP  (J·cc)")
         ax.set_xticks(x)
         ax.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=8)
-        ax.set_title(f"{wl}  (best: {d['best']})")
+        # ax.set_title(f"{wl}  (best: {d['best']})")
 
         # Energy on secondary axis
         ax2 = ax.twinx()
@@ -1202,7 +1202,7 @@ def plot_depfin_cs1():
         ax.semilogy(d["tiles"], d["edp"], "o-", color=COLORS[wl])
         ax.set_xlabel("Tile size")
         ax.set_ylabel("EDP  (J·cc)")
-        ax.set_title(wl)
+        # ax.set_title(wl)
         ax.set_xticks(d["tiles"])
         # mark best
         best_i = int(np.argmin(d["edp"]))
@@ -1231,7 +1231,7 @@ def plot_depfin_cs2_cs3():
         ax_row.plot(d2["rows"], d2["edp"], "o-", color=COLORS[wl], linewidth=2)
         ax_row.set_xlabel("PE rows  (cols = 128)")
         ax_row.set_ylabel("EDP  (J·cc)")
-        ax_row.set_title("Row Sweep (CS2)")
+        # ax_row.set_title("Row Sweep (CS2)")
         ax_row.set_xticks(d2["rows"])
         _sci_fmt(ax_row)
         # mark best
@@ -1251,7 +1251,7 @@ def plot_depfin_cs2_cs3():
         ax_col.plot(d3["cols"], d3["edp"], "s-", color=COLORS[wl], linewidth=2)
         ax_col.set_xlabel("PE cols  (rows = 16)")
         ax_col.set_ylabel("EDP  (J·cc)")
-        ax_col.set_title("Col Sweep (CS3)")
+        # ax_col.set_title("Col Sweep (CS3)")
         ax_col.set_xticks(d3["cols"])
         _sci_fmt(ax_col)
         # mark best
@@ -1336,7 +1336,7 @@ def plot_eyeriss_cs1():
 
         ax.set_xlabel("WReg size (entries)")
         ax.set_ylabel("EDP  (J·cc)")
-        ax.set_title(wl, fontsize=13)
+        # ax.set_title(wl, fontsize=13)
         ax.set_xticks(sorted(set(wreg_a + wreg_b)))
         ax.legend(fontsize=9, loc="lower right")
         _sci_fmt(ax)
@@ -1368,7 +1368,7 @@ def plot_eyeriss_cs1_inverted():
         ax.plot(pes, wreg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum WReg (entries)")
-        ax.set_title(wl, fontsize=13)
+        # ax.set_title(wl, fontsize=13)
         ax.set_xticks(pes)
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
         ax.invert_xaxis()  # large budget on the left
@@ -1401,7 +1401,7 @@ def plot_eyeriss_cs2_cs3():
         ax.plot(ir, en, "o-", color=COLORS[wl])
         ax.set_xlabel("IntReg size")
         ax.set_ylabel("Energy (μJ)")
-        ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=9)
+        # ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=9)
         _sci_fmt(ax)
 
     for ax, wl in zip(axes[1], WORKLOADS):
@@ -1412,7 +1412,7 @@ def plot_eyeriss_cs2_cs3():
         ax.plot(oreg, en, "s-", color=COLORS[wl])
         ax.set_xlabel("OutReg size")
         ax.set_ylabel("Energy (μJ)")
-        ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=9)
+        # ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=9)
         _sci_fmt(ax)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
@@ -1450,7 +1450,7 @@ def plot_eyeriss_cs2_inverted():
         ax.plot(pes, ireg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum IntReg (entries)")
-        ax.set_title(wl, fontsize=13)
+        # ax.set_title(wl, fontsize=13)
         ax.set_xticks(pes)
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
         ax.invert_xaxis()
@@ -1495,7 +1495,7 @@ def plot_eyeriss_cs3_inverted():
         ax.plot(pes, oreg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum OutReg (entries)")
-        ax.set_title(wl, fontsize=13)
+        # ax.set_title(wl, fontsize=13)
         ax.set_xticks(pes)
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=9)
         ax.invert_xaxis()
@@ -1539,7 +1539,7 @@ def plot_eyeriss_cs5():
                   color="gold", markeredgecolor="black", zorder=5)
         ax_e.set_xticks(x)
         ax_e.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=7)
-        ax_e.set_title(f"{wl}  ({d['total_pes']} PEs)", fontsize=10)
+        # ax_e.set_title(f"{wl}  ({d['total_pes']} PEs)", fontsize=10)
         if col == 0:
             ax_e.set_ylabel("Energy  (μJ)")
         _plain_ticks(ax_e)
@@ -1651,7 +1651,7 @@ def plot_fusion_auto_energy():
         ax.set_ylabel("Energy (μJ)")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
 
 
@@ -1683,7 +1683,7 @@ def plot_fusion_auto_latency():
         ax.set_ylabel("Latency (cc)")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
         _sci_fmt(ax)
 
@@ -1725,7 +1725,7 @@ def plot_fusion_auto_dram():
         ax.set_ylabel("DRAM Reads")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(f"{arch} — DRAM Reads")
+        # ax.set_title(f"{arch} — DRAM Reads")
         ax.legend(fontsize=8)
         ax.set_ylim(top=ax.get_ylim()[1] * 3)
 
@@ -1742,7 +1742,7 @@ def plot_fusion_auto_dram():
         ax.set_ylabel("DRAM Writes")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(f"{arch} — DRAM Writes")
+        # ax.set_title(f"{arch} — DRAM Writes")
         ax.legend(fontsize=8)
         ax.set_ylim(top=ax.get_ylim()[1] * 3)
 
@@ -1777,7 +1777,7 @@ def plot_fusion_auto_energy_norm():
         ax.set_ylabel("Normalized Energy")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         ax.set_ylim(top=1.60)
@@ -1820,7 +1820,7 @@ def plot_fusion_auto_latency_norm():
         ax.set_ylabel("Normalized Latency")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         ax.set_ylim(top=2.80)
@@ -1862,7 +1862,7 @@ def plot_fusion_auto_edp_norm():
         ax.set_ylabel("Normalized EDP")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         ax.set_ylim(top=1.70)
@@ -1914,7 +1914,7 @@ def plot_partial_sized_energy():
         ax.set_ylabel("Energy (μJ)")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
 
         # Annotate per-workload arch config below x-axis
@@ -1953,7 +1953,7 @@ def plot_partial_sized_latency():
         ax.set_ylabel("Latency (cc)")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
         _sci_fmt(ax)
 
@@ -1993,7 +1993,7 @@ def plot_partial_sized_edp():
         ax.set_ylabel("EDP (J·cc)")
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
-        ax.set_title(arch)
+        # ax.set_title(arch)
         ax.legend(fontsize=9)
 
         for i, wl in enumerate(WORKLOADS):
@@ -2033,8 +2033,8 @@ def plot_partial_sized_norm():
             ax.set_ylabel(ylabel)
             ax.set_xticks(x)
             ax.set_xticklabels(WORKLOADS)
-            if row == 0:
-                ax.set_title(arch)
+#            if row == 0:
+                # ax.set_title(arch)
             ax.legend(fontsize=8)
             ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
             max_val = max(max(part_v), max(sing_v))
@@ -2068,7 +2068,7 @@ def plot_fusion_fixed_resnet18():
     ax1.set_ylabel("Full / Single Energy Ratio")
     ax1.set_xticks(x)
     ax1.set_xticklabels(labels, fontsize=8)
-    ax1.set_title("Full vs Single — Energy Ratio")
+    # ax1.set_title("Full vs Single — Energy Ratio")
     for i, v in enumerate(d["energy_ratio_fs"]):
         ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=9, fontweight="bold")
 
@@ -2082,7 +2082,7 @@ def plot_fusion_fixed_resnet18():
     ax2.set_ylabel("Energy (μJ)")
     ax2.set_xticks(x)
     ax2.set_xticklabels(labels, fontsize=8)
-    ax2.set_title("Absolute Energy")
+    # ax2.set_title("Absolute Energy")
     ax2.legend()
 
     fig.tight_layout()
@@ -2106,7 +2106,7 @@ def plot_fusion_fixed_vgg16():
     ax1.set_ylabel("Full / Single Energy Ratio")
     ax1.set_xticks(x)
     ax1.set_xticklabels(labels, fontsize=9)
-    ax1.set_title("Full vs Single — Energy Ratio")
+    # ax1.set_title("Full vs Single — Energy Ratio")
     for i, v in enumerate(d["energy_ratio_fs"]):
         ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=9, fontweight="bold")
 
@@ -2121,7 +2121,7 @@ def plot_fusion_fixed_vgg16():
     ax2.set_ylabel("Energy (μJ)")
     ax2.set_xticks(x)
     ax2.set_xticklabels(labels, fontsize=9)
-    ax2.set_title("Full / Partial / Single Energy")
+    # ax2.set_title("Full / Partial / Single Energy")
     ax2.legend()
 
     fig.tight_layout()
@@ -2158,7 +2158,7 @@ def plot_fusion_fixed_overview():
     ax.set_ylabel("Energy (μJ)")
     ax.set_xticks(x)
     ax.set_xticklabels(wls)
-    ax.set_title("Eyeriss (2048 PEs, WReg=384)")
+    # ax.set_title("Eyeriss (2048 PEs, WReg=384)")
     ax.legend()
     for i, wl in enumerate(wls):
         r = eye_data[wl]["energy_ratio_fs"]
@@ -2181,7 +2181,7 @@ def plot_fusion_fixed_overview():
     ax.set_ylabel("Energy (μJ)")
     ax.set_xticks(x)
     ax.set_xticklabels(WORKLOADS)
-    ax.set_title("DepFiN (2048 PEs)")
+    # ax.set_title("DepFiN (2048 PEs)")
     ax.legend()
     for i, wl in enumerate(WORKLOADS):
         r = dep_data[wl]["energy_ratio_fs"]
@@ -2222,7 +2222,7 @@ def plot_fusion_fixed_resnet18_partial():
     ax1.set_ylabel("Energy (μJ)")
     ax1.set_xticks(x)
     ax1.set_xticklabels(labels, fontsize=8)
-    ax1.set_title("Absolute Energy")
+    # ax1.set_title("Absolute Energy")
     ax1.legend()
 
     # Right: latency comparison
@@ -2233,7 +2233,7 @@ def plot_fusion_fixed_resnet18_partial():
     ax2.set_ylabel("Latency (cycles)")
     ax2.set_xticks(x)
     ax2.set_xticklabels(labels, fontsize=8)
-    ax2.set_title("Absolute Latency")
+    # ax2.set_title("Absolute Latency")
     ax2.legend()
 
     fig.tight_layout()
@@ -2264,7 +2264,7 @@ def plot_fusion_fixed_vgg16_partial():
     ax1.set_ylabel("Energy (μJ)")
     ax1.set_xticks(x)
     ax1.set_xticklabels(labels, fontsize=9)
-    ax1.set_title("Absolute Energy")
+    # ax1.set_title("Absolute Energy")
     ax1.legend()
 
     ax2.bar(x - w/2, d_part["partial_latency"], w, label="Partial",
@@ -2274,7 +2274,7 @@ def plot_fusion_fixed_vgg16_partial():
     ax2.set_ylabel("Latency (cycles)")
     ax2.set_xticks(x)
     ax2.set_xticklabels(labels, fontsize=9)
-    ax2.set_title("Absolute Latency")
+    # ax2.set_title("Absolute Latency")
     ax2.legend()
 
     fig.tight_layout()
@@ -2306,7 +2306,7 @@ def plot_fusion_fixed_overview_partial():
     ax.set_ylabel("Energy (μJ)")
     ax.set_xticks(x)
     ax.set_xticklabels(eye_wls)
-    ax.set_title("Eyeriss (2048 PEs, WReg=384)\n(same wreg for both scenarios)")
+    # ax.set_title("Eyeriss (2048 PEs, WReg=384)\n(same wreg for both scenarios)")
     ax.legend()
 
     # --- DepFiN panel ---
@@ -2325,7 +2325,7 @@ def plot_fusion_fixed_overview_partial():
     ax.set_xticks(x)
     sub = [f"{wl}\nFMEM={dep_data[wl]['fmem']}" for wl in WORKLOADS]
     ax.set_xticklabels(sub, fontsize=8)
-    ax.set_title("DepFiN (2048 PEs, Partial-Sized Mem)")
+    # ax.set_title("DepFiN (2048 PEs, Partial-Sized Mem)")
     ax.legend()
 
     fig.tight_layout()
@@ -2386,7 +2386,7 @@ def plot_eyeriss_cs1_feasibility():
         if not mask:
             ax.text(0.5, 0.5, "All infeasible", transform=ax.transAxes,
                    ha="center", va="center", fontsize=14)
-            ax.set_title(wl)
+            # ax.set_title(wl)
             continue
 
         wreg = [d["wreg"][i] for i in mask]
@@ -2399,7 +2399,7 @@ def plot_eyeriss_cs1_feasibility():
         ax.set_xticks(range(len(wreg)))
         ax.set_xticklabels([str(w) for w in wreg])
         ax.set_xlabel("WReg size")
-        ax.set_title(wl)
+        # ax.set_title(wl)
 
         # Min PEs on twin axis
         ax2 = ax.twinx()
