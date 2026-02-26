@@ -1865,7 +1865,8 @@ def plot_fusion_auto_edp_norm():
         # ax.set_title(arch)
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
-        ax.set_ylim(top=1.70)
+        max_val = max(max(full_edp), max(part_edp), max(sing_edp))
+        ax.set_ylim(top=max_val * 1.15)
 
         for i, (f, p, s) in enumerate(zip(full_edp, part_edp, sing_edp)):
             for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
