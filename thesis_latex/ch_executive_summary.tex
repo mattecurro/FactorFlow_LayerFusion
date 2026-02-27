@@ -49,12 +49,22 @@ this bottleneck by computing multiple consecutive layers in a single,
 interleaved schedule: intermediate activations are produced and
 consumed entirely within on-chip buffers in localized chunks,
 effectively eliminating the round trip through external DRAM.
-Hardware implementations such as DepFiN~\cite{goetschalckx2023depfin}
-have demonstrated that depth-first fused execution can achieve
-significant reductions in off-chip data movement.
+Hardware implementations of layer fusion, such as
+DepFiN~\cite{goetschalckx2023depfin}, adopt a \emph{depth-first}
+inter-layer scheduling: execution remains sequential across layers,
+but instead of evaluating the entire spatial extent of a single
+layer before proceeding to the next, the accelerator computes a
+localized intermediate feature-map tile that is buffered exclusively
+in on-chip SRAM and immediately consumed by the subsequent layer.
+This strategy eliminates redundant external-memory round trips for
+intermediate activations.
+However, the depth-first mapping employed by DepFiN is fixed at
+architecture-definition time and therefore cannot be adapted to
+efficiently serve diverse workloads.
 
-However, reasoning about fused-layer mappings is fundamentally more
-complex than the single-layer case.
+To overcome this rigidity, a general-purpose analytical model of
+fused-layer mapping is needed---yet reasoning about such mappings is
+fundamentally more complex than the single-layer case.
 Fusing $F$~layers into a unified loop nest exponentially multiplies
 the number of loop dimensions, introduces strict producer--consumer
 dependencies between layers, and creates new inter-layer data-reuse
