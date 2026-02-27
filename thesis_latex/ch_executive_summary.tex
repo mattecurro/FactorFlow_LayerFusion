@@ -496,17 +496,38 @@ ratio.
 % ====================================================================
 \section*{Conclusions}
 
-This thesis demonstrates that the fused-layer map space, despite its
-astronomical size ($>10^{515}$ configurations for an 11-layer
-fusion), can be rigorously formalized, pruned, and evaluated through
-the aliasing, decoupling, and constraint-based feasibility framework
-developed here.
-The per-layer analytical cost model accurately reproduces the
-behavior of the DepFiN accelerator, and the systematic experimental
-campaign clarifies the fundamental trade-offs of layer fusion.
+The central theoretical contribution of this thesis is demonstrating
+that the fused-layer map space, despite its astronomical size
+($>10^{515}$ configurations for an 11-layer fusion), can be rigorously
+formalized, navigated, and evaluated within a single, unified loop-nest
+abstraction.
+The key enablers are the \emph{aliasing} and \emph{decoupling}
+mechanisms.
+Aliasing introduces concrete loop variables for every intermediate
+activation, giving each shared tensor first-class status in the
+unified nest: its dimensions can be tiled, reordered, and
+parallelized independently, just like those of any single-layer
+operand.
+Decoupling is a direct consequence: because aliasing assigns
+syntactically distinct names to each layer, the per-layer dimension
+sets become disjoint ($\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$
+for $i \neq j$), so that iterating over any dimension of one layer
+leaves all other layers stationary.
+This property guarantees that the unified loop nest can encode a
+\emph{different dataflow} for each fused layer---for instance,
+weight-stationary for one layer and output-stationary for the
+next---without requiring separate per-layer scheduling passes.
+No prior fused-layer framework offers this combination of a coherent
+loop-nest representation with full per-layer mapping independence.
+Combined with exact producer--consumer feasibility pruning, the
+framework eliminates only physically infeasible mappings while
+preserving every valid candidate, and the per-layer analytical cost
+model accurately reproduces the behavior of the DepFiN accelerator.
 
-The central finding is that layer fusion is a \emph{workload-dependent
-and architecture-dependent optimization} whose energy outcome is
+The systematic experimental campaign built on this formalization
+clarifies the fundamental trade-offs of layer fusion.
+Layer fusion is a \emph{workload-dependent and
+architecture-dependent optimization} whose energy outcome is
 sensitive to the DRAM technology cost.
 At 160\,pJ\,/\,byte, fusion is energy-beneficial for
 activation-dominant workloads on shared-memory architectures,
