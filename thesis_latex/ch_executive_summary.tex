@@ -208,6 +208,70 @@ satisfied.
 
 
 % ====================================================================
+%  §3b  RELATED WORKS
+% ====================================================================
+\section*{Related Works}
+
+\paragraph{Layer-by-layer dataflow exploration.}
+With the advent of spatial architectures, analytical modeling
+frameworks and automated mappers have been developed to navigate
+the single-layer map space.
+Timeloop~\cite{parashar2019timeloop} introduced a nested-loop
+representation of workloads and a mapper--model paradigm that
+became a reference point for subsequent work; combined with
+Accelergy~\cite{wu2019accelergy}, it achieves rapid energy and
+throughput estimates with 95\% accuracy against published silicon.
+ZigZag~\cite{zigzag} unifies tiling and loop ordering by assigning
+each prime factor of a workload dimension its own loop, enabling
+aggressive pruning heuristics that reduce the search space by orders of
+magnitude, at the risk of eliminating optimal solutions.
+FactorFlow~\cite{Factorflow} further improves analytical efficiency
+by modeling spatial fanout levels explicitly, introducing precise
+architectural toggles for multicast and reduction, and inverting the
+traditional mapping paradigm via QuickFlow~\cite{Quickflow} to achieve
+up to $182\times$ faster runtimes.
+Its lightweight evaluation engine makes it the natural baseline for
+this thesis, where the exponential map-space growth of fusion demands
+minimal per-evaluation overhead.
+
+\paragraph{Fused-layer dataflow exploration.}
+DeFiNES~\cite{mei2023defines} extends the single-layer LOMA
+optimizer to cross-layer schedules, formalizing the depth-first
+design space along tile size, overlap storing mode, and fuse depth.
+Its unified cost model accounts for the full on-chip hierarchy and
+weight traffic, demonstrating up to $10\times$ improvement when both
+are considered.
+However, DeFiNES acts as an analytical wrapper around the standard
+single-layer optimizer and cannot specify a different dataflow for
+each fused layer.
+LoopTree~\cite{gilbert2024looptree} proposes an extensive design
+space and a highly accurate model for fused-layer dataflows,
+capturing inter-layer tiling, data retention, and recomputation.
+Yet it inherits Timeloop's exhaustive mapping strategies, which
+struggle to scale in a fused-layer paradigm where the map space
+grows exponentially with each additional layer.
+Furthermore, LoopTree adopts a tree-based representation that
+departs from the nested-loop abstraction, whereas the framework
+proposed here maintains structural consistency with the loop-nest
+formalism.
+
+\paragraph{Broader landscape.}
+Beyond analytical frameworks, works such as
+ConvFusion~\cite{waeijen2021convfusion}, early fused-layer CNN
+architectures~\cite{alwani2016fusedlayer}, and Fusion
+Frame~\cite{fusionframe} propose targeted techniques to minimize
+intermediate data transfers for specific topologies or fixed
+dataflows, but lack generalized search-based mapping capabilities.
+At the graph level, Optimus~\cite{optimus} employs memory-aware
+heuristics to determine \emph{which} layers to fuse, solving the
+topological grouping problem.
+Crucially, graph-level compilers like Optimus are strictly
+complementary to the framework developed in this thesis, which
+solves the spatial mapping problem: determining exactly \emph{how}
+to tile, order, and execute fused layers on a specific accelerator.
+
+
+% ====================================================================
 %  §4  PROPOSED SOLUTION
 % ====================================================================
 \section*{Proposed Solution}
