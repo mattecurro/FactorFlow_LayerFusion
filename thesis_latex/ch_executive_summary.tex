@@ -10,202 +10,254 @@
 % ====================================================================
 \section*{Context}
 
-Deep neural networks (DNNs) power an expanding range of applications,
-from image classification and object detection to super-resolution
-and autonomous driving.
-Their computational cost, however, places severe demands on both
-throughput and energy efficiency.
-Dedicated \emph{spatial architectures} (SAs)---custom accelerators
-built around two-dimensional arrays of processing elements (PEs),
-each executing multiply-accumulate (MAC) operations---exploit the
-regular parallelism of DNN kernels to meet these demands.
+Deep neural networks (DNNs) have become the dominant computational
+paradigm across applications ranging from image classification and
+super-resolution to autonomous driving.
+Their computational cost is immense: a single inference pass of a
+large convolutional network requires billions of multiply-and-accumulate
+(MAC) operations.
+To meet the stringent throughput and energy-efficiency requirements of
+edge and embedded deployment, the hardware community has developed
+\emph{spatial architectures} (SAs): custom accelerators built around
+large arrays of processing elements (PEs) interconnected by
+multi-level on-chip memory hierarchies.
 
-The performance of a spatial architecture depends critically on the
-\emph{mapping}: a schedule that determines how loop iterations are
-tiled across memory levels, ordered within each level to exploit
-data reuse, and distributed across PEs for parallel execution.
-Even for a single convolutional layer on a moderately complex SA,
-the number of valid mappings exceeds $10^{24}$--$10^{32}$,
-motivating analytical cost models and automated map-space
-exploration tools~\cite{parashar2019timeloop, Factorflow}.
-
-Existing frameworks operate on a \emph{single layer at a time}:
-every intermediate activation tensor is written to off-chip DRAM
-after one layer completes and read back when the next begins.
-At a DRAM access cost of roughly 160\,pJ per byte---two orders of
-magnitude more expensive than an on-chip SRAM access---this
-ping-pong pattern can dominate the total energy budget.
+The performance of a spatial architecture is not determined by the
+hardware alone.
+It depends critically on the \emph{mapping}: a schedule that
+specifies how the loop iterations of a DNN layer are tiled, ordered,
+and distributed across PEs and memory levels.
+Even for a single convolutional layer on a moderately complex SA, the
+combinatorial space of valid mappings, the \emph{map space}, exceeds
+$10^{24}$--$10^{32}$ candidates~\cite{Factorflow}.
+Analytical cost models and automated mappers have been developed to
+navigate this space efficiently for single-layer
+execution~\cite{parashar2019timeloop, Factorflow}.
 
 
 % ====================================================================
-%  §2  PROBLEM AND MOTIVATION
+%  §2  PROBLEM AND WHY IT MATTERS
 % ====================================================================
-\section*{Problem and Motivation}
+\section*{The Problem}
 
-\emph{Layer fusion} eliminates the intermediate DRAM round-trips by
-computing multiple consecutive layers in a single, interleaved
-schedule, keeping intermediate activations entirely on-chip.
-Hardware implementations such as DepFiN~\cite{goetschalckx2023depfin},
-a 22\,nm depth-first CNN accelerator, demonstrate that fused
-execution can reduce DRAM traffic by over 90\,\% for
-activation-heavy workloads.
+The conventional execution model for DNNs on spatial architectures is
+\emph{layer-by-layer}: each layer is computed in isolation, and the
+resulting activation tensor is written to off-chip DRAM before the
+next layer reads it back.
+Because DRAM accesses cost roughly two orders of magnitude more energy
+than on-chip SRAM accesses, this intermediate-activation traffic
+dominates the total energy budget for many workloads and frequently
+creates bandwidth-limited processing stalls that degrade latency.
 
-However, fusion fundamentally changes the mapping problem and no
-prior tool provides a general, factor-based framework to represent,
-prune, and evaluate fused-layer mappings.
-The challenges are threefold:
+\emph{Layer fusion} addresses this bottleneck by computing multiple
+consecutive layers in a single, interleaved schedule so that
+intermediate activations are produced and consumed entirely within
+on-chip buffers, eliminating the round trip through DRAM.
+Hardware implementations such as DepFiN~\cite{goetschalckx2023depfin}
+have demonstrated that depth-first fused execution can substantially
+reduce off-chip data movement.
 
-\begin{enumerate}
-  \item \textbf{Dimension proliferation.}
-        A single convolution has $|D| = 6$ loop dimensions.
-        Each fused layer introduces six new dimensions (three aliased
-        spatial dimensions for the intermediate activation, plus
-        three weight dimensions), so an $F$-layer fusion operates on
-        $|D_{\text{fused}}| = 6F$ dimensions.
-        For the 11-layer configuration used in validation,
-        $|D_{\text{fused}}| = 66$.
+However, fused-layer mapping is fundamentally more complex than the
+single-layer case.
+Fusing $F$ layers into a unified loop nest multiplies the number of
+loop dimensions, introduces strict producer--consumer data
+dependencies between layers, and creates new inter-layer data-reuse
+opportunities.
+Existing analytical frameworks either operate on a single layer
+at a time~\cite{parashar2019timeloop, Factorflow} or, when they do
+address fusion, constrain the admissible dataflows or lack the
+generality to represent per-layer mapping independence within a
+unified loop nest~\cite{mei2023defines, gilbert2024looptree}.
+No prior tool provides a formalized, constraint-aware analytical
+model that can represent, prune, and evaluate the full fused-layer
+map space while preserving heterogeneous per-layer dataflow freedom.
 
-  \item \textbf{Map-space explosion.}
-        The map-space cardinality is governed by
-        %
-        \[
-          |\mathcal{MS}| \;=\;
-          \underbrace{(|D|!)^{L_m}}_{\text{loop permutations}}
-          \;\cdot\;
-          \underbrace{
-            \prod_{d \in D}\;\prod_{p \mid d}
-              \binom{v_p(d) + L - 1}{L - 1}
-          }_{\text{factor allocations}},
-        \]
-        %
-        where $L_m$ is the number of memory levels and $L$ the total
-        levels (memory + spatial).
-        For the 11-layer fusion on a five-memory-level Eyeriss-like
-        architecture ($L_m = 5$, $L = 7$), the permutation term alone
-        is $(66!)^5 \approx 10^{460}$;
-        the total map-space exceeds
-        $\mathbf{10^{515}}$---over 480~orders of magnitude larger
-        than the single-layer case (${\sim}10^{24}\text{--}10^{32}$).
 
-  \item \textbf{Inter-layer tile-size dependencies.}
-        An output tile of size $P \times Q$ for the last layer forces
-        every preceding layer~$i$ to produce a progressively larger
-        tile to cover the convolutional halos:
-        %
-        \begin{equation}
-          \text{Layer } i: \quad
-          \bigl(P + \textstyle\sum_{j=i+1}^{F-1}(R_j - 1)\bigr)
-          \;\times\;
-          \bigl(Q + \textstyle\sum_{j=i+1}^{F-1}(S_j - 1)\bigr).
-          \tag{Cascading tiles}
-        \end{equation}
-        Deeper fusion therefore tightens on-chip memory constraints
-        for every layer in the chain.
-\end{enumerate}
+% ====================================================================
+%  §3  PROBLEM FORMULATION
+% ====================================================================
+\section*{Problem Formulation}
+
+\paragraph{Dimension proliferation.}
+A single 2-D convolution has $|D| = 6$ loop dimensions.
+When $F$ consecutive layers are fused into a unified loop nest,
+each layer contributes its own set of dimensions.
+The total dimension count grows as:
+%
+\begin{equation}
+  |D_{\text{fused}}| \;=\;
+  \underbrace{4F}_{\substack{\text{per-layer:}\\
+    C_i, R_i, S_i, Z_i}} \;+\;
+  \underbrace{2(F-1)}_{\substack{\text{intermediate}\\
+    \text{spatial: } Y_i, X_i}} \;+\;
+  \underbrace{2}_{\substack{\text{output}\\
+    P, Q}}
+  \;=\; 6F.
+  \tag{Dimension growth}
+\end{equation}
+%
+For the 11-layer FSRCNN fusion used in validation, this yields
+$|D_{\text{fused}}| = 66$, an order-of-magnitude increase.
+
+\paragraph{Map-space explosion.}
+The map-space cardinality is the product of loop permutations at
+every memory level and factor allocations across all hierarchy
+levels:
+%
+\begin{equation}
+  |\mathcal{MS}| \;=\;
+  \underbrace{(|D|!)^{L_m}}_{\text{loop permutations}}
+  \;\cdot\;
+  \underbrace{
+    \prod_{d \in D}\;\prod_{p \mid d}
+      \binom{v_p(d) + L - 1}{L - 1}
+  }_{\text{factor allocations}},
+  \label{eq:es-mapspace}
+\end{equation}
+%
+where $L_m$ is the number of memory levels and $L$ the total number
+of levels (memory + spatial).
+Table~\ref{tab:es-mapspace} quantifies the growth.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Map-space comparison: single layer vs.\ 11-layer fusion
+           on a representative spatial architecture ($L_m = 5$
+           memory levels, $L = 7$ total levels).}
+  \label{tab:es-mapspace}
+  \small
+  \begin{tabular}{l r r}
+    \toprule
+    \textbf{Quantity}
+      & \textbf{Single layer}
+      & \textbf{11-layer fusion} \\
+    \midrule
+    Dimensions ($|D|$)          & 6     & 66 \\
+    Memory levels ($L_m$)       & 5     & 5 \\
+    Total levels ($L$)          & 7     & 7 \\
+    Permutation term            & $\sim\!10^{11}$
+                                & $\sim\!10^{460}$ \\
+    Factor-allocation term      & $\sim\!10^{13}$--$10^{20}$
+                                & $\sim\!10^{55}$ \\
+    \addlinespace
+    \textbf{Total map-space}    & $\sim\!10^{24}$--$10^{32}$
+                                & $>\!10^{515}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \noindent
-Existing fused-layer tools either constrain the admissible set of
-dataflows (DeFiNES~\cite{DeFiNES}), inherit the exhaustive search
-strategies of single-layer frameworks that do not scale to fused
-map spaces (LoopTree~\cite{LoopTree}), or address the complementary
-graph-level problem of \emph{which} layers to fuse rather than
-\emph{how} to map them (Optimus~\cite{Optimus}).
-None provides a factor-based abstraction that decouples per-layer
-mapping freedom from inter-layer dependency enforcement.
+The fused map space exceeds $10^{515}$, over 400~orders of magnitude
+larger than the single-layer case.
+Unguided exploration has effectively zero probability of discovering
+valid, high-quality mappings.
+
+\paragraph{Cascading inter-layer tile-size dependencies.}
+Fusion introduces strict producer--consumer constraints.
+An output tile of size $P \times Q$ for the last layer forces every
+preceding layer~$i$ to produce a progressively larger tile to account
+for the cumulative filter halo:
+%
+\begin{equation}
+  \text{Layer } i: \quad
+  \Bigl(P + \textstyle\sum_{j=i+1}^{F-1}(R_j - 1)\Bigr)
+  \;\times\;
+  \Bigl(Q + \textstyle\sum_{j=i+1}^{F-1}(S_j - 1)\Bigr).
+  \tag{Cascading tiles}
+\end{equation}
+%
+Deeper fusion topologies eliminate more DRAM traffic but
+progressively tighten the on-chip memory constraints for every
+participating layer.
+
+\paragraph{Five operand categories.}
+Unlike single-layer mapping, which distinguishes three operand types
+(input, weights, output), fused mapping requires five categories:
+(1)~global input, (2)~per-layer weights $W_0, \dots, W_{F-1}$,
+(3)~intermediate output $A_i$, (4)~intermediate input $A_{i-1}$,
+and (5)~global output.
+Each memory level must specify bypass rules for all five categories;
+these rules govern whether intermediate activations stay on-chip,
+thereby determining whether the depth-first fusion guarantee is
+satisfied.
 
 
 % ====================================================================
-%  §3  PROPOSED SOLUTION
+%  §4  PROPOSED SOLUTION
 % ====================================================================
 \section*{Proposed Solution}
 
-This thesis presents an analytical framework for representing,
-pruning, and evaluating fused-layer mappings on spatial DNN
-accelerators.
-Building on the factor-based map-space representation and the
-extended Einsum workload notation of
-FactorFlow~\cite{Factorflow}, the framework introduces three
-modelling concepts and a generalised per-layer cost model.
+This thesis develops an analytical framework for fused-layer mapping
+that can represent, prune, and evaluate the multi-layer map space.
+The framework builds upon the FactorFlow~\cite{Factorflow}
+factor-based abstraction and introduces three modeling concepts and
+a generalized per-layer cost model.
 
-\paragraph{1.\ Aliasing.}
-Each intermediate activation tensor $A_i$ serves a dual role:
-it is the \emph{output} of layer~$i$ and the \emph{input} of
-layer~$i{+}1$.
-The framework gives the intermediate its own set of concrete loop
-variables ($Z_i$, $Y_i$, $X_i$), so that the producer indexes
-$A_i$ through native dimensions and the consumer indexes the
-\emph{same} tensor through affine dim-sums involving its own
-variables.
-This eliminates the nested dim-sum constructs that would
-otherwise prevent independent per-layer tiling, and it enables
-the mapping to express a different dataflow (stationarity) for
-each layer within a single unified loop nest.
+\paragraph{1.\ Aliasing: naming the intermediate dimensions.}
+When layers are fused, each intermediate activation $A_i$ serves a
+dual role: output of layer~$i$ and input of layer~$i\!+\!1$.
+Without explicit naming, these shared tensors can only be indexed
+through nested affine sums, collapsing the two layers into a rigid
+back-to-back scalar schedule with no per-layer mapping freedom.
+\emph{Aliasing} resolves this by introducing concrete loop variables
+($Y_i, X_i, Z_i$) for each intermediate tensor, registering them in
+the coupling so that the producer indexes the tensor through native
+dimensions while the consumer indexes it through affine dim-sums
+involving its own variables.
+The intermediate dimensions become first-class citizens of the
+unified loop nest: they can be tiled, reordered, and parallelized
+independently.
 
-Every pair of aliased dimensions must satisfy a cascading
-inequality at every hierarchy level~$l$:
-%
-\begin{align}
-  Q_{\text{zone}} + S_{\text{zone}} - 1 &\;\le\;
-    X_{\text{cum}},
-    \tag{Width} \\[2pt]
-  P_{\text{zone}} + R_{\text{zone}} - 1 &\;\le\;
-    Y_{\text{cum}},
-    \tag{Height} \\[2pt]
-  C_{i+1,\text{zone}} &\;\le\; Z_{i,\text{cum}}.
-    \tag{Channel}
-\end{align}
-
-\paragraph{2.\ Decoupling.}
-Aliasing makes the per-layer dimension sets
-$\mathcal{D}_0, \mathcal{D}_1, \dots, \mathcal{D}_{F-1}$ pairwise
-disjoint.
-Advancing any dimension in $\mathcal{D}_i$ triggers
-$\text{MAC}_i$ operations while leaving all other layers
-\emph{stationary}.
-Each layer can therefore be tiled, ordered, and parallelised
-independently---different stationarities in the same unified loop
-nest---without requiring separate scheduling phases.
+\paragraph{2.\ Decoupling: per-layer mapping independence.}
+Because aliasing assigns syntactically distinct variable names to
+each layer, the per-layer dimension sets become disjoint:
+$\mathcal{D}_i \cap \mathcal{D}_j = \emptyset$ for $i \neq j$.
+This \emph{decoupling} guarantees that iterating over any dimension
+of one layer leaves all other layers stationary.
+As a direct consequence, the unified dataflow can encode a
+\emph{different stationarity} for each layer within a single loop
+nest (e.g., weight-stationary for layer~0 and output-stationary for
+layer~1), without requiring separate per-layer scheduling.
 
 \paragraph{3.\ Producer--consumer feasibility pruning.}
-The aliasing constraints above are enforced \emph{at every
-hierarchy level} for every inter-layer connection.
-Every candidate mapping modification triggers the pruning
-validator; moves that violate the constraints are rolled back
-immediately, eliminating infeasible regions of the
-$10^{515}$-point map space \emph{before} cost evaluation.
-The pruning is \emph{exact}: it removes only mappings that violate
-the producer--consumer data dependency, preserving every feasible
-candidate.
+Aliasing and decoupling give the mapper freedom, but that freedom
+introduces a risk: the loop nest no longer automatically guarantees
+that every intermediate datum is produced before it is consumed.
+The framework enforces exact feasibility constraints at every
+hierarchy level through cascading tile-size inequalities:
+%
+\begin{align}
+  Q_{\text{zone}} + S_{\text{zone}} - 1 &\;\le\; X_{\text{cum}},
+    \tag{Width} \\[2pt]
+  P_{\text{zone}} + R_{\text{zone}} - 1 &\;\le\; Y_{\text{cum}},
+    \tag{Height} \\[2pt]
+  C_{i+1,\,\text{zone}} &\;\le\; Z_{i,\,\text{cum}}.
+    \tag{Channel}
+\end{align}
+%
+Every candidate mapping move triggers this validator; moves that
+violate any constraint are rolled back immediately.
+The pruning is \emph{exact}: it removes only physically infeasible
+mappings, preserving every valid candidate.
 
 \paragraph{4.\ Per-layer cost model.}
-
-The single-layer cost model is generalised along three axes.
-
-\emph{Memory operations.}\;
-Each memory level reports reads and writes for five operand
-categories (global input, per-layer weights, intermediate output,
-intermediate input, global output), scaled by per-layer dimension
-filtering that ensures a dimension belonging solely to layer~$j$
-does not inflate the iteration count attributed to layer~$i$.
-
-\emph{Energy.}\;
-The energy-weighted MOPs metric is decomposed per layer:
+The single-layer cost model is generalized to compute memory
+operations, energy, and latency on a per-layer basis.
+Reads and writes are attributed to each layer through per-layer
+dimension filtering, and operand bypass rules are extended to the
+five fused categories.
+The energy is decomposed as:
 %
 \begin{equation}
   \text{WMOPs}_i \;=\;
     \sum_{l \in \text{levels}}
       e_l \cdot \bigl(R_l^{(i)} + W_l^{(i)}\bigr),
-  \quad
-  \text{WMOPs} = \sum_{i=0}^{F-1} \text{WMOPs}_i
-    + \text{WMOPs}_{\text{compute}}.
   \tag{Per-layer energy}
 \end{equation}
-
-\emph{Latency with stall detection.}\;
-At each memory level~$l$, the ideal bandwidth required by each
-layer's traffic is compared to the physical bandwidth $B_l$.
-If the ideal exceeds the physical, the level is memory-bound
-and the per-tile latency is stretched:
+%
+where $e_l$ is the per-access energy at level~$l$.
+The latency model detects bandwidth-limited stalls per layer per
+level:
 %
 \begin{equation}
   \Lambda_l^{(i)} \;=\;
@@ -218,185 +270,163 @@ and the per-tile latency is stretched:
     \max_{l}\;\sum_{i=0}^{F-1} \Lambda_l^{(i)}.
   \tag{Latency}
 \end{equation}
-
-\noindent
+%
 The energy--delay product
-$\text{EDP} = \text{WMOPs} \times \Lambda$
-provides a single-number efficiency metric combining energy and
+$\text{EDP} = \text{WMOPs} \times \Lambda$ provides a single-number
+efficiency metric that captures the trade-off between energy and
 throughput.
 
 
 % ====================================================================
-%  §4  VALIDATION
+%  §5  VALIDATION
 % ====================================================================
 \section*{Validation}
 
-The framework is validated by reproducing the depth-first execution
-of an 11-layer workload (10 fused $3{\times}3$ convolutions at
-$720{\times}1280$ HD resolution, totalling 77.7\,billion MACs) on
-the DepFiN accelerator ($16 \times 128$~PEs, 1056\,KB Feature
-Memory, 524\,KB Weight Memory, LPDDR4 DRAM).
-Per-access energy values are estimated by
-Accelergy~\cite{accelergy}---the same validated back-end used by
-Timeloop---at the 22\,nm technology node.
-
-The key validation results are:
+The framework is validated against the DepFiN
+accelerator~\cite{goetschalckx2023depfin}, a 22\,nm depth-first
+CNN chip with a $16 \times 128$ PE array, 1056\,KB Feature Memory,
+and 524\,KB Weight Memory.
+The validation reproduces the execution of an 11-layer FSRCNN
+workload (77.7\,billion MACs at 720$\times$1280 resolution):
 
 \begin{enumerate}
   \item \textbf{Ideal latency}: the model predicts 37.94\,M cycles,
         matching the compute-bound reference
         ($\text{Total MACs} / \text{PEs}$) exactly.
-  \item \textbf{DRAM bypass}: zero intermediate DRAM traffic is
-        produced, reproducing DepFiN's depth-first fusion guarantee.
+  \item \textbf{DRAM bypass}: zero intermediate DRAM traffic,
+        reproducing DepFiN's depth-first fusion guarantee.
   \item \textbf{On-chip stalls}: only 24 stall cycles out of
-        37.94\,M arise from the Feature Memory, and these occur
-        exclusively at the boundary layers (L0 and L10).
-        At the regime layers (L1--L9), zero stall cycles are
-        observed.
-  \item \textbf{Weight Memory}: zero stall cycles, confirming that
-        the 16\,B/cycle bandwidth is sufficient for weight delivery.
+        37.94\,M arise from the Feature Memory, exclusively at the
+        boundary layers (L0 and L10).
+        At regime (L1--L9), zero stall cycles.
+  \item \textbf{Weight Memory}: zero stall cycles, confirming
+        sufficient bandwidth for weight delivery.
 \end{enumerate}
 
 \noindent
-These results establish confidence in the analytical cost model for
-the design-space exploration that follows.
+These results establish that the analytical model faithfully captures
+the data-movement behavior and timing of a real fused-layer
+accelerator.
 
 
 % ====================================================================
-%  §5  EXPERIMENTAL RESULTS
+%  §6  KEY FINDINGS
 % ====================================================================
-\section*{Key Experimental Findings}
+\section*{Key Findings}
 
-The design-space exploration covers two spatial architectures
-(DepFiN-like with shared on-chip memories, Eyeriss-v1-like with
-replicated per-PE registers), four CNN workloads (FSRCNN,
-MC-CNN---both activation-dominant; VGG16,
-ResNet18---both weight-dominant), and three execution modes:
-\emph{full fusion} (all layers fused), \emph{partial fusion}
-(pairwise), and \emph{single-layer} (each layer in isolation).
-Two architecture-sizing scenarios are tested: Scenario~A sizes
-the hardware for full fusion; Scenario~B sizes it for pairwise
-fusion only, reducing on-chip memory substantially.
+The validated framework is exercised on a systematic design-space
+exploration covering two spatial architectures (DepFiN-like with
+shared on-chip memories, Eyeriss-v1-like with replicated per-PE
+registers), four CNN workloads (FSRCNN, MC-CNN---activation-dominant;
+VGG16, ResNet18---weight-dominant), three execution modes (full
+fusion, partial fusion, single-layer), and two architecture-sizing
+scenarios (Scenario~A sized for full fusion, Scenario~B sized for
+pairwise fusion).
 
-\paragraph{DRAM traffic reduction.}
-Full fusion achieves its primary objective: DRAM traffic is
-reduced by $94.8\%$ (FSRCNN), $85.3\%$ (MC-CNN), $59.9\%$
-(VGG16), and $25.1\%$ (ResNet18), relative to single-layer
-execution.
+\paragraph{DRAM traffic elimination.}
+Full fusion reduces total DRAM traffic by $94.8\%$ (FSRCNN),
+$85.3\%$ (MC-CNN), $59.9\%$ (VGG16), and $25.1\%$ (ResNet18),
+confirming that fusion eliminates the dominant off-chip transfers
+for activation-heavy workloads.
 
 \paragraph{Latency.}
-Fusion delivers $42$--$48\%$ latency savings for the
-activation-dominant workloads on DepFiN and $16$--$46\%$ on
+Fusion delivers $42$--$48\%$ latency savings for activation-dominant
+workloads on the DepFiN-like architecture and $16$--$46\%$ on
 Eyeriss.
-For weight-dominant workloads, the outcome is
-architecture-dependent: Eyeriss still benefits (up to $21\%$
-saving) thanks to its distributed per-PE registers, while DepFiN
-can be \emph{slower} under full fusion (up to $30\%$ latency
-increase) because the very large shared weight memory
-(10.7--14.4\,MB) becomes a bandwidth bottleneck.
-Partial fusion captures $87$--$103\%$ of the full-fusion latency
-benefit, confirming that nearly all the inter-layer traffic
-saving is realised by fusing just two consecutive layers.
+For weight-dominant workloads, the outcome is architecture-dependent:
+Eyeriss still reduces latency ($7.8$--$21.2\%$) because its
+distributed per-PE registers avoid a single shared-memory contention
+point, while DepFiN can be \emph{slower} under full fusion (up to
+$30.3\%$ latency increase for ResNet18) because the very large
+shared weight memory (10.7--14.4\,MB) becomes a bandwidth
+bottleneck.
+Partial (pairwise) fusion captures $87$--$103\%$ of the full-fusion
+latency benefit, indicating that nearly all the inter-layer saving
+is realized by fusing just two consecutive layers.
 
 \paragraph{Energy: workload-dependent and architecture-dependent.}
-At 160\,pJ/byte for DRAM, the energy outcome splits along
-workload type.
-On DepFiN, full fusion is \emph{energy-beneficial} for
-activation-dominant workloads: FSRCNN single-layer energy is
-$4.38\times$ the full-fusion value, and MC-CNN is $1.73\times$.
-For weight-dominant workloads on both architectures, fusion is
-energy-adverse (VGG16 single costs only $5.9$--$7.4\%$ of full
-fusion).
-On Eyeriss, the replicated register architecture inflates on-chip
-energy: with 16\,384~PEs for VGG16 and a per-PE weight register
-of 1\,200 words, the aggregate register capacity exceeds
-19.7\,million bytes, making full fusion up to $17\times$ more
-expensive than single-layer execution.
-The energy outcome is therefore sensitive to the DRAM technology
-cost: a lower DRAM energy would reduce the benefit of eliminating
-DRAM traffic and shift the balance further against fusion, while
-a higher cost would extend fusion's advantage.
+The energy outcome depends critically on the interplay between the
+DRAM cost saved and the on-chip memory overhead incurred, and is
+consequently sensitive to the DRAM per-access energy.
+At 160\,pJ\,/\,byte (Section~\ref{sec:energy-model}), full fusion
+is \emph{energy-beneficial} on DepFiN for activation-dominant
+workloads: FSRCNN single-layer energy is $4.38\times$ the
+full-fusion value, and MC-CNN is $1.73\times$, because the
+eliminated DRAM traffic is massive and the feature-memory overhead
+modest.
+For weight-dominant workloads on DepFiN, the picture reverses:
+VGG16 single-layer energy is only $7.4\%$ of the full-fusion value,
+and ResNet18 is $17.3\%$, because 10--14\,MB weight memories inflate
+per-access energy far beyond the DRAM savings.
+On Eyeriss, the replicated per-PE register architecture amplifies
+the on-chip overhead: fusion is roughly energy-neutral for FSRCNN
+and energy-adverse for all other workloads.
 
 \paragraph{Energy--Delay Product.}
-Combining energy and latency, full fusion wins on EDP in three of
-the eight architecture--workload combinations: FSRCNN on DepFiN
-($6.44\times$ single/full), MC-CNN on DepFiN ($2.31\times$), and
-FSRCNN on Eyeriss ($1.75\times$).
-In all three, the activation-dominant nature of the workload
-ensures that both energy and latency favour fusion, amplifying the
+Full fusion wins on EDP in three of the eight architecture--workload
+combinations: FSRCNN on DepFiN ($6.44\times$ single/full), MC-CNN
+on DepFiN ($2.31\times$), and FSRCNN on Eyeriss ($1.75\times$).
+In all three cases, the activation-dominant nature of the workload
+ensures that both energy and latency favor fusion, amplifying the
 EDP advantage.
-For the remaining five cases, the on-chip memory overhead
-dominates and single-layer execution is more efficient.
+For the remaining five combinations, single-layer execution is the
+more efficient choice.
 
 \paragraph{Partial fusion as a practical compromise.}
-Scenario~B demonstrates that sizing the architecture for pairwise
-fusion reduces weight memory by up to $3.1\times$ on DepFiN
-(VGG16: 14\,366\,KB$\to$4\,610\,KB) and per-PE registers on
-Eyeriss (VGG16 WReg: 1\,200$\to$576), while preserving
-$96$--$100\%$ of the latency saving for activation-dominant
-workloads.
-The worst-case latency penalty on DepFiN is also greatly reduced
-($-30.3\% \to -7.5\%$ for ResNet18).
-For activation-dominant workloads on DepFiN, partial fusion wins
-on energy, latency, and EDP simultaneously.
+Sizing the architecture for pairwise rather than full fusion
+(Scenario~B) reduced the weight memory by up to $3.1\times$ on
+DepFiN and the per-PE register by up to $2.1\times$ on Eyeriss,
+while preserving $96$--$100\%$ of the full-fusion latency saving
+for activation-dominant workloads.
+For activation-dominant workloads on DepFiN, partial fusion won on
+energy, latency, and EDP simultaneously, making it the strictly
+dominant strategy.
 
 \paragraph{Super-linear scaling of the energy penalty.}
-On Eyeriss, each $2\times$ increase in per-PE register size
-raises the fusion-to-single energy ratio by $1.5$--$1.9\times$
-(ResNet18: $8.0\times \to 11.7\times \to 19.6\times$;
-VGG16: $17.0\times \to 28.9\times \to 54.1\times$).
-The fused energy grows because each register access touches a
-larger SRAM structure, while the single-layer energy shrinks only
-modestly (the DRAM component is PE-count-independent).
+The fusion-to-single energy ratio is not a fixed constant: each
+$2\times$ increase in per-PE register size raises the ratio by
+$1.5$--$1.9\times$ (ResNet18: $8.0\times \to 11.7\times \to
+19.6\times$; VGG16: $17.0\times \to 28.9\times \to 54.1\times$).
 A designer who shrinks the PE array to save area will face a
-proportionally larger register and a worse fusion-to-single energy
+proportionally larger register and a correspondingly worse energy
 ratio.
 
 
 % ====================================================================
-%  §6  CONCLUSIONS
+%  §7  CONCLUSIONS
 % ====================================================================
 \section*{Conclusions}
 
-This thesis demonstrates that fused-layer mappings can be
-represented, pruned, and evaluated within a factor-based analytical
-framework via aliasing, decoupling, and producer--consumer
-feasibility pruning.
-The pruning rule makes the otherwise intractable $10^{515}$-point
-map space navigable by eliminating infeasible mappings before cost
-evaluation, while preserving every feasible candidate.
-The per-layer cost model accurately reproduces the behaviour of the
-DepFiN accelerator, providing confidence in the design-space
-exploration results.
+This thesis demonstrates that the fused-layer map space, despite its
+astronomical size ($>10^{515}$ configurations for an 11-layer
+fusion), can be rigorously formalized, pruned, and evaluated through
+the aliasing, decoupling, and constraint-based feasibility framework
+developed here.
+The per-layer analytical cost model accurately reproduces the
+behavior of the DepFiN accelerator, and the systematic experimental
+campaign clarifies the fundamental trade-offs of layer fusion.
 
-The experimental campaign clarifies the trade-offs of layer fusion.
-DRAM traffic is reduced by $25$--$95\%$, and latency improves by
-up to $48\%$ for activation-dominant workloads.
-However, the on-chip memory overhead makes the energy outcome
-workload-dependent and architecture-dependent: fusion is
-energy-beneficial only when the eliminated DRAM traffic is large
-relative to the increased on-chip access cost.
-At 160\,pJ/byte, three of eight architecture--workload combinations
-favour fusion on the combined EDP metric, all involving
-activation-dominant workloads.
-
+The central finding is that layer fusion is a \emph{workload-dependent
+and architecture-dependent optimization} whose energy outcome is
+sensitive to the DRAM technology cost.
+At 160\,pJ\,/\,byte, fusion is energy-beneficial for
+activation-dominant workloads on shared-memory architectures,
+yielding EDP improvements of up to $6.4\times$.
+For weight-dominant workloads, the on-chip memory overhead dominates,
+and single-layer execution remains more efficient.
 Partial (pairwise) fusion emerges as the most practical deployment
-strategy: it captures nearly all of the full-fusion latency
-benefit, requires substantially less on-chip memory, and wins
-simultaneously on energy, latency, and EDP for activation-dominant
-workloads on shared-memory architectures.
-The energy penalty of fusion scales super-linearly with register
-size on replicated-register architectures, underscoring the
-importance of accurate energy modelling for both on-chip and
-off-chip memory when evaluating fusion strategies.
+strategy: it captures nearly all the latency benefit of full fusion
+at a fraction of the memory cost and, for activation-dominant
+workloads on DepFiN, is the strictly dominant choice on energy,
+latency, and EDP simultaneously.
 
-The primary directions for future work include extending the
-automated mapper to explore fused mappings directly, modelling
-inter-layer parallelism (pipeline execution), and porting the
-framework to a compiled language to enable large-scale automated
+The primary directions for future work include developing automated
+heuristic mappers capable of navigating the pruned fused map space,
+supporting inter-layer pipeline parallelism, and porting the
+analytical engine to a compiled language to enable large-scale
 exploration.
 
 \vspace{1em}
 \noindent\textbf{Keywords:} deep neural networks, spatial architectures,
-layer fusion, mapping, design-space exploration, analytical cost
-modelling, DepFiN, Eyeriss.
+layer fusion, depth-first scheduling, mapping, design-space
+exploration, analytical cost modeling, DepFiN, Eyeriss.
