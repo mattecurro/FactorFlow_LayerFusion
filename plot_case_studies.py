@@ -1776,7 +1776,8 @@ def plot_fusion_auto_energy_norm():
         ax.set_title(arch)
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
-        ax.set_ylim(top=1.60)
+        max_val = max(max(full_e), max(part_e), max(sing_e))
+        ax.set_ylim(top=max(1.25, max_val * 1.12))
 
         # Annotate bar values
         for i, (f, p, s) in enumerate(zip(full_e, part_e, sing_e)):
@@ -1819,7 +1820,8 @@ def plot_fusion_auto_latency_norm():
         ax.set_title(arch)
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
-        ax.set_ylim(top=2.80)
+        max_val = max(max(full_l), max(part_l), max(sing_l))
+        ax.set_ylim(top=max(1.25, max_val * 1.12))
 
         for i, (f, p, s) in enumerate(zip(full_l, part_l, sing_l)):
             for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
@@ -1862,7 +1864,7 @@ def plot_fusion_auto_edp_norm():
         ax.legend(fontsize=9)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         max_val = max(max(full_edp), max(part_edp), max(sing_edp))
-        ax.set_ylim(top=max_val * 1.15)
+        ax.set_ylim(top=max(1.25, max_val * 1.12))
 
         for i, (f, p, s) in enumerate(zip(full_edp, part_edp, sing_edp)):
             for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
@@ -2068,6 +2070,7 @@ def plot_fusion_fixed_resnet18():
     ax1.set_title("Full vs Single — Energy Ratio")
     for i, v in enumerate(d["energy_ratio_fs"]):
         ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=9, fontweight="bold")
+    ax1.set_ylim(top=max(d["energy_ratio_fs"]) * 1.30)
 
     # Right: Absolute energy comparison
     w = 0.3
@@ -2106,6 +2109,7 @@ def plot_fusion_fixed_vgg16():
     ax1.set_title("Full vs Single — Energy Ratio")
     for i, v in enumerate(d["energy_ratio_fs"]):
         ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=9, fontweight="bold")
+    ax1.set_ylim(top=max(d["energy_ratio_fs"]) * 1.30)
 
     w = 0.25
     ax2.bar(x - w, d["full_energy"], w, label="Full",
