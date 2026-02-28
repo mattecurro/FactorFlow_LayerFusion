@@ -1156,7 +1156,7 @@ FUSION_FIXED_DEPFIN_PARTIAL = {
 # ────────────────────────────────────────────────────────────────────
 def plot_depfin_cs4():
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    # fig.suptitle("DepFiN — PE Aspect Ratio Sweep  (2048 PEs)", fontsize=16, y=0.98)
+#    fig.suptitle("DepFiN — PE Aspect Ratio Sweep  (2048 PEs)", fontsize=16, y=0.98)
 
     for ax, wl in zip(axes.flat, WORKLOADS):
         d = DEPFIN_CS4[wl]
@@ -1195,7 +1195,7 @@ def plot_depfin_cs4():
 # ────────────────────────────────────────────────────────────────────
 def plot_depfin_cs1():
     fig, axes = plt.subplots(2, 2, figsize=(13, 9))
-    # fig.suptitle("DepFiN — Tile Size Sensitivity  (16×128 PEs) DepFiN 16×128 PEs, \n FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)", fontsize=16, y=0.98)
+#    fig.suptitle("DepFiN — Tile Size Sensitivity  (16×128 PEs) DepFiN 16×128 PEs, \n FMEM BW scales as: BW_scaled = BW_base × (tile_size / 128)", fontsize=16, y=0.98)
 
     for ax, wl in zip(axes.flat, WORKLOADS):
         d = DEPFIN_CS1[wl]
@@ -1285,7 +1285,7 @@ def plot_depfin_cs2_cs3():
 def plot_eyeriss_cs1():
     cs1_wls = ["VGG16", "ResNet18"]
     fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-    # fig.suptitle("Eyeriss CS1 — WReg Sensitivity: Summary A (min PEs) vs Summary B (min EDP)",               fontsize=14, y=1.02)
+#    fig.suptitle("Eyeriss CS1 — WReg Sensitivity: Summary A (min PEs) vs Summary B (min EDP)",               fontsize=14, y=1.02)
 
     for ax, wl in zip(axes, cs1_wls):
         da = EYERISS_CS1[wl]
@@ -1353,7 +1353,7 @@ def plot_eyeriss_cs1_inverted():
     """Designer-oriented view: given a PE budget, what is the minimum WReg?"""
     cs1_wls = ["VGG16", "ResNet18"]
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    # fig.suptitle("Eyeriss CS1 — Minimum WReg for a Given PE Budget",                 fontsize=14, y=1.02)
+#    fig.suptitle("Eyeriss CS1 — Minimum WReg for a Given PE Budget",                 fontsize=14, y=1.02)
 
     for ax, wl in zip(axes, cs1_wls):
         d = EYERISS_CS1[wl]
@@ -1390,8 +1390,7 @@ def plot_eyeriss_cs1_inverted():
 # ────────────────────────────────────────────────────────────────────
 def plot_eyeriss_cs2_cs3():
     fig, axes = plt.subplots(2, 4, figsize=(18, 8))
-    # fig.suptitle("Eyeriss — IntReg Sweep (top) and OutReg Sweep (bottom) — min PEs config",
-                 # fontsize=15, y=0.98)
+#    fig.suptitle("Eyeriss — IntReg Sweep (top) and OutReg Sweep (bottom) — min PEs config",                fontsize=15, y=0.98)
 
     for ax, wl in zip(axes[0], WORKLOADS):
         d = EYERISS_CS2[wl]
@@ -1427,8 +1426,7 @@ def plot_eyeriss_cs2_inverted():
     """Designer-oriented view: given a PE budget, what is the minimum IntReg?"""
     cs2_wls = ["VGG16", "ResNet18"]
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    # fig.suptitle("Eyeriss CS2 — Minimum IntReg for a Given PE Budget",
-                 # fontsize=14, y=1.02)
+#    fig.suptitle("Eyeriss CS2 — Minimum IntReg for a Given PE Budget",                fontsize=14, y=1.02)
 
     for ax, wl in zip(axes, cs2_wls):
         d = EYERISS_CS2[wl]
@@ -1473,8 +1471,7 @@ def plot_eyeriss_cs3_inverted():
     """Designer-oriented view: given a PE budget, what is the minimum OutReg?"""
     cs3_wls = ["VGG16", "ResNet18"]
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    # fig.suptitle("Eyeriss CS3 — Minimum OutReg for a Given PE Budget",
-                 # fontsize=14, y=1.02)
+ #   fig.suptitle("Eyeriss CS3 — Minimum OutReg for a Given PE Budget",                 fontsize=14, y=1.02)
 
     for ax, wl in zip(axes, cs3_wls):
         d = EYERISS_CS3[wl]
@@ -1518,8 +1515,7 @@ def plot_eyeriss_cs5():
     fig, axes = plt.subplots(2, 4, figsize=(18, 8))
     fig.subplots_adjust(top=0.90, hspace=0.55, wspace=0.35,
                         bottom=0.12, left=0.05, right=0.97)
-    # fig.suptitle("Eyeriss — PE Aspect Ratio Sweep  (fixed total PEs)",
-    #     fontsize=16)
+ #   fig.suptitle("Eyeriss — PE Aspect Ratio Sweep  (fixed total PEs)",   fontsize=16)
 
     def _plain_ticks(ax):
         """Use plain float formatting – no offset, no scientific notation."""
@@ -1581,9 +1577,9 @@ def plot_eyeriss_cs6():
     wls = ["VGG16", "ResNet18"]
     metrics = [("energy", "Energy"), ("latency", "Latency"), ("edp", "EDP")]
     fig, axes = plt.subplots(1, 3, figsize=(14, 5))
-    # fig.suptitle(
-    #         "Eyeriss — Earliest Fused Block vs Σ Singles  (normalised, Σ Singles = 1.0)",
-    #         fontsize=14)
+#    fig.suptitle(
+##        "Eyeriss — Earliest Fused Block vs Σ Singles  (normalised, Σ Singles = 1.0)",
+ #       fontsize=14)
 
     x = np.arange(len(wls))
     w = 0.30
@@ -1632,7 +1628,7 @@ def plot_eyeriss_cs6():
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_energy():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    # fig.suptitle("Full-Sized Arch — Energy  (Full vs Partial vs Single)", fontsize=16, y=1.0)
+ #   fig.suptitle("Full-Sized Arch — Energy  (Full vs Partial vs Single)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
         data = FUSION_AUTO_DRAM_160[arch]
@@ -1665,7 +1661,7 @@ def plot_fusion_auto_energy():
 # ────────────────────────────────────────────────────────────────────
 def plot_fusion_auto_latency():
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    # fig.suptitle("Full-Sized Arch — Latency (Full vs Partial vs Single)", fontsize=16, y=1.0)
+ #   fig.suptitle("Full-Sized Arch — Latency (Full vs Partial vs Single)", fontsize=16, y=1.0)
 
     for ax, arch in zip(axes, ["DepFiN", "Eyeriss"]):
         data = FUSION_AUTO_DRAM_160[arch]
