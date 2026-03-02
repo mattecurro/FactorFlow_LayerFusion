@@ -23,12 +23,12 @@ from collections import OrderedDict
 plt.style.use("classic")
 matplotlib.rcParams.update({
     "font.family": "serif",
-    "font.size": 11,
+    "font.size": 13,
     "axes.labelsize": 18,
-    "axes.titlesize": 15,
-    "legend.fontsize": 15,
+    "axes.titlesize": 18,
+    "legend.fontsize": 13,
     "xtick.labelsize": 12,
-    "ytick.labelsize": 12,
+    "ytick.labelsize": 8,
     "figure.dpi": 150,
     "savefig.dpi": 300,
     "savefig.bbox": "tight",
@@ -1183,7 +1183,9 @@ def plot_depfin_cs4():
         edp_handle, = ax.plot([], [], "o", color=COLORS[wl], label="EDP")
         lns = [edp_handle] + ln2
         labs = [l.get_label() for l in lns]
-        ax.legend(lns, labs, loc="upper left", fontsize=15, numpoints=1)
+        ax.legend(lns, labs, loc="upper left", fontsize=13, numpoints=1)
+        ax.set_ylim(top=max(d["edp"]) * 1.15)
+        ax2.set_ylim(top=max(d["energy"]) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "depfin_cs4_aspect_ratio")
@@ -1209,7 +1211,8 @@ def plot_depfin_cs1():
         ax.plot(d["tiles"][best_i], d["edp"][best_i], "*",
                 markersize=14, color="gold", markeredgecolor="black", zorder=5)
         edp_handle, = ax.plot([], [], "o", color=COLORS[wl], label="EDP")
-        ax.legend(handles=[edp_handle], fontsize=15, numpoints=1)
+        ax.legend(handles=[edp_handle], fontsize=13, numpoints=1)
+        ax.set_ylim(top=max(d["edp"]) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "depfin_cs1_tile_sweep")
@@ -1242,7 +1245,7 @@ def plot_depfin_cs2_cs3():
         for i, (r, edp_val) in enumerate(zip(d2["rows"], d2["edp"])):
             ax_row.annotate(f"{d2['total_pes'][i]:,} PEs",
                             (r, edp_val), textcoords="offset points",
-                            xytext=(0, 10), ha="center", fontsize=12,
+                            xytext=(0, 10), ha="center", fontsize=7,
                             bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                       ec=COLORS[wl], alpha=0.8, lw=0.5))
 
@@ -1262,15 +1265,14 @@ def plot_depfin_cs2_cs3():
         for i, (c, edp_val) in enumerate(zip(d3["cols"], d3["edp"])):
             ax_col.annotate(f"{d3['total_pes'][i]:,} PEs",
                             (c, edp_val), textcoords="offset points",
-                            xytext=(0, 10), ha="center", fontsize=12,
+                            xytext=(0, 10), ha="center", fontsize=7,
                             bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                       ec=COLORS[wl], alpha=0.8, lw=0.5))
 
-        # Add 8% bottom + top margin so data lines don't touch the axes
-        for ax in (ax_row, ax_col):
-            lo, hi = ax.get_ylim()
-            margin = 0.08 * (hi - lo)
-            ax.set_ylim(lo - margin, hi + margin)
+        # Add top margin so data lines don't touch the axes
+        for ax_sweep, d_sweep in [(ax_row, d2), (ax_col, d3)]:
+            max_val = max(d_sweep["edp"])
+            ax_sweep.set_ylim(top=max_val * 1.4)
 
         fig.tight_layout(rect=[0, 0, 1, 0.95])
         _save(fig, f"depfin_cs2cs3_{wl.lower().replace('-', '')}")
@@ -1318,7 +1320,7 @@ def plot_eyeriss_cs1():
             ax.annotate(f"{cfg}\n{da['min_pe_total'][mask_a[i]]:,} PEs",
                        (w, edp_val),
                        textcoords="offset points", xytext=(0, 18),
-                       fontsize=12, ha="center", color=COLORS[wl],
+                       fontsize=8, ha="center", color=COLORS[wl],
                        bbox=bbox_a, zorder=5,
                        arrowprops=dict(arrowstyle="->", color=COLORS[wl], lw=0.8))
 
@@ -1330,16 +1332,18 @@ def plot_eyeriss_cs1():
             ax.annotate(f"{cfg}\n{db['minedp_pe_total'][mask_b[i]]:,} PEs",
                        (w, edp_val),
                        textcoords="offset points", xytext=(0, -28),
-                       fontsize=12, ha="center", color="gray",
+                       fontsize=8, ha="center", color="gray",
                        bbox=bbox_b, zorder=5,
                        arrowprops=dict(arrowstyle="->", color="gray", lw=0.8))
 
         ax.set_xlabel("WReg size (entries)")
         ax.set_ylabel("EDP  (J·cc)")
-        ax.set_title(wl, fontsize=15)
+        ax.set_title(wl, fontsize=13)
         ax.set_xticks(sorted(set(wreg_a + wreg_b)))
-        ax.legend(fontsize=15, loc="lower right")
+        ax.legend(fontsize=13, loc="lower right")
         _sci_fmt(ax)
+        max_val = max(max(edp_a), max(edp_b))
+        ax.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     _save(fig, "eyeriss_cs1_wreg_sweep")
@@ -1368,7 +1372,7 @@ def plot_eyeriss_cs1_inverted():
         ax.plot(pes, wreg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum WReg (entries)")
-        ax.set_title(wl, fontsize=15)
+        ax.set_title(wl, fontsize=13)
         ax.set_xticks(pes)
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=12)
         ax.invert_xaxis()  # large budget on the left
@@ -1376,9 +1380,10 @@ def plot_eyeriss_cs1_inverted():
         # Annotate configs
         for p, w, cfg in zip(pes, wreg, cfgs):
             ax.annotate(cfg, (p, w), textcoords="offset points",
-                        xytext=(0, 12), ha="center", fontsize=12,
+                        xytext=(0, 12), ha="center", fontsize=8,
                         bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                   ec=COLORS[wl], alpha=0.85, lw=0.6))
+        ax.set_ylim(top=max(wreg) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     _save(fig, "eyeriss_cs1_wreg_inverted")
@@ -1400,8 +1405,10 @@ def plot_eyeriss_cs2_cs3():
         ax.plot(ir, en, "o-", color=COLORS[wl])
         ax.set_xlabel("IntReg size")
         ax.set_ylabel("Energy (μJ)")
-        ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=15)
+        ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=9)
         _sci_fmt(ax)
+        if en:
+            ax.set_ylim(top=max(en) * 1.15)
 
     for ax, wl in zip(axes[1], WORKLOADS):
         d = EYERISS_CS3[wl]
@@ -1411,8 +1418,10 @@ def plot_eyeriss_cs2_cs3():
         ax.plot(oreg, en, "s-", color=COLORS[wl])
         ax.set_xlabel("OutReg size")
         ax.set_ylabel("Energy (μJ)")
-        ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=15)
+        ax.set_title(f"{wl}\n{d.get('note','')}", fontsize=9)
         _sci_fmt(ax)
+        if en:
+            ax.set_ylim(top=max(en) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "eyeriss_cs2cs3_intreg_outreg")
@@ -1448,16 +1457,17 @@ def plot_eyeriss_cs2_inverted():
         ax.plot(pes, ireg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum IntReg (entries)")
-        ax.set_title(wl, fontsize=15)
+        ax.set_title(wl, fontsize=13)
         ax.set_xticks(pes)
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=12)
         ax.invert_xaxis()
 
         for p, ir_val, cfg in zip(pes, ireg, cfgs):
             ax.annotate(cfg, (p, ir_val), textcoords="offset points",
-                        xytext=(0, 12), ha="center", fontsize=12,
+                        xytext=(0, 12), ha="center", fontsize=8,
                         bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                   ec=COLORS[wl], alpha=0.85, lw=0.6))
+        ax.set_ylim(top=max(ireg) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     _save(fig, "eyeriss_cs2_intreg_inverted")
@@ -1492,16 +1502,17 @@ def plot_eyeriss_cs3_inverted():
         ax.plot(pes, oreg, "o-", color=COLORS[wl], linewidth=2)
         ax.set_xlabel("PE budget (total PEs)")
         ax.set_ylabel("Minimum OutReg (entries)")
-        ax.set_title(wl, fontsize=15)
+        ax.set_title(wl, fontsize=13)
         ax.set_xticks(pes)
         ax.set_xticklabels([f"{p:,}" for p in pes], fontsize=12)
         ax.invert_xaxis()
 
         for p, or_val, cfg in zip(pes, oreg, cfgs):
             ax.annotate(cfg, (p, or_val), textcoords="offset points",
-                        xytext=(0, 12), ha="center", fontsize=12,
+                        xytext=(0, 12), ha="center", fontsize=8,
                         bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                   ec=COLORS[wl], alpha=0.85, lw=0.6))
+        ax.set_ylim(top=max(oreg) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     _save(fig, "eyeriss_cs3_outreg_inverted")
@@ -1535,13 +1546,12 @@ def plot_eyeriss_cs5():
                   color="gold", markeredgecolor="black", zorder=5)
         ax_e.set_xticks(x)
         ax_e.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=12)
-        ax_e.set_title(f"{wl}  ({d['total_pes']} PEs)", fontsize=15)
+        ax_e.set_title(f"{wl}  ({d['total_pes']} PEs)", fontsize=10)
         if col == 0:
             ax_e.set_ylabel("Energy  (μJ)")
         _plain_ticks(ax_e)
-        # add 8% top margin so high points aren't flush with the edge
-        lo, hi = ax_e.get_ylim()
-        ax_e.set_ylim(lo - 0.01 * lo, hi + 0.08 * (hi - lo))
+        # add top margin so high points aren't flush with the edge
+        ax_e.set_ylim(top=max(d["energy"]) * 1.15)
 
         # ── Bottom row: EDP ──
         ax_d = axes[1, col]
@@ -1550,19 +1560,18 @@ def plot_eyeriss_cs5():
                   color="gold", markeredgecolor="black", zorder=5)
         ax_d.set_xticks(x)
         ax_d.set_xticklabels(d["configs"], rotation=45, ha="right", fontsize=12)
-        ax_d.set_xlabel("PE config  (rows × cols)", fontsize=18)
+        ax_d.set_xlabel("PE config  (rows × cols)", fontsize=8)
         if col == 0:
             ax_d.set_ylabel("EDP  (μJ · cc)")
         _plain_ticks(ax_d)
-        # add 8% top margin
-        lo, hi = ax_d.get_ylim()
-        ax_d.set_ylim(lo - 0.01 * lo, hi + 0.08 * (hi - lo))
+        # add top margin
+        ax_d.set_ylim(top=max(d["edp"]) * 1.15)
 
         # annotate best config
         ax_d.annotate(f"best: {d['best']}",
                       xy=(best_idx, d["edp"][best_idx]),
                       xytext=(0, 18), textcoords="offset points",
-                      fontsize=12, ha="center", color=c, fontweight="bold",
+                      fontsize=7, ha="center", color=c, fontweight="bold",
                       bbox=dict(boxstyle="round,pad=0.2", fc="white",
                                 ec=c, alpha=0.85))
 
@@ -1603,20 +1612,20 @@ def plot_eyeriss_cs6():
         ax.set_xticks(x)
         ax.set_xticklabels(wls)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
-        ax.legend(fontsize=15, loc="upper right")
+        ax.legend(fontsize=13, loc="upper right")
 
         # annotate
         for i, (fv, sv) in enumerate(zip(fused_vals, sing_vals)):
             ax.annotate(f"{fv:.2f}×", (i - w / 2, fv),
                         textcoords="offset points", xytext=(0, 5),
-                        fontsize=12, ha="center", fontweight="bold")
+                        fontsize=9, ha="center", fontweight="bold")
             ax.annotate(f"{sv:.2f}×", (i + w / 2, sv),
                         textcoords="offset points", xytext=(0, 5),
-                        fontsize=12, ha="center", fontweight="bold")
+                        fontsize=9, ha="center", fontweight="bold")
 
         # set y limits with headroom
         top = max(max(fused_vals), max(sing_vals))
-        ax.set_ylim(0, top * 1.20)
+        ax.set_ylim(0, top * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.93])
     _save(fig, "eyeriss_cs6_block_vs_singles")
@@ -1648,7 +1657,9 @@ def plot_fusion_auto_energy():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
+        max_val = max(max(full_e), max(part_e), max(sing_e))
+        ax.set_ylim(top=max_val * 1.4)
 
 
     fig.tight_layout()
@@ -1680,8 +1691,10 @@ def plot_fusion_auto_latency():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
         _sci_fmt(ax)
+        max_val = max(max(full_l), max(part_l), max(sing_l))
+        ax.set_ylim(top=max_val * 1.4)
 
         # Add latency savings annotations
         for i, wl in enumerate(WORKLOADS):
@@ -1689,7 +1702,7 @@ def plot_fusion_auto_latency():
             if saving > 0:
                 ax.annotate(f"-{saving*100:.0f}%", (i + w, sing_l[i]),
                            textcoords="offset points", xytext=(0, 8),
-                           fontsize=12, ha="center", color="darkgreen", fontweight="bold")
+                           fontsize=7, ha="center", color="darkgreen", fontweight="bold")
 
     fig.tight_layout()
     _save(fig, "fusion_auto_latency")
@@ -1722,8 +1735,9 @@ def plot_fusion_auto_dram():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(f"{arch} — DRAM Reads")
-        ax.legend(fontsize=15)
-        ax.set_ylim(top=ax.get_ylim()[1] * 3)
+        ax.legend(fontsize=13)
+        max_val = max(max(full_rd), max(part_rd), max(sing_rd))
+        ax.set_ylim(top=max_val * 1.4)
 
         # DRAM Writes (bottom row)
         ax = axes[1, col_idx]
@@ -1739,8 +1753,9 @@ def plot_fusion_auto_dram():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(f"{arch} — DRAM Writes")
-        ax.legend(fontsize=15)
-        ax.set_ylim(top=ax.get_ylim()[1] * 3)
+        ax.legend(fontsize=13)
+        max_val = max(max(full_wr), max(part_wr), max(sing_wr))
+        ax.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "fusion_auto_dram_traffic")
@@ -1774,17 +1789,17 @@ def plot_fusion_auto_energy_norm():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         max_val = max(max(full_e), max(part_e), max(sing_e))
-        ax.set_ylim(top=max(1.25, max_val * 1.12))
+        ax.set_ylim(top=max_val * 1.4)
 
         # Annotate bar values
         for i, (f, p, s) in enumerate(zip(full_e, part_e, sing_e)):
             for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
                 ax.annotate(f"{val:.3f}", (xpos, val),
                            textcoords="offset points", xytext=(0, 4),
-                           fontsize=12, ha="center", fontweight="bold")
+                           fontsize=7, ha="center", fontweight="bold")
 
     fig.tight_layout()
     _save(fig, "fusion_auto_energy_norm")
@@ -1818,16 +1833,16 @@ def plot_fusion_auto_latency_norm():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         max_val = max(max(full_l), max(part_l), max(sing_l))
-        ax.set_ylim(top=max(1.25, max_val * 1.12))
+        ax.set_ylim(top=max_val * 1.4)
 
         for i, (f, p, s) in enumerate(zip(full_l, part_l, sing_l)):
             for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
                 ax.annotate(f"{val:.3f}", (xpos, val),
                            textcoords="offset points", xytext=(0, 4),
-                           fontsize=12, ha="center", fontweight="bold")
+                           fontsize=7, ha="center", fontweight="bold")
 
     fig.tight_layout()
     _save(fig, "fusion_auto_latency_norm")
@@ -1861,16 +1876,16 @@ def plot_fusion_auto_edp_norm():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
         ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
         max_val = max(max(full_edp), max(part_edp), max(sing_edp))
-        ax.set_ylim(top=max(1.25, max_val * 1.12))
+        ax.set_ylim(top=max_val * 1.4)
 
         for i, (f, p, s) in enumerate(zip(full_edp, part_edp, sing_edp)):
             for val, xpos in [(f, i - w), (p, i), (s, i + w)]:
                 ax.annotate(f"{val:.3f}", (xpos, val),
                            textcoords="offset points", xytext=(0, 4),
-                           fontsize=12, ha="center", fontweight="bold")
+                           fontsize=7, ha="center", fontweight="bold")
 
     fig.tight_layout()
     _save(fig, "fusion_auto_edp_norm")
@@ -1914,14 +1929,16 @@ def plot_partial_sized_energy():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
+        max_val = max(max(part_e), max(sing_e))
+        ax.set_ylim(top=max_val * 1.4)
 
         # Annotate per-workload arch config below x-axis
         for i, wl in enumerate(WORKLOADS):
             cfg = _arch_cfg_label(arch, data_ps[wl])
             ax.annotate(cfg, (i, 0), xycoords=("data", "axes fraction"),
                        xytext=(0, -28), textcoords="offset points",
-                       fontsize=10, ha="center", color="gray", style="italic")
+                       fontsize=5.5, ha="center", color="gray", style="italic")
 
     fig.tight_layout(rect=[0, 0.04, 1, 1.0])
     _save(fig, "fusion_partial_sized_energy")
@@ -1953,14 +1970,16 @@ def plot_partial_sized_latency():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
         _sci_fmt(ax)
+        max_val = max(max(part_l), max(sing_l))
+        ax.set_ylim(top=max_val * 1.4)
 
         for i, wl in enumerate(WORKLOADS):
             cfg = _arch_cfg_label(arch, data_ps[wl])
             ax.annotate(cfg, (i, 0), xycoords=("data", "axes fraction"),
                        xytext=(0, -28), textcoords="offset points",
-                       fontsize=10, ha="center", color="gray", style="italic")
+                       fontsize=5.5, ha="center", color="gray", style="italic")
 
     fig.tight_layout(rect=[0, 0.04, 1, 1.0])
     _save(fig, "fusion_partial_sized_latency")
@@ -1993,13 +2012,15 @@ def plot_partial_sized_edp():
         ax.set_xticks(x)
         ax.set_xticklabels(WORKLOADS)
         ax.set_title(arch)
-        ax.legend(fontsize=15)
+        ax.legend(fontsize=13)
+        max_val = max(max(part_edp), max(sing_edp))
+        ax.set_ylim(top=max_val * 1.4)
 
         for i, wl in enumerate(WORKLOADS):
             cfg = _arch_cfg_label(arch, data_ps[wl])
             ax.annotate(cfg, (i, 0), xycoords=("data", "axes fraction"),
                        xytext=(0, -28), textcoords="offset points",
-                       fontsize=10, ha="center", color="gray", style="italic")
+                       fontsize=5.5, ha="center", color="gray", style="italic")
 
     fig.tight_layout(rect=[0, 0.04, 1, 1.0])
     _save(fig, "fusion_partial_sized_edp")
@@ -2010,8 +2031,8 @@ def plot_partial_sized_edp():
 #  Figure 9h: Partial-Sized Arch — Normalised (Partial = 1.0)
 # ────────────────────────────────────────────────────────────────────
 def plot_partial_sized_norm():
-    metrics = [("energy", "Normalised Energy"), ("latency", "Normalised Latency"),
-               ("edp", "Normalised EDP")]
+    metrics = [("energy", "Normalized Energy"), ("latency", "Normalized Latency"),
+               ("edp", "Normalized EDP")]
     fig, axes = plt.subplots(len(metrics), 2, figsize=(14, 12))
     # fig.suptitle("Partial-Sized Arch — Normalised  (Partial = 1.0)", fontsize=16, y=0.98)
 
@@ -2029,21 +2050,21 @@ def plot_partial_sized_norm():
             ax.bar(x + w/2, sing_v, w, label=r"$\Sigma$ Singles",
                    color=FUSION_COLORS["Single"], edgecolor="black", linewidth=0.5)
 
-            ax.set_ylabel(ylabel, fontsize=18)
+            ax.set_ylabel(ylabel, fontsize=14)
             ax.set_xticks(x)
             ax.set_xticklabels(WORKLOADS, fontsize=12)
             if row == 0:
                 ax.set_title(arch, fontsize=15)
-            ax.legend(fontsize=15)
+            ax.legend(fontsize=13)
             ax.axhline(1.0, color="black", linewidth=0.6, linestyle="--", zorder=0)
             max_val = max(max(part_v), max(sing_v))
-            ax.set_ylim(top=max(1.35, max_val * 1.12))
+            ax.set_ylim(top=max_val * 1.4)
 
             for i, (p, s) in enumerate(zip(part_v, sing_v)):
                 for val, xpos in [(p, i - w/2), (s, i + w/2)]:
                     ax.annotate(f"{val:.3f}", (xpos, val),
                                textcoords="offset points", xytext=(0, 4),
-                               fontsize=12, ha="center", fontweight="bold")
+                               fontsize=9, ha="center", fontweight="bold")
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "fusion_partial_sized_norm")
@@ -2069,8 +2090,8 @@ def plot_fusion_fixed_resnet18():
     ax1.set_xticklabels(labels, fontsize=12)
     ax1.set_title("Full vs Single — Energy Ratio")
     for i, v in enumerate(d["energy_ratio_fs"]):
-        ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=12, fontweight="bold")
-    ax1.set_ylim(top=max(d["energy_ratio_fs"]) * 1.30)
+        ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=9, fontweight="bold")
+    ax1.set_ylim(top=max(d["energy_ratio_fs"]) * 1.15)
 
     # Right: Absolute energy comparison
     w = 0.3
@@ -2084,6 +2105,8 @@ def plot_fusion_fixed_resnet18():
     ax2.set_xticklabels(labels, fontsize=12)
     ax2.set_title("Absolute Energy")
     ax2.legend()
+    max_val = max(max(d["full_energy"]), max(d["single_energy"]))
+    ax2.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_fixed_resnet18_scaling")
@@ -2108,8 +2131,8 @@ def plot_fusion_fixed_vgg16():
     ax1.set_xticklabels(labels, fontsize=12)
     ax1.set_title("Full vs Single — Energy Ratio")
     for i, v in enumerate(d["energy_ratio_fs"]):
-        ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=12, fontweight="bold")
-    ax1.set_ylim(top=max(d["energy_ratio_fs"]) * 1.30)
+        ax1.text(i, v + 2, f"{v:.1f}×", ha="center", fontsize=9, fontweight="bold")
+    ax1.set_ylim(top=max(d["energy_ratio_fs"]) * 1.15)
 
     w = 0.25
     ax2.bar(x - w, d["full_energy"], w, label="Full",
@@ -2124,6 +2147,8 @@ def plot_fusion_fixed_vgg16():
     ax2.set_xticklabels(labels, fontsize=12)
     ax2.set_title("Full / Partial / Single Energy")
     ax2.legend()
+    max_val = max(max(d["full_energy"]), max(d["partial_energy"]), max(d["single_energy"]))
+    ax2.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_fixed_vgg16_scaling")
@@ -2165,7 +2190,9 @@ def plot_fusion_fixed_overview():
         r = eye_data[wl]["energy_ratio_fs"]
         ax.annotate(f"{r:.1f}×", (i - w, full_e[i]),
                    textcoords="offset points", xytext=(0, 8),
-                   fontsize=12, ha="center", color="darkred", fontweight="bold")
+                   fontsize=8, ha="center", color="darkred", fontweight="bold")
+    max_val = max(max(full_e), max(part_e), max(sing_e))
+    ax.set_ylim(top=max_val * 1.4)
 
     # DepFiN panel
     ax = axes[1]
@@ -2188,7 +2215,9 @@ def plot_fusion_fixed_overview():
         r = dep_data[wl]["energy_ratio_fs"]
         ax.annotate(f"{r:.1f}×", (i - w, full_e[i]),
                    textcoords="offset points", xytext=(0, 8),
-                   fontsize=12, ha="center", color="darkred", fontweight="bold")
+                   fontsize=8, ha="center", color="darkred", fontweight="bold")
+    max_val = max(max(full_e), max(part_e), max(sing_e))
+    ax.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_fixed_overview_2048pe")
@@ -2225,6 +2254,8 @@ def plot_fusion_fixed_resnet18_partial():
     ax1.set_xticklabels(labels, fontsize=12)
     ax1.set_title("Absolute Energy")
     ax1.legend()
+    max_val = max(max(d_part["partial_energy"]), max(d_part["single_energy"]))
+    ax1.set_ylim(top=max_val * 1.4)
 
     # Right: latency comparison
     ax2.bar(x - w/2, d_part["partial_latency"], w, label="Partial",
@@ -2236,6 +2267,8 @@ def plot_fusion_fixed_resnet18_partial():
     ax2.set_xticklabels(labels, fontsize=12)
     ax2.set_title("Absolute Latency")
     ax2.legend()
+    max_val = max(max(d_part["partial_latency"]), max(d_part["single_latency"]))
+    ax2.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_fixed_resnet18_partial_scaling")
@@ -2267,6 +2300,8 @@ def plot_fusion_fixed_vgg16_partial():
     ax1.set_xticklabels(labels, fontsize=12)
     ax1.set_title("Absolute Energy")
     ax1.legend()
+    max_val = max(max(d_part["partial_energy"]), max(d_part["single_energy"]))
+    ax1.set_ylim(top=max_val * 1.4)
 
     ax2.bar(x - w/2, d_part["partial_latency"], w, label="Partial",
             color=FUSION_COLORS["Partial"], edgecolor="black", linewidth=0.5)
@@ -2277,6 +2312,8 @@ def plot_fusion_fixed_vgg16_partial():
     ax2.set_xticklabels(labels, fontsize=12)
     ax2.set_title("Absolute Latency")
     ax2.legend()
+    max_val = max(max(d_part["partial_latency"]), max(d_part["single_latency"]))
+    ax2.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_fixed_vgg16_partial_scaling")
@@ -2309,6 +2346,8 @@ def plot_fusion_fixed_overview_partial():
     ax.set_xticklabels(eye_wls)
     ax.set_title("Eyeriss (2048 PEs, WReg=384)\n(same wreg for both scenarios)")
     ax.legend()
+    max_val = max(max(part_e), max(sing_e))
+    ax.set_ylim(top=max_val * 1.4)
 
     # --- DepFiN panel ---
     ax = axes[1]
@@ -2328,6 +2367,8 @@ def plot_fusion_fixed_overview_partial():
     ax.set_xticklabels(sub, fontsize=12)
     ax.set_title("DepFiN (2048 PEs, Partial-Sized Mem)")
     ax.legend()
+    max_val = max(max(part_e), max(sing_e))
+    ax.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_fixed_overview_2048pe_partial")
@@ -2364,8 +2405,11 @@ def plot_fusion_cross_arch():
     ax.axhline(1.0, color="black", ls="--", lw=0.8, alpha=0.5)
 
     for i, (dr, er) in enumerate(zip(depfin_ratios, eyeriss_ratios)):
-        ax.text(i - w/2, dr + 0.5, f"{dr:.1f}×", ha="center", fontsize=12, fontweight="bold")
-        ax.text(i + w/2, er + 0.5, f"{er:.1f}×", ha="center", fontsize=12, fontweight="bold")
+        ax.text(i - w/2, dr + 0.5, f"{dr:.1f}×", ha="center", fontsize=8, fontweight="bold")
+        ax.text(i + w/2, er + 0.5, f"{er:.1f}×", ha="center", fontsize=8, fontweight="bold")
+
+    max_val = max(max(depfin_ratios), max(eyeriss_ratios))
+    ax.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_cross_arch_energy_ratio")
@@ -2386,7 +2430,7 @@ def plot_eyeriss_cs1_feasibility():
         mask = [i for i, e in enumerate(d["energy"]) if e is not None]
         if not mask:
             ax.text(0.5, 0.5, "All infeasible", transform=ax.transAxes,
-                   ha="center", va="center", fontsize=18)
+                   ha="center", va="center", fontsize=14)
             ax.set_title(wl)
             continue
 
@@ -2409,8 +2453,12 @@ def plot_eyeriss_cs1_feasibility():
         ax2.set_ylabel("Min total PEs", color="red")
         ax2.tick_params(axis="y", labelcolor="red")
 
-        ax.legend(loc="upper left", fontsize=15)
-        ax2.legend(loc="upper right", fontsize=15)
+        ax.legend(loc="upper left", fontsize=13)
+        ax2.legend(loc="upper right", fontsize=13)
+        if n_feas:
+            ax.set_ylim(top=max(n_feas) * 1.15)
+        if min_pes:
+            ax2.set_ylim(top=max(min_pes) * 1.15)
 
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     _save(fig, "eyeriss_cs1_wreg_feasibility")
@@ -2451,9 +2499,12 @@ def plot_fusion_latency_savings():
 
     for i, (ds, es) in enumerate(zip(depfin_savings, eyeriss_savings)):
         y_off = 1 if ds >= 0 else -3
-        ax.text(i - w/2, ds + y_off, f"{ds:.1f}%", ha="center", fontsize=12)
+        ax.text(i - w/2, ds + y_off, f"{ds:.1f}%", ha="center", fontsize=8)
         y_off = 1 if es >= 0 else -3
-        ax.text(i + w/2, es + y_off, f"{es:.1f}%", ha="center", fontsize=12)
+        ax.text(i + w/2, es + y_off, f"{es:.1f}%", ha="center", fontsize=8)
+
+    max_val = max(max(depfin_savings), max(eyeriss_savings))
+    ax.set_ylim(top=max_val * 1.4)
 
     fig.tight_layout()
     _save(fig, "fusion_latency_savings")
