@@ -1,0 +1,462 @@
+% ============================================================
+%  FUSED-LAYER MAPPING DESIGN SPACE
+% ============================================================
+\chapter{Fused-Layer Mapping Design Space}
+\label{ch:fused-design-space}
+
+Chapter~\ref{ch:background} has established the mapping problem for a
+\emph{single} convolutional layer: given a loop nest and a spatial
+architecture, a mapping specifies how the computation is tiled,
+ordered, and distributed across the hardware
+(Section~\ref{sec:bg-mapping}), and even for a single layer the
+resulting map-space can exceed $10^{24}$ candidate configurations
+(Section~\ref{sec:bg-mapspace}).
+Chapter~\ref{ch:background} also has introduced layer fusion as a strategy
+to eliminate intermediate DRAM traffic
+(Section~\ref{sec:bg-layer-fusion}), showing how multiple layers are
+expressed as a single unified loop nest with five operand categories
+and cascading tile-size dependencies
+
+This chapter bridges the gap between those two discussions.
+Layer fusion does not merely concatenate individual mappings; it
+introduces qualitatively new mapping decisions that have no
+counterpart in single-layer execution.
+Intermediate activations must be assigned to specific memory levels,
+inter-layer tile sizes must be chosen jointly, and bypass rules must
+be defined for each of the five operand types at every level of the
+hierarchy.
+These additional degrees of freedom enlarge the design space
+dramatically and create complex trade-offs between data reuse,
+on-chip memory capacity, and off-chip bandwidth.
+
+% ============================================================
+%  1.  From Single-Layer to Fused-Layer Mapping
+% ============================================================
+\section{From Single-Layer to Fused-Layer Mapping}
+\label{sec:fds-from-single}
+
+% ------------------------------------------------------------
+\subsection{Single-Layer Mapping Recap}
+\label{sec:fds-single-recap}
+
+In a standard single-layer mapping, the computation is fundamentally expressed as a single loop nest over $|D|$ dimensions (e.g., six dimensions for a 2D convolution, as detailed in Section~\ref{sec:loop-nest}). A mapping configuration is fully characterized by three independent decisions made at each level of the architectural hierarchy: \emph{tiling} (how each dimension's extent is factored across the memory levels), \emph{loop ordering} (the iteration sequence within each specific memory level), and \emph{spatial parallelism} (which dimensions are unrolled across the PE array) (see Section~\ref{sec:mapping-dof}). 
+The analytical cost model evaluates the memory operations (MOPs), energy consumption, and cycle latency for each level independently (Section~\ref{sec:bg-cost-model}). As previously established, the combinatorial explosion of valid tilings and orderings already makes exhaustive unguided search computationally infeasible for practical hardware architectures (Section~\ref{sec:bg-mapspace}).
+
+% ------------------------------------------------------------
+\subsection{The Architectural Shifts of Layer Fusion}
+\label{sec:fds-what-changes}
+
+Fusing $F$ consecutive layers into a single, interleaved execution unit preserves the three foundational degrees of freedom (tiling, ordering, and parallelism) but alters the mapping problem in four fundamental ways. 
+
+\subsubsection{Dimension Proliferation}
+\label{sec:fds-dim-proliferation}
+
+In single-layer mapping, the loop nest contains a fixed number of dimensions ($|D|$). However, when $F$ layers are mathematically unified into a fused loop nest, each layer contributes its own distinct set of per-layer dimensions. Consequently, the total dimensionality of the scheduling problem expands linearly with the fusion depth. Because the map-space cardinality depends combinatorially on both the \emph{permutations} of dimensions at each memory level and the \emph{factor allocations} of every dimension's prime factors across the hardware hierarchy (Equation~\ref{eq:ms-cardinality}), this dimensional proliferation triggers a massive, compounding explosion in the search space (quantified formally in Section~\ref{sec:ps-mapspace}).
+
+\subsubsection{Five Operand Categories}
+\label{sec:fds-five-operands}
+
+As introduced in Chapter~\ref{ch:background}, distinguishing intermediate activations from external memory traffic expands the tensor footprint into five distinct operand categories:
+\begin{enumerate}
+  \item \textbf{Input}: The read-only tensor consumed exclusively by the first layer in the fused segment.
+  \item \textbf{Weights}: One independent set per layer ($W_0, \dots, W_{F-1}$), each referenced strictly by its own layer's dimensional indices.
+  \item \textbf{Intermediate Output}: The localized feature map produced by every intermediate layer (e.g., layer~$i$ produces $A_i$).
+  \item \textbf{Intermediate Input}: The feature map consumed by every non-first layer (e.g., layer~$i$ reads $A_{i-1}$, which is the intermediate output of the preceding layer).
+  \item \textbf{Output}: The write-only tensor produced exclusively by the final layer.
+\end{enumerate}
+
+Every memory level in the spatial architecture must explicitly define a bypass configuration for each of these five categories. These granular bypass rules directly control the physical on-chip residency of intermediate activations, dictating the feasibility of the fused schedule.
+
+\subsubsection{Inter-Layer Tile-Size Dependencies}
+\label{sec:fds-tile-deps}
+
+Fusion breaks the isolation of layer scheduling by introducing strict \emph{cascading dependencies} between layers. 
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{Images/stride_1.png}
+  \caption{Example of output tile size 2x2 with stride 1}
+  \label{fig:fds-tile-deps-no-stride}
+\end{figure}
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{Images/stride_2.png}
+  \caption{Example of output tile size 2x2 with stride 2}
+  \label{fig:fds-tile-deps-no-stride_2}
+\end{figure}
+
+
+As discussed in Section~\ref{sec:fused-tiling}, selecting an output spatial tile of size $P \times Q$ for the final layer mathematically forces every preceding layer to compute a progressively larger tile to account for overlapping filter halo. Accounting for independent strides along the spatial dimensions, this constraint propagates backward according to:
+\begin{equation*}
+\label{eq:cascading-tiles-recap}
+\text{Layer } i \text{ (intermediate footprint)}: \quad
+  \big(\text{stride}_h \cdot (P - 1) + R\big)
+  \;\times\;
+  \big(\text{stride}_w \cdot (Q - 1) + S\big)
+\end{equation*}
+This backward propagation dictates that inter-layer tile sizes are \emph{strictly dependent}. A tiling choice made for the outermost layer rigidly constrains the required intermediate tile sizes at every preceding level of the computation. 
+
+The practical architectural consequence is severe: as fusion depth increases, intermediate tiles swell due to the cumulative halo effect. This inflates the on-chip SRAM footprint and restricts the maximum feasible output tile size that can fit within a fixed memory budget. This creates the fundamental architectural trade-off of fusion: deeper fusion topologies eliminate more external DRAM traffic, but exponentially tighten the on-chip capacity constraints for every participating layer.
+
+\subsubsection{Execution Models and Parallelism}
+\label{sec:fds-sequential}
+
+In standard single-layer mapping, the question of \emph{how layers interact in time and space} does not exist: each layer is completely mapped, executed, and flushed to DRAM before the next begins. Layer fusion, however, requires explicitly defining an \emph{execution model} to manage the concurrent residency of multiple layers. 
+Two principal models exist in the literature:
+
+\begin{description}
+  \item[Sequential (Depth-First):]
+    for each spatial tile, all $F$ layers are executed sequentially on the exact same shared PE array. The first layer produces an intermediate tile, which is buffered and immediately consumed by the second layer, continuing until the final layer writes the completed output tile to memory. Only then does the accelerator advance to the next spatial spatial region. This model, adopted by architectures like DepFiN~\cite{goetschalckx2023depfin}, does not physically partition the PE array.    
+  \item[Pipelined (Inter-Layer Parallel):]
+    different layers execute concurrently on physically distinct, spatially partitioned subsets of the PE array, functioning as continuous pipeline stages. While this inter-layer parallelism can increase throughput and reduce overall latency, it introduces severe control complexity and rigid hardware partitioning constraints.
+\end{description}
+
+The formalized analytical mapping framework developed and evaluated in this thesis strictly operates under the \textbf{Sequential (Depth-First)} execution model, evaluating the complex memory trade-offs of shared-array fusion. The integration of spatial pipeline parallelism represents a separate architectural paradigm and remains a potential for future work.
+\subsection{Hardware Implementations of Layer Fusion}
+
+The theoretical benefits of layer fusion have been heavily substantiated by dedicated silicon and FPGA implementations, which demonstrate the empirical value of avoiding intermediate memory round-trips. For instance, classic fused-layer CNN accelerators have shown that layer fusion of initial five convolutional layers of the VGG-E (a weight dominant workload) layer fusion reduces off-chip data transfers by approximately 95\% (from 77\,MB down to 3.6\,MB) while requiring only a modest increase in on-chip storage \cite{alwani2016fusedlayer}.
+
+\paragraph{ISAAC and DepFiN}
+
+Building upon these principles, the ISAAC \cite{shafiee2016isaac} architecture exemplifies a pipelined, fused organization tailored for in-situ analog processing. Central to ISAAC's design is the memristor crossbar array, a dense hardware matrix where computational weights are stored as programmable resistances at the cross-points of conductive wires. This structure allows MAC operations to be performed directly in the analog domain as voltages pass through the grid, meaning the weights remain completely stationary. To enable fusion, eDRAM buffers stage inter-layer data, allowing subsequent layers to commence computation as soon as a minimal activation window is generated.
+
+More recently, depth-first silicon implementations such as \emph{DepFiN} \cite{goetschalckx2023depfin} have pushed the boundaries of fusion for high-resolution pixel processing workloads. DepFiN relies on a control flow that supports frequent inter-layer switching to keep intermediate feature maps on-chip. This architecture achieves a reported on the MC-CNN-fast workload up to $18\times$ system-level efficiency gains when compared to a conventional layer-by-layer processor with equivalent core-level efficiency. 
+
+The tremendous physical performance gains demonstrated by hardware like ISAAC and DepFiN strongly motivate the need for generalized exploration frameworks, such as the one proposed in this thesis, capable of automatically navigating the complex scheduling and mapping spaces these accelerators introduce.
+
+% ============================================================
+%  2.  DEGREES OF FREEDOM IN FUSED MAPPING
+% ============================================================
+\section{Degrees of Freedom in Fused Mapping}
+\label{sec:fds-dof}
+
+Section~\ref{sec:mapping-dof} identified three degrees of freedom
+for single-layer mapping: tiling, loop ordering, and parallelism
+strategy.
+All three remain relevant under fusion, but they are augmented by
+decisions that have no single-layer counterpart.
+This section organizes the fused-layer mapping degrees of freedom into
+three groups: \emph{inter-layer} tiling choices (new), \emph{intra-layer}
+decisions (inherited), and \emph{memory-level bypass rules} (new).
+
+
+% ------------------------------------------------------------
+\subsection{Inter-Layer Tiling}
+\label{sec:fds-inter-tiling}
+
+Inter-layer tiling refers to the choice of \emph{which dimensions are
+tiled at the outermost (DRAM) level} and \emph{what tile sizes are
+assigned} to those dimensions.
+In a fused mapping, these decisions determine how the spatial extent
+of the computation is partitioned into tiles that cascade through the
+layers, as described in Section~\ref{sec:fds-tile-deps}.
+
+Three classes of dimension can be tiled at the inter-layer level:
+
+\paragraph{Spatial (output) dimension tiling.}
+The output spatial dimensions are the primary candidates
+for inter-layer tiling.
+This form of tiling is applicable regardless of the number of fused
+layers and is the most common inter-layer tiling strategy.
+
+For example, in the DepFiN configuration validated in
+Chapter~\ref{ch:validation}, the 1280-pixel output width is tiled into
+10 tiles of 128 pixels each ($Q = 10$), and all 720 rows are
+iterated ($P = 720$).
+
+\paragraph{Channel tiling.}
+In a two-layer fusion, it is possible to tile the output channels of the
+first layer (equivalently, the input channels of the second) across
+multiple passes.
+However, for fusions of three or more layers this form of tiling is
+not applicable to internal intermediate channels with depth-first
+execution model, because it requires that each intermediate tile be fully
+produced and consumed within a single pass, while in this case I would have 
+only a partial intermediate output tile after a pass. 
+
+
+\paragraph{Tile iteration order.}
+Beyond choosing which dimensions to tile and their sizes, the mapper
+must decide the \emph{iteration order} of the tiles: the sequence in
+which spatial tiles are visited.
+For a 2-D tiling with factors $P$ and $Q$, the two orderings
+$\langle P, Q \rangle$ (row-major: complete one row of tiles before
+moving to the next) and $\langle Q, P \rangle$ (column-major: complete
+one column before moving to the next row) produce different data
+reuse patterns.
+In a row-major scan, horizontally adjacent tiles share vertical
+halo regions; in a column-major scan, vertically adjacent tiles
+share horizontal halo.
+The optimal choice depends on the filter shapes, strides and the relative
+costs of fetching horizontal vs.\ vertical non-overlapped slices.
+
+
+% ------------------------------------------------------------
+\subsection{Intra-Layer Decisions}
+\label{sec:fds-intra}
+
+Within each fused layer, the single-layer mapping (intra-layer mapping) degrees of freedom
+apply unchanged:
+\begin{itemize}
+  \item \textbf{Tiling} at on-chip memory levels determines how each
+        layer's tile (whose size is fixed by the inter-layer tiling and
+        the cascading halo) is further subdivided for processing by the
+        PE array (Section~\ref{sec:tiling}).
+  \item \textbf{Loop ordering} at each memory level determines the
+        dataflow, which operand is stationary and whether halo reuse
+        is exploited (Section~\ref{sec:loop-ordering}).
+  \item \textbf{Spatial parallelism} at fanout levels determines how
+        the PE array is used: which dimensions are unrolled across
+        rows and columns (Section~\ref{sec:parallelism}).
+\end{itemize}
+
+These three decisions are made independently for each layer in the
+fused group, but they all operate \emph{within} the tile boundaries
+established by the inter-layer tiling.
+Changing the inter-layer tile size therefore ripples into every
+layer's intra-layer decisions: a smaller inter-layer tile means
+smaller per-layer tiles, potentially reducing intra-layer reuse.
+
+
+% ------------------------------------------------------------
+\subsection{Memory-Level Bypass Rules}
+\label{sec:fds-bypass}
+
+In a single-layer mapping, three operand types (input, weight, output) must each be assigned to one or more
+memory levels, and levels that do not store a particular operand
+\emph{bypass} it.
+Bypass decisions in single-layer mapping are relatively
+straightforward: a scratchpad either stores an operand or it
+does not, and the choice is driven by the level's capacity and
+bandwidth.
+
+Fusion introduces five operand categories
+(Section~\ref{sec:fds-five-operands}), and the bypass configuration
+at each level must be specified for \emph{each} of them.
+This creates a richer, and more consequential, design space.
+The bypass rules collectively determine where intermediate
+activations reside, and therefore whether the depth-first fusion
+guarantee is enforced.
+In fused-layer execution under depth-first scheduling, the memory bypass configuration is typically enforced as a rigid \emph{per-architecture} design decision rather than a flexible per-mapping choice. Because these bypass rules are strictly fixed within the hardware description, they cannot be actively explored by the mapper as a degree of freedom. Instead, from the perspective of the analytical engine, these predefined bypass configurations act as fundamental hardware constraints that rigorously prune the search space by dictating which intermediate operand allocations are physically valid.
+
+
+% ============================================================
+%  3.  DATA REUSE UNDER FUSION
+% ============================================================
+\section{Data Reuse under Fusion}
+\label{sec:fds-reuse}
+
+Section~\ref{sec:data-reuse} has introduced the fundamental reuse
+mechanisms available in single-layer mapping: stationarity (temporal
+reuse), halo overlap, and spatial multicast.
+Section~\ref{sec:inter-intra-reuse} then has noted that fusion introduces
+an additional form of reuse, inter-layer reuse, arising from the
+on-chip residency of intermediate activations.
+
+This section provides a more detailed analysis of the reuse
+opportunities specific to fused execution, distinguishing between
+\emph{immediate} and \emph{buffered} reuse, and formalizing the
+\emph{reuse--recompute trade--off} that governs the relationship
+between on-chip memory capacity and data-movement efficiency.
+
+% ------------------------------------------------------------
+\subsection{Immediate Reuse}
+\label{sec:fds-immediate-reuse}
+
+Immediate reuse occurs when the intermediate input region required
+to compute a given output tile \emph{overlaps} the intermediate input
+region used for the \emph{immediately preceding} output tile in the
+schedule.
+Because the two tiles are processed consecutively, the overlapping
+elements are still resident in the on-chip buffer from the previous
+iteration; no additional storage beyond the current working set is
+needed.
+
+
+This form of reuse arises naturally from the \emph{halo} of
+convolutional filters.
+Consider a 1-Dimensional example with a $3\times 3$ filter ($R = 3$, stride 1).
+The overlap between tile~$k$ and tile~$k+1$ is $R - 1 = 2$ elements.
+These elements were fetched (or produced by a preceding layer)
+during tile~$k$ and can be reused for tile~$k+1$ without any
+re-fetch from DRAM, provided the iteration order visits tiles in spatial
+sequence.
+
+Immediate reuse is cost-free in terms of memory: it requires no
+extra buffer capacity, only that the scheduling policy visits
+adjacent tiles consecutively.
+It is the halo-reuse mechanism described in
+Section~\ref{sec:loop-ordering}, applied to the \emph{inter-layer}
+context: the overlapping data is the intermediate activation produced
+by a preceding layer rather than an input fetched from DRAM.
+
+
+% ------------------------------------------------------------
+\subsection{Buffered Reuse}
+\label{sec:fds-buffered-reuse}
+
+Buffered reuse arises when the overlapping region between two tiles that are not consecutive but at
+a distance spans of multiple tiles.
+
+A common scenario is 2-Dimensional tiling with a row-major iteration order.
+After completing all tiles in one row, the schedule advances to the
+next row.
+The first tile of the new row overlaps vertically with the first tile
+of the previous row by $R - 1$ rows of the intermediate feature map.
+However, all tiles of the previous row have been processed in between,
+so the overlapping data is no longer in the immediate working set.
+
+To exploit this reuse, the accelerator must \emph{retain} the
+overlapping region in the on-chip scratchpad for the duration of
+the entire row of tiles.
+The required residency, and therefore the extra scratchpad capacity
+needed, grows with the number of tiles per row and the overlap
+size:
+%
+\begin{equation}
+\label{eq:buffered-reuse-size}
+S_{\text{buffered}} = (R - 1) \cdot W_{\text{row}} \cdot C,
+\end{equation}
+%
+where $W_{\text{row}}$ is the full row width of the intermediate
+feature map and $C$ the number of channels.
+This capacity must be reserved \emph{in addition to} the working
+set of the current tile.
+
+Buffered reuse trades scratchpad capacity for reduced data movement:
+the $S_{\text{buffered}}$ elements are fetched (or produced) once
+and reused across multiple tile iterations, avoiding redundant
+re-computation or re-fetching from DRAM.
+
+
+% ------------------------------------------------------------
+\subsection{Reuse--Recompute Trade-off}
+\label{sec:fds-reuse-recompute}
+
+The decision to buffer or to recompute is central to fused-layer
+mapping.
+Let $S_{\text{required}}$ denote the total scratchpad capacity
+needed to realize a given level of buffered reuse (working set plus
+buffered overlap), and let $S_{\text{available}}$ denote the
+physically available on-chip capacity.
+
+\begin{itemize}
+  \item If $S_{\text{required}} \le S_{\text{available}}$, buffered
+        reuse is feasible: the overlapping data is retained on-chip
+        and reused, eliminating redundant computation and data
+        movement.
+  \item If $S_{\text{required}} > S_{\text{available}}$, the
+        overlapping data must be \emph{evicted} and either
+        \emph{re-fetched} from DRAM (if intermediate fetching from DRAM is
+        allowed) or \emph{recomputed} by re-executing the producing
+        layer for the overlapping region.
+\end{itemize}
+
+The trade-off has three axes:
+
+\begin{enumerate}
+  \item \textbf{Reuse reduces data movement.}
+        Greater reuse eliminates redundant reads from outer memory
+        levels, reducing both energy (fewer high-cost accesses) and
+        latency (fewer bandwidth-limited transfers).
+
+  \item \textbf{Buffered Reuse increases scratchpad demand.}
+        Retaining overlap regions consumes buffer capacity that could
+        otherwise be used for larger tiles or for storing other
+        operands (e.g., weights).
+
+  \item \textbf{Recomputation increases compute cost but relaxes
+        storage.}
+        Re-executing a producing layer for the halo region adds  multiply accumulation (MAC)
+        operations but avoids the need to buffer the overlap.
+        In compute-bound regimes (where the PE array is fully
+        utilized and memory bandwidth is not the bottleneck), the
+        additional computation may be nearly free; in
+        bandwidth-bound regimes, it adds non-negligible latency.
+\end{enumerate}
+
+Design-space exploration must therefore sweep output-tile dimensions
+and scheduling policies and, for each candidate mapping, check the
+feasibility condition $S_{\text{required}} \le S_{\text{available}}$
+to determine whether buffered reuse is achievable.
+The optimal mapping balances reuse, recomputation, and on-chip
+constraints to minimize the target cost metric (energy, latency, or
+EDP).
+
+% ------------------------------------------------------------
+% Describe the necessity of having different mapping in every layer,
+% no back to back computation, different time moments
+% ------------------------------------------------------------
+\subsection{The Need for Per-Layer Mapping and Flexible Execution Granularity}
+\label{sec:fds-per-layer-mapping}
+% ------------------------------------------------------------
+
+A naive strategy for transitioning from single-layer execution mapping a to multi-layer fusion mapping representation might attempt to mathematically compose the layers by completely merging their loop indices into a single, monolithic mathematical formula. However, this over-simplification mathematically eliminates the explicit representation of the intermediate feature maps. The intermediate spatial dimensions (e.g., intermediate height and width) lose their standalone loop variables, becoming inextricably bound to the shared outer dimensions of the final output and the overlapping filter halo. 
+
+Failing to maintain distinct, independent iteration variables for each layer introduces severe architectural modeling limitations, primarily manifesting in two ways:
+
+\begin{enumerate}
+  \item \textbf{Loss of Per-Layer Mapping Freedom.}
+        DNN architectures frequently compose layers with vastly different topologies (with respect to activation and weight size). Consequently, the optimal mapping will naturally differ for each layer. 
+        If a fused schedule forces all layers to share the exact same loop variables universally, the mapping engine loses the ability to express heterogeneous dataflows. Every loop transformation applied to the first layer would rigidly and unavoidably transform the other layers. In a properly defined design space, the mapper must retain the freedom to assign distinct tilings and local dataflows (e.g., enforcing Weight-Stationary for Layer 0 and Output-Stationary for Layer 1) despite they are fused. \\
+
+  \item \textbf{Forced Scalar Lockstep (Back-to-Back MAC Execution).}
+        If intermediate iteration variables are completely collapsed, the scheduling granularity is forced into an inflexible extreme. Because no loop variable can advance the computation of the producer without simultaneously advancing the consumer, the operations become locked into a strict \emph{back-to-back} scalar schedule. 
+        
+In this restrictive model, at every innermost iteration, the producer executes a single Multiply-Accumulate (MAC) operation to generate one intermediate scalar, which the consumer must immediately fetch and compute. This eliminates any opportunity for temporal buffering, assuming that all the MACs operations happens at the same time. 
+\end{enumerate}
+
+Therefore, a robust formulation of the fused-layer design space must mathematically decouple the iteration spaces of the fused layers. It must explicitly represent intermediate dimensions to allow for distinct, per layer mapping choices.
+
+% ------------------------------------------------------------
+\subsection{The Need for Constraint-Based Pruning}
+\label{sec:fds-pruning}
+
+The astronomical size of the fused map-space
+(Table~\ref{tab:mapspace-comparison}) makes any form of exhaustive
+enumeration or even large-scale random sampling entirely infeasible.
+Unlike single-layer mapping, where random or heuristic search can
+still cover a meaningful fraction of the space within reasonable
+time, the fused map-space is so large that unguided search has
+effectively zero probability of discovering high-quality mappings.
+
+The key insight that reduce this immense map-space is that a vast
+majority of the $10^{515}$ configurations are either \emph{invalid}
+(they violate memory capacity constraints) or \emph{structurally
+sub-optimal} (they contradict known properties of the hardware).
+\textbf{Constraint-based pruning} eliminates part of these configurations
+\emph{before} evaluation by fixing dimensions and factors that are
+determined by the architecture:
+
+\begin{enumerate}
+  \item \textbf{Dataflow constraints} fix the loop ordering at levels
+        where the hardware enforces a specific dataflow.
+        For example, in DepFiN all spatial dimensions are constrained
+        to iterate at the DRAM level, and all weight dimensions are
+        constrained to the Weight Memory (WMEM) level.
+        Each fixed ordering eliminates $|D|! - 1$ permutations at that
+        level.
+
+  \item \textbf{Factor constraints} fix the tile sizes for dimensions
+        whose factorization is dictated by the architecture.
+        For instance, constraining $Q = 10$ at the DRAM level and
+        $Z_i = 16$ at the spatial row level leaves only one valid
+        factor allocation for those dimensions, eliminating an
+        exponential number of invalid candidates.
+
+  \item \textbf{Bypass constraints} exclude operand--level
+        combinations that are physically impossible (e.g.,
+        intermediate operands at DRAM), reducing the number of
+        memory-level interactions to evaluate.
+\end{enumerate}
+
+
+The critical point of constraint-based pruning is neither an
+approximation nor a heuristic that might discard high-quality solutions: the
+constraints encode \emph{properties of the hardware} that any valid
+mapping must satisfy.
+The pruned space therefore contains all valid and potentially
+optimal mappings, no feasible solution is lost.

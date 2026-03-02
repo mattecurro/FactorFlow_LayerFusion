@@ -1,0 +1,223 @@
+% ====================================================================
+%  CHAPTER: CONCLUSIONS AND FUTURE WORK
+% ====================================================================
+\chapter{Conclusions}
+\label{ch:conclusions}
+
+% ====================================================================
+%  §1  SUMMARY
+% ====================================================================
+\section{Summary}
+\label{sec:concl-summary}
+
+This thesis explored the complex design space of multi-layer fusion on spatial DNN accelerators.
+To navigate and evaluate this space, the FactorFlow analytical framework was extended to model cascading inter-layer dependencies that govern fused execution. 
+The research encompassed the theoretical modeling, implementation of the model, and validation using
+an hardware architecture specialized for fusion \cite{goetschalckx2023depfin}, followed by an experimental evaluation. 
+To quantify the inherent performance and energy trade-offs, the evaluation systematically analyzed
+modified DepFiN-Like and Eyeriss-Like spatial architectures across both activation-dominant
+and weight-dominant CNN workloads (FSRCNN, MC-CNN, VGG16, ResNet18). The study compared three execution
+strategies (full fusion, partial fusion, and standard single-layer execution) across two distinct
+hardware-sizing scenarios (Scenario~A and Scenario~B). This section recapitulates the key findings along
+two primary axes: the empirical trade-offs of layer fusion as an execution strategy, and the theoretical 
+contribution of the formalized analytical model in making this design space navigable.
+
+% ------------------------------------------------------------------
+\subsection{Formalizing and Exploring the Fused Design Space}
+\label{sec:concl-design-space-impact}
+
+A primary contribution of this thesis is the formalization of the complex design space inherent to multi-layer fused scheduling. The transition from single-layer to fused execution is not a mere linear concatenation of operations, but a proliferation of loop dimensions that fundamentally alters the mapping problem. 
+
+\paragraph{Defining Dimension Proliferation and Residency.}
+This work accurately models the on-chip residency of data during fusion by establishing five distinct operand categories: inputs, weights, intermediate outputs, intermediate inputs, and final outputs. This precise categorization is essential for formalizing the memory-level bypass rules, effectively governing whether intermediate activations are buffered for inter-layer reuse or evicted. 
+
+\paragraph{Managing Cascading Dependencies.}
+Fusion introduces strict cascading dependencies between layers. The choice of an outermost output tile dictates the required intermediate tile sizes of all preceding layers due to the accumulation of filter affine dimension. The framework translates these dataflow restrictions into exact mathematical constraints, allowing for a precise characterization of the reuse-recompute trade-off.
+
+\paragraph{Sizing and pruning the new Search Space.}
+Unconstrained, the compounding permutations of a fused loop nest cause the map-space to explode to intractable scales, exceeding $10^{515}$ possible configurations for a 11-layer architecture. Unguided exploration of such a space has effectively zero probability of discovering valid, high-quality mappings. By implementing rigorous constraint-based pruning, this work dynamically eliminates structurally invalid configurations that violate hardware dataflow, spatial factorization, or memory capacity limits. 
+
+
+% ------------------------------------------------------------------
+\subsection{Impact of Layer Fusion}
+\label{sec:concl-fusion-impact}
+
+The central premise of layer fusion is that eliminating the
+intermediate-activation round-trips through external memory can
+reduce both energy and latency.
+The experiments confirm part of this premise and, equally
+importantly, reveal its boundaries: the outcome depends on the
+workload's activation-to-weight traffic ratio, the architecture's
+memory organization, and the per-access energy cost of DRAM.
+
+\paragraph{DRAM traffic reduction.}
+Full fusion achieves its objective of reducing DRAM traffic, it is reduced
+by $25$--$95\%$ depending on the workload ($94.8\%$ for FSRCNN,
+$85.3\%$ for MC-CNN, $59.9\%$ for VGG16, $25.1\%$ for ResNet18).
+Activation-dominant workloads benefit the most because their
+intermediate activations constitute the overwhelming majority of
+off-chip traffic in single-layer mode.
+These reductions are identical across the two architectures because
+the DRAM access pattern is determined by the tiling of the mapping,
+and we use the same tile sizes on both architectures for fairness
+of evaluation.
+
+\paragraph{Latency benefit.}
+The DRAM-traffic reduction translates into substantial latency
+improvements for activation-dominant workloads: $42$--$48\%$ on
+DepFiN and $16$--$46\%$ on Eyeriss.
+For weight-dominant workloads the results depend on the
+architecture.
+On Eyeriss, full fusion still reduces latency ($7.8$--$21.2\%$),
+because the distributed per-PE register architecture avoids a
+single shared-memory contention point for all layers' weights.
+On DepFiN, however, full fusion is \emph{slower} than single-layer
+execution (up to $30.3\%$ latency increase for ResNet18) because
+the very large shared weight memory (10.7--14.4\,MB) creates a
+bandwidth bottleneck that outweighs the DRAM savings.
+Partial (pairwise) fusion captures $87$--$103\%$ of the full-fusion
+latency benefit, indicating that nearly all the inter-layer traffic
+saving is realized by fusing just two consecutive layers at a time.
+
+\paragraph{Energy: a workload-dependent and architecture-dependent outcome.}
+Unlike the simpler narrative of ``fusion always increases energy,''
+the outcome depends critically on the interplay between the DRAM
+energy saved and the on-chip memory overhead incurred, and
+consequently on the DRAM per-access energy cost assumed in the
+model.
+At the 160\,pJ\,/\,byte DRAM cost used in this work
+(Section~\ref{sec:energy-model}), the results split along workload
+type and architecture:
+
+\begin{itemize}
+  \item On \textbf{DepFiN}, full fusion is energy-beneficial for
+        activation-dominant workloads: FSRCNN single-layer energy is
+        $4.38\times$ the full-fusion value, and MC-CNN is
+        $1.73\times$.
+        The eliminated DRAM traffic is so massive that the on-chip overhead is
+        outweighed by the DRAM savings.
+  \item For weight-dominant workloads on DepFiN, the picture
+        reverses: VGG16 single-layer energy is only $7.4\%$ of the
+        full-fusion value, and ResNet18 is $17.3\%$.
+        Fusion requires weight memories of 14.4\,MB (VGG16) or
+        10.7\,MB (ResNet18), whose per-access energy compounds
+        across billions of MACs, far exceeding the DRAM savings.
+  \item On \textbf{Eyeriss}, full fusion is roughly energy-neutral
+        for FSRCNN ($0.985\times$\,full) and energy-adverse for all
+        other workloads (MC-CNN single costs $45\%$ of full, VGG16
+        costs $5.9\%$, ResNet18 costs $12.6\%$).
+        The replicated per-PE register architecture amplifies the
+        on-chip energy: with 16\,384~PEs for VGG16, the aggregate
+        weight register capacity is $19.7$,M~bytes ($1{,}200$ $\times$ $16{,}384$), each register access contributing to
+        per-access energy.
+\end{itemize}
+
+\noindent
+A lower DRAM energy cost would reduce the benefit of eliminating
+DRAM traffic and shift the balance further against fusion; a higher
+DRAM cost would extend fusion's energy advantage to more
+workload--architecture combinations.
+The success of fusion is therefore sensitive to the DRAM
+
+\paragraph{Energy--Delay Product.}
+When energy and latency are combined into the EDP metric, full
+fusion wins in three of the eight architecture--workload
+combinations: FSRCNN on DepFiN ($6.44\times$ single/full), MC-CNN
+on DepFiN ($2.31\times$), and FSRCNN on Eyeriss ($1.75\times$).
+In all three, the activation-dominant nature of the workload
+ensures that both energy and latency favor fusion, amplifying the
+EDP advantage.
+For the remaining five combinations, single-layer execution is the
+more efficient choice, with the weight-dominant workloads showing
+particularly unfavorable ratios (VGG16 on Eyeriss:
+$0.074\times$; ResNet18 on DepFiN: $0.073\times$).
+
+This result clarifies the role of layer fusion:
+\emph{fusion is primarily a latency optimization whose energy
+trade-off is workload-dependent}.
+Its benefit grows with the activation-to-weight traffic ratio and
+diminishes as the on-chip memory overhead increases.
+Whether the trade-off is acceptable depends on the design priority,
+the workload class, and the external memory technology:
+energy-constrained
+systems or weight-dominant workloads should favor single-layer
+execution.
+
+\paragraph{Partial fusion as a practical compromise.}
+Partial fusion consistently captures most of the latency benefit
+while reducing the memory and energy cost.
+In Scenario~B, sizing the architecture for pairwise rather than
+full fusion reduced the weight memory size up to $3.1\times$ on DepFiN
+(VGG16: 14\,366\,KB${\to}$4\,610\,KB; ResNet18:
+10\,738\,KB${\to}$4\,608\,KB) and the per-PE weight register (WReg)  size on Eyeriss
+(VGG16: 1\,200${\to}$576; ResNet18: 902${\to}$384).
+The latency benefit was almost fully preserved: partial fusion
+captured $96$--$100\%$ of the full-fusion latency saving for
+activation-dominant workloads, and it eliminated or greatly reduced
+the worst-case latency penalty on DepFiN
+($-11.3\% \to +0.8\%$ for VGG16; $-30.3\% \to -7.5\%$ for
+ResNet18).
+The EDP verdict was identical in scope: three of eight
+architecture--workload combinations favored fusion in both
+scenarios.
+For activation-dominant workloads on DepFiN, partial fusion
+won on energy, latency, and EDP simultaneously, making it the
+strictly dominant strategy.
+
+\paragraph{Super-linear scaling of the energy penalty with PE configurations.}
+The experiment on Eyeriss
+(Section~\ref{sec:fusion-fixed-scaling}) revealed that the
+fusion-to-single energy ratio with different PE configuration: it
+\emph{scales super-linearly} with register size.
+Each $2\times$ increase in per-PE WReg raised the ratio by
+$1.5$--$1.9\times$ (ResNet18: $8.0\times \to 11.7\times \to
+19.6\times$; VGG16: $17.0\times \to 28.9\times \to 54.1\times$).
+The growth arises because the fused energy increases with WReg
+(each access touches a larger SRAM structure) while the
+single-layer energy decreases only modestly (the DRAM component is
+PE-count-independent).
+Shrinking the PE array to save area will face a
+proportionally larger WReg and, consequently, a worse
+fusion-to-single energy ratio.
+
+
+
+% ====================================================================
+%  §2  FUTURE WORK
+% ====================================================================
+\section{Future Work}
+\label{sec:concl-future}
+
+While the framework developed in this thesis demonstrates the feasibility of analytical fused-layer mapping evaluation, remaining limitations define clear directions for future research.
+
+% ------------------------------------------------------------------
+\subsection{Automated Mapper for Fused Workloads}
+\label{sec:fw-mapper}
+
+The most impactful limitation in the state of the art is the absence of an automated mapper for multi-layer fused workloads. Currently, fused mappings must be specified manually through the architecture definition file, restricting exploration to expert-guided configurations. 
+
+While the constraint-based pruning developed in this work successfully eliminates physically impossible hardware mappings, the remaining valid map-space is still far too large for exhaustive or simple heuristic searches (such as standard linear or quadratic methods). Extending the existing mapper infrastructure to automatically explore the fused map-space will require the development of aggressive, domain-specific heuristics. These new heuristics must deliberately reduce the search space to achieve computational tractability, which inherently comes at the cost of potentially losing absolute optimal solutions. Designing search algorithms that can intelligently navigate this trade-off, sacrificing guaranteed optimality to reliably find high-efficiency configurations within a reasonable timeframe, is the critical next step to transform this tool into a fully autonomous design-space exploration engine.
+% ------------------------------------------------------------------
+% ------------------------------------------------------------------
+\subsection{Inter-Layer Pipeline Parallelism}
+\label{sec:fw-inter-layer}
+
+The current analytical model enforces strictly sequential, depth-first layer execution: processing tiles sequentially. However, architectures can also exploit \emph{inter-layer pipeline parallelism}, where different layers execute concurrently on spatially partitioned, disjoint subsets of the PE array. Extending the framework to support this paradigm would require formulating a new latency model capable of capturing overlapping execution intervals, pipeline stalls, and inter-partition bandwidth constraints. This extension will broad the class of fused-layer schedules that can be analytically modeled and compared against depth-first approaches.
+
+% ------------------------------------------------------------------
+\subsection{Fine-Grained Modeling of Innermost Dimension-Sum Reuse}
+\label{sec:fw-dimsum}
+
+When two loop dimensions contribute to the same operand index through an affine sum (e.g., $y + r$ in a standard convolution), the current cost model conservatively assumes independent memory accesses. It does not completely capture the data overlap between consecutive iterations of the sliding window within a single spatial tile. This simplification leads to a safe, but over-estimated, count of Memory Operations (MOPs) at the innermost scratchpad levels. Implementing a more fine-grained footprint analysis to account for this sliding-window overlap would yield highly accurate energy estimates. This refinement is particularly important for evaluating workloads featuring large filter dimensions.
+
+% ------------------------------------------------------------------
+\subsection{Computational Scaling via Compiled Systems Languages}
+\label{sec:fw-compiled}
+
+While the current Python-based implementation of our work is highly effective for mathematical prototyping, architectural modeling, and validation, it incurs inherent interpreter overhead. Furthermore, it is constrained by the Global Interpreter Lock (GIL), which precludes true shared-memory multithreading. Transitioning the analytical engine to a compiled, systems-level language (such as C++ or Rust) is a crucial next step. Eliminating these computational bottlenecks and enabling highly parallel, lightweight multithreading is practically mandatory to support the immense number of cost-model evaluations required by the automated heuristic mappers proposed in Section~\ref{sec:fw-mapper}.
+
+% ------------------------------------------------------------------
+\subsection{Joint Optimization with Graph-Level Schedulers}
+\label{sec:fw-graph-level}
+
+This thesis operates strictly at the \emph{dataflow level}, exploring the spatial and temporal mapping of a predetermined set of fused layers. A highly promising complementary direction involves \emph{graph-level} scheduling, determining mathematically \emph{which} layers to fuse and how to optimally partition the neural network graph into distinct fusion segments. Tools such as Optimus address this macro-level partitioning problem. Integrating a graph-level topology scheduler with the fine-grained, constraint-aware analytical dataflow model developed in this work would enable the joint optimization of both the fusion graph and the hardware mapping. 
