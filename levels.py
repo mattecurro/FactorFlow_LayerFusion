@@ -453,6 +453,7 @@ class MemLevel(Level):
         self.out_writes = out_writes    
         # Calculate totals for backward compatibility
         self.w_reads = sum(per_layer_w_reads.values()) if per_layer_w_reads else 0
+        self.w_writes = sum(per_layer_w_writes.values()) if per_layer_w_writes else 0
         self.int_in_reads = sum(per_layer_int_in_reads.values()) if per_layer_int_in_reads else 0
         self.int_in_writes = sum(per_layer_int_in_writes.values()) if per_layer_int_in_writes else 0
         self.int_out_reads = sum(per_layer_int_out_reads.values()) if per_layer_int_out_reads else 0
