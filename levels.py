@@ -15,7 +15,12 @@ if TYPE_CHECKING:
 # to either be used or sent to a level below) during consecutive (thus, innermost) iterations.
 
 """
-Class with the minimal information characterizing a level's mapping.
+NOTE: the hierarchy is read just as the architecture is specified, with
+"below" levels being closer to the computation and "above" ones closer
+to DRAM or slower memories.
+
+
+Class with the minimal information characterizing a level's mapping (dataflow, factors, tile_sizes).
 """
 class LevelCore:
     # IMPORTANT:
@@ -24,7 +29,7 @@ class LevelCore:
     dataflow : list[str] # order of the loops | e.g. ['M', 'K', 'N']
     dataflow_per_layer : dict[int, str]
     factors : Factors # iterations done for the dimensions at this level
-    tile_sizes : Shape # indicate the size of a tile used in the level BELOW
+    tile_sizes : Shape # indicate the size of a tile used in the level BELOW (closer to PEs)
     # NOTE: also, this is the data sent inward at each iterations
     # NOTE: tile sizes are, in other words, the number of elements jumped
     #       by one iteration at this level an any dimension
@@ -37,31 +42,13 @@ class LevelCore:
     # NOTE: tile sizes are updated in "moveFactor"
     
     def __init__(self, dataflow : list[str], factors : Factors, tile_sizes : Shape):
-        # DEBUG print("CIAO Initializing LevelCore...")
         self.dataflow = dataflow
         self.dataflow_per_layer = {}
         for layer_id in range(self.arch.coupling.getNumLayers()):
-            if layer_id == 0:
-                layer_relevant_dims = (
-                    set(self.arch.coupling.getFlatInputCoupling()) |
-                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                    set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                )
-            elif layer_id == self.arch.coupling.getNumLayers() - 1:
-                layer_relevant_dims = (
-                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                    set(self.arch.coupling.getFlatOutputCoupling()) |
-                    set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
-                )
-            else:
-                layer_relevant_dims = (
-                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                    set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) |
-                    set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                )
+            layer_relevant_dims = self.arch.coupling.relevantDimsForLayer(layer_id)
             self.dataflow_per_layer[layer_id] = [
                 dim for dim in dataflow if dim in layer_relevant_dims
-            ]                  
+            ]
         self.tile_sizes = tile_sizes
     
     def __str__(self) -> str:
@@ -69,10 +56,6 @@ class LevelCore:
 
 """
 Abstract class representing a level of the accelerator's architecture.
-
-NOTE: the hierarchy is read just as the architecture is specified, with
-"below" levels being closer to the computation and "above" ones closer
-to DRAM or slower memories.
 """
 class Level(LevelCore):
     name : str
@@ -106,7 +89,7 @@ class Level(LevelCore):
 
     """
     Returns True iif factors present on this level satisfy all of its constraints.
-    """
+    """ 
     ## aggiungere constraints
     def checkFactorsConstraints(self) -> bool:
         # NOTE: full condition kept for readability:
@@ -471,6 +454,7 @@ class MemLevel(Level):
         # Calculate totals for backward compatibility
         self.w_reads = sum(per_layer_w_reads.values()) if per_layer_w_reads else 0
         self.int_in_reads = sum(per_layer_int_in_reads.values()) if per_layer_int_in_reads else 0
+        self.int_in_writes = sum(per_layer_int_in_writes.values()) if per_layer_int_in_writes else 0
         self.int_out_reads = sum(per_layer_int_out_reads.values()) if per_layer_int_out_reads else 0
         self.int_out_writes = sum(per_layer_int_out_writes.values()) if per_layer_int_out_writes else 0
         
@@ -493,6 +477,7 @@ class MemLevel(Level):
             self.last_per_layer_int_out_writes = last_per_layer_int_out_writes.copy()
 
     """
+    NOTE:
     Fill	DOWN ↓	Data written TO this level FROM the level above (e.g., DRAM → FeatureMemory)
     Drain	UP ↑	Data read FROM this level TO the level above (e.g., FeatureMemory → DRAM)
     Read	DOWN ↓	Data read FROM this level TO the level below (e.g., FeatureMemory → Compute)
@@ -593,6 +578,8 @@ class MemLevel(Level):
         else: 
             return self.getRead()
 
+
+    """ The if for "FeatureMemory" is for a special case of DepFin feature shifter. """
     def getReadPerLayerTotal(self, layer_id) -> int:
         if self.arch.coupling.getNumLayers() > 1:
             if layer_id == 0:
@@ -818,26 +805,9 @@ class MemLevel(Level):
         if self.arch.coupling.getNumLayers() > 1:
           for layer_id in range(self.arch.coupling.getNumLayers()):
             # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
-            if layer_id == 0:
-                layer_relevant_dims = (
-                    set(self.arch.coupling.getFlatInputCoupling()) |
-                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                    set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                )            
-            elif layer_id == self.arch.coupling.getNumLayers() - 1:
-                layer_relevant_dims = (
-                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                    set(self.arch.coupling.getFlatOutputCoupling()) |
-                    set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
-                )
-            else:
-                layer_relevant_dims = (
-                    set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                    set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id  - 1)) |
-                    set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                )
+            layer_relevant_dims = self.arch.coupling.relevantDimsForLayer(layer_id)
             actual_dataflow_per_layer[layer_id] = [
-                dim for dim in actual_dataflow 
+                dim for dim in actual_dataflow
                 if dim in layer_relevant_dims
             ]
             vprint(f"actual_dataflow_per_layer[{layer_id}]: {actual_dataflow_per_layer[layer_id]}")
@@ -1190,26 +1160,9 @@ class MemLevel(Level):
                         if self.arch.coupling.getNumLayers() > 1:        
                             for layer_id in range(self.arch.coupling.getNumLayers()):
                                 # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
-                                if layer_id == 0:
-                                    layer_relevant_dims = (
-                                        set(self.arch.coupling.getFlatInputCoupling()) |
-                                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                                    )
-                                elif layer_id == self.arch.coupling.getNumLayers() - 1:
-                                    layer_relevant_dims = (
-                                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                                        set(self.arch.coupling.getFlatOutputCoupling()) |
-                                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
-                                    )
-                                else:
-                                    layer_relevant_dims = (
-                                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) |
-                                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                                    )
+                                layer_relevant_dims = self.arch.coupling.relevantDimsForLayer(layer_id)
                                 actual_dataflow_per_layer_bp[layer_id] = [
-                                    dim for dim in actual_dataflow_bp 
+                                    dim for dim in actual_dataflow_bp
                                     if dim in layer_relevant_dims
                                 ]
                         else:
@@ -1907,7 +1860,7 @@ class FanoutLevel(SpatialLevel):
                 if layer_id in per_layer_int_out_writes:
                     for dim_sum in int_out_coupling:
                         if len(dim_sum) > 1:
-                            strides = [self.arch.getIntermediateOutputStrides(dim, layer_id) for dim in dim_sum]
+                            strides = [self.arch.getIntermediateOutputStride(dim, layer_id) for dim in dim_sum]
                             per_layer_int_out_writes[layer_id] //= distinct_values([self.tile_sizes[dim] for dim in dim_sum], strides)
                             per_layer_int_out_writes[layer_id] *= distinct_values([self.factors.dimProduct(dim)*self.tile_sizes[dim] for dim in dim_sum], strides)
                         else:
@@ -1926,26 +1879,9 @@ class FanoutLevel(SpatialLevel):
         if self.arch.coupling.getNumLayers() > 1:
             for layer_id in range(self.arch.coupling.getNumLayers()):
                 # For each layer, filter dimensions that have loops > 1 AND are relevant to that layer
-                if layer_id == 0:
-                    layer_relevant_dims = (
-                        set(self.arch.coupling.getFlatInputCoupling()) |
-                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                    )                       
-                elif layer_id == self.arch.coupling.getNumLayers() - 1:
-                    layer_relevant_dims = (
-                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatOutputCoupling()) |
-                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id-1)) 
-                    )
-                else:
-                    layer_relevant_dims = (
-                        set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id)) |
-                        set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                    )
+                layer_relevant_dims = self.arch.coupling.relevantDimsForLayer(layer_id)
                 dataflow_per_layer[layer_id] = [
-                    dim for dim in self.dataflow 
+                    dim for dim in self.dataflow
                     if dim in layer_relevant_dims
                 ]
         else:
@@ -2139,25 +2075,8 @@ class ComputeLevel(SpatialLevel):
         layer_factors_product = 1
         
         # Get the relevant dimensions for this layer
-        if layer_id == 0:
-            layer_relevant_dims = (
-                set(self.arch.coupling.getFlatInputCoupling()) |
-                set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-            )
-        elif layer_id == self.arch.coupling.getNumLayers() - 1:
-            layer_relevant_dims = (
-                set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                set(self.arch.coupling.getFlatOutputCoupling()) |
-                set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id - 1))
-            )
-        else:
-            layer_relevant_dims = (
-                set(self.arch.coupling.getFlatWeightCoupling(layer_id)) |
-                set(self.arch.coupling.getFlatIntermediateInputCoupling(layer_id - 1)) |
-                set(self.arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-            )
-        
+        layer_relevant_dims = self.arch.coupling.relevantDimsForLayer(layer_id)
+
         # Calculate the product of factors only for dimensions relevant to this layer
         for dim in self.dataflow:
             if dim in layer_relevant_dims:

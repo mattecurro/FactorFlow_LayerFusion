@@ -57,24 +57,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
         dataflow_per_layer = {}
         if num_layers > 1:
             for layer_idx in range(num_layers):
-                if layer_idx == 0:
-                    layer_relevant_dims = (
-                        set(arch.coupling.getFlatInputCoupling()) |
-                        set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                        set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-                    )
-                elif layer_idx == num_layers - 1:
-                    layer_relevant_dims = (
-                        set(arch.coupling.getFlatOutputCoupling()) |
-                        set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                        set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1))
-                    )
-                else:
-                    layer_relevant_dims = (
-                        set(arch.coupling.getFlatIntermediateInputCoupling(layer_idx - 1)) |
-                        set(arch.coupling.getFlatWeightCoupling(layer_idx))|
-                        set(arch.coupling.getFlatIntermediateOutputCoupling(layer_idx))
-                    )
+                layer_relevant_dims = arch.coupling.relevantDimsForLayer(layer_idx)
                 dataflow_per_layer[layer_idx] = [dim for dim in level.dataflow if dim in layer_relevant_dims]
         else:
             dataflow_per_layer[0] = level.dataflow.copy()
@@ -245,19 +228,7 @@ def updateStats(arch : Arch, bias_read : bool) -> tuple[float, int]:
                     # spatial reuse of an operand occurs if the fanout is along a dimension not coupled to such operand,
                     # hence, the operand is read once, but written once per instance (modeled by last_XX_reads)
                     # TODO: add NoC modeling and accumulate data transfer energy here!
-                    layer_relevant_dims = set()
-                    if layer_id == 0:
-                        layer_relevant_dims = set(arch.coupling.getFlatInputCoupling()) | \
-                                            set(arch.coupling.getFlatWeightCoupling(layer_id)) | \
-                                            set(arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
-                    elif layer_id == num_layers - 1:
-                        layer_relevant_dims = set(arch.coupling.getFlatIntermediateInputCoupling(layer_id - 1)) | \
-                                            set(arch.coupling.getFlatWeightCoupling(layer_id)) | \
-                                            set(arch.coupling.getFlatOutputCoupling())
-                    else:
-                        layer_relevant_dims = set(arch.coupling.getFlatIntermediateInputCoupling(layer_id - 1)) | \
-                                            set(arch.coupling.getFlatWeightCoupling(layer_id)) | \
-                                            set(arch.coupling.getFlatIntermediateOutputCoupling(layer_id))
+                    layer_relevant_dims = arch.coupling.relevantDimsForLayer(layer_id)
                     actual_dataflow_per_layer[layer_id] = [
                         dim for dim in level.dataflow
                         if dim in layer_relevant_dims

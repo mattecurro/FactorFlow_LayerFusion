@@ -452,6 +452,32 @@ class Coupling:
         """Returns the number of layers in this coupling."""
         return len(self.w_coupling)
 
+    """
+    Returns the set of dimensions relevant to the given layer in a (possibly fused)
+    multi-layer coupling. A layer reads its input (the network input for the first
+    layer, otherwise the previous layer's intermediate output) and its weights, and
+    writes its output (the network output for the last layer, otherwise its own
+    intermediate output); only the dimensions of those tensors matter for it.
+    The result depends only on the (immutable) coupling, so it is memoized.
+    """
+    def relevantDimsForLayer(self, layer_index : int) -> set[str]:
+        cache = self.__dict__.setdefault("_relevant_dims_cache", {})
+        if layer_index not in cache:
+            if layer_index == 0:
+                dims = (set(self.getFlatInputCoupling()) |
+                        set(self.getFlatWeightCoupling(layer_index)) |
+                        set(self.getFlatIntermediateOutputCoupling(layer_index)))
+            elif layer_index == self.getNumLayers() - 1:
+                dims = (set(self.getFlatWeightCoupling(layer_index)) |
+                        set(self.getFlatOutputCoupling()) |
+                        set(self.getFlatIntermediateInputCoupling(layer_index - 1)))
+            else:
+                dims = (set(self.getFlatWeightCoupling(layer_index)) |
+                        set(self.getFlatIntermediateInputCoupling(layer_index - 1)) |
+                        set(self.getFlatIntermediateOutputCoupling(layer_index)))
+            cache[layer_index] = dims
+        return cache[layer_index]
+
 
     """Returns the input strides."""
     def getInputStrides(self) -> dict[str, str]:
